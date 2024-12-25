@@ -3,7 +3,7 @@ name = "jam"
 version = "0.0.1"
 description = "Simple and univirsal library for authorization"
 authors = ["Makridenko Adrian <adrian.makridenko@proton.me>"]
-license = "MIT license"
+license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
