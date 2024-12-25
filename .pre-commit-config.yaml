@@ -1,0 +1,17 @@
+repos:
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
+    hooks:
+    - id: flake8
+      args: [--config=setup.cfg]
+  - repo: https://github.com/ambv/black
+    rev: 22.6.0
+    hooks:
+    - id: black
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        name: isort
+        entry: isort
+        types: [python]

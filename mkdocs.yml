@@ -1,0 +1,5 @@
+site_name: Jam
+site_url: https://jam.makridenko.ru
+
+theme:
+  name: material
