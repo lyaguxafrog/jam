@@ -5,6 +5,8 @@ description = "Simple and univirsal library for authorization"
 authors = ["Makridenko Adrian <adrian.makridenko@proton.me>"]
 license = "MIT"
 readme = "README.md"
+homepage = "https://jam.makridenko.ru"
+repository = "https://github.com/lyaguxafrog/jam
 
 [tool.poetry.dependencies]
 python = "^3.13"
