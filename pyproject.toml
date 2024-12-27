@@ -10,6 +10,7 @@ repository = "https://github.com/lyaguxafrog/jam"
 
 [tool.poetry.dependencies]
 python = "^3.13"
+pydantic = "^2.10.4"
 
 [tool.poetry.group.dev.dependencies]
 pretty-errors = "^1.2.25"
