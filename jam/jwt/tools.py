@@ -8,9 +8,13 @@ import secrets
 import time
 
 from jam.config import JAMConfig
+from jam.jwt.__errors__ import JamNullJWTSecret as NullSecret
 
 
 def __gen_access_token__(config: JAMConfig, payload: dict) -> str:
+
+    if not config.JWT_ACCESS_SECRET_KEY:
+        raise NullSecret(message="JWT_ACCESS_SECRET_KEY is null")
 
     __payload__: dict = {
         "data": payload,
@@ -46,6 +50,9 @@ def __gen_access_token__(config: JAMConfig, payload: dict) -> str:
 
 
 def __gen_refresh_token__(config: JAMConfig, payload: dict) -> str:
+
+    if not config.JWT_REFRESH_SECRET_KEY:
+        raise NullSecret(message="JWT_REFRESH_TOKEN is null")
 
     __payload__: dict = {
         "data": payload,
