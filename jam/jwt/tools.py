@@ -12,6 +12,17 @@ from jam.jwt.__errors__ import JamNullJWTSecret as NullSecret
 
 
 def __gen_access_token__(config: JAMConfig, payload: dict) -> str:
+    """
+    Private tool for generating access token
+
+    :param config: Standart jam confg
+    :type config: jam.config.JAMConfig
+    :param payload: Custom user payload
+    :type payload: dict
+
+    :returns: Returns access token by string
+    :rtype: str
+    """
 
     if not config.JWT_ACCESS_SECRET_KEY:
         raise NullSecret(message="JWT_ACCESS_SECRET_KEY is null")
@@ -50,6 +61,17 @@ def __gen_access_token__(config: JAMConfig, payload: dict) -> str:
 
 
 def __gen_refresh_token__(config: JAMConfig, payload: dict) -> str:
+    """
+    Private tool for generating refresh token
+
+    :param config: Standart jam config
+    :type config: jam.config.JAMConfig
+    :param payload: Custom user payload
+    :type payload: dict
+
+    :returns: Returns refresh roken by string
+    :type: str
+    """
 
     if not config.JWT_REFRESH_SECRET_KEY:
         raise NullSecret(message="JWT_REFRESH_TOKEN is null")
