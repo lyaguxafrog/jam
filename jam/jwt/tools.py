@@ -8,6 +8,7 @@ import secrets
 import time
 
 from jam.config import JAMConfig
+from jam.jwt.__errors__ import JamJWTMakingError as JWTError
 from jam.jwt.__errors__ import JamNullJWTSecret as NullSecret
 
 
@@ -108,3 +109,41 @@ def __gen_refresh_token__(config: JAMConfig, payload: dict) -> str:
         f"{encoded_header}.{encoded_payload}.{encoded_signature}"
     )
     return refresh_token
+
+
+def gen_jwt_tokens(config: JAMConfig, payload: dict = {}) -> dict:
+    """
+    Service for generating JWT tokens
+
+    Example:
+    ```
+    config = JAMConfig(
+        JWT_ACCESS_SECRET_KEY="SOME_SUPER_SECRET_KEY",
+        JWT_REFRESH_SECRET_KEY="ANOTHER_SECRET_KEY"
+    )
+
+    payload: dict = {
+        "id": 1,
+        "username": "lyaguxafrog"
+    }
+
+    tokens: dict = gen_jwt_tokens(config, payload)
+    ```
+
+    :param config: Standart jam config
+    :type config: jam.config.JAMConfig
+    :param payload: Custom user payload
+    :type payload: dict
+
+    :returns: Dict with access and refresh tokens
+    :rtype: dict
+    """
+
+    try:
+        access: str = __gen_access_token__(config, payload)
+        refresh: str = __gen_refresh_token__(config, payload)
+
+    except Exception as e:
+        raise JWTError(message=e)
+
+    return {"access": access, "refresh": refresh}

@@ -4,3 +4,8 @@
 class JamNullJWTSecret(Exception):
     def __init__(self, message="Secret keys cannot be Null") -> None:
         self.message = message
+
+
+class JamJWTMakingError(Exception):
+    def __init__(self, message) -> None:
+        self.message = message
