@@ -50,7 +50,7 @@ def __gen_refresh_token__(config: JAMConfig, payload: dict) -> str:
     __payload__: dict = {
         "data": payload,
         "exp": time.time() + config.JWT_REFRESH_EXP,
-        "jit": secrets.token_hex(16),
+        "jti": secrets.token_hex(16),
     }
 
     encoded_header: str = (
