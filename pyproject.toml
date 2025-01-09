@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "jam"
-version = "0.0.1"
+version = "0.0.2"
 description = "Simple and univirsal library for authorization"
-authors = ["Makridenko Adrian <adrian.makridenko@proton.me>"]
+authors = ["Makridenko Adrian <adrianmakridenko@duck.com>"]
 license = "MIT"
 readme = "README.md"
 homepage = "https://jam.makridenko.ru"
