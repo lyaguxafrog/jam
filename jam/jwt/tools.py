@@ -14,7 +14,7 @@ def __gen_access_token__(config: JAMConfig, payload: dict) -> str:
 
     __payload__: dict = {
         "data": payload,
-        "exp": time.time() + config.JWT_ACCESS_EXP,
+        "exp": int(time.time()) + config.JWT_ACCESS_EXP,
     }
 
     encoded_header: str = (
@@ -49,7 +49,7 @@ def __gen_refresh_token__(config: JAMConfig, payload: dict) -> str:
 
     __payload__: dict = {
         "data": payload,
-        "exp": time.time() + config.JWT_REFRESH_EXP,
+        "exp": int(time.time()) + config.JWT_REFRESH_EXP,
         "jti": secrets.token_hex(16),
     }
 
