@@ -6,8 +6,9 @@ from pydantic_settings import BaseSettings
 
 
 class JAMConfig(BaseSettings):
-    JWT_SECRET_KEY: str
-    ALGHORYTM: Literal[
+    JWT_ACCESS_SECRET_KEY: str | None = None
+    JWT_REFRESH_SECRET_KEY: str | None = JWT_ACCESS_SECRET_KEY
+    JWT_ALGORITHM: Literal[
         "HS256",
         "HS384",
         "HS512",
@@ -19,7 +20,9 @@ class JAMConfig(BaseSettings):
         "ES512",
         "PS256",
         "PS384",
-        "PS512"
+        "PS512",
     ] = "HS256"
 
-    HEADERS: dict
+    JWT_ACCESS_EXP: int = 3600
+    JWT_REFRESH_EXP: int = JWT_ACCESS_EXP
+    JWT_HEADERS: dict = {}
