@@ -10,6 +10,7 @@ import time
 from jam.config import JAMConfig
 from jam.jwt.__errors__ import JamJWTMakingError as JWTError
 from jam.jwt.__errors__ import JamNullJWTSecret as NullSecret
+from jam.jwt.types import Tokens
 
 
 def __gen_access_token__(config: JAMConfig, payload: dict) -> str:
@@ -111,7 +112,7 @@ def __gen_refresh_token__(config: JAMConfig, payload: dict) -> str:
     return refresh_token
 
 
-def gen_jwt_tokens(config: JAMConfig, payload: dict = {}) -> dict:
+def gen_jwt_tokens(config: JAMConfig, payload: dict = {}) -> Tokens:
     """
     Service for generating JWT tokens
 
@@ -127,7 +128,7 @@ def gen_jwt_tokens(config: JAMConfig, payload: dict = {}) -> dict:
         "username": "lyaguxafrog"
     }
 
-    tokens: dict = gen_jwt_tokens(config, payload)
+    tokens = gen_jwt_tokens(config, payload)
     ```
 
     :param config: Standart jam config
@@ -135,8 +136,8 @@ def gen_jwt_tokens(config: JAMConfig, payload: dict = {}) -> dict:
     :param payload: Custom user payload
     :type payload: dict
 
-    :returns: Dict with access and refresh tokens
-    :rtype: dict
+    :returns: Base model with access and refresh tokens
+    :rtype: jam.jwt.types.Tokens
     """
 
     try:
@@ -146,4 +147,4 @@ def gen_jwt_tokens(config: JAMConfig, payload: dict = {}) -> dict:
     except Exception as e:
         raise JWTError(message=e)
 
-    return {"access": access, "refresh": refresh}
+    return Tokens(access=access, refresh=refresh)
