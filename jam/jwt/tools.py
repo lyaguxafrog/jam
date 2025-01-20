@@ -148,3 +148,38 @@ def gen_jwt_tokens(config: JAMConfig, payload: dict = {}) -> Tokens:
         raise JWTError(message=e)
 
     return Tokens(access=access, refresh=refresh)
+
+
+def decode_token(*, config: JAMConfig, token: str) -> dict:
+    """
+    Service for decoding JWT token
+
+    :param config: Base jam config
+    :type config: jam.config.JAMConfig
+    :param token: Some jwt token
+    :type token: str
+
+    :retutns: Dict with information in token
+    :rtype: dict
+    """
+
+    # NOTE: for checksum
+    __ACESS_KEY__: str = config.JWT_ACCESS_SECRET_KEY  # noqa
+    __REFRESH_KEY__: str = config.JWT_REFRESH_SECRET_KEY  # noqa
+
+    if not config.JWT_ACCESS_SECRET_KEY or not config.JWT_REFRESH_SECRET_KEY:
+        raise NullSecret
+
+    try:
+        header, payload, signature = token.split(".")
+    except ValueError:
+        raise ValueError(
+            "Invalid token format. Token must have three parts separated by '.'"
+        )
+
+    try:
+        padding = "=" * (4 - len(payload) % 4)
+        decoded_payload = base64.urlsafe_b64decode(payload + padding)
+        return json.loads(decoded_payload)
+    except (ValueError, json.JSONDecodeError) as e:
+        raise ValueError("Failed to decode the payload: " + str(e))
