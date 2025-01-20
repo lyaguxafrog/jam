@@ -6,11 +6,30 @@ import hmac
 import json
 import secrets
 import time
+from typing import Literal
 
 from jam.config import JAMConfig
 from jam.jwt.__errors__ import JamJWTMakingError as JWTError
 from jam.jwt.__errors__ import JamNullJWTSecret as NullSecret
 from jam.jwt.types import Tokens
+
+
+def __check_secrets__(config: JAMConfig) -> bool:
+    """
+    Private tool for check secrets in confg
+
+    :param config: Base jam config
+    :type config: jam.config.JAMConfig
+
+    :returns: True if secrets in config
+    :rtype: bool
+    """
+
+    if not config.JWT_ACCESS_SECRET_KEY or not config.JWT_REFRESH_SECRET_KEY:
+        raise NullSecret
+
+    else:
+        return True
 
 
 def __gen_access_token__(config: JAMConfig, payload: dict) -> str:
@@ -112,7 +131,7 @@ def __gen_refresh_token__(config: JAMConfig, payload: dict) -> str:
     return refresh_token
 
 
-def gen_jwt_tokens(config: JAMConfig, payload: dict = {}) -> Tokens:
+def gen_jwt_tokens(*, config: JAMConfig, payload: dict = {}) -> Tokens:
     """
     Service for generating JWT tokens
 
@@ -179,7 +198,58 @@ def decode_token(*, config: JAMConfig, token: str) -> dict:
 
     try:
         padding = "=" * (4 - len(payload) % 4)
-        decoded_payload = base64.urlsafe_b64decode(payload + padding)
+        decoded_payload: bytes = base64.urlsafe_b64decode(payload + padding)
         return json.loads(decoded_payload)
     except (ValueError, json.JSONDecodeError) as e:
         raise ValueError("Failed to decode the payload: " + str(e))
+
+
+def check_jwt_signature(
+    *, config: JAMConfig, token_type: Literal["access", "refresh"], token: str
+) -> bool:
+    """
+    Service for checking JWT signature
+
+    :param config: Base jam config
+    :type config: jam.config.JAMConfig
+    :param token: JWT token
+    :type token: str
+    :param key_type: Type of JWT key ( access token or refresh token )
+    :type key_type: str
+
+    :returns: Bool with signature status
+    :rtype: bool
+    """
+
+    if token_type == "access":
+        secret_key: str = config.JWT_ACCESS_SECRET_KEY
+
+    elif token_type == "refresh":
+        secret_key: str = config.JWT_REFRESH_SECRET_KEY
+
+    else:
+        raise ValueError("Invalid key type. Must be 'access' or 'refresh'.")
+
+    if not secret_key:
+        raise NullSecret("The specified secret key is missing.")
+
+    try:
+        header, payload, signature = token.split(".")
+    except ValueError:
+        raise ValueError(
+            "Invalid token format. Token must have three parts separated by '.'"
+        )
+
+    data_to_sign = f"{header}.{payload}".encode("utf-8")
+
+    expected_signature = (
+        base64.urlsafe_b64encode(
+            hmac.new(
+                secret_key.encode("utf-8"), data_to_sign, hashlib.sha256
+            ).digest()
+        )
+        .decode("utf-8")
+        .rstrip("=")
+    )
+
+    return expected_signature == signature
