@@ -1,8 +1,8 @@
 # jam
 
-<div style="border: 1px solid red; padding: 10px; background-color: #f8d7da; color: #721c24;">
-  <strong>CAUTION:</strong> In active development! Cannot be used in real projects!
-</div>
+> [!CAUTION]  
+> In active development! Cannot be used in real projects!
+> 
 
 
 ## Features
