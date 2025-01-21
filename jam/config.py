@@ -6,8 +6,8 @@ from pydantic_settings import BaseSettings
 
 
 class JAMConfig(BaseSettings):
-    JWT_ACCESS_SECRET_KEY: str | None = None
-    JWT_REFRESH_SECRET_KEY: str | None = JWT_ACCESS_SECRET_KEY
+    JWT_ACCESS_SECRET_KEY: str | None
+    JWT_REFRESH_SECRET_KEY: str | None
     JWT_ALGORITHM: Literal[
         "HS256",
         "HS384",
