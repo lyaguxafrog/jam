@@ -4,11 +4,13 @@ import base64
 import hashlib
 import hmac
 import json
+import logging
 import secrets
 import time
 from typing import Literal
 
 from jam.config import JAMConfig
+from jam.jwt.__errors__ import JamInvalidSignature as InvalidSignature
 from jam.jwt.__errors__ import JamJWTMakingError as JWTError
 from jam.jwt.__errors__ import JamNullJWTSecret as NullSecret
 from jam.jwt.types import Tokens
@@ -147,7 +149,7 @@ def gen_jwt_tokens(*, config: JAMConfig, payload: dict = {}) -> Tokens:
         "username": "lyaguxafrog"
     }
 
-    tokens = gen_jwt_tokens(config, payload)
+    tokens = gen_jwt_tokens(config=config, payload=payload)
     ```
 
     :param config: Standart jam config
@@ -169,41 +171,6 @@ def gen_jwt_tokens(*, config: JAMConfig, payload: dict = {}) -> Tokens:
     return Tokens(access=access, refresh=refresh)
 
 
-def decode_token(*, config: JAMConfig, token: str) -> dict:
-    """
-    Service for decoding JWT token
-
-    :param config: Base jam config
-    :type config: jam.config.JAMConfig
-    :param token: Some jwt token
-    :type token: str
-
-    :retutns: Dict with information in token
-    :rtype: dict
-    """
-
-    # NOTE: for checksum
-    __ACESS_KEY__: str = config.JWT_ACCESS_SECRET_KEY  # noqa
-    __REFRESH_KEY__: str = config.JWT_REFRESH_SECRET_KEY  # noqa
-
-    if not config.JWT_ACCESS_SECRET_KEY or not config.JWT_REFRESH_SECRET_KEY:
-        raise NullSecret
-
-    try:
-        header, payload, signature = token.split(".")
-    except ValueError:
-        raise ValueError(
-            "Invalid token format. Token must have three parts separated by '.'"
-        )
-
-    try:
-        padding = "=" * (4 - len(payload) % 4)
-        decoded_payload: bytes = base64.urlsafe_b64decode(payload + padding)
-        return json.loads(decoded_payload)
-    except (ValueError, json.JSONDecodeError) as e:
-        raise ValueError("Failed to decode the payload: " + str(e))
-
-
 def check_jwt_signature(
     *, config: JAMConfig, token_type: Literal["access", "refresh"], token: str
 ) -> bool:
@@ -214,7 +181,7 @@ def check_jwt_signature(
     :type config: jam.config.JAMConfig
     :param token: JWT token
     :type token: str
-    :param key_type: Type of JWT key ( access token or refresh token )
+    :param key_type: Type of JWT ( access token or refresh token )
     :type key_type: str
 
     :returns: Bool with signature status
@@ -253,3 +220,56 @@ def check_jwt_signature(
     )
 
     return expected_signature == signature
+
+
+def decode_token(
+    *,
+    config: JAMConfig,
+    token: str,
+    checksum: bool = False,
+    checksum_token_type: Literal["access", "refresh", None] = None,
+) -> dict:
+    """
+    Service for decoding JWT token
+
+    :param config: Base jam config
+    :type config: jam.config.JAMConfig
+    :param token: Some jwt token
+    :type token: str
+    :param checksum: Use `check_jwt_signature` in decode?
+    :type checksum: bool
+    :param checksum_token_type: Type of JWT ( access or refresh )
+    :type checksum_token_type: str | None
+
+    :retutns: Dict with information in token
+    :rtype: dict
+    """
+
+    if checksum:
+        sum: bool = check_jwt_signature(
+            config=config, token_type=checksum_token_type, token=token
+        )
+        if not sum:
+            raise InvalidSignature
+        else:
+            logging.info("Signature valid")
+            pass
+    else:
+        pass
+
+    if not config.JWT_ACCESS_SECRET_KEY or not config.JWT_REFRESH_SECRET_KEY:
+        raise NullSecret
+
+    try:
+        header, payload, signature = token.split(".")
+    except ValueError:
+        raise ValueError(
+            "Invalid token format. Token must have three parts separated by '.'"
+        )
+
+    try:
+        padding: str = "=" * (4 - len(payload) % 4)
+        decoded_payload: bytes = base64.urlsafe_b64decode(payload + padding)
+        return json.loads(decoded_payload)
+    except (ValueError, json.JSONDecodeError) as e:
+        raise ValueError("Failed to decode the payload: " + str(e))

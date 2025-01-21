@@ -9,3 +9,8 @@ class JamNullJWTSecret(Exception):
 class JamJWTMakingError(Exception):
     def __init__(self, message) -> None:
         self.message = message
+
+
+class JamInvalidSignature(Exception):
+    def __init__(self, message="Invalid signature") -> None:
+        self.message = message
