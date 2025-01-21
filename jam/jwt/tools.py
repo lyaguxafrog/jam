@@ -189,10 +189,10 @@ def check_jwt_signature(
     """
 
     if token_type == "access":
-        secret_key: str = config.JWT_ACCESS_SECRET_KEY
+        secret_key: str | None = config.JWT_ACCESS_SECRET_KEY
 
     elif token_type == "refresh":
-        secret_key: str = config.JWT_REFRESH_SECRET_KEY
+        secret_key: str | None = config.JWT_REFRESH_SECRET_KEY
 
     else:
         raise ValueError("Invalid key type. Must be 'access' or 'refresh'.")
@@ -227,7 +227,7 @@ def decode_token(
     config: JAMConfig,
     token: str,
     checksum: bool = False,
-    checksum_token_type: Literal["access", "refresh", None] = None,
+    checksum_token_type: Literal["access", "refresh"] | None = None,
 ) -> dict:
     """
     Service for decoding JWT token
@@ -247,7 +247,7 @@ def decode_token(
 
     if checksum:
         sum: bool = check_jwt_signature(
-            config=config, token_type=checksum_token_type, token=token
+            config=config, token_type=checksum_token_type, token=token  # type: ignore
         )
         if not sum:
             raise InvalidSignature
