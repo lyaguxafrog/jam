@@ -35,6 +35,8 @@ pytest = "^8.3.4"
 [tool.poetry.group.docs.dependencies]
 mkdocs = "^1.6.1"
 mkdocs-material = "^9.5.50"
+mkdocstrings = "^0.27.0"
+mkdocstrings-python = "^1.13.0"
 
 [tool.flake8]
 ignore = ["D203", "E501"]
