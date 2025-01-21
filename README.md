@@ -1,7 +1,7 @@
 # jam
 
 <div style="border: 1px solid red; padding: 10px; background-color: #f8d7da; color: #721c24;">
-  <strong>CATION:</strong> In active development! Cannot be used in real projects!
+  <strong>CAUTION:</strong> In active development! Cannot be used in real projects!
 </div>
 
 
