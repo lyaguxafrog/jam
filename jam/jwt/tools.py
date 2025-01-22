@@ -10,28 +10,11 @@ import time
 from typing import Literal
 
 from jam.config import JAMConfig
+from jam.jwt.__dev_tools__ import __encode_base64__
 from jam.jwt.__errors__ import JamInvalidSignature as InvalidSignature
 from jam.jwt.__errors__ import JamJWTMakingError as JWTError
 from jam.jwt.__errors__ import JamNullJWTSecret as NullSecret
 from jam.jwt.types import Tokens
-
-
-def __check_secrets__(config: JAMConfig) -> bool:
-    """
-    Private tool for check secrets in confg
-
-    :param config: Base jam config
-    :type config: jam.config.JAMConfig
-
-    :returns: True if secrets in config
-    :rtype: bool
-    """
-
-    if not config.JWT_ACCESS_SECRET_KEY or not config.JWT_REFRESH_SECRET_KEY:
-        raise NullSecret
-
-    else:
-        return True
 
 
 def __gen_access_token__(config: JAMConfig, payload: dict) -> str:
@@ -55,27 +38,18 @@ def __gen_access_token__(config: JAMConfig, payload: dict) -> str:
         "exp": int(time.time()) + config.JWT_ACCESS_EXP,
     }
 
-    encoded_header: str = (
-        base64.urlsafe_b64encode(
-            json.dumps({"alg": config.JWT_ALGORITHM, "typ": "JWT"}).encode()
-        )
-        .decode()
-        .rstrip("=")
+    encoded_header: str = __encode_base64__(
+        json.dumps({"alg": config.JWT_ALGORITHM, "typ": "JWT"}).encode()
     )
-    encoded_payload: str = (
-        base64.urlsafe_b64encode(json.dumps(__payload__).encode())
-        .decode()
-        .rstrip("=")
-    )
+    encoded_payload: str = __encode_base64__(json.dumps(__payload__).encode())
 
     __signature__: bytes = hmac.new(
         config.JWT_ACCESS_SECRET_KEY.encode(),
         f"{encoded_header}.{encoded_payload}".encode(),
         hashlib.sha256,
     ).digest()
-    encoded_signature: str = (
-        base64.urlsafe_b64encode(__signature__).decode().rstrip("=")
-    )
+
+    encoded_signature: str = __encode_base64__(__signature__)
 
     access_token: str = (
         f"{encoded_header}.{encoded_payload}.{encoded_signature}"
@@ -97,7 +71,7 @@ def __gen_refresh_token__(config: JAMConfig, payload: dict) -> str:
     """
 
     if not config.JWT_REFRESH_SECRET_KEY:
-        raise NullSecret(message="JWT_REFRESH_TOKEN is null")
+        raise NullSecret(message="JWT_REFRESH_SECRET_KEY is null")
 
     __payload__: dict = {
         "data": payload,
@@ -105,27 +79,18 @@ def __gen_refresh_token__(config: JAMConfig, payload: dict) -> str:
         "jti": secrets.token_hex(16),
     }
 
-    encoded_header: str = (
-        base64.urlsafe_b64encode(
-            json.dumps({"alg": config.JWT_ALGORITHM, "typ": "JWT"}).encode()
-        )
-        .decode()
-        .rstrip("=")
+    encoded_header: str = __encode_base64__(
+        json.dumps({"alg": config.JWT_ALGORITHM, "typ": "JWT"}).encode()
     )
-    encoded_payload: str = (
-        base64.urlsafe_b64encode(json.dumps(__payload__).encode())
-        .decode()
-        .rstrip("=")
-    )
+    encoded_payload: str = __encode_base64__(json.dumps(__payload__).encode())
 
     __signature__: bytes = hmac.new(
         config.JWT_REFRESH_SECRET_KEY.encode(),
         f"{encoded_header}.{encoded_payload}".encode(),
         hashlib.sha256,
     ).digest()
-    encoded_signature: str = (
-        base64.urlsafe_b64encode(__signature__).decode().rstrip("=")
-    )
+
+    encoded_signature: str = __encode_base64__(__signature__)
 
     refresh_token: str = (
         f"{encoded_header}.{encoded_payload}.{encoded_signature}"
