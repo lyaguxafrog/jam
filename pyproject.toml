@@ -1,5 +1,5 @@
 [project]
-name = "jam"
+name = "jamlib"
 version = "0.0.2-alpha"
 description = "Simple and univirsal library for authorization"
 authors = [
@@ -13,10 +13,20 @@ dependencies = [
     "pydantic-settings (>=2.7.1,<3.0.0)"
 ]
 
+[project.urls]
+Homepage = "https://github.com/lyaguxafrog/jam"
+Repository = "https://github.com/lyaguxafrog/jam"
+Issues = "https://github.com/lyaguxafrog/jam/issues"
+
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+packages = [
+    { include = "jam" },
+]
 
 [tool.poetry.group.dev.dependencies]
 pretty-errors = "^1.2.25"
@@ -37,6 +47,7 @@ mkdocs = "^1.6.1"
 mkdocs-material = "^9.5.50"
 mkdocstrings = "^0.27.0"
 mkdocstrings-python = "^1.13.0"
+
 
 [tool.flake8]
 ignore = ["D203", "E501"]
