@@ -11,6 +11,8 @@ nav:
   - API Docs:
     - Types:
       - Tokens: api/types/tokens.md
+    - Tools:
+      - jwt: api/tools/jwt.md
     - JAMConfig: api/config.md
     - Jam: api/base_instance.md
 
