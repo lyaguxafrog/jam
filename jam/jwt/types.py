@@ -1,16 +1,29 @@
 # -*- coding: utf-8 -*-
 
+from typing import Dict
 
-from pydantic import BaseModel
 
+class tokens:
+    """Output token type"""
 
-class Tokens(BaseModel):
-    """
-    Scop for tokens
+    def __init__(self, access_token: str, refresh_token: str | None) -> None:
+        self.access: str = access_token
+        self.refresh: str | None = refresh_token
 
-    * access: str
-    * refresh: str
-    """
+    def to_dict(self) -> Dict[str, str | None]:
+        """
+        Serializer tokens type to dict
 
-    access: str
-    refresh: str
+        Example:
+        ```python
+
+        token_dict: dict = tokens.to_dict()
+        print(tokens)
+        # {'access': '<access_token>', 'refresh': '<refresh_token>'}
+        ```
+
+        Returns:
+            (Dict[str, str | None]): Dict with access and refresh tokens
+        """
+
+        return {"access": self.access, "refresh": self.refresh}

@@ -12,10 +12,13 @@ from jam.jwt.__dev_tools__ import __gen_access_token__, __gen_refresh_token__
 from jam.jwt.__errors__ import JamInvalidSignature as InvalidSignature
 from jam.jwt.__errors__ import JamJWTMakingError as JWTError
 from jam.jwt.__errors__ import JamNullJWTSecret as NullSecret
-from jam.jwt.types import Tokens
+from jam.jwt.types import tokens
 
 
-def gen_jwt_tokens(*, config: JAMConfig, payload: dict = {}) -> Tokens:
+# TODO: Rewrite docstrings
+
+
+def gen_jwt_tokens(*, config: JAMConfig, payload: dict | None) -> tokens:
     """
     Service for generating JWT tokens
 
@@ -36,14 +39,16 @@ def gen_jwt_tokens(*, config: JAMConfig, payload: dict = {}) -> Tokens:
     refresh_token: str = tokens.refresh
     ```
 
-    :param config: Standart jam config
-    :type config: jam.config.JAMConfig
-    :param payload: Custom user payload
-    :type payload: dict
+    Args:
+        config (JAMConfig): Base jam config class
+        payload (dict | None): Payload with data
 
-    :returns: Base model with access and refresh tokens
-    :rtype: jam.jwt.types.Tokens
+    Returns:
+        (tokens): Tokens type
     """
+
+    if not payload:
+        payload: dict = {}
 
     try:
         access: str = __gen_access_token__(config, payload)
@@ -52,7 +57,7 @@ def gen_jwt_tokens(*, config: JAMConfig, payload: dict = {}) -> Tokens:
     except Exception as e:
         raise JWTError(message=e)
 
-    return Tokens(access=access, refresh=refresh)
+    return tokens(access_token=access, refresh_token=refresh)
 
 
 def check_jwt_signature(
@@ -61,15 +66,17 @@ def check_jwt_signature(
     """
     Service for checking JWT signature
 
-    :param config: Base jam config
-    :type config: jam.config.JAMConfig
-    :param token: JWT token
-    :type token: str
-    :param key_type: Type of JWT ( access token or refresh token )
-    :type key_type: str
+    Args:
+        config (JAMConfig): Base jam config
+        token_type (Literal["access", "refresh"]): Token type
+        token (str): JWT token
 
-    :returns: Bool with signature status
-    :rtype: bool
+    Returns:
+        (bool) Bool
+
+    Raising:
+        ValueError
+        JamNullJWTSecret
     """
 
     if token_type == "access":
