@@ -12,10 +12,10 @@ from jam.jwt.__dev_tools__ import __gen_access_token__, __gen_refresh_token__
 from jam.jwt.__errors__ import JamInvalidSignature as InvalidSignature
 from jam.jwt.__errors__ import JamJWTMakingError as JWTError
 from jam.jwt.__errors__ import JamNullJWTSecret as NullSecret
-from jam.jwt.types import Tokens
+from jam.jwt.types import Tokens  # type: ignore
 
 
-def gen_jwt_tokens(*, config: JAMConfig, payload: dict = {}) -> Tokens:
+def gen_jwt_tokens(*, config: JAMConfig, payload: dict = {}) -> Tokens:  # type: ignore
     """
     Service for generating JWT tokens
 
