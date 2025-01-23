@@ -9,6 +9,8 @@ edit_uri: blob/release/docs/
 nav:
   - Home: index.md
   - API Docs:
+    - Types:
+      - Tokens: api/types/tokens.md
     - JAMConfig: api/config.md
     - Jam: api/base_instance.md
 

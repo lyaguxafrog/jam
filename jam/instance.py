@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from typing import Literal
+
 from jam.config import JAMConfig
-from jam.jwt.tools import gen_jwt_tokens
+from jam.jwt.tools import decode_token, gen_jwt_tokens
 from jam.jwt.types import tokens
 
 
@@ -17,12 +19,38 @@ class Jam:
         """
         Service for generating access and refresh tokend by config
 
-        :param payload: Payload for stacking in token
-        :type payload: dict
+        Args:
+            payload (dict | None): Payload with data
 
-        :returns: Tokens
-        :rtype: jam.jwt.types.tokens
+        Returns:
+            JWT Tokens
         """
 
         jwt_tokens: tokens = gen_jwt_tokens(config=self.config, payload=payload)
         return jwt_tokens
+
+    def jwt_decode_token(
+        self,
+        token: str,
+        checksum: bool = False,
+        token_type: Literal["access", "refresh"] | None = None,
+    ) -> dict:
+        """
+        Method for decode token data
+
+        Args:
+            token (str): Your JWT token
+            checksum (bool): Make `True` if you need to check signature
+            token_type (str): Access or refresh(need while checking sum)
+
+        Returns:
+            (dict): Dict with decoded data
+        """
+
+        decoded: dict = decode_token(
+            config=self.config,
+            token=token,
+            checksum=checksum,
+            checksum_token_type=token_type,
+        )
+        return decoded
