@@ -1,11 +1,6 @@
 name: Run tests
 
 on:
-  push:
-    tags-ignore:
-      - '*'
-    branches:
-      - '*'
   pull_request:
 
 jobs:
