@@ -47,7 +47,7 @@ def __encode_base64__(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).decode().rstrip("=")
 
 
-def __gen_access_token__(config: JAMConfig, payload: dict) -> str:
+def __gen_access_token__(config: JAMConfig, payload: dict | None) -> str:
     """
     Private tool for generating access token
 
@@ -62,6 +62,9 @@ def __gen_access_token__(config: JAMConfig, payload: dict) -> str:
 
     if not config.JWT_ACCESS_SECRET_KEY:
         raise NullSecret(message="JWT_ACCESS_SECRET_KEY is null")
+
+    if not payload:
+        payload: dict = {}
 
     __payload__: dict = {
         "data": payload,
@@ -87,7 +90,7 @@ def __gen_access_token__(config: JAMConfig, payload: dict) -> str:
     return access_token
 
 
-def __gen_refresh_token__(config: JAMConfig, payload: dict) -> str:
+def __gen_refresh_token__(config: JAMConfig, payload: dict | None) -> str:
     """
     Private tool for generating refresh token
 
@@ -102,6 +105,9 @@ def __gen_refresh_token__(config: JAMConfig, payload: dict) -> str:
 
     if not config.JWT_REFRESH_SECRET_KEY:
         raise NullSecret(message="JWT_REFRESH_SECRET_KEY is null")
+
+    if not payload:
+        payload: dict = {}
 
     __payload__: dict = {
         "data": payload,

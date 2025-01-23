@@ -1,16 +1,9 @@
 # -*- coding: utf-8 -*-
 
 
-from pydantic import BaseModel
+class tokens:
+    """Output token type"""
 
-
-class Tokens(BaseModel):
-    """
-    Scop for tokens
-
-    * access: str
-    * refresh: str
-    """
-
-    access: str
-    refresh: str
+    def __init__(self, access_token: str, refresh_token: str | None) -> None:
+        self.access: str = access_token
+        self.refresh: str | None = refresh_token
