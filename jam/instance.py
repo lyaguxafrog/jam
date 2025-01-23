@@ -19,6 +19,23 @@ class Jam:
         """
         Service for generating access and refresh tokend by config
 
+        Example:
+        ```python
+        config = JAMConfig(
+            JWT_ACCESS_SECRET_KEY="SOME_SUPER_SECRET_KEY",
+            JWT_REFRESH_SECRET_KEY="ANOTHER_SECRET_KEY"
+        )
+
+        jam = Jam(config=config)
+
+        payload: dict = {
+            "id": 1,
+            "username": "lyaguxafrog"
+        }
+
+        tokens = jam.jwt_gen_tokens(payload=payload)
+        ```
+
         Args:
             payload (dict | None): Payload with data
 
