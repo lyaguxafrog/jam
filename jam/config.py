@@ -9,7 +9,7 @@ class JAMConfig:
     def __init__(
         self,
         JWT_ACCESS_SECRET_KEY: str | None,
-        JWT_REFRESH_SECRET_KET: str | None,
+        JWT_REFRESH_SECRET_KEY: str | None,
         JWT_ALGORITHM: Literal[
             "HS256",
             "HS384",
@@ -29,7 +29,7 @@ class JAMConfig:
         JWT_HEADERS: dict | None = None,
     ):
         self.JWT_ACCESS_SECRET_KEY: str | None = JWT_ACCESS_SECRET_KEY
-        self.JWT_REFRESH_SECRET_KEY: str | None = JWT_REFRESH_SECRET_KET
+        self.JWT_REFRESH_SECRET_KEY: str | None = JWT_REFRESH_SECRET_KEY
 
         self.JWT_ALGORITHM: str = JWT_ALGORITHM
 
