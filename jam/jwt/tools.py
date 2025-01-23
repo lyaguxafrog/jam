@@ -20,7 +20,7 @@ def gen_jwt_tokens(*, config: JAMConfig, payload: dict = {}) -> Tokens:
     Service for generating JWT tokens
 
     Example:
-    ```
+    ```python
     config = JAMConfig(
         JWT_ACCESS_SECRET_KEY="SOME_SUPER_SECRET_KEY",
         JWT_REFRESH_SECRET_KEY="ANOTHER_SECRET_KEY"
@@ -32,6 +32,8 @@ def gen_jwt_tokens(*, config: JAMConfig, payload: dict = {}) -> Tokens:
     }
 
     tokens = gen_jwt_tokens(config=config, payload=payload)
+    access_token: str = tokens.access
+    refresh_token: str = tokens.refresh
     ```
 
     :param config: Standart jam config
