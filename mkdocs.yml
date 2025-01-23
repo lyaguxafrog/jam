@@ -1,5 +1,63 @@
 site_name: Jam
 site_url: https://jam.makridenko.ru
+site_description: Simple and univirsal library for authorization.
+
+repo_name: lyaguxafrog/jam
+repo_url: https://github.com/lyaguxafrog/jam
+edit_uri: blob/release/docs/
+
+nav:
+  - Home: index.md
+
 
 theme:
   name: material
+  feature:
+    tabs: true
+
+  icon:
+    repo: fontawesome/brands/github
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/lyaguxafrog/jam
+    # - icon: fontawesome/brands/python
+    #   link: https://pypi.org/project/jam/
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - admonition
+  - pymdownx.keys
+  - pymdownx.magiclink
+  - pymdownx.superfences:
+      custom_fences:
+      - name: mermaid
+        class: mermaid
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_doctring_examples: true
+            merge_init_into_class: true
+            show_source: false
+            docstring_options:
+              ignore_init_summary: true
+            separate_signature: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_signature_annotations: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            signature_crossrefs: true
+            summary: true
