@@ -38,5 +38,8 @@ config: JAMConfig = JAMConfig(
 jam: Jam = Jam(config=config)
 
 
-access_key: str = jam.gen_tokens.get("access_key")
+tokens = jam.jwt_gen_tokens()
+access_token: str = tokens.access
+print(access_token)
+# 'eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJkYXRhIjoge30sICJleHAiOiAxNzM3NzI5MDI3fQ.07gECSzAqetFYgToOFvBTSYjEAzWlZYmzucDL7Lgeno'
 ```
