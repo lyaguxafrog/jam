@@ -15,7 +15,7 @@ class Jam:
     def __init__(self, config: JAMConfig) -> None:
         self.config: JAMConfig = config
 
-    def jwt_gen_tokens(self, payload: dict | None = None) -> tokens:
+    def jwt_gen_tokens(self, *, payload: dict | None = None) -> tokens:
         """
         Service for generating access and refresh tokend by config
 
@@ -48,6 +48,7 @@ class Jam:
 
     def jwt_decode_token(
         self,
+        *,
         token: str,
         checksum: bool = False,
         token_type: Literal["access", "refresh"] | None = None,
