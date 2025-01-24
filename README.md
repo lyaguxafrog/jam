@@ -10,9 +10,33 @@
 
 
 ## Features
-- [ ] JWT Making
+- [x] JWT Making
 - [ ] Another crypt alghorutms
 - [ ] White/Black lists
 - [ ] Session Maker
 - [ ] Integration with Django, FastAPI, Strawberry
 - [ ] OAuth2
+
+
+Simple and univirsal library for authorization. 
+
+## Install
+```bash
+pip install jamlib
+```
+
+## Example
+
+```python
+from jam import JAMConfig, Jam
+
+config: JAMConfig = JAMConfig(
+    JWT_ACCESS_SECRET_KEY="some_secret_key",
+    JWT_REFRESH_SECRET_KEY="another_secret_key",
+)
+
+jam: Jam = Jam(config=config)
+
+
+access_key: str = jam.gen_tokens.get("access_key")
+```
