@@ -17,6 +17,7 @@ pip install jamlib
 ## Features
 - [ ] All JWT algs
 - [ ] Session maker
+- [ ] Async instance
 - [ ] Strawberry extension
 - [ ] FastAPI extenstion
 

@@ -62,9 +62,6 @@ class AbstractIntance(ABC):
 class Config(AbstractConfig):
     """
     Base config class
-
-    Args:
-        JWT_ACCESS_SECRET_KEY (str | None): Access secret key
     """
 
     def __init__(
