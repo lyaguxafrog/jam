@@ -95,6 +95,13 @@ class Jam(AbstractIntance):
         super().__init__(config)
 
     def gen_token(self, *args):
+        """
+        Method for generating JWT token with different algorithms.
+
+        Raises:
+            EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
+            EmtpyPrivateKey: If RSA algorithm is selected, but private key None
+        """
 
         header = {"alg": self.config.JWT_ALGORITHM, "type": "jwt"}
 
