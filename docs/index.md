@@ -14,9 +14,9 @@ pip install jamlib
 ## Example
 
 ```python
-from jam import JAMConfig, Jam
+from jam import Config, Jam
 
-config: JAMConfig = JAMConfig(
+config: Config = Config(
     JWT_ACCESS_SECRET_KEY="some_secret_key",
     JWT_REFRESH_SECRET_KEY="another_secret_key",
 )
