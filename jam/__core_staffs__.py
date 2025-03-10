@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABC, abstractmethod
-from typing import Any, Literal
+from typing import Dict, Literal
+
+from jam.jwt.__tools__ import __gen_jwt__
 
 
 class AbstractConfig(ABC):
     @abstractmethod
     def __init__(
         self,
-        JWT_ACCESS_SECRET_KEY: str | None,
-        JWT_REFRESH_SECRET_KEY: str | None,
+        JWT_SECRET_KEY: str | None,
+        JWT_PRIVATE_KEY: str | None,
         JWT_ALGORITHM: (
             Literal[
                 "HS256",
@@ -28,9 +30,8 @@ class AbstractConfig(ABC):
         JWT_REFRESH_EXP: int = 3600,
         JWT_HEADERS: dict | None = None,
     ) -> None:
-        self.JWT_ACCESS_SECRET_KEY: str | None = JWT_ACCESS_SECRET_KEY
-        self.JWT_REFRESH_SECRET_KEY: str | None = JWT_REFRESH_SECRET_KEY
-
+        self.JWT_SECRET_KEY: str | None = JWT_SECRET_KEY
+        self.JWT_PRIVATE_KEY: str | None = JWT_PRIVATE_KEY
         self.JWT_ALGORITHM: str | None = JWT_ALGORITHM
 
         self.JWT_ACCESS_EXP: int = JWT_ACCESS_EXP
@@ -50,7 +51,11 @@ class AbstractIntance(ABC):
         self.config = config
 
     @abstractmethod
-    def gen_jwt_tokens(self, **kwargs) -> Any:
+    def gen_jwt_tokens(self, **kwargs) -> Dict[str, str]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def gen_token(self, **kwargs) -> str:
         raise NotImplementedError
 
 
@@ -64,17 +69,17 @@ class Config(AbstractConfig):
 
     def __init__(
         self,
-        JWT_ACCESS_SECRET_KEY,
-        JWT_REFRESH_SECRET_KEY,
+        JWT_SECRET_KEY,
+        JWT_PRIVATE_KEY,
         JWT_ALGORITHM=None,
         JWT_ACCESS_EXP=3600,
         JWT_REFRESH_EXP=3600,
         JWT_HEADERS=None,
     ):
         super().__init__(
-            JWT_ACCESS_SECRET_KEY,
-            JWT_REFRESH_SECRET_KEY,
+            JWT_SECRET_KEY,
             JWT_ALGORITHM,
+            JWT_PRIVATE_KEY,
             JWT_ACCESS_EXP,
             JWT_REFRESH_EXP,
             JWT_HEADERS,
@@ -91,3 +96,16 @@ class Jam(AbstractIntance):
 
     def __init__(self, config: Config):
         super().__init__(config)
+
+    def gen_token(self, *args):
+
+        header = {"alg": self.config.JWT_ALGORITHM, "type": "jwt"}
+
+        token: str = __gen_jwt__(
+            header=header,
+            payload=args,
+            secret=self.config.JWT_SECRET_KEY,
+            private_key=self.config.JWT_PRIVATE_KEY,
+        )
+
+        return token
