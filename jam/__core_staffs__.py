@@ -18,9 +18,6 @@ class AbstractConfig(ABC):
                 "RS256",
                 "RS384",
                 "RS512",
-                "ES256",
-                "ES384",
-                "ES512",
                 "PS256",
                 "PS384",
                 "PS512",
@@ -62,8 +59,7 @@ class Config(AbstractConfig):
     Base config class
 
     Args:
-        JWT_ACCESS_SECRET_KEY (str | None)
-        JWT_REFRESH_SECRET_KEY (str | None)
+        JWT_ACCESS_SECRET_KEY (str | None): Access secret key
     """
 
     def __init__(
