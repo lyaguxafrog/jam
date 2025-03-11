@@ -22,15 +22,18 @@ def generate_rsa_key_pair(key_size: int = 2048) -> dict:
     }
     ```
     """
+
     private_key = rsa.generate_private_key(
         public_exponent=65537, key_size=key_size, backend=default_backend()
     )
 
+    # Получение открытого ключа
     public_key = private_key.public_key()
 
     pem_private = private_key.private_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption(),
     )
 
     pem_public = public_key.public_bytes(
@@ -38,4 +41,7 @@ def generate_rsa_key_pair(key_size: int = 2048) -> dict:
         format=serialization.PublicFormat.SubjectPublicKeyInfo,
     )
 
-    return {"public": pem_public, "private": pem_private}
+    return {
+        "public": pem_public.decode("utf-8"),
+        "private": pem_private.decode("utf-8"),
+    }
