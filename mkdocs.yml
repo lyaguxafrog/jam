@@ -8,6 +8,7 @@ edit_uri: blob/release/docs/
 
 nav:
   - Home: index.md
+  - Getting start: start.md
   - API:
     - Core:
       - Config: API/core/config.md
