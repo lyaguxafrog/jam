@@ -21,6 +21,16 @@ class EmtpyPrivateKey(Exception):
         return str(self.message)
 
 
+class EmptyPublicKey(Exception):
+    def __inti__(
+        self, message: str | Exception = "Public key cannot be NoneType"
+    ) -> None:
+        self.message: str | Exception = message
+
+    def __str__(self) -> str:
+        return str(self.message)
+
+
 class TokenLifeTimeExpired(Exception):
     def __inti__(
         self, message: str | Exception = "Token lifetime has expired."
