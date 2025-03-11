@@ -3,18 +3,25 @@
 import hashlib
 import hmac
 import json
+from datetime import datetime
 from typing import Any, Dict
 
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
 from Crypto.Signature import pkcs1_15
 
-from jam.exceptions import EmptySecretKey, EmtpyPrivateKey
-from jam.jwt.__utils__ import __base64url_encode__
+from jam.exceptions import (
+    EmptyPublicKey,
+    EmptySecretKey,
+    EmtpyPrivateKey,
+    NotFoundSomeInPayload,
+    TokenLifeTimeExpired,
+)
+from jam.jwt.__utils__ import __base64url_decode__, __base64url_encode__
 
 
 def __gen_jwt__(
-    header: Dict[str, str],
+    header: Dict[str, Any],
     payload: Dict[str, Any],
     secret: str | None = None,
     private_key: str | None = None,
@@ -73,3 +80,71 @@ def __gen_jwt__(
 
     jwt_token = f"{header_encoded}.{payload_encoded}.{signature_encoded}"
     return jwt_token
+
+
+def __validate_jwt__(
+    token: str,
+    check_exp: bool = False,
+    secret: str | None = None,
+    public_key: str | None = None,
+) -> Dict[str, Any]:
+    """
+    Validate a JWT token and return the payload if valid.
+
+    Args:
+        token (str): The JWT token to validate.
+        check_exp (bool): true to check token lifetime.
+        secret (str | None): Secret key for HMAC algorithms.
+        public_key (str | None): Public key for RSA algorithms.
+
+    Returns:
+        (Dict[str, Any]): The payload if the token is valid.
+
+    Raises:
+        ValueError: If the token is invalid.
+        EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None.
+        EmtpyPublicKey: If RSA algorithm is selected, but public key None.
+        NotFoundSomeInPayload: If 'exp' not found in payload.
+        TokenLifeTimeExpired: If token has expired.
+    """
+
+    try:
+        header_encoded, payload_encoded, signature_encoded = token.split(".")
+    except ValueError:
+        raise ValueError("Invalid token format")
+
+    header = json.loads(__base64url_decode__(header_encoded).decode("utf-8"))
+    payload = json.loads(__base64url_decode__(payload_encoded).decode("utf-8"))
+    signature = __base64url_decode__(signature_encoded)
+
+    signature_input = f"{header_encoded}.{payload_encoded}".encode("utf-8")
+
+    if header["alg"].startswith("HS"):
+        if secret is None:
+            raise EmptySecretKey
+        expected_signature = hmac.new(
+            secret.encode("utf-8"), signature_input, hashlib.sha256
+        ).digest()
+    elif header["alg"].startswith("RS"):
+        if public_key is None:
+            raise EmptyPublicKey
+        rsa_key = RSA.import_key(public_key)
+        hash_obj = SHA256.new(signature_input)
+        try:
+            pkcs1_15.new(rsa_key).verify(hash_obj, signature)
+            expected_signature = signature
+        except (ValueError, TypeError):
+            raise ValueError("Invalid signature")
+    else:
+        raise ValueError("Unsupported algorithm")
+
+    if expected_signature != signature:
+        raise ValueError("Invalid token signature")
+
+    if check_exp:
+        if payload["exp"] is None:
+            raise NotFoundSomeInPayload('"exp" not found in payload')
+        if payload["exp"] < datetime.today().timestamp():
+            raise TokenLifeTimeExpired
+
+    return payload

@@ -8,17 +8,20 @@ edit_uri: blob/release/docs/
 
 nav:
   - Home: index.md
+  - Getting start: start.md
   - API:
     - Core:
       - Config: API/core/config.md
       - Instance: API/core/instance.md
+    - Tools:
+      - JWT:
+        - __gen_jwt__: API/jwt/gen_jwt.md
 
 
 theme:
   name: material
   feature:
     tabs: true
-
   icon:
     repo: fontawesome/brands/github
 
