@@ -4,4 +4,4 @@
 All Jam exceptions
 """
 
-from .jwt import EmptySecretKey, EmtpyPrivateKey
+from .jwt import EmptySecretKey, EmtpyPrivateKey, TokenLifeTimeExpired
