@@ -10,5 +10,5 @@ Documentation: https://jam.makridenko.ru
 from .__core_staffs__ import Config, Jam
 
 
-__version__ = "2.0.0-alpha"
+__version__ = "2.1.1-alpha"
 __all__ = ["Config", "Jam"]
