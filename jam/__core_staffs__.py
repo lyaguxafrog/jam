@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABC, abstractmethod
-from typing import Literal
+from typing import Any, Dict, Literal
 
-from jam.jwt.__tools__ import __gen_jwt__
+from jam.jwt.__tools__ import __gen_jwt__, __validate_jwt__
 
 
 class AbstractConfig(ABC):
@@ -55,7 +55,13 @@ class AbstractIntance(ABC):
     #     raise NotImplementedError
 
     @abstractmethod
-    def gen_token(self, **kwargs) -> str:
+    def gen_jwt_token(self, **kwargs) -> str:
+        raise NotImplementedError
+
+    @abstractmethod
+    def decode_jwt_token(
+        self, token: str, check_exp: bool, **kwargs
+    ) -> Dict[str, Any]:
         raise NotImplementedError
 
 
@@ -92,7 +98,7 @@ class Jam(AbstractIntance):
     def __init__(self, config: Config):
         super().__init__(config)
 
-    def gen_token(self, *args):
+    def gen_jwt_token(self, **kwargs) -> str:
         """
         Method for generating JWT token with different algorithms.
 
@@ -105,9 +111,41 @@ class Jam(AbstractIntance):
 
         token: str = __gen_jwt__(
             header=header,
-            payload=args,
+            payload=kwargs,
             secret=self.config.JWT_SECRET_KEY,
             private_key=self.config.JWT_PRIVATE_KEY,
         )
 
         return token
+
+    def decode_jwt_token(
+        self, token: str, check_exp: bool = False, **kwargs
+    ) -> Dict[str, Any]:
+        """
+        Validate a JWT token and return the payload if valid.
+
+        Args:
+            token (str): The JWT token to validate.
+            check_exp (bool): true to check token lifetime.
+            secret (str | None): Secret key for HMAC algorithms.
+            public_key (str | None): Public key for RSA algorithms.
+
+        Returns:
+            (Dict[str, Any]): The payload if the token is valid.
+
+        Raises:
+            ValueError: If the token is invalid.
+            EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None.
+            EmtpyPublicKey: If RSA algorithm is selected, but public key None.
+            NotFoundSomeInPayload: If 'exp' not found in payload.
+            TokenLifeTimeExpired: If token has expired.
+        """
+
+        payload = __validate_jwt__(
+            token=token,
+            check_exp=check_exp,
+            secret=kwargs["secret"],
+            public_key=kwargs["public_key"],
+        )
+
+        return payload

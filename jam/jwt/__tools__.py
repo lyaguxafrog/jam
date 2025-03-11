@@ -21,7 +21,7 @@ from jam.jwt.__utils__ import __base64url_decode__, __base64url_encode__
 
 
 def __gen_jwt__(
-    header: Dict[str, str],
+    header: Dict[str, Any],
     payload: Dict[str, Any],
     secret: str | None = None,
     private_key: str | None = None,
