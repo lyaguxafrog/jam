@@ -26,21 +26,12 @@ class AbstractConfig(ABC):
             ]
             | None  # noqa
         ) = None,
-        JWT_ACCESS_EXP: int = 3600,
-        JWT_REFRESH_EXP: int = 3600,
-        JWT_HEADERS: dict | None = None,
+        JWT_EXPIRE: int | None = None,
     ) -> None:
         self.JWT_SECRET_KEY: str | None = JWT_SECRET_KEY
         self.JWT_PRIVATE_KEY: str | None = JWT_PRIVATE_KEY
         self.JWT_ALGORITHM: str | None = JWT_ALGORITHM
-
-        self.JWT_ACCESS_EXP: int = JWT_ACCESS_EXP
-        self.JWT_REFRESH_EXP: int = JWT_REFRESH_EXP
-
-        if not JWT_HEADERS:
-            self.JWT_HEADERS: dict = {}
-        else:
-            self.JWT_HEADERS: dict = JWT_HEADERS
+        self.JWT_EXPIRE: int | None = JWT_EXPIRE
 
 
 class AbstractIntance(ABC):
@@ -75,16 +66,12 @@ class Config(AbstractConfig):
         JWT_SECRET_KEY=None,
         JWT_PRIVATE_KEY=None,
         JWT_ALGORITHM=None,
-        JWT_ACCESS_EXP=3600,
-        JWT_REFRESH_EXP=3600,
-        JWT_HEADERS=None,
+        JWT_EXPIRE=None,
     ):
         self.JWT_SECRET_KEY = JWT_SECRET_KEY
         self.JWT_ALGORITHM = JWT_ALGORITHM
         self.JWT_PRIVATE_KEY = JWT_PRIVATE_KEY
-        self.JWT_ACCESS_EXP = JWT_ACCESS_EXP
-        self.JWT_REFRESH_EXP = JWT_REFRESH_EXP
-        self.JWT_HEADERS = JWT_HEADERS
+        self.JWT_EXPIRE = JWT_EXPIRE
 
 
 class Jam(AbstractIntance):
