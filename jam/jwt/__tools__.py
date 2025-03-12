@@ -165,7 +165,7 @@ def __payload_maker__(exp: int | None, **data) -> Dict[str, Any]:
     base_payload: dict = {
         "iat": datetime.now().timestamp(),
         "exp": exp,
-        "jti": uuid4(),
+        "jti": str(uuid4()),
     }
 
     base_payload.update(data)

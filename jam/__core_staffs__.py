@@ -145,7 +145,7 @@ class Jam(AbstractIntance):
             "exp": 9834938493
             "iat": 99109201,
             "jti": "c9405246-11b8-43fd-bca3-337422f208c9",
-            <your data>
+            "data": <your data>
         }
         ```
 
