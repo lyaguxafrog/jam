@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Literal
 
-from jam.jwt.__tools__ import __gen_jwt__, __validate_jwt__
+from jam.jwt.__tools__ import __gen_jwt__, __payload_maker__, __validate_jwt__
 
 
 class AbstractConfig(ABC):
@@ -134,5 +134,25 @@ class Jam(AbstractIntance):
             secret=kwargs["secret"],
             public_key=kwargs["public_key"],
         )
+
+        return payload
+
+    def jwt_payload_maker(self, **data) -> Dict[str, Any]:
+        """
+        Method for creating a payload for JWT, in format:
+        ```
+        {
+            "exp": 9834938493
+            "iat": 99109201,
+            "jti": "c9405246-11b8-43fd-bca3-337422f208c9",
+            <your data>
+        }
+        ```
+
+        Returns:
+            (Dict[str, Any])
+        """
+
+        payload: dict = __payload_maker__(exp=self.config.JWT_EXPIRE, data=data)
 
         return payload
