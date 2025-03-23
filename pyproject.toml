@@ -5,13 +5,12 @@ description = "Simple and univirsal library for authorization"
 authors = [
     {name = "Makridenko Adrian",email = "adrianmakridenko@duck.com"}
 ]
-license = {text = "MIT"}
+license = {text = "MIT License"}
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "pycryptodome (>=3.21.0,<4.0.0)",
- "cryptography (>=44.0.2,<45.0.0)",
- "crypto>=1.4.1",
+    "pycryptodome>=3.21.0,<4.0.0",
+    "cryptography (>=44.0.2,<45.0.0)",
 ]
 
 [project.urls]
@@ -66,7 +65,7 @@ skip-string-normalization = false
 disable_error_code = ["no-redef", "import-not-found", "import-untyped", "attr-defined"]
 
 [tool.pytest]
-asyncio_default_fixture_loop_scope = "function"
+#asyncio_default_fixture_loop_scope = "function"
 python_files = ["test*.py"]
 
 [tool.pytest.ini_options]
