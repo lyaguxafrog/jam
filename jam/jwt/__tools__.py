@@ -5,6 +5,7 @@ import hmac
 import json
 from datetime import datetime
 from typing import Any, Dict
+from uuid import uuid4
 
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
@@ -148,3 +149,24 @@ def __validate_jwt__(
             raise TokenLifeTimeExpired
 
     return payload
+
+
+def __payload_maker__(exp: int | None, **data) -> Dict[str, Any]:
+    """
+    Tool for making base payload
+
+    Args:
+        exp (int | None): Token expire
+
+    Returns:
+        (Dict[str, Any])
+    """
+
+    base_payload: dict = {
+        "iat": datetime.now().timestamp(),
+        "exp": exp,
+        "jti": str(uuid4()),
+    }
+
+    base_payload.update(data)
+    return base_payload

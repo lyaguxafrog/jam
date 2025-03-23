@@ -1,22 +1,31 @@
 repos:
-  - repo: https://github.com/PyCQA/flake8
-    rev: 7.1.1
-    hooks:
-    - id: flake8
-      args: [--config=.flake8]
   - repo: https://github.com/ambv/black
-    rev: 24.10.0
+    rev: 25.1.0
     hooks:
     - id: black
   - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
+    rev: 6.0.1
     hooks:
       - id: isort
         name: isort
         entry: isort
         types: [python]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.14.1
+    rev: v1.15.0
     hooks:
       - id: mypy
         args: [--config-file=pyproject.toml]
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.6.6
+    hooks:
+      - id: uv-lock
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.6.6
+    hooks:
+      - id: uv-export
+        args: [--no-dev, --format, requirements-txt, -o, requirements.txt]
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.0
+    hooks:
+      - id: ruff
+      - id: ruff-format
