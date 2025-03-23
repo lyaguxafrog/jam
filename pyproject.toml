@@ -8,7 +8,11 @@ authors = [
 license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = ["pycryptodome (>=3.21.0,<4.0.0)", "cryptography (>=44.0.2,<45.0.0)"]
+dependencies = [
+    "pycryptodome (>=3.21.0,<4.0.0)",
+ "cryptography (>=44.0.2,<45.0.0)",
+ "crypto>=1.4.1",
+]
 
 [project.urls]
 Homepage = "https://github.com/lyaguxafrog/jam"

@@ -128,6 +128,19 @@ wheels = [
 ]
 
 [[package]]
+name = "crypto"
+version = "1.4.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "naked" },
+    { name = "shellescape" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/12/0d/34dce1487b3158a0ccd0e5982cba0259c798c24c0de4cc25ec265b37cd98/crypto-1.4.1.tar.gz", hash = "sha256:8f2ee9756a0265c18845ac097ae447c75cfbde158abe1361b7491619f866a9bd", size = 13278 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fc/bb/0b812dc02e6357606228edfbf5808f5ca0a675a84273578c3a199e841cd8/crypto-1.4.1-py2.py3-none-any.whl", hash = "sha256:985120aa86f71545388199f96a2a0e00f7ccfe5ecd14c56355eb399e1a63d164", size = 18019 },
+]
+
+[[package]]
 name = "cryptography"
 version = "44.0.2"
 source = { registry = "https://pypi.org/simple" }
@@ -245,6 +258,7 @@ name = "jamlib"
 version = "2.2.1a0"
 source = { virtual = "." }
 dependencies = [
+    { name = "crypto" },
     { name = "cryptography" },
     { name = "pycryptodome" },
 ]
@@ -265,6 +279,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "crypto", specifier = ">=1.4.1" },
     { name = "cryptography", specifier = ">=44.0.2,<45.0.0" },
     { name = "pycryptodome", specifier = ">=3.21.0,<4.0.0" },
 ]
@@ -484,6 +499,19 @@ wheels = [
 ]
 
 [[package]]
+name = "naked"
+version = "0.1.32"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyyaml" },
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/47/a5/7a4f84bb6a7b0d6ba84fda48119e29afd339a1bc4f9589dab1fe064d6eb6/Naked-0.1.32.tar.gz", hash = "sha256:f81015107e3aefdc801d7144fbae214bdf3cb179c0020a1dc6d5acb3659d5d5c", size = 552681 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/83/7b/e55081f0cdd50bf443c0a6bbddb6bf012527c53125ae94aba6583d49461e/Naked-0.1.32-py2.py3-none-any.whl", hash = "sha256:ea3d7eeada6b89bd8464ba0cfaa631867aaa68a3e2d5d6a6800cbe74f8941e5f", size = 587731 },
+]
+
+[[package]]
 name = "nodeenv"
 version = "1.9.1"
 source = { registry = "https://pypi.org/simple" }
@@ -696,6 +724,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/d9/3a/a647fa4f316482dacf2fd68e8a386327a33d6eabd8eb2f9a0c3d291ec549/ruff-0.11.2-py3-none-win32.whl", hash = "sha256:aca01ccd0eb5eb7156b324cfaa088586f06a86d9e5314b0eb330cb48415097cc", size = 10319835 },
     { url = "https://files.pythonhosted.org/packages/86/54/3c12d3af58012a5e2cd7ebdbe9983f4834af3f8cbea0e8a8c74fa1e23b2b/ruff-0.11.2-py3-none-win_amd64.whl", hash = "sha256:3170150172a8f994136c0c66f494edf199a0bbea7a409f649e4bc8f4d7084080", size = 11373713 },
     { url = "https://files.pythonhosted.org/packages/d6/d4/dd813703af8a1e2ac33bf3feb27e8a5ad514c9f219df80c64d69807e7f71/ruff-0.11.2-py3-none-win_arm64.whl", hash = "sha256:52933095158ff328f4c77af3d74f0379e34fd52f175144cefc1b192e7ccd32b4", size = 10441990 },
+]
+
+[[package]]
+name = "shellescape"
+version = "3.8.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/19/40/13b9e84bf04774365830cbed1bd95a989d5324a99d207bcb1619a6c517f2/shellescape-3.8.1.tar.gz", hash = "sha256:40b310b30479be771bf3ab28bd8d40753778488bd46ea0969ba0b35038c3ec26", size = 5246 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d0/f4/0081137fceff5779cd4205c1e96657e41cc2d2d56c940dc8eeb6111780f7/shellescape-3.8.1-py2.py3-none-any.whl", hash = "sha256:f17127e390fa3f9aaa80c69c16ea73615fd9b5318fd8309c1dca6168ae7d85bf", size = 3081 },
 ]
 
 [[package]]
