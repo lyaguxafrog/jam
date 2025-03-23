@@ -16,42 +16,6 @@ Repository = "https://github.com/lyaguxafrog/jam"
 Issues = "https://github.com/lyaguxafrog/jam/issues"
 
 
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry]
-packages = [
-    { include = "jam" },
-]
-
-[tool.poetry.group.dev.dependencies]
-pretty-errors = "^1.2.25"
-icecream = "^2.1.4"
-pre-commit = "^4.1.0"
-flake8 = "^7.1.1"
-isort = "^5.13.2"
-black = "^24.10.0"
-mypy = "^1.14.1"
-
-
-[tool.poetry.group.tests.dependencies]
-pytest = "^8.3.4"
-
-
-[tool.poetry.group.docs.dependencies]
-mkdocs = "^1.6.1"
-mkdocs-material = "^9.5.50"
-mkdocstrings = "^0.27.0"
-mkdocstrings-python = "^1.13.0"
-
-
-[tool.flake8]
-ignore = ["D203", "E501"]
-exclude = [".git", "__pycache__", "__init__.py", "docs/"]
-max-complexity = 18
-max-line-length = 80
-
 [tool.isort]
 profile = "black"
 default_section = "THIRDPARTY"
@@ -71,6 +35,17 @@ skip-string-normalization = false
 [tool.mypy]
 disable_error_code = ["no-redef", "import-not-found"]
 
-[tool.pytest]
-asyncio_default_fixture_loop_scope = "function"
-python_files = ["test*.py"]
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "isort>=6.0.1",
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.6.9",
+    "mkdocstrings>=0.29.0",
+    "mkdocstrings-python>=1.16.7",
+    "mypy>=1.15.0",
+    "pre-commit>=4.2.0",
+    "pytest>=8.3.5",
+    "ruff>=0.11.2",
+]
+
