@@ -14,12 +14,7 @@
 pip install jamlib
 ```
 
-## Features
-- [x] All JWT algs
-- [ ] Session maker
-- [ ] Async instance
-- [ ] Strawberry extension
-- [ ] FastAPI extenstion
 
+![Roadmap](docs/assets/roadmap.png)
 
 &copy; [Adrian Makridenko](https://github.com/lyaguxafrog) 2025
