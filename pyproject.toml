@@ -1,6 +1,6 @@
 [project]
 name = "jamlib"
-version = "2.2.3-alpha"
+version = "3.0.0-alpha"
 description = "Simple and univirsal library for authorization"
 authors = [
     {name = "Makridenko Adrian",email = "adrianmakridenko@duck.com"}
@@ -37,7 +37,7 @@ dev = [
 target-version = "py313"
 line-length = 80
 ignore = ["UP009", "D100"]
-exclude = ["*__init__.py"]
+exclude = ["*__init__.py", "tests/"]
 
 [tool.ruff.lint]
 extend-select = ["UP", "D"]

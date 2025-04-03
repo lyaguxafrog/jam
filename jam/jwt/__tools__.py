@@ -4,7 +4,7 @@ import hashlib
 import hmac
 import json
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 from uuid import uuid4
 
 from Crypto.Hash import SHA256
@@ -22,13 +22,12 @@ from jam.jwt.__utils__ import __base64url_decode__, __base64url_encode__
 
 
 def __gen_jwt__(
-    header: Dict[str, Any],
-    payload: Dict[str, Any],
+    header: dict[str, Any],
+    payload: dict[str, Any],
     secret: str | None = None,
     private_key: str | None = None,
 ) -> str:
-    """
-    Method for generating JWT token with different algorithms
+    """Method for generating JWT token with different algorithms.
 
     Example:
     ```python
@@ -60,7 +59,7 @@ def __gen_jwt__(
     header_encoded = __base64url_encode__(json.dumps(header).encode("utf-8"))
     payload_encoded = __base64url_encode__(json.dumps(payload).encode("utf-8"))
 
-    signature_input = f"{header_encoded}.{payload_encoded}".encode("utf-8")
+    signature_input = f"{header_encoded}.{payload_encoded}".encode()
 
     if header["alg"].startswith("HS"):
         if secret is None:
@@ -88,9 +87,8 @@ def __validate_jwt__(
     check_exp: bool = False,
     secret: str | None = None,
     public_key: str | None = None,
-) -> Dict[str, Any]:
-    """
-    Validate a JWT token and return the payload if valid.
+) -> dict[str, Any]:
+    """Validate a JWT token and return the payload if valid.
 
     Args:
         token (str): The JWT token to validate.
@@ -108,7 +106,6 @@ def __validate_jwt__(
         NotFoundSomeInPayload: If 'exp' not found in payload.
         TokenLifeTimeExpired: If token has expired.
     """
-
     try:
         header_encoded, payload_encoded, signature_encoded = token.split(".")
     except ValueError:
@@ -118,7 +115,7 @@ def __validate_jwt__(
     payload = json.loads(__base64url_decode__(payload_encoded).decode("utf-8"))
     signature = __base64url_decode__(signature_encoded)
 
-    signature_input = f"{header_encoded}.{payload_encoded}".encode("utf-8")
+    signature_input = f"{header_encoded}.{payload_encoded}".encode()
 
     if header["alg"].startswith("HS"):
         if secret is None:
@@ -151,17 +148,16 @@ def __validate_jwt__(
     return payload
 
 
-def __payload_maker__(exp: int | None, **data) -> Dict[str, Any]:
-    """
-    Tool for making base payload
+def __payload_maker__(exp: int | None, **data) -> dict[str, Any]:
+    """Tool for making base payload.
 
     Args:
         exp (int | None): Token expire
+        **data: Data for payload
 
     Returns:
         (Dict[str, Any])
     """
-
     base_payload: dict = {
         "iat": datetime.now().timestamp(),
         "exp": exp,

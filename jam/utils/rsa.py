@@ -6,8 +6,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 
 
 def generate_rsa_key_pair(key_size: int = 2048) -> dict:
-    """
-    RSA key generation utility
+    """RSA key generation utility.
 
     Args:
         key_size (int): Size of RSA key
@@ -22,7 +21,6 @@ def generate_rsa_key_pair(key_size: int = 2048) -> dict:
     }
     ```
     """
-
     private_key = rsa.generate_private_key(
         public_exponent=65537, key_size=key_size, backend=default_backend()
     )

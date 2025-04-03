@@ -8,14 +8,13 @@ edit_uri: blob/release/docs/
 
 nav:
   - Home: index.md
-  - Getting start: start.md
+  - Changelog: https://github.com/lyaguxafrog/jam/releases
   - API:
-    - Core:
-      - Config: API/core/config.md
-      - Instance: API/core/instance.md
-    - Tools:
-      - JWT:
-        - __gen_jwt__: API/jwt/gen_jwt.md
+      - Instance:
+          AbstractInstance: API/instance/abc_instance.md
+          Jam: API/instance/instance.md
+      - __modules__: API/modules.md
+
 
 
 theme:

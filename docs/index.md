@@ -1,28 +1,42 @@
-
 # Jam
 
 ![Static Badge](https://img.shields.io/badge/Python-3.13-blue?logo=python&logoColor=white)
 ![tests](https://github.com/lyaguxafrog/jam/actions/workflows/run-tests.yml/badge.svg) ![License](https://img.shields.io/badge/Licese-MIT-grey?link=https%3A%2F%2Fgithub.com%2Flyaguxafrog%2Fjam%2Fblob%2Frelease%2FLICENSE.md)
+![jam](https://img.shields.io/badge/jam-3.0.0_alpha-white?style=flat&labelColor=red)
 
-Simple and univirsal library for authorization. 
+
+> [!CAUTION]
+> In active development! Cannot be used in real projects!
+> 
 
 ## Install
 ```bash
 pip install jamlib
 ```
 
-## Example
-
+## Getting start
 ```python
-from jam import Config, Jam
+# -*- coding: utf-8 -*-
 
-config: Config = Config(
-    JWT_ACCESS_SECRET_KEY="some_secret_key",
-    JWT_REFRESH_SECRET_KEY="another_secret_key",
-)
+from typing import Any
 
-jam: Jam = Jam(config=config)
+from jam import Jam
 
+config: dict[str, Any] = {
+        "jwt_secret_key": "some-secret",
+        "expire": 3600
+    }
 
-access_key: str = jam.gen_tokens.get("access_key")
+data = {
+    "user_id": 1,
+    "role": "admin"
+}
+
+jam = Jam(auth_type="jwt", config=config)
+
+payload = jam.make_payload(**data)
+token = jam.gen_jwt_token(**payload)
 ```
+
+## Roadmap
+![Roadmap](assets/roadmap.png)
