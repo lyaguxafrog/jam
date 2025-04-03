@@ -7,8 +7,7 @@ Source code: https://github.com/lyaguxafrog/jam
 Documentation: https://jam.makridenko.ru
 """
 
-from .__core_staffs__ import Config, Jam
+from jam.instance import Jam
 
-
-__version__ = "2.2.1-alpha"
-__all__ = ["Config", "Jam"]
+__version__ = "3.0.0-alpha"
+__all__ = ["Jam"]
