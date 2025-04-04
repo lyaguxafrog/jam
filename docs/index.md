@@ -26,11 +26,13 @@ cd jam/ && uv sync --no-dev  # need to install uv
 from typing import Any
 
 from jam import Jam
+from jam.utils import make_jwt_config
 
-config: dict[str, Any] = {
-        "jwt_secret_key": "some-secret",
-        "expire": 3600
-    }
+config = make_jwt_config(
+            alg="HS256",
+            secret_key="some_secret",
+            expire=18000
+    )
 
 data = {
     "user_id": 1,
