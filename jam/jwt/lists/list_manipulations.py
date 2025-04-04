@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 
+from redis import Redis
 from tinydb import Query, TinyDB
 
 
@@ -98,3 +99,58 @@ class JSONList(AbstracttListRepo):
             (list)
         """
         return self.list.all()
+
+
+class RedisList(AbstracttListRepo):
+    """Black/White lists in Redis, most optimal format."""
+
+    def __init__(
+        self, redis_instance: Redis, in_list_life_time: int | None
+    ) -> None:
+        """Class constructor.
+
+        Args:
+            redis_instance (Redis): `redis.Redis`
+            in_list_life_time (int | None): The lifetime of a token in the list
+        """
+        self.list = redis_instance
+        self.exp = in_list_life_time
+
+    def add(self, token: str) -> None:
+        """Method for adding token to list.
+
+        Args:
+            token (str): Your JWT token
+
+        Returns:
+            (None)
+        """
+        self.list.set(name=token, ex=self.exp)
+        return None
+
+    def check(self, token: str) -> bool:
+        """Method for checking if a token is present in the list.
+
+        Args:
+            token (str): Your JWT token
+
+        Returns:
+            (bool)
+        """
+        _token = self.list.get(name=token)
+        if not _token:
+            return False
+        else:
+            return True
+
+    def delete(self, token: str) -> None:
+        """Method for removing a token from a list.
+
+        Args:
+            token (str): Your JWT token
+
+        Returns:
+            None
+        """
+        self.list.delete(token)
+        return None
