@@ -2,6 +2,8 @@
 
 # TODO: Exceptions to dataclasses
 
+from dataclasses import dataclass
+
 
 class EmptySecretKey(Exception):
     def __init__(
@@ -34,3 +36,13 @@ class TokenLifeTimeExpired(Exception):
 class NotFoundSomeInPayload(Exception):
     def __inti__(self, message: str | Exception) -> None:
         self.message: str | Exception = message
+
+
+@dataclass
+class TokenNotInWhiteList(Exception):
+    message: str | Exception = "Token not found on white list."
+
+
+@dataclass
+class TokenInBlackList(Exception):
+    message: str | Exception = "The token is blacklisted."
