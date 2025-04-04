@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 
+# TODO: Exceptions to dataclasses
+
 
 class EmptySecretKey(Exception):
     def __init__(
         self, message: str | Exception = "Secret key cannot be NoneType"
     ) -> None:
         self.message: str | Exception = message
-
-    def __str__(self) -> str:
-        return str(self.message)
 
 
 class EmtpyPrivateKey(Exception):
@@ -17,18 +16,12 @@ class EmtpyPrivateKey(Exception):
     ) -> None:
         self.message: str | Exception = message
 
-    def __str__(self) -> str:
-        return str(self.message)
-
 
 class EmptyPublicKey(Exception):
     def __inti__(
         self, message: str | Exception = "Public key cannot be NoneType"
     ) -> None:
         self.message: str | Exception = message
-
-    def __str__(self) -> str:
-        return str(self.message)
 
 
 class TokenLifeTimeExpired(Exception):
@@ -37,13 +30,7 @@ class TokenLifeTimeExpired(Exception):
     ) -> None:
         self.message: str | Exception = message
 
-    def __str__(self) -> str:
-        return str(self.message)
-
 
 class NotFoundSomeInPayload(Exception):
     def __inti__(self, message: str | Exception) -> None:
         self.message: str | Exception = message
-
-    def __str__(self) -> str:
-        return str(self.message)
