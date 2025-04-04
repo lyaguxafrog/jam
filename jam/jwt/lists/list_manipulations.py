@@ -15,13 +15,12 @@ class JSONList(AbstracttListRepo):
     `pip install jamlib[json-list]`
 
     Attributes:
-        list (TinyDB): TinyDB instance
+        __list__ (TinyDB): TinyDB instance
 
     Methods:
         add: adding token to list
         check: check token in list
         delete: removing token from list
-        all: return all tokens in list
     """
 
     def __init__(self, json_path: str = "whitelist.json") -> None:
@@ -76,14 +75,6 @@ class JSONList(AbstracttListRepo):
         """
         cond = Query()
         self.__list__.remove(cond.token == token)
-
-    def all(self) -> list:
-        """Returns a list of all tokens in the list.
-
-        Args:
-            (list)
-        """
-        return self.__list__.all()
 
 
 class RedisList(AbstracttListRepo):
