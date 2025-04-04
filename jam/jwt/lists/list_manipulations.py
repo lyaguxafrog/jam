@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 
+from motor import MotorClient
 from redis import Redis
 from tinydb import Query, TinyDB
 
@@ -138,4 +139,63 @@ class RedisList(AbstracttListRepo):
             None
         """
         self.list.delete(token)
+        return None
+
+
+class MongoList(AbstracttListRepo):
+    """Black/White lists in MongoDB."""
+
+    def __init__(
+        self, mongo_str: str, db_name: str, collection_name: str = "jam_list"
+    ) -> None:
+        """Class constructor.
+
+        Args:
+            mongo_str (str): MongoDB connection string
+            db_name (str): MongoDB DB Name
+            collection_name (str): Collection name, by default "jam_list"
+        """
+        self._client = MotorClient(mongo_str)
+        self._db = self._client[db_name]
+        self.list = self._db[collection_name]
+
+    def add(self, token: str) -> None:
+        """Method for adding token to list.
+
+        Args:
+            token (str): Your jwt token
+
+        Returns:
+            (None)
+        """
+        document = {
+            "token": token,
+            "timestamp": datetime.datetime.now().timestamp(),
+        }
+
+        self.list.insert_one(document=document)
+        return None
+
+    def check(self, token: str) -> bool:
+        """Method for checking if a token is present in the list.
+
+        Args:
+            token (str): Your jwt token
+
+        Returns:
+            (bool)
+        """
+        _token = self.list.find_one(token=token)
+        if _token:
+            return True
+        else:
+            return False
+
+    def delete(self, token: str) -> None:
+        """Method for removing a token from a list.
+
+        Args:
+            token (str): Your jwt token
+        """
+        self.list.delete_one({"token": token})
         return None
