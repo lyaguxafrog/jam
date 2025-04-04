@@ -1,28 +1,10 @@
 # -*- coding: utf-8 -*-
-
-from abc import ABC, abstractmethod
+import datetime
 
 from redis import Redis
 from tinydb import Query, TinyDB
 
-
-class AbstracttListRepo(ABC):
-    """Abstrac class for lists manipulation."""
-
-    @abstractmethod
-    def add(self, token: str) -> None:
-        """Method for adding token to list."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def check(self, token: str) -> bool:
-        """Method for checking if a token is present in the list."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def delete(self, token: str) -> None:
-        """Method for removing a token from a list."""
-        raise NotImplementedError
+from jam.jwt.lists.__abc_list_repo__ import AbstracttListRepo
 
 
 # TODO: Made with aiotinydb too
@@ -59,7 +41,10 @@ class JSONList(AbstracttListRepo):
         Returns:
             (None)
         """
-        _doc = {"token": token}
+        _doc = {
+            "token": token,
+            "timestamp": datetime.datetime.now().timestamp(),
+        }
 
         self.list.insert(_doc)
         return None

@@ -4,7 +4,7 @@ import datetime
 from typing import Any, Literal
 from uuid import uuid4
 
-from jam.jwt.__tools__ import __gen_jwt__, __validate_jwt__
+from jam.jwt.tools import __gen_jwt__, __validate_jwt__
 
 
 class BaseModule:
