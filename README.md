@@ -38,7 +38,7 @@ payload = jam.make_payload(**data)
 token = jam.gen_jwt_token(**payload)
 ```
 
-## Roadma
-![Roadmap](docs/assets/roadmap.png)
+## Roadmap
+![Roadmap](https://github.com/lyaguxafrog/jam/blob/stable/docs/assets/roadmap.png)
 
 &copy; [Adrian Makridenko](https://github.com/lyaguxafrog) 2025
