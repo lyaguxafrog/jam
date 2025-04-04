@@ -8,7 +8,6 @@ from tinydb import Query, TinyDB
 from jam.jwt.lists.__abc_list_repo__ import AbstracttListRepo
 
 
-# TODO: Made with aiotinydb too
 class JSONList(AbstracttListRepo):
     """Black/White list in JSON format, not recommended for blacklists  because it is not convenient to control token lifetime.
 
@@ -31,7 +30,7 @@ class JSONList(AbstracttListRepo):
         Args:
             json_path (str): Path to .json file
         """
-        self.list = TinyDB(json_path)
+        self.__list__ = TinyDB(json_path)
 
     def add(self, token: str) -> None:
         """Method for adding token to list.
@@ -47,7 +46,7 @@ class JSONList(AbstracttListRepo):
             "timestamp": datetime.datetime.now().timestamp(),
         }
 
-        self.list.insert(_doc)
+        self.__list__.insert(_doc)
         return None
 
     def check(self, token: str) -> bool:
@@ -60,7 +59,7 @@ class JSONList(AbstracttListRepo):
             (bool)
         """
         cond = Query()
-        _token = self.list.search(cond.token == token)
+        _token = self.__list__.search(cond.token == token)
         if _token:
             return True
         else:
@@ -76,7 +75,7 @@ class JSONList(AbstracttListRepo):
             (None)
         """
         cond = Query()
-        self.list.remove(cond.token == token)
+        self.__list__.remove(cond.token == token)
 
     def all(self) -> list:
         """Returns a list of all tokens in the list.
@@ -84,7 +83,7 @@ class JSONList(AbstracttListRepo):
         Args:
             (list)
         """
-        return self.list.all()
+        return self.__list__.all()
 
 
 class RedisList(AbstracttListRepo):
@@ -99,7 +98,7 @@ class RedisList(AbstracttListRepo):
             redis_instance (Redis): `redis.Redis`
             in_list_life_time (int | None): The lifetime of a token in the list
         """
-        self.list = redis_instance
+        self.__list__ = redis_instance
         self.exp = in_list_life_time
 
     def add(self, token: str) -> None:
@@ -111,7 +110,7 @@ class RedisList(AbstracttListRepo):
         Returns:
             (None)
         """
-        self.list.set(name=token, ex=self.exp)
+        self.__list__.set(name=token, ex=self.exp)
         return None
 
     def check(self, token: str) -> bool:
@@ -123,7 +122,7 @@ class RedisList(AbstracttListRepo):
         Returns:
             (bool)
         """
-        _token = self.list.get(name=token)
+        _token = self.__list__.get(name=token)
         if not _token:
             return False
         else:
@@ -138,7 +137,7 @@ class RedisList(AbstracttListRepo):
         Returns:
             None
         """
-        self.list.delete(token)
+        self.__list__.delete(token)
         return None
 
 
@@ -157,7 +156,7 @@ class MongoList(AbstracttListRepo):
         """
         self._client = MotorClient(mongo_str)
         self._db = self._client[db_name]
-        self.list = self._db[collection_name]
+        self.__list__ = self._db[collection_name]
 
     def add(self, token: str) -> None:
         """Method for adding token to list.
@@ -173,7 +172,7 @@ class MongoList(AbstracttListRepo):
             "timestamp": datetime.datetime.now().timestamp(),
         }
 
-        self.list.insert_one(document=document)
+        self.__list__.insert_one(document=document)
         return None
 
     def check(self, token: str) -> bool:
@@ -185,7 +184,7 @@ class MongoList(AbstracttListRepo):
         Returns:
             (bool)
         """
-        _token = self.list.find_one(token=token)
+        _token = self.__list__.find_one(token=token)
         if _token:
             return True
         else:
@@ -197,5 +196,5 @@ class MongoList(AbstracttListRepo):
         Args:
             token (str): Your jwt token
         """
-        self.list.delete_one({"token": token})
+        self.__list__.delete_one({"token": token})
         return None
