@@ -13,6 +13,11 @@
 ```bash
 pip install jamlib
 ```
+or from repo:
+```bash
+git clone https://github.com/lyaguxafrog/jam.git && \
+cd jam/ && uv sync --no-dev  # need to install uv
+```
 
 ## Getting start
 ```python
