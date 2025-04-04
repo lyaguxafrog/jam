@@ -56,6 +56,9 @@ def __gen_jwt__(
     Returns:
         (str): Access/refresh token
     """
+    from icecream import ic
+
+    ic(payload)
     header_encoded = __base64url_encode__(json.dumps(header).encode("utf-8"))
     payload_encoded = __base64url_encode__(json.dumps(payload).encode("utf-8"))
 

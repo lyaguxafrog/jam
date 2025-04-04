@@ -25,6 +25,7 @@ redis-lists=["redis>=5.2.1"]
 [dependency-groups]
 dev = [
     "black>=25.1.0",
+    "icecream>=2.1.4",
     "isort>=6.0.1",
     "mkdocs>=1.6.1",
     "mkdocs-material>=9.6.9",

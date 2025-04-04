@@ -75,7 +75,10 @@ class JWTModule(BaseModule):
             exp (int | None): If none exp = JWTModule.exp
             **data: Custom data
         """
-        _exp = lambda e=exp: e if e is not None else self.exp  # noqa: E731
+        if not exp:
+            _exp = self.exp
+        else:
+            _exp = exp
         payload = {
             "jti": str(uuid4()),
             "exp": _exp,
