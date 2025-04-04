@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 
-from tinydb import TinyDB, Query
+from tinydb import Query, TinyDB
 
 
 class AbstracttListRepo(ABC):
@@ -26,8 +26,7 @@ class AbstracttListRepo(ABC):
 
 # TODO: Made with aiotinydb too
 class JSONList(AbstracttListRepo):
-    """Black/White list in JSON format, not recommended for
-    blacklists because it is not convenient to control token lifetime.
+    """Black/White list in JSON format, not recommended for blacklists  because it is not convenient to control token lifetime.
 
     Dependency required:
     `pip install jamlib[json-list]`
@@ -42,17 +41,13 @@ class JSONList(AbstracttListRepo):
         all: return all tokens in list
     """
 
-    def __init__(
-            self,
-            json_path: str = "whitelist.json"
-    ) -> None:
+    def __init__(self, json_path: str = "whitelist.json") -> None:
         """Class constructor.
 
         Args:
             json_path (str): Path to .json file
         """
         self.list = TinyDB(json_path)
-
 
     def add(self, token: str) -> None:
         """Method for adding token to list.
@@ -63,10 +58,7 @@ class JSONList(AbstracttListRepo):
         Returns:
             (None)
         """
-
-        _doc = {
-            "token": token
-        }
+        _doc = {"token": token}
 
         self.list.insert(_doc)
         return None
@@ -80,7 +72,6 @@ class JSONList(AbstracttListRepo):
         Returns:
             (bool)
         """
-
         cond = Query()
         _token = self.list.search(cond.token == token)
         if _token:
@@ -97,7 +88,6 @@ class JSONList(AbstracttListRepo):
         Returns:
             (None)
         """
-
         cond = Query()
         self.list.remove(cond.token == token)
 

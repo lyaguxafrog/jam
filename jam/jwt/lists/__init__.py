@@ -2,6 +2,5 @@
 
 from .list_manipulations import JSONList
 
-__all__ = [
-    "JSONList"
-]
+
+__all__ = ["JSONList"]

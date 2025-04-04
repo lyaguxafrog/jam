@@ -9,11 +9,7 @@ from jam.__modules__ import JWTModule
 class Jam(AbstractInstance):
     """Main instance."""
 
-    def __init__(
-            self,
-            auth_type: str,
-            config: dict[str, Any]
-    ) -> None:
+    def __init__(self, auth_type: str, config: dict[str, Any]) -> None:
         """Class construcotr.
 
         Args:
@@ -27,11 +23,10 @@ class Jam(AbstractInstance):
                 secret_key=config["secret_key"],
                 public_key=config["public_key"],
                 private_key=config["private_key"],
-                expire=config["expire"]
+                expire=config["expire"],
             )
         else:
             raise NotImplementedError
-
 
     def gen_jwt_token(self, **payload) -> str:
         """Creating a new token.
@@ -46,9 +41,7 @@ class Jam(AbstractInstance):
         return self.module.gen_token(**payload)
 
     def verify_jwt_token(
-            self,
-            token: str,
-            check_exp: bool = True
+        self, token: str, check_exp: bool = True
     ) -> dict[str, Any]:
         """A method for verifying a token.
 
@@ -66,9 +59,7 @@ class Jam(AbstractInstance):
         Returns:
             (dict[str, Any]): Payload from token
         """
-        return self.module.validate_payload(
-            token=token, check_exp=check_exp
-        )
+        return self.module.validate_payload(token=token, check_exp=check_exp)
 
     def make_payload(self, exp: int | None = None, **data) -> dict[str, Any]:
         """Payload maker tool.

@@ -41,7 +41,7 @@ dev = [
 target-version = "py313"
 line-length = 80
 ignore = ["UP009", "D100"]
-exclude = ["*__init__.py", "tests/"]
+exclude = ["*__init__.py", "tests/", "*exceptions/"]
 
 [tool.ruff.lint]
 extend-select = ["UP", "D"]
