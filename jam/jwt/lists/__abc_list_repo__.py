@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABC, abstractmethod
+from typing import Protocol
 
 
 class AbstracttListRepo(ABC):
@@ -20,3 +21,19 @@ class AbstracttListRepo(ABC):
     def delete(self, token: str) -> None:
         """Method for removing a token from a list."""
         raise NotImplementedError
+
+
+class JWTList(Protocol):
+    """Protocol class for lists."""
+
+    def add(self, token: str) -> None:
+        """Method for adding token to list."""
+        pass
+
+    def check(self, token: str) -> bool:
+        """Method for checking if a token is present in the list."""
+        pass
+
+    def delete(self, token: str) -> None:
+        """Method for removing a token from a list."""
+        pass
