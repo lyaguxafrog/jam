@@ -1,12 +1,17 @@
 [project]
 name = "jamlib"
-version = "3.1.0-alpha"
-description = "Simple and univirsal library for authorization"
+dynamic = ["version"]
+description = "Simple and univirsal library for authorization."
 authors = [
     {name = "Makridenko Adrian",email = "adrianmakridenko@duck.com"}
 ]
 license = {text = "MIT License"}
-readme = "README.md"
+readme = {file = "README.md", content-type = "text/markdown"}
+keywords = [
+    "auth",
+    "backend",
+    "jwt"
+]
 requires-python = ">=3.13"
 dependencies = [
     "pycryptodome>=3.21.0,<4.0.0",
@@ -17,6 +22,7 @@ dependencies = [
 Homepage = "https://github.com/lyaguxafrog/jam"
 Repository = "https://github.com/lyaguxafrog/jam"
 Issues = "https://github.com/lyaguxafrog/jam/issues"
+Changelog = "https://github.com/lyaguxafrog/jam/releases"
 
 [project.optional-dependencies]
 json-lists=["tinydb>=4.8.2"]

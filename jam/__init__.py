@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-JAM - Universal Authorization Library
+JAM - Universal auth* library
 
 Source code: https://github.com/lyaguxafrog/jam
 Documentation: https://jam.makridenko.ru

@@ -1,19 +1,23 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any
+from typing import Any, Literal
 
 from jam.__abc_instances__ import AbstractInstance
-from jam.__modules__ import JWTModule
+from jam.modules import JWTModule
 
 
 class Jam(AbstractInstance):
     """Main instance."""
 
-    def __init__(self, auth_type: str, config: dict[str, Any]) -> None:
+    def __init__(
+        self,
+        auth_type: Literal["jwt"],
+        config: dict[str, Any],
+    ) -> None:
         """Class construcotr.
 
         Args:
-            auth_type (str): Type of auth*
+            auth_type (Literal["jwt"]): Type of auth*
             config (dict[str, Any]): Config for Jam, can use `jam.utils.config_maker`
         """
         self.type = auth_type
