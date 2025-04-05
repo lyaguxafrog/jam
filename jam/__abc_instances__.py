@@ -4,16 +4,18 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 
-class AbstractInstance(ABC):
+class __AbstractInstance(ABC):
     """Abstract Instance object."""
 
     @abstractmethod
-    def gen_jwt_token(self, **payload) -> str:
+    def gen_jwt_token(self, payload) -> str:
         """Generate new JWT token."""
         raise NotImplementedError
 
     @abstractmethod
-    def verify_jwt_token(self, token: str, check_exp: bool) -> Any:
+    def verify_jwt_token(
+        self, token: str, check_exp: bool, check_list: bool
+    ) -> Any:
         """Verify JWT token."""
         raise NotImplementedError
 

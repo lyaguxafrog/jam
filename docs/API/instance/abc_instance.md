@@ -1,1 +1,0 @@
-::: jam.__abc_instances__.AbstractInstance

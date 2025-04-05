@@ -1,13 +1,11 @@
 # Jam
 
+![logo](docs/assets/h_logo_n_title.png)
+
 ![Static Badge](https://img.shields.io/badge/Python-3.13-blue?logo=python&logoColor=white)
-![tests](https://github.com/lyaguxafrog/jam/actions/workflows/run-tests.yml/badge.svg) ![License](https://img.shields.io/badge/Licese-MIT-grey?link=https%3A%2F%2Fgithub.com%2Flyaguxafrog%2Fjam%2Fblob%2Frelease%2FLICENSE.md)
-![jam](https://img.shields.io/badge/jam-3.0.0_alpha-white?style=flat&labelColor=red)
-
-
-> [!CAUTION]
-> In active development! Cannot be used in real projects!
-> 
+![tests](https://github.com/lyaguxafrog/jam/actions/workflows/run-tests.yml/badge.svg)
+![License](https://img.shields.io/badge/Licese-MIT-grey?link=https%3A%2F%2Fgithub.com%2Flyaguxafrog%2Fjam%2Fblob%2Frelease%2FLICENSE.md)
+![jam](https://img.shields.io/badge/jam-3.1.0_alpha-white?style=flat&labelColor=red)
 
 ## Install
 ```bash
@@ -38,7 +36,7 @@ payload = jam.make_payload(**data)
 token = jam.gen_jwt_token(**payload)
 ```
 
-## Roadma
-![Roadmap](docs/assets/roadmap.png)
+## Roadmap
+![Roadmap](https://github.com/lyaguxafrog/jam/blob/stable/docs/assets/roadmap.png)
 
 &copy; [Adrian Makridenko](https://github.com/lyaguxafrog) 2025

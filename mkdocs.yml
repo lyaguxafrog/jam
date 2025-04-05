@@ -1,6 +1,7 @@
 site_name: Jam
 site_url: https://jam.makridenko.ru
 site_description: Simple and univirsal library for authorization.
+copyright: Adrian Makridenko | <a href="https://github.com/lyaguxafrog/">@lyaguxafrog</a>
 
 repo_name: lyaguxafrog/jam
 repo_url: https://github.com/lyaguxafrog/jam
@@ -8,21 +9,67 @@ edit_uri: blob/release/docs/
 
 nav:
   - Home: index.md
-  - Changelog: https://github.com/lyaguxafrog/jam/releases
+  - Usage:
+      - JWT:
+          - Config: jwt/config.md
+          - Instance: jwt/instance.md
+          - Lists:
+              - What is?: jwt/lists/what.md
+              - How to use?: jwt/lists/how.md
+              - JSONList: jwt/lists/json.md
+              - RedisList: jwt/lists/redis.md
+              - CustomList: jwt/lists/own_module.md
   - API:
-      - Instance:
-          AbstractInstance: API/instance/abc_instance.md
-          Jam: API/instance/instance.md
-      - __modules__: API/modules.md
+      - Jam: api/instance.md
+      - __AbstractInstance: api/abc_instance.md
+      - jam.jwt:
+          - tools.py: api/jwt/tools.md
+          - __utils__.py: api/jwt/utils.md
+          - jam.jwt.lists:
+              - __abc_list_repo__.py: api/jwt/lists/abc_lists.md
+              - JSONList: api/jwt/lists/json.md
+              - RedisList: api/jwt/lists/redis.md
+      - jam.utils:
+          - generate_rsa_key_pair: api/utils/rsa.md
+          - make_jwt_config: api/utils/jwt_config.md
+  - Changelog: https://github.com/lyaguxafrog/jam/releases
+  - Contributing: contributing.md
 
 
 
 theme:
   name: material
-  feature:
-    tabs: true
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - header.autohide
+    - tabs
+    - navigation.footer
   icon:
     repo: fontawesome/brands/github
+    previous: fontawesome/solid/angle-left
+    next: fontawesome/solid/angle-right
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: pink
+      accent: pink
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: pink
+      accent: pink
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
 
 extra:
   social:
@@ -49,6 +96,10 @@ markdown_extensions:
 
 plugins:
   - search
+  - termynal:
+      prompt_literal_start:
+        - "$"
+        - ">"
   - mkdocstrings:
       handlers:
         python:
