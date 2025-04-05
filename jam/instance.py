@@ -28,6 +28,7 @@ class Jam(__AbstractInstance):
                 public_key=config["public_key"],
                 private_key=config["private_key"],
                 expire=config["expire"],
+                list=config["list"],
             )
         else:
             raise NotImplementedError
@@ -63,7 +64,9 @@ class Jam(__AbstractInstance):
         Returns:
             (dict[str, Any]): Payload from token
         """
-        return self.module.validate_payload(token=token, check_exp=check_exp)
+        return self.module.validate_payload(
+            token=token, check_exp=check_exp, check_list=True
+        )
 
     def make_payload(self, exp: int | None = None, **data) -> dict[str, Any]:
         """Payload maker tool.

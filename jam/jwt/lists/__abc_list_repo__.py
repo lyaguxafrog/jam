@@ -9,7 +9,7 @@ class ABCList(ABC):
 
     def __init__(self, list_type: Literal["white", "black"]) -> None:
         """Class constructor."""
-        self.__list_type__ = type
+        self.__list_type__ = list_type
 
     @abstractmethod
     def add(self, token: str) -> None:
