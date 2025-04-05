@@ -3,7 +3,7 @@
 from typing import Any, Literal
 
 from jam.exceptions.jwt import EmptyPublicKey, EmptySecretKey, EmtpyPrivateKey
-from jam.jwt.lists.__abc_list_repo__ import ABCList
+from jam.jwt.lists.__abc_list_repo__ import JWTList
 
 
 def make_jwt_config(
@@ -22,7 +22,7 @@ def make_jwt_config(
     public_key: str | None = None,
     private_key: str | None = None,
     expire: int = 3600,
-    list: ABCList | None = None,
+    list: JWTList | None = None,
 ) -> dict[str, Any]:
     """Util for making JWT config.
 
