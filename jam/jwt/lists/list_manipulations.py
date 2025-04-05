@@ -120,7 +120,7 @@ class RedisList(ABCList):
         Returns:
             (None)
         """
-        self.__list__.set(name=token, ex=self.exp)
+        self.__list__.set(name=token, value="", ex=self.exp)
         return None
 
     def check(self, token: str) -> bool:
