@@ -31,7 +31,7 @@ This is the lifetime of the token in seconds.
 
 ### `list`
 This is a module for working with black/white lists.
-See Jam List documentaion.
+See [Jam List documentaion](lists/what.md).
 
 You can use `jam.utils.make_jwt_config`.
 ```python
