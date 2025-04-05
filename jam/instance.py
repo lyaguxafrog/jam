@@ -2,11 +2,11 @@
 
 from typing import Any, Literal
 
-from jam.__abc_instances__ import AbstractInstance
+from jam.__abc_instances__ import __AbstractInstance
 from jam.modules import JWTModule
 
 
-class Jam(AbstractInstance):
+class Jam(__AbstractInstance):
     """Main instance."""
 
     def __init__(

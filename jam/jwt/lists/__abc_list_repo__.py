@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABC, abstractmethod
-from typing import Protocol
+from typing import Literal, Protocol
 
 
 class ABCList(ABC):
     """Abstrac class for lists manipulation."""
+
+    def __init__(self, list_type: Literal["white", "black"]) -> None:
+        """Class constructor."""
+        self.__list_type__ = type
 
     @abstractmethod
     def add(self, token: str) -> None:

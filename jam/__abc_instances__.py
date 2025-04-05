@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 
-class AbstractInstance(ABC):
+class __AbstractInstance(ABC):
     """Abstract Instance object."""
 
     @abstractmethod

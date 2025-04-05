@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+
 import datetime
+from typing import Literal
 
 from redis import Redis
 from tinydb import Query, TinyDB
@@ -22,12 +24,16 @@ class JSONList(ABCList):
         delete: removing token from list
     """
 
-    def __init__(self, json_path: str = "whitelist.json") -> None:
+    def __init__(
+        self, type: Literal["white", "black"], json_path: str = "whitelist.json"
+    ) -> None:
         """Class constructor.
 
         Args:
+            type (Literal["white", "black"]): Type of list
             json_path (str): Path to .json file
         """
+        super().__init__(list_type=type)
         self.__list__ = TinyDB(json_path)
 
     def add(self, token: str) -> None:
@@ -80,14 +86,19 @@ class RedisList(ABCList):
     """Black/White lists in Redis, most optimal format."""
 
     def __init__(
-        self, redis_instance: Redis, in_list_life_time: int | None
+        self,
+        type: Literal["white", "black"],
+        redis_instance: Redis,
+        in_list_life_time: int | None,
     ) -> None:
         """Class constructor.
 
         Args:
+            type (Literal["white", "black"]): Type og list
             redis_instance (Redis): `redis.Redis`
             in_list_life_time (int | None): The lifetime of a token in the list
         """
+        super().__init__(list_type=type)
         self.__list__ = redis_instance
         self.exp = in_list_life_time
 
