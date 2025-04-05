@@ -13,7 +13,7 @@ class JSONList(ABCList):
     """Black/White list in JSON format, not recommended for blacklists  because it is not convenient to control token lifetime.
 
     Dependency required:
-    `pip install jamlib[json-list]`
+    `pip install jamlib[json-lists]`
 
     Attributes:
         __list__ (TinyDB): TinyDB instance
@@ -85,7 +85,14 @@ class JSONList(ABCList):
 
 
 class RedisList(ABCList):
-    """Black/White lists in Redis, most optimal format."""
+    """Black/White lists in Redis, most optimal format.
+
+    Dependency required: `pip install jamlib[redis-lists]`
+
+    Attributes:
+        __list__ (Redis): Redis instance
+        exp (int | None): Token lifetime
+    """
 
     def __init__(
         self,
