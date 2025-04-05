@@ -30,6 +30,8 @@ class ABCList(ABC):
 class JWTList(Protocol):
     """Protocol class for lists."""
 
+    __list_type__: Literal["black", "white"]
+
     def add(self, token: str) -> None:
         """Method for adding token to list."""
         pass

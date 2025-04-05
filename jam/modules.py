@@ -4,6 +4,8 @@ import datetime
 from typing import Any, Literal
 from uuid import uuid4
 
+from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
+from jam.jwt.lists.__abc_list_repo__ import JWTList
 from jam.jwt.tools import __gen_jwt__, __validate_jwt__
 
 
@@ -51,6 +53,7 @@ class JWTModule(BaseModule):
         public_key: str | None = None,
         private_key: str | None = None,
         expire: int = 3600,
+        list: JWTList | None = None,
     ) -> None:
         """Class constructor.
 
@@ -60,6 +63,7 @@ class JWTModule(BaseModule):
             private_key (str | None): Private key for RSA enecryption
             public_key (str | None): Public key for RSA
             expire (int): Token lifetime in seconds
+            list (JWTList | None): List module
         """
         super().__init__(module_type="jwt")
         self._secret_key = secret_key
@@ -67,6 +71,7 @@ class JWTModule(BaseModule):
         self._private_key = (private_key,)
         self.public_key = public_key
         self.exp = expire
+        self.list = list
 
     def make_payload(self, exp: int | None = None, **data) -> dict[str, Any]:
         """Payload maker tool.
@@ -98,23 +103,27 @@ class JWTModule(BaseModule):
             EmtpyPrivateKey: If RSA algorithm is selected, but private key None
         """
         header = {"alg": self.alg, "type": "jwt"}
-        return __gen_jwt__(
+        token = __gen_jwt__(
             header=header,
             payload=payload,
             secret=self._secret_key,
             private_key=self._private_key,  # type: ignore
         )
 
+        if self.list:
+            if self.list.__list_type__ == "white":
+                self.list.add(token)
+        return token
+
     def validate_payload(
-        self,
-        token: str,
-        check_exp: bool = False,
+        self, token: str, check_exp: bool = False, check_list: bool = True
     ) -> dict[str, Any]:
         """A method for verifying a token.
 
         Args:
             token (str): The token to check
             check_exp (bool): Check for expiration?
+            check_list (bool): Check if there is a black/white list
 
         Raises:
             ValueError: If the token is invalid.
@@ -122,13 +131,29 @@ class JWTModule(BaseModule):
             EmtpyPublicKey: If RSA algorithm is selected, but public key None.
             NotFoundSomeInPayload: If 'exp' not found in payload.
             TokenLifeTimeExpired: If token has expired.
+            TokenNotInWhiteList: If the list type is white, but the token is  not there
+            TokenInBlackList: If the list type is black and the token is there
 
         Returns:
             (dict[str, Any]): Payload from token
         """
-        return __validate_jwt__(
+        if check_list:
+            if self.list.__list_type__ == "white":  # type: ignore
+                if not self.list.check(token):  # type: ignore
+                    raise TokenNotInWhiteList
+                else:
+                    pass
+            if self.list.__list_type__ == "black":  # type: ignore
+                if self.list.check(token):  # type: ignore
+                    raise TokenInBlackList
+                else:
+                    pass
+
+        payload = __validate_jwt__(
             token=token,
             check_exp=check_exp,
             secret=self._secret_key,
             public_key=self.public_key,
         )
+
+        return payload
