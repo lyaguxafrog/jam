@@ -1,6 +1,6 @@
 [project]
 name = "jamlib"
-version = "1.0.0"
+version = "1.0.1"
 description = "Simple and univirsal library for authorization."
 authors = [
     {name = "Makridenko Adrian",email = "adrianmakridenko@duck.com"}
@@ -19,7 +19,7 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/lyaguxafrog/jam"
+Homepage = "https://jam.makridenko.ru"
 Repository = "https://github.com/lyaguxafrog/jam"
 Issues = "https://github.com/lyaguxafrog/jam/issues"
 Changelog = "https://github.com/lyaguxafrog/jam/releases"

@@ -86,7 +86,7 @@ class JWTModule(BaseModule):
             _exp = exp
         payload = {
             "jti": str(uuid4()),
-            "exp": _exp,
+            "exp": _exp + datetime.datetime.now().timestamp(),
             "iat": datetime.datetime.now().timestamp(),
         }
         payload.update(**data)

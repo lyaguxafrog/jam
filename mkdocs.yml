@@ -34,6 +34,7 @@ nav:
           - make_jwt_config: api/utils/jwt_config.md
   - Changelog: https://github.com/lyaguxafrog/jam/releases
   - Contributing: contributing.md
+  - License: LICENSE.md
 
 
 
