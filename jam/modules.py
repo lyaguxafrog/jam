@@ -45,9 +45,9 @@ class JWTModule(BaseModule):
             "RS256",
             "RS384",
             "RS512",
-            "PS256",
-            "PS384",
-            "PS512",
+            # "PS256",
+            # "PS384",
+            # "PS512",
         ] = "HS256",
         secret_key: str | None = None,
         public_key: str | None = None,
@@ -102,7 +102,7 @@ class JWTModule(BaseModule):
             EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
             EmtpyPrivateKey: If RSA algorithm is selected, but private key None
         """
-        header = {"alg": self.alg, "type": "jwt"}
+        header = {"alg": self.alg, "typ": "jwt"}
         token = __gen_jwt__(
             header=header,
             payload=payload,

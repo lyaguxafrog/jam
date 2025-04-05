@@ -33,11 +33,11 @@ class Jam(__AbstractInstance):
         else:
             raise NotImplementedError
 
-    def gen_jwt_token(self, **payload) -> str:
+    def gen_jwt_token(self, payload: dict[str, Any]) -> str:
         """Creating a new token.
 
         Args:
-            **payload: Payload with information
+            payload (dict[str, Any]): Payload with information
 
         Raises:
             EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
@@ -46,13 +46,14 @@ class Jam(__AbstractInstance):
         return self.module.gen_token(**payload)
 
     def verify_jwt_token(
-        self, token: str, check_exp: bool = True
+        self, token: str, check_exp: bool = True, check_list: bool = True
     ) -> dict[str, Any]:
         """A method for verifying a token.
 
         Args:
             token (str): The token to check
             check_exp (bool): Check for expiration?
+            check_list (bool): Check if there is a black/white list
 
         Raises:
             ValueError: If the token is invalid.
@@ -60,12 +61,14 @@ class Jam(__AbstractInstance):
             EmtpyPublicKey: If RSA algorithm is selected, but public key None.
             NotFoundSomeInPayload: If 'exp' not found in payload.
             TokenLifeTimeExpired: If token has expired.
+            TokenNotInWhiteList: If the list type is white, but the token is  not there
+            TokenInBlackList: If the list type is black and the token is there
 
         Returns:
             (dict[str, Any]): Payload from token
         """
         return self.module.validate_payload(
-            token=token, check_exp=check_exp, check_list=True
+            token=token, check_exp=check_exp, check_list=check_list
         )
 
     def make_payload(self, exp: int | None = None, **data) -> dict[str, Any]:
