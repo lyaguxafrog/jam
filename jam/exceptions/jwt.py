@@ -1,36 +1,26 @@
 # -*- coding: utf-8 -*-
 
-# TODO: Exceptions to dataclasses
-
 from dataclasses import dataclass
 
 
+@dataclass
 class EmptySecretKey(Exception):
-    def __init__(
-        self, message: str | Exception = "Secret key cannot be NoneType"
-    ) -> None:
-        self.message: str | Exception = message
+    message: str | Exception = "Secret key cannot be NoneType"
 
 
+@dataclass
 class EmtpyPrivateKey(Exception):
-    def __init__(
-        self, message: str | Exception = "Private key cannot be NoneType"
-    ) -> None:
-        self.message: str | Exception = message
+    message: str | Exception = "Private key cannot be NoneType"
 
 
+@dataclass
 class EmptyPublicKey(Exception):
-    def __inti__(
-        self, message: str | Exception = "Public key cannot be NoneType"
-    ) -> None:
-        self.message: str | Exception = message
+    message: str | Exception = "Public key cannot be NoneType"
 
 
+@dataclass
 class TokenLifeTimeExpired(Exception):
-    def __inti__(
-        self, message: str | Exception = "Token lifetime has expired."
-    ) -> None:
-        self.message: str | Exception = message
+    message: str | Exception = "Token lifetime has expired."
 
 
 class NotFoundSomeInPayload(Exception):
