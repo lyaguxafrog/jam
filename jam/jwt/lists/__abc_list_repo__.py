@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Protocol
 
 
-class AbstracttListRepo(ABC):
+class ABCList(ABC):
     """Abstrac class for lists manipulation."""
 
     @abstractmethod
