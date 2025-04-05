@@ -10,7 +10,7 @@ from jam.exceptions import (
     EmtpyPrivateKey,
     TokenLifeTimeExpired,
 )
-from jam.jwt.__tools__ import __gen_jwt__, __validate_jwt__
+from jam.jwt.tools import __gen_jwt__, __validate_jwt__
 from jam.utils import generate_rsa_key_pair
 
 

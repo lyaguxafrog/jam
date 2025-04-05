@@ -1,12 +1,17 @@
 [project]
 name = "jamlib"
-version = "3.0.0-alpha"
-description = "Simple and univirsal library for authorization"
+dynamic = ["version"]
+description = "Simple and univirsal library for authorization."
 authors = [
     {name = "Makridenko Adrian",email = "adrianmakridenko@duck.com"}
 ]
 license = {text = "MIT License"}
-readme = "README.md"
+readme = {file = "README.md", content-type = "text/markdown"}
+keywords = [
+    "auth",
+    "backend",
+    "jwt"
+]
 requires-python = ">=3.13"
 dependencies = [
     "pycryptodome>=3.21.0,<4.0.0",
@@ -17,10 +22,16 @@ dependencies = [
 Homepage = "https://github.com/lyaguxafrog/jam"
 Repository = "https://github.com/lyaguxafrog/jam"
 Issues = "https://github.com/lyaguxafrog/jam/issues"
+Changelog = "https://github.com/lyaguxafrog/jam/releases"
+
+[project.optional-dependencies]
+json-lists=["tinydb>=4.8.2"]
+redis-lists=["redis>=5.2.1"]
 
 [dependency-groups]
 dev = [
     "black>=25.1.0",
+    "icecream>=2.1.4",
     "isort>=6.0.1",
     "mkdocs>=1.6.1",
     "mkdocs-material>=9.6.9",
@@ -29,7 +40,10 @@ dev = [
     "mypy>=1.15.0",
     "pre-commit>=4.2.0",
     "pytest>=8.3.5",
+    "redis>=5.2.1",
     "ruff>=0.11.2",
+    "termynal>=0.13.0",
+    "tinydb>=4.8.2",
 ]
 
 
@@ -37,7 +51,7 @@ dev = [
 target-version = "py313"
 line-length = 80
 ignore = ["UP009", "D100"]
-exclude = ["*__init__.py", "tests/"]
+exclude = ["*__init__.py", "tests/", "*exceptions/"]
 
 [tool.ruff.lint]
 extend-select = ["UP", "D"]
