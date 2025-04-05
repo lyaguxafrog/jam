@@ -42,6 +42,7 @@ dev = [
     "pytest>=8.3.5",
     "redis>=5.2.1",
     "ruff>=0.11.2",
+    "termynal>=0.13.0",
     "tinydb>=4.8.2",
 ]
 

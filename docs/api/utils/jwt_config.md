@@ -1,0 +1,1 @@
+::: jam.utils.config_maker.make_jwt_config
