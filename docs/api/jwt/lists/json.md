@@ -1,1 +1,1 @@
-::: jam.jwt.lists.list_manipulations.JSONList
+::: jam.jwt.lists.json.JSONList
