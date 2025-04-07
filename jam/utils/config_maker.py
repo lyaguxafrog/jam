@@ -56,3 +56,22 @@ def make_jwt_config(
         "expire": expire,
         "list": list,
     }
+
+
+# def __yaml_config_parser__(path: str) -> dict[str, Any]:
+#     """Private method for parsinf YML config.
+#
+#     Args:
+#         path (str): Path to config.yml
+#
+#     Returns:
+#         (dict[str, Any]): Dict with cofigs params
+#     """
+#     try:
+#         with open(path) as file:
+#             config = yaml.safe_load(file)
+#         return config if config else {}
+#     except FileNotFoundError:
+#         raise FileNotFoundError(f"YAML config file not found at: {path}")
+#     except yaml.YAMLError as e:
+#         raise ValueError(f"Error parsing YAML file: {e}")
