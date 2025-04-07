@@ -4,7 +4,8 @@ from pytest import fixture, raises
 
 from jam import Jam
 from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
-from jam.jwt.lists import JSONList, RedisList
+from jam.jwt.lists.json import JSONList
+from jam.jwt.lists.redis import RedisList
 from jam.utils import make_jwt_config
 
 
