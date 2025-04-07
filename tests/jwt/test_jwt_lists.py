@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from fakeredis import FakeRedis
 from pytest import fixture, raises
 
 from jam import Jam
-from jam.exceptions import TokenInBlackList
+from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
 from jam.jwt.lists import RedisList
 from jam.utils import make_jwt_config
 
@@ -19,6 +18,13 @@ from jam.utils import make_jwt_config
 def redis_black_list(fake_redis):
     return RedisList(
         type="black", redis_instance=fake_redis, in_list_life_time=None
+    )
+
+
+@fixture(scope="function")
+def redis_white_list(fake_redis):
+    return RedisList(
+        type="white", redis_instance=fake_redis, in_list_life_time=None
     )
 
 
@@ -46,10 +52,27 @@ def test_redis_black_lists(redis_black_list):
     assert payload == _payload
 
     # check blacklist
-
     jam.module.list.add(token)
 
     with raises(TokenInBlackList):
         __payload = jam.verify_jwt_token(
             token=token, check_exp=False, check_list=True
         )
+
+
+def test_redis_white_lists(redis_white_list):
+    config = make_jwt_config(
+        alg="HS512", secret_key="secret", list=redis_white_list
+    )
+
+    jam = Jam(auth_type="jwt", config=config)
+    payload = {"user_id": 1}
+
+    token = jam.gen_jwt_token(payload)
+
+    _payload = jam.verify_jwt_token(token, check_exp=False, check_list=True)
+    assert _payload == payload
+
+    jam.module.list.delete(token)
+    with raises(TokenNotInWhiteList):
+        jam.verify_jwt_token(token, check_exp=False, check_list=True)
