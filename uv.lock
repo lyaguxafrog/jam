@@ -293,6 +293,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "cryptography" },
     { name = "pycryptodome" },
+    { name = "pyyml" },
 ]
 
 [package.optional-dependencies]
@@ -326,6 +327,7 @@ dev = [
 requires-dist = [
     { name = "cryptography", specifier = ">=44.0.2,<45.0.0" },
     { name = "pycryptodome", specifier = ">=3.21.0,<4.0.0" },
+    { name = "pyyml", specifier = ">=0.0.2" },
     { name = "redis", marker = "extra == 'redis-lists'", specifier = ">=5.2.1" },
     { name = "tinydb", marker = "extra == 'json-lists'", specifier = ">=4.8.2" },
 ]
@@ -723,6 +725,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/fb/8e/da1c6c58f751b70f8ceb1eb25bc25d524e8f14fe16edcce3f4e3ba08629c/pyyaml_env_tag-0.1.tar.gz", hash = "sha256:70092675bda14fdec33b31ba77e7543de9ddc88f2e5b99160396572d11525bdb", size = 5631 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/5a/66/bbb1dd374f5c870f59c5bb1db0e18cbe7fa739415a24cbd95b2d1f5ae0c4/pyyaml_env_tag-0.1-py3-none-any.whl", hash = "sha256:af31106dec8a4d68c60207c1886031cbf839b68aa7abccdb19868200532c2069", size = 3911 },
+]
+
+[[package]]
+name = "pyyml"
+version = "0.0.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyyaml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/37/03/06f9809cf57ef6fdffe11a4bf7c0c092835913da05bfce9d618ac6f714af/pyyml-0.0.2.tar.gz", hash = "sha256:f005c753eb36a405321eb653d803861c8570c347f89b35a7c9c21edef5248f5f", size = 1406 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/20/c4/3996ead5533b19da63409c0e5e56827f0e5ed8228c771d587ac98c63c157/pyyml-0.0.2-py2.py3-none-any.whl", hash = "sha256:17acc886bb8d58197a745003eae477b18b343ebaa0a304527c5a5dc5770a2b74", size = 1489 },
 ]
 
 [[package]]
