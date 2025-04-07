@@ -4,7 +4,7 @@ from pytest import fixture, raises
 
 from jam import Jam
 from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
-from jam.jwt.lists import RedisList
+from jam.jwt.lists import JSONList, RedisList
 from jam.utils import make_jwt_config
 
 
@@ -26,6 +26,16 @@ def redis_white_list(fake_redis):
     return RedisList(
         type="white", redis_instance=fake_redis, in_list_life_time=None
     )
+
+
+@fixture(scope="function")
+def json_black_list():
+    return JSONList(type="black", json_path="json-for-tests.json")
+
+
+@fixture(scope="function")
+def json_white_list():
+    return JSONList(type="white", json_path="json-for-tests.json")
 
 
 def test_redis_list_init(fake_redis):
@@ -67,6 +77,42 @@ def test_redis_white_lists(redis_white_list):
 
     jam = Jam(auth_type="jwt", config=config)
     payload = {"user_id": 1}
+
+    token = jam.gen_jwt_token(payload)
+
+    _payload = jam.verify_jwt_token(token, check_exp=False, check_list=True)
+    assert _payload == payload
+
+    jam.module.list.delete(token)
+    with raises(TokenNotInWhiteList):
+        jam.verify_jwt_token(token, check_exp=False, check_list=True)
+
+
+def test_json_black_lists(json_black_list):
+    config = make_jwt_config(
+        alg="HS384", secret_key="secret", list=json_black_list
+    )
+    jam = Jam(auth_type="jwt", config=config)
+    payload = {"json_list": "penis"}
+
+    token = jam.gen_jwt_token(payload)
+    _payload = jam.verify_jwt_token(token, check_exp=False, check_list=True)
+
+    assert payload == _payload
+
+    jam.module.list.add(token)
+
+    with raises(TokenInBlackList):
+        jam.verify_jwt_token(token, check_list=True, check_exp=False)
+
+
+def test_json_white_lists(json_white_list):
+    config = make_jwt_config(
+        alg="HS512", secret_key="secret", list=json_white_list
+    )
+
+    jam = Jam(auth_type="jwt", config=config)
+    payload = {"user_id": 1100}
 
     token = jam.gen_jwt_token(payload)
 

@@ -172,3 +172,4 @@ cython_debug/
 .pytest_cache/
 debug.py
 .idea/
+json-for-tests.json
