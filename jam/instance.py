@@ -18,15 +18,15 @@ class Jam(__AbstractInstance):
 
         Args:
             auth_type (Literal["jwt"]): Type of auth*
-            config (dict[str, Any]): Config for Jam, can use `jam.utils.config_maker`
+            config (dict[str, Any] | str): Config for Jam, can use `jam.utils.config_maker`
         """
         self.type = auth_type
         if self.type == "jwt":
             self.module = JWTModule(
                 alg=config["alg"],
                 secret_key=config["secret_key"],
-                public_key=config["public_key"],
                 private_key=config["private_key"],
+                public_key=config["public_key"],
                 expire=config["expire"],
                 list=config["list"],
             )
@@ -43,6 +43,11 @@ class Jam(__AbstractInstance):
             EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
             EmtpyPrivateKey: If RSA algorithm is selected, but private key None
         """
+        if self.type != "jwt":
+            raise NotImplementedError(
+                "This method is only available for JWT auth*."
+            )
+
         return self.module.gen_token(**payload)
 
     def verify_jwt_token(
@@ -67,6 +72,11 @@ class Jam(__AbstractInstance):
         Returns:
             (dict[str, Any]): Payload from token
         """
+        if self.type != "jwt":
+            raise NotImplementedError(
+                "This method is only available for JWT auth*."
+            )
+
         return self.module.validate_payload(
             token=token, check_exp=check_exp, check_list=check_list
         )
@@ -78,4 +88,9 @@ class Jam(__AbstractInstance):
             exp (int | None): If none exp = JWTModule.exp
             **data: Custom data
         """
+        if self.type != "jwt":
+            raise NotImplementedError(
+                "This method is only available for JWT auth*."
+            )
+
         return self.module.make_payload(exp=exp, **data)

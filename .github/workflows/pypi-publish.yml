@@ -1,27 +1,23 @@
-name: Publish lib
+name: Release
 
 on:
   push:
     tags:
-      - 'v*'
+      # Publish on any tag starting with a `v`, e.g. v1.2.3
+      - v*
 
 jobs:
-  pypi-publish:
-    name: upload release to PyPI
+  pypi:
+    name: Publish to PyPI
     runs-on: ubuntu-latest
-    # Specifying a GitHub environment is optional, but strongly encouraged
-    environment: pypi
+    # Environment and permissions trusted publishing.
+    environment:
+      # Create this environment in the GitHub repository under Settings -> Environments
+      name: release
     permissions:
-      # IMPORTANT: this permission is mandatory for Trusted Publishing
       id-token: write
     steps:
-      # retrieve your distributions here
-
-      - name: Install uv
-        run: pip install uv
-
-      - name: Build Jam
-        run: uv build
-
-      - name: Publish package distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - run: uv build
+      - run: uv publish --trusted-publishing always
