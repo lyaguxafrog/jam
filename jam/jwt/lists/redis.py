@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import datetime
 from typing import Literal
 
 
@@ -52,7 +52,9 @@ class RedisList(ABCList):
         Returns:
             (None)
         """
-        self.__list__.set(name=token, value="", ex=self.exp)
+        self.__list__.set(
+            name=token, value=str(datetime.datetime.now()), ex=self.exp
+        )
         return None
 
     def check(self, token: str) -> bool:
@@ -65,10 +67,9 @@ class RedisList(ABCList):
             (bool)
         """
         _token = self.__list__.get(name=token)
-        if not _token:
-            return False
-        else:
+        if _token:
             return True
+        return False
 
     def delete(self, token: str) -> None:
         """Method for removing a token from a list.
