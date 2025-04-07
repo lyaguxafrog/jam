@@ -14,9 +14,7 @@ class BaseModule:
 
     def __init__(
         self,
-        module_type: Literal[
-            "jwt", "session-redis", "session-mongo", "session-custom"
-        ],
+        module_type: Literal["jwt"],
     ) -> None:
         """Class constructor.
 
