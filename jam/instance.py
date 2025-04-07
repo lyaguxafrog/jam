@@ -22,7 +22,14 @@ class Jam(__AbstractInstance):
         """
         self.type = auth_type
         if self.type == "jwt":
-            self.module = JWTModule(**config)
+            self.module = JWTModule(
+                alg=config["alg"],
+                secret_key=config["secret_key"],
+                private_key=config["private_key"],
+                public_key=config["public_key"],
+                expire=config["expire"],
+                list=config["list"],
+            )
         else:
             raise NotImplementedError
 
