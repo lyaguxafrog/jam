@@ -58,9 +58,7 @@ class JSONList(ABCList):
             "timestamp": datetime.datetime.now().timestamp(),
         }
 
-        from icecream import ic
-
-        ic(self.__list__.insert(_doc))
+        self.__list__.insert(_doc)
         return None
 
     def check(self, token: str) -> bool:
