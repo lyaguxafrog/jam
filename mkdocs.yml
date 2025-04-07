@@ -19,6 +19,7 @@ nav:
               - JSONList: jwt/lists/json.md
               - RedisList: jwt/lists/redis.md
               - CustomList: jwt/lists/own_module.md
+      - Quick: quick.md
   - API:
       - Jam: api/instance.md
       - __AbstractInstance: api/abc_instance.md
@@ -32,6 +33,8 @@ nav:
       - jam.utils:
           - generate_rsa_key_pair: api/utils/rsa.md
           - make_jwt_config: api/utils/jwt_config.md
+      - jam.quick:
+          - jwt: api/quick/jwt.md
   - Changelog: https://github.com/lyaguxafrog/jam/releases
   - Contributing: contributing.md
   - License: LICENSE.md
