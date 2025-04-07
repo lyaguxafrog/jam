@@ -1,6 +1,6 @@
 [project]
 name = "jamlib"
-version = "1.0.2"
+version = "1.0.3"
 description = "Simple and univirsal library for authorization."
 authors = [
     {name = "Makridenko Adrian",email = "adrianmakridenko@duck.com"}
@@ -31,6 +31,7 @@ redis-lists=["redis>=5.2.1"]
 [dependency-groups]
 dev = [
     "black>=25.1.0",
+    "fakeredis>=2.28.1",
     "icecream>=2.1.4",
     "isort>=6.0.1",
     "mkdocs>=1.6.1",

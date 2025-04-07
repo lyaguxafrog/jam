@@ -16,7 +16,7 @@ Installed!
 ```python
 from jam import Jam
 from jam.exceptions import TokenInBlackList
-from jam.jwt.lists import JSONList
+from jam.jwt.lists.json import JSONList
 
 config = {
     "alg": "HS256",
@@ -39,11 +39,11 @@ except TokenInBlackList:
 jam.module.list.add(some_token)
 ```
 
-## Whitelists
+### Whitelists
 ```python
 from jam import Jam
 from jam.exceptions import TokenNotInWhiteList
-from jam.jwt.lists import JSONList
+from jam.jwt.lists.json import JSONList
 
 config = {
     "alg": "HS256",
@@ -76,6 +76,6 @@ token: str = "some_token"
 
 jam.module.list.add(token) # Adding a token
 jam.module.list.delete(token) # Deleting a token
-result: bool = jam.module.list.check(token) # # Check token presence in list
+result: bool = jam.module.list.check(token) # Check token presence in list
 
 ```

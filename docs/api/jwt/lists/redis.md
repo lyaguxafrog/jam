@@ -1,1 +1,1 @@
-::: jam.jwt.lists.list_manipulations.RedisList
+::: jam.jwt.lists.redis.RedisList

@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from .__abc_list_repo__ import ABCList
-from .list_manipulations import JSONList, RedisList
+"""
+Module for managing white and black lists.
+See: https://jam.makridenko.ru/jwt/lists/what/
+"""
+
+from .__abc_list_repo__ import ABCList, JWTList
 
 
-__all__ = ["JSONList", "RedisList", "ABCList"]
+__all__ = ["JWTList", "ABCList"]
