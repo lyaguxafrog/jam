@@ -37,5 +37,23 @@ payload = jam.make_payload(**{"user_id": 1})
 token = jam.gen_jwt_token(**payload)
 ```
 
+## Asynchronous support
+!!! note test
+    You can use `jam.asyncio` module to work with async functions. **The methods are the same**, but you need to use `await` keyword.
+
+
+```python
+from jam.asyncio import Jam
+
+config = {
+    "alg": "HS256",
+    "secret_key": "secret",
+    "expire": 2600
+}
+jam = Jam(auth_type="jwt", config=config)
+payload = await jam.make_payload(**{"user_id": 1})
+token = await jam.gen_jwt_token(**payload)
+```
+
 ## Roadmap
 ![ROADMAP](assets/roadmap.png)
