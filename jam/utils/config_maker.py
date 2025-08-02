@@ -2,6 +2,7 @@
 
 from typing import Any, Literal
 
+from jam.asyncio.jwt.lists.__abc_list_repo__ import JWTList as AsyncJWTList
 from jam.exceptions.jwt import EmptyPublicKey, EmptySecretKey, EmtpyPrivateKey
 from jam.jwt.lists.__abc_list_repo__ import JWTList
 
@@ -22,7 +23,7 @@ def make_jwt_config(
     public_key: str | None = None,
     private_key: str | None = None,
     expire: int = 3600,
-    list: JWTList | None = None,
+    list: JWTList | AsyncJWTList | None = None,
 ) -> dict[str, Any]:
     """Util for making JWT config.
 
@@ -32,12 +33,15 @@ def make_jwt_config(
         private_key (str | None): Private key for RSA enecryption
         public_key (str | None): Public key for RSA
         expire (int): Token lifetime in seconds
-        list (JWTList | None): List module for checking
+        list (JWTList | AsyncJWTList | None): List module for checking
 
     Raises:
         EmptySecretKey: If HS* algorithm is selected, but the secret key is empty
         EmtpyPrivateKey: If RS* algorithm is selected, but the private key is empty
         EmtpyPublicKey: If RS* algorithm is selected, but the public key is empty
+
+    Returns:
+        (dict[str, Any]): Dict with config params
     """
     if alg.startswith("HS") and secret_key is None:
         raise EmptySecretKey
