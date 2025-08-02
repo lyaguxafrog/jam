@@ -106,6 +106,8 @@ def test_json_black_lists(json_black_list):
     with raises(TokenInBlackList):
         jam.verify_jwt_token(token, check_list=True, check_exp=False)
 
+    jam.module.list.delete(token)
+
 
 def test_json_white_lists(json_white_list):
     config = make_jwt_config(

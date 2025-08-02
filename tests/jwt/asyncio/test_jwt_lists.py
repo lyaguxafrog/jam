@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import pytest
 from fakeredis import FakeAsyncRedis
 from pytest import fixture, raises
@@ -32,12 +33,12 @@ def redis_white_list(fake_aioredis):
 
 @fixture(scope="function")
 def json_black_list():
-    return JSONList(type="black", json_path="json-for-tests.json")
+    return JSONList(type="black", json_path="another-json-for-tests.json")
 
 
 @fixture(scope="function")
 def json_white_list():
-    return JSONList(type="white", json_path="json-for-tests.json")
+    return JSONList(type="white", json_path="another-json-for-tests.json")
 
 
 def test_redis_list_init(fake_aioredis):
@@ -115,6 +116,8 @@ async def test_json_black_lists(json_black_list):
 
     with raises(TokenInBlackList):
         await jam.verify_jwt_token(token, check_list=True, check_exp=False)
+
+    await jam.module.list.delete(token)
 
 
 @pytest.mark.asyncio
