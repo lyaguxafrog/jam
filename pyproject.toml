@@ -41,6 +41,7 @@ dev = [
     "mypy>=1.15.0",
     "pre-commit>=4.2.0",
     "pytest>=8.3.5",
+    "pytest-asyncio>=1.1.0",
     "redis>=5.2.1",
     "ruff>=0.11.2",
     "termynal>=0.13.0",
@@ -80,8 +81,8 @@ skip-string-normalization = false
 disable_error_code = ["no-redef", "import-not-found", "import-untyped", "attr-defined"]
 
 [tool.pytest]
-#asyncio_default_fixture_loop_scope = "function"
 python_files = ["test*.py"]
 
 [tool.pytest.ini_options]
 addopts = "--capture=no"
+asyncio_default_fixture_loop_scope = "function"
