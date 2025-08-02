@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any
 from asyncio import to_thread
-from jam.jwt.tools import __gen_jwt__, __validate_jwt__, __payload_maker__
+from typing import Any
+
+from jam.jwt.tools import __gen_jwt__, __payload_maker__, __validate_jwt__
 
 
 async def __gen_jwt_async__(
-        header: dict[str, Any],
-        payload: dict[str, Any],
-        secret: str | None = None,
-        private_key: str | None = None,
+    header: dict[str, Any],
+    payload: dict[str, Any],
+    secret: str | None = None,
+    private_key: str | None = None,
 ) -> str:
     """Method for generating JWT token with different algorithms.
 
@@ -40,14 +41,14 @@ async def __gen_jwt_async__(
     Returns:
         (str): Access/refresh token
     """
-    return await to_thread(__gen_jwt__,header, payload, secret, private_key)
+    return await to_thread(__gen_jwt__, header, payload, secret, private_key)
 
 
 async def __validate_jwt_async__(
-        token: str,
-        check_exp: bool = False,
-        secret: str | None = None,
-        public_key: str | None = None,
+    token: str,
+    check_exp: bool = False,
+    secret: str | None = None,
+    public_key: str | None = None,
 ) -> dict[str, Any]:
     """Validate a JWT token and return the payload if valid.
 
@@ -68,11 +69,7 @@ async def __validate_jwt_async__(
         TokenLifeTimeExpired: If token has expired.
     """
     return await to_thread(
-        __validate_jwt__,
-        token,
-        check_exp,
-        secret,
-        public_key
+        __validate_jwt__, token, check_exp, secret, public_key
     )
 
 
@@ -88,8 +85,4 @@ async def __payload_maker_async__(
     Returns:
         (Dict[str, Any])
     """
-    return await to_thread(
-        __payload_maker__,
-        exp,
-        **data
-    )
+    return await to_thread(__payload_maker__, exp, **data)
