@@ -2,7 +2,6 @@
 
 from typing import Any, Literal
 
-from jam.asyncio.jwt.lists.__abc_list_repo__ import JWTList as AsyncJWTList
 from jam.exceptions.jwt import EmptyPublicKey, EmptySecretKey, EmtpyPrivateKey
 from jam.jwt.lists.__abc_list_repo__ import JWTList
 
@@ -23,14 +22,14 @@ def make_jwt_config(
     public_key: str | None = None,
     private_key: str | None = None,
     expire: int = 3600,
-    list: JWTList | AsyncJWTList | None = None,
+    list: JWTList | None = None,
 ) -> dict[str, Any]:
     """Util for making JWT config.
 
     Args:
         alg (Literal["HS256", "HS384", "HS512", "RS256", "RS384", "RS512", "PS512", "PS384", "PS512"]): Algorithm for token encryption
-        secret_key (str | None): Secret key for HMAC enecryption
-        private_key (str | None): Private key for RSA enecryption
+        secret_key (str | None): Secret key for HMAC encryption
+        private_key (str | None): Private key for RSA encryption
         public_key (str | None): Public key for RSA
         expire (int): Token lifetime in seconds
         list (JWTList | AsyncJWTList | None): List module for checking
