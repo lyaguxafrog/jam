@@ -8,7 +8,7 @@ class __AbstractInstance(ABC):
     """Abstract Instance object."""
 
     @abstractmethod
-    def gen_jwt_token(self, payload) -> str:
+    def gen_jwt_token(self, payload) -> Any:
         """Generate new JWT token."""
         raise NotImplementedError
 
