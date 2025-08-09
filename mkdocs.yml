@@ -21,7 +21,7 @@ nav:
               - CustomList: jwt/lists/own_module.md
       - Quick: quick.md
   - API:
-      - Asynchronous:
+      - Jam.asyncio:
           - Jam: api/asyncio/instance.md
           - __AbstractInstance: api/asyncio/abc_instance.md
           - jam.jwt:
