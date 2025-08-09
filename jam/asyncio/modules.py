@@ -7,21 +7,7 @@ from uuid import uuid4
 from jam.asyncio.jwt.lists.__abc_list_repo__ import JWTList
 from jam.asyncio.jwt.tools import __gen_jwt_async__, __validate_jwt_async__
 from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
-
-
-class BaseModule:
-    """The base module from which all other modules inherit."""
-
-    def __init__(self, module_type: Literal["jwt"]) -> None:
-        """Class constructor.
-
-        Args:
-            module_type (Literal["jwt"]): Type of module
-        """
-        self._type = module_type
-
-    def __get_type(self) -> str:
-        return self._type
+from jam.modules import BaseModule
 
 
 class JWTModule(BaseModule):
