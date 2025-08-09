@@ -50,7 +50,9 @@ class JWTModule(BaseModule):
         self.exp = expire
         self.list = list
 
-    def make_payload(self, exp: int | None = None, **data) -> dict[str, Any]:
+    async def make_payload(
+        self, exp: int | None = None, **data
+    ) -> dict[str, Any]:
         """Payload maker tool.
 
         Args:

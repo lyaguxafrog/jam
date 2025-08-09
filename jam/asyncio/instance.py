@@ -83,7 +83,9 @@ class Jam(__AbstractInstance):
             token=token, check_exp=check_exp, check_list=check_list
         )
 
-    def make_payload(self, exp: int | None = None, **data) -> dict[str, Any]:
+    async def make_payload(
+        self, exp: int | None = None, **data
+    ) -> dict[str, Any]:
         """Payload maker tool.
 
         Args:
@@ -95,4 +97,4 @@ class Jam(__AbstractInstance):
                 "This method is only available for JWT auth*."
             )
 
-        return self.module.make_payload(exp=exp, **data)
+        return await self.module.make_payload(exp=exp, **data)
