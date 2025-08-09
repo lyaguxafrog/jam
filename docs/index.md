@@ -38,7 +38,7 @@ token = jam.gen_jwt_token(**payload)
 ```
 
 ## Asynchronous support
-!!! note test
+!!! note
     You can use `jam.asyncio` module to work with async functions. **The methods are the same**, but you need to use `await` keyword.
 
 
