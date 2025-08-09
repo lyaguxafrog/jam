@@ -1,1 +1,0 @@
-::: jam.asyncio.__abc_instances__.__AbstractInstance
