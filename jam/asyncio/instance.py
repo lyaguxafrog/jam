@@ -2,7 +2,7 @@
 
 from typing import Any, Literal
 
-from jam.asyncio.__abc_instances__ import __AbstractInstance
+from jam.__abc_instances__ import __AbstractInstance
 from jam.asyncio.modules import JWTModule
 
 
