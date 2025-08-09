@@ -28,5 +28,5 @@ def __base64url_decode__(data: str) -> bytes:
     Returns:
         bytes: The decoded byte data.
     """
-    padding = "=" * (4 - len(data) % 4)
+    padding = "=" * ((4 - len(data) % 4) % 4)
     return base64.urlsafe_b64decode(data + padding)
