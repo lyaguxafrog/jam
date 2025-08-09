@@ -4,7 +4,7 @@ import datetime
 from asyncio import to_thread
 from typing import Literal
 
-from jam.asyncio.jwt.lists.__abc_list_repo__ import ABCList
+from jam.jwt.lists.__abc_list_repo__ import ABCList
 
 
 try:
