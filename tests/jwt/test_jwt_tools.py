@@ -10,6 +10,7 @@ from jam.exceptions import (
     EmtpyPrivateKey,
     TokenLifeTimeExpired,
 )
+from jam.jwt.__utils__ import __base64url_decode__, __base64url_encode__
 from jam.jwt.tools import __gen_jwt__, __validate_jwt__
 from jam.utils import generate_rsa_key_pair
 
@@ -109,7 +110,15 @@ def test_validate_jwt_hmac_invalid_signature():
     token = __gen_jwt__(header, payload, secret=secret)
 
     # Tamper with the token
-    tampered_token = token[:-1] + "X"  # Change the last character
+    parts = token.split(".")
+    sig_bytes = bytearray(
+        __base64url_decode__(parts[2])
+    )  # Decode the signature part
+    sig_bytes[0] ^= 0xFF  # Flip the first byte to tamper with the signature
+    parts[2] = __base64url_encode__(
+        bytes(sig_bytes)
+    )  # Re-encode the tampered signature
+    tampered_token = ".".join(parts)
 
     with pytest.raises(ValueError, match="Invalid token signature"):
         __validate_jwt__(tampered_token, check_exp=True, secret=secret)
