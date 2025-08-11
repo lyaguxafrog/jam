@@ -28,16 +28,19 @@ def make_jwt_config(
 
     Args:
         alg (Literal["HS256", "HS384", "HS512", "RS256", "RS384", "RS512", "PS512", "PS384", "PS512"]): Algorithm for token encryption
-        secret_key (str | None): Secret key for HMAC enecryption
-        private_key (str | None): Private key for RSA enecryption
+        secret_key (str | None): Secret key for HMAC encryption
+        private_key (str | None): Private key for RSA encryption
         public_key (str | None): Public key for RSA
         expire (int): Token lifetime in seconds
-        list (JWTList | None): List module for checking
+        list (JWTList | AsyncJWTList | None): List module for checking
 
     Raises:
         EmptySecretKey: If HS* algorithm is selected, but the secret key is empty
         EmtpyPrivateKey: If RS* algorithm is selected, but the private key is empty
         EmtpyPublicKey: If RS* algorithm is selected, but the public key is empty
+
+    Returns:
+        (dict[str, Any]): Dict with config params
     """
     if alg.startswith("HS") and secret_key is None:
         raise EmptySecretKey

@@ -21,6 +21,16 @@ nav:
               - CustomList: jwt/lists/own_module.md
       - Quick: quick.md
   - API:
+      - Jam.asyncio:
+          - Jam: api/asyncio/instance.md
+          - __AbstractInstance: api/asyncio/abc_instance.md
+          - jam.jwt:
+              - tools.py: api/asyncio/jwt/tools.md
+              - jam.jwt.lists:
+                  - __abc_list_repo__.py: api/asyncio/jwt/lists/abc_lists.md
+                  - JSONList: api/asyncio/jwt/lists/json.md
+                  - RedisList: api/asyncio/jwt/lists/redis.md
+
       - Jam: api/instance.md
       - __AbstractInstance: api/abc_instance.md
       - jam.jwt:
