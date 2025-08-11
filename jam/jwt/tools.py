@@ -136,9 +136,6 @@ def __validate_jwt__(
     else:
         raise ValueError("Unsupported algorithm")
 
-    print(f"Expected Signature: {expected_signature}")  # type: ignore
-    print(f"Actual Signature: {signature}")  # type: ignore
-
     if expected_signature != signature:
         raise ValueError("Invalid token signature")
 
