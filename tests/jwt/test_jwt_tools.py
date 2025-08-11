@@ -134,15 +134,7 @@ def test_validate_jwt_rsa_invalid_signature():
     token = __gen_jwt__(header, payload, private_key=private_key)
 
     # Tamper with the token
-    parts = token.split(".")
-    sig_bytes = bytearray(
-        __base64url_decode__(parts[2])
-    )  # Decode the signature part
-    sig_bytes[0] ^= 0xFF  # Flip the first byte to tamper with the signature
-    parts[2] = __base64url_encode__(
-        bytes(sig_bytes)
-    )  # Re-encode the tampered signature
-    tampered_token = ".".join(parts)
+    tampered_token = token[:-1] + "X"  # Change the last character
 
     with pytest.raises(ValueError, match="Invalid signature"):
         __validate_jwt__(tampered_token, check_exp=True, public_key=public_key)
