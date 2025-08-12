@@ -1,6 +1,6 @@
 # Jam
 
-![logo](https://github.com/lyaguxafrog/jam/blob/stable/docs/assets/h_logo_n_title.png?raw=true)
+![logo](https://github.com/lyaguxafrog/jam/blob/master/docs/assets/h_logo_n_title.png?raw=true)
 
 ![Static Badge](https://img.shields.io/badge/Python-3.13-blue?logo=python&logoColor=white)
 ![tests](https://github.com/lyaguxafrog/jam/actions/workflows/run-tests.yml/badge.svg)
@@ -29,6 +29,6 @@ token = jam.gen_jwt_token({"user_id": 1})
 ```
 
 ## Roadmap
-![Roadmap](https://github.com/lyaguxafrog/jam/blob/stable/docs/assets/roadmap.png?raw=true)
+![Roadmap](https://github.com/lyaguxafrog/jam/blob/master/docs/assets/roadmap.png?raw=true)
 
 &copy; [Adrian Makridenko](https://github.com/lyaguxafrog) 2025
