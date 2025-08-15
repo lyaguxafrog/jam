@@ -70,11 +70,10 @@ FB: Removed the dependency and wrote independently
 ```
 
 ### Branches
-The project has two main branches:
-* `stable` - Stable code of the latest release
-* `develop` - Code ready for release at any moment
+The project has one main branche:
+* `master` - Stable code of the latest release
 
-All branches are created from `develop` and adhere to strict branch naming:
+All branches are created from `master` and adhere to strict branch naming:
 
 * New feature: `feature/<id-issue-if-it-is>-<pair-words-about-feature>`
 * Bug fixes: `fix/<id-issue-if-it-is>-<pair-words-about-bug>`
