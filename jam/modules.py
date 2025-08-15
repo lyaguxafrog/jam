@@ -15,12 +15,12 @@ class BaseModule:
 
     def __init__(
         self,
-        module_type: Literal["jwt"],
+        module_type: Literal["jwt", "session"],
     ) -> None:
         """Class constructor.
 
         Args:
-            module_type (Litetal["jwt", "session-redis", "session-mongo", "session-custom"]): Type of module
+            module_type (Litetal["jwt", "session"]): Type of module
         """
         self._type = module_type
 
@@ -67,7 +67,7 @@ class JWTModule(BaseModule):
         super().__init__(module_type="jwt")
         self._secret_key = secret_key
         self.alg = alg
-        self._private_key = (private_key,)
+        self._private_key = private_key
         self.public_key = public_key
         self.exp = expire
         self.list = list
