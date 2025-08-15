@@ -4,6 +4,7 @@ import datetime
 from typing import Any, Literal
 from uuid import uuid4
 
+from jam.__logger__ import logger
 from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
 from jam.jwt.lists.__abc_list_repo__ import JWTList
 from jam.jwt.tools import __gen_jwt__, __validate_jwt__
@@ -79,6 +80,7 @@ class JWTModule(BaseModule):
             **data: Custom data
         """
         if not exp:
+            logger.debug("Set expire from default")
             _exp = self.exp
         else:
             _exp = exp
@@ -88,6 +90,7 @@ class JWTModule(BaseModule):
             "iat": datetime.datetime.now().timestamp(),
         }
         payload.update(**data)
+        logger.debug(f"Gen payload: {payload}")
         return payload
 
     def gen_token(self, **payload) -> str:
@@ -108,8 +111,13 @@ class JWTModule(BaseModule):
             private_key=self._private_key,  # type: ignore
         )
 
+        logger.debug(f"Gen jwt token: {token}")
+        logger.debug(f"Token header: {header}")
+        logger.debug(f"Token payload: {payload}")
+
         if self.list:
             if self.list.__list_type__ == "white":
+                logger.debug("Add JWT token to white list")
                 self.list.add(token)
         return token
 
@@ -140,11 +148,13 @@ class JWTModule(BaseModule):
                 if not self.list.check(token):  # type: ignore
                     raise TokenNotInWhiteList
                 else:
+                    logger.debug("Token in white list")
                     pass
             if self.list.__list_type__ == "black":  # type: ignore
                 if self.list.check(token):  # type: ignore
                     raise TokenInBlackList
                 else:
+                    logger.debug("Token not in black list")
                     pass
 
         payload = __validate_jwt__(

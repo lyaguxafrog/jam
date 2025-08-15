@@ -3,6 +3,7 @@
 from typing import Any, Literal
 
 from jam.__abc_instances__ import __AbstractInstance
+from jam.__logger__ import logger
 from jam.modules import JWTModule
 
 
@@ -22,6 +23,7 @@ class Jam(__AbstractInstance):
         """
         self.type = auth_type
         if self.type == "jwt":
+            logger.debug("Create JWT instance")
             self.module = JWTModule(
                 alg=config["alg"],
                 secret_key=config["secret_key"],
