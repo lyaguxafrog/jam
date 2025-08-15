@@ -4,6 +4,7 @@ from typing import Any, Literal
 
 from jam.exceptions.jwt import EmptyPublicKey, EmptySecretKey, EmtpyPrivateKey
 from jam.jwt.lists.__abc_list_repo__ import JWTList
+from jam.__logger__ import logger
 
 
 def make_jwt_config(
@@ -50,6 +51,12 @@ def make_jwt_config(
 
     if alg.startswith("RS") and public_key is None:
         raise EmptyPublicKey
+
+    logger.debug(
+        "Creating JWT config with parameters: \n"
+        "{alg: %s, secret_key: %s, private_key: %s, public_key: %s, expire: %d, list: %s}",
+        alg, secret_key, private_key, public_key, expire, list
+    )
 
     return {
         "alg": alg,

@@ -3,6 +3,8 @@
 import datetime
 from typing import Literal
 
+from jam.__logger__ import logger
+
 
 try:
     from tinydb import Query, TinyDB
@@ -43,6 +45,7 @@ class JSONList(ABCList):
         """
         super().__init__(list_type=type)
         self.__list__ = TinyDB(json_path)
+        logger.info(f"Save JSON to: {json_path}")
 
     def add(self, token: str) -> None:
         """Method for adding token to list.
@@ -59,6 +62,10 @@ class JSONList(ABCList):
         }
 
         self.__list__.insert(_doc)
+
+        logger.info("Set token in list.")
+        logger.debug(f"Set {token} in list")
+        logger.debug(f"JSON document: {_doc}")
         return None
 
     def check(self, token: str) -> bool:

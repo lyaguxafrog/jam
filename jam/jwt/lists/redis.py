@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+
 import datetime
 from typing import Literal
+
+from jam.__logger__ import logger
 
 
 try:
@@ -55,6 +58,8 @@ class RedisList(ABCList):
         self.__list__.set(
             name=token, value=str(datetime.datetime.now()), ex=self.exp
         )
+        logger.info("Set token in list.")
+        logger.debug(f"Set {token} in list")
         return None
 
     def check(self, token: str) -> bool:
