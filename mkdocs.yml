@@ -42,6 +42,7 @@ nav:
           - make_jwt_config: api/utils/jwt_config.md
       - jam.quick:
           - jwt: api/quick/jwt.md
+      - jam.__logger__: api/logger.md
   - Changelog: https://github.com/lyaguxafrog/jam/releases
   - Contributing: contributing.md
   - License: LICENSE.md
