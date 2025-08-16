@@ -174,3 +174,34 @@ def decode_jwt_token(
         raise EmptyPublicKey(e)
     except EmptySecretKey as e:
         raise EmptySecretKey(e)
+
+
+async def adecode_jwt_token(
+    token: str, secret_key: str | None = None, public_key: str | None = None
+) -> dict[str, Any]:
+    """Token decoding (async).
+
+    Args:
+        token (str): JWT token
+        secret_key (str | None): Secret key for HS algs
+        public_key (str | None): Public key for RS algs
+
+    Returns:
+        (dict[str, Any]): Decoded payload
+
+    Raises:
+        ValueError: If the token is invalid.
+        EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None.
+        EmtpyPublicKey: If RSA algorithm is selected, but public key None.
+    """
+    try:
+        payload = await __validate_jwt_async__(
+            token=token, secret=secret_key, public_key=public_key
+        )
+        return payload
+    except ValueError as e:
+        raise ValueError(e)
+    except EmptyPublicKey as e:
+        raise EmptyPublicKey(e)
+    except EmptySecretKey as e:
+        raise EmptySecretKey(e)
