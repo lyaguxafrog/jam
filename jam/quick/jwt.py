@@ -4,7 +4,7 @@
 
 from typing import Any
 
-from jam.asyncio.jwt.tools import __gen_jwt_async__
+from jam.asyncio.jwt.tools import __gen_jwt_async__, __validate_jwt_async__
 from jam.exceptions import EmptyPublicKey, EmptySecretKey, EmtpyPrivateKey
 from jam.jwt.tools import __gen_jwt__, __validate_jwt__
 
@@ -104,6 +104,37 @@ def verify_jwt_token(
     """
     try:
         __validate_jwt__(token=token, secret=secret_key, public_key=public_key)
+    except EmptySecretKey as e:
+        raise EmptySecretKey(e)
+    except EmptyPublicKey as e:
+        raise EmptyPublicKey(e)
+    except ValueError:
+        return False
+
+    return True
+
+
+async def averify_jwt_token(
+    token: str, secret_key: str | None = None, public_key: str | None = None
+) -> bool:
+    """Method to verify the token (async).
+
+    Args:
+        token (str): JWT token
+        secret_key (str | None): Secret key for HS algs
+        public_key (str | None): Public key for RS algs
+
+    Returns:
+        (bool): If token is valid
+
+    Raises:
+        EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None.
+        EmtpyPublicKey: If RSA algorithm is selected, but public key None.
+    """
+    try:
+        await __validate_jwt_async__(
+            token=token, secret=secret_key, public_key=public_key
+        )
     except EmptySecretKey as e:
         raise EmptySecretKey(e)
     except EmptyPublicKey as e:
