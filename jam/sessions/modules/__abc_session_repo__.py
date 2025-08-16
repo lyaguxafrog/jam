@@ -35,6 +35,7 @@ class BaseSessionModule(ABC):
             session_key_aes_secret (Optional[bytes], optional): AES secret for encoding session keys.
         """
         self._id = id_factory
+        self._sk_mark_symbol = "J$_"
         if is_session_key_crypt and not session_key_aes_secret:
             raise ValueError(
                 "If 'code_session_key' is True, 'session_key_aes_secret' must be provided."
@@ -42,19 +43,21 @@ class BaseSessionModule(ABC):
         if is_session_key_crypt:
             self._code_session_key = Fernet(session_key_aes_secret)
 
-    def _encode_session_key(self, session_key: str) -> bytes:
+    def _encode_session_key(self, session_key: str) -> str:
         """Encode the session key using AES encryption."""
         if not hasattr(self, "_code_session_key"):
             raise AttributeError("Session key encoding is not enabled.")
-        return self._code_session_key.encrypt(session_key.encode())
+        return f"{self._sk_mark_symbol}{self._code_session_key.encrypt(session_key.encode()).decode()}"
 
-    def _decode_session_key(self, session_key: bytes | str) -> str:
+    def _decode_session_key(self, session_key: str) -> str:
         """Decode the session key using AES decryption."""
         if not hasattr(self, "_code_session_key"):
             raise AttributeError("Session key encoding is not enabled.")
-        if isinstance(session_key, bytes):
-            return self._code_session_key.decrypt(session_key).decode()
-        return self._code_session_key.decrypt(session_key.encode()).decode()
+        if not session_key.startswith(self._sk_mark_symbol):
+            raise ValueError("Session key is not encoded or is invalid.")
+        return self._code_session_key.decrypt(
+            session_key[len(self._sk_mark_symbol) :].encode()
+        ).decode()
 
     @property
     def id(self) -> str:
