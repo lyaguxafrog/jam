@@ -5,6 +5,8 @@ from collections.abc import Callable
 from typing import Any, Optional
 from uuid import uuid4
 
+from cryptography.fernet import Fernet
+
 
 class BaseSessionModule(ABC):
     """Abstract base class for session management modules.
@@ -20,14 +22,39 @@ class BaseSessionModule(ABC):
     """
 
     def __init__(
-        self, id_factory: Callable[[], str] = lambda: str(uuid4())
+        self,
+        id_factory: Callable[[], str] = lambda: str(uuid4()),
+        is_session_key_crypt: bool = False,
+        session_key_aes_secret: Optional[bytes] = None,
     ) -> None:
         """Class constructor.
 
         Args:
             id_factory (Callable[str], optional): A callable that generates unique IDs. Defaults to a UUID factory.
+            is_session_key_crypt (bool, optional): If True, session keys will be encoded. Defaults to False.
+            session_key_aes_secret (Optional[bytes], optional): AES secret for encoding session keys.
         """
         self._id = id_factory
+        if is_session_key_crypt and not session_key_aes_secret:
+            raise ValueError(
+                "If 'code_session_key' is True, 'session_key_aes_secret' must be provided."
+            )
+        if is_session_key_crypt:
+            self._code_session_key = Fernet(session_key_aes_secret)
+
+    def _encode_session_key(self, session_key: str) -> bytes:
+        """Encode the session key using AES encryption."""
+        if not hasattr(self, "_code_session_key"):
+            raise AttributeError("Session key encoding is not enabled.")
+        return self._code_session_key.encrypt(session_key.encode())
+
+    def _decode_session_key(self, session_key: bytes | str) -> str:
+        """Decode the session key using AES decryption."""
+        if not hasattr(self, "_code_session_key"):
+            raise AttributeError("Session key encoding is not enabled.")
+        if isinstance(session_key, bytes):
+            return self._code_session_key.decrypt(session_key).decode()
+        return self._code_session_key.decrypt(session_key.encode()).decode()
 
     @property
     def id(self) -> str:
