@@ -43,20 +43,20 @@ class BaseSessionModule(ABC):
         if is_session_key_crypt:
             self._code_session_key = Fernet(session_key_aes_secret)
 
-    def _encode_session_key(self, session_key: str) -> str:
-        """Encode the session key using AES encryption."""
+    def _encode_session_id(self, data: str) -> str:
+        """Encode the session using AES encryption."""
         if not hasattr(self, "_code_session_key"):
             raise AttributeError("Session key encoding is not enabled.")
-        return f"{self._sk_mark_symbol}{self._code_session_key.encrypt(session_key.encode()).decode()}"
+        return f"{self._sk_mark_symbol}{self._code_session_key.encrypt(data.encode()).decode()}"
 
-    def _decode_session_key(self, session_key: str) -> str:
-        """Decode the session key using AES decryption."""
+    def _decode_session_id(self, data: str) -> str:
+        """Decode the session using AES decryption."""
         if not hasattr(self, "_code_session_key"):
             raise AttributeError("Session key encoding is not enabled.")
-        if not session_key.startswith(self._sk_mark_symbol):
+        if not data.startswith(self._sk_mark_symbol):
             raise ValueError("Session key is not encoded or is invalid.")
         return self._code_session_key.decrypt(
-            session_key[len(self._sk_mark_symbol) :].encode()
+            data[len(self._sk_mark_symbol) :].encode()
         ).decode()
 
     @property
@@ -75,12 +75,11 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get(self, session_key: Optional[str], session_id: Optional[str]) -> Any:
+    def get(self, session_id: str) -> Any:
         """Retrieve a session by its key or ID.
 
         Args:
-            session_key (Optional[str]): The key for the session.
-            session_id (Optional[str]): The ID of the session.
+            session_id (str): The ID of the session.
 
         Returns:
             Any: The session data if found, otherwise None.
@@ -88,14 +87,11 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def delete(
-        self, session_key: Optional[str], session_id: Optional[str]
-    ) -> None:
+    def delete(self, session_id: str) -> None:
         """Delete a session by its key or ID.
 
         Args:
-            session_key (Optional[str]): The key for the session.
-            session_id (Optional[str]): The ID of the session.
+            session_id (str): The ID of the session.
         """
         raise NotImplementedError
 
