@@ -27,6 +27,7 @@ Changelog = "https://github.com/lyaguxafrog/jam/releases"
 [project.optional-dependencies]
 json-lists=["tinydb>=4.8.2"]
 redis-lists=["redis>=5.2.1"]
+reids=["redis>5.2.1"]
 
 [dependency-groups]
 dev = [
