@@ -65,7 +65,7 @@ class BaseSessionModule(ABC):
         return self._id()
 
     @abstractmethod
-    def create(self, session_key: str, data: dict) -> None:
+    def create(self, session_key: str, data: dict) -> str:
         """Create a new session with the given session key and data.
 
         Args:
