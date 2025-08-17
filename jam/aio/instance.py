@@ -3,11 +3,11 @@
 from typing import Any, Literal
 
 from jam.__abc_instances__ import __AbstractInstance
-from jam.asyncio.modules import JWTModule
+from jam.aio.modules import JWTModule
 
 
 class Jam(__AbstractInstance):
-    """Main instance for asyncio."""
+    """Main instance for aio."""
 
     def __init__(
         self, auth_type: Literal["jwt"], config: dict[str, Any]

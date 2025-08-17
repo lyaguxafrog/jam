@@ -24,12 +24,12 @@ nav:
       - Jam: api/instance.md
       - __AbstractInstance: api/abc_instance.md
       - jam.asyncio:
-          - Jam: api/asyncio/instance.md
+          - Jam: api/aio/instance.md
           - jam.asyncio.jwt:
-              - tools.py: api/asyncio/jwt/tools.md
+              - tools.py: api/aio/jwt/tools.md
               - jam.asyncio.jwt.lists:
-                  - JSONList: api/asyncio/jwt/lists/json.md
-                  - RedisList: api/asyncio/jwt/lists/redis.md
+                  - JSONList: api/aio/jwt/lists/json.md
+                  - RedisList: api/aio/jwt/lists/redis.md
       - jam.jwt:
           - tools.py: api/jwt/tools.md
           - __utils__.py: api/jwt/utils.md

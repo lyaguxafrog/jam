@@ -4,7 +4,7 @@ import datetime
 from typing import Any, Literal
 from uuid import uuid4
 
-from jam.asyncio.jwt.tools import __gen_jwt_async__, __validate_jwt_async__
+from jam.aio.jwt.tools import __gen_jwt_async__, __validate_jwt_async__
 from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
 from jam.jwt.lists.__abc_list_repo__ import JWTList
 from jam.modules import BaseModule

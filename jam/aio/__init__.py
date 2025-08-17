@@ -7,7 +7,7 @@ Source code: https://github.com/lyaguxafrog/jam
 Documentation: https://jam.makridenko.ru
 """
 
-from jam.asyncio.instance import Jam
+from jam.aio.instance import Jam
 
 
 __version__ = "1.0.5"
