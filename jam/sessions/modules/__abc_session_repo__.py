@@ -24,24 +24,24 @@ class BaseSessionModule(ABC):
     def __init__(
         self,
         id_factory: Callable[[], str] = lambda: str(uuid4()),
-        is_session_key_crypt: bool = False,
-        session_key_aes_secret: Optional[bytes] = None,
+        is_session_crypt: bool = False,
+        session_aes_secret: Optional[bytes] = None,
     ) -> None:
         """Class constructor.
 
         Args:
             id_factory (Callable[str], optional): A callable that generates unique IDs. Defaults to a UUID factory.
-            is_session_key_crypt (bool, optional): If True, session keys will be encoded. Defaults to False.
-            session_key_aes_secret (Optional[bytes], optional): AES secret for encoding session keys.
+            is_session_crypt (bool, optional): If True, session keys will be encoded. Defaults to False.
+            session_aes_secret (Optional[bytes], optional): AES secret for encoding session keys.
         """
         self._id = id_factory
         self._sk_mark_symbol = "J$_"
-        if is_session_key_crypt and not session_key_aes_secret:
+        if is_session_crypt and not session_aes_secret:
             raise ValueError(
                 "If 'code_session_key' is True, 'session_key_aes_secret' must be provided."
             )
-        if is_session_key_crypt:
-            self._code_session_key = Fernet(session_key_aes_secret)
+        if is_session_crypt:
+            self._code_session_key = Fernet(session_aes_secret)
 
     def _encode_session_id(self, data: str) -> str:
         """Encode the session using AES encryption."""
