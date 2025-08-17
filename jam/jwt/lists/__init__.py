@@ -5,7 +5,7 @@ Module for managing white and black lists.
 See: https://jam.makridenko.ru/jwt/lists/what/
 """
 
-from .__abc_list_repo__ import ABCList, JWTList
+from .__abc_list_repo__ import ABCList
 
 
-__all__ = ["JWTList", "ABCList"]
+__all__ = ["ABCList"]

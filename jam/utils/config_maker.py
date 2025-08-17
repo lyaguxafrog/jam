@@ -2,9 +2,9 @@
 
 from typing import Any, Literal
 
-from jam.exceptions.jwt import EmptyPublicKey, EmptySecretKey, EmtpyPrivateKey
-from jam.jwt.lists.__abc_list_repo__ import JWTList
 from jam.__logger__ import logger
+from jam.exceptions.jwt import EmptyPublicKey, EmptySecretKey, EmtpyPrivateKey
+from jam.jwt.lists.__abc_list_repo__ import ABCList
 
 
 def make_jwt_config(
@@ -23,7 +23,7 @@ def make_jwt_config(
     public_key: str | None = None,
     private_key: str | None = None,
     expire: int = 3600,
-    list: JWTList | None = None,
+    list: ABCList | None = None,
 ) -> dict[str, Any]:
     """Util for making JWT config.
 
@@ -33,7 +33,7 @@ def make_jwt_config(
         private_key (str | None): Private key for RSA encryption
         public_key (str | None): Public key for RSA
         expire (int): Token lifetime in seconds
-        list (JWTList | AsyncJWTList | None): List module for checking
+        list (ABCList | None): List module for checking
 
     Raises:
         EmptySecretKey: If HS* algorithm is selected, but the secret key is empty
@@ -55,7 +55,12 @@ def make_jwt_config(
     logger.debug(
         "Creating JWT config with parameters: \n"
         "{alg: %s, secret_key: %s, private_key: %s, public_key: %s, expire: %d, list: %s}",
-        alg, secret_key, private_key, public_key, expire, list
+        alg,
+        secret_key,
+        private_key,
+        public_key,
+        expire,
+        list,
     )
 
     return {
