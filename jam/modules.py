@@ -24,9 +24,6 @@ class BaseModule:
         """
         self._type = module_type
 
-    def __get_type(self) -> str:
-        return self._type
-
 
 class JWTModule(BaseModule):
     """Module for JWT auth.
