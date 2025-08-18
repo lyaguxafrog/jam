@@ -26,8 +26,8 @@ Changelog = "https://github.com/lyaguxafrog/jam/releases"
 
 [project.optional-dependencies]
 json-lists=["tinydb>=4.8.2"]
-redis-lists=["redis>=5.2.1"]
-reids=["redis>5.2.1"]
+redis-lists=["redis>=6.4.0"]
+reids=["redis>=6.4.0"]
 
 [dependency-groups]
 dev = [
@@ -43,7 +43,7 @@ dev = [
     "pre-commit>=4.2.0",
     "pytest>=8.3.5",
     "pytest-asyncio>=1.1.0",
-    "redis>=5.2.1",
+    "redis>=6.4.0",
     "ruff>=0.11.2",
     "termynal>=0.13.0",
     "tinydb>=4.8.2",
