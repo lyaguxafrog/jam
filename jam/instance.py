@@ -15,7 +15,7 @@ class Jam(__AbstractInstance):
         auth_type: Literal["jwt"],
         config: dict[str, Any],
     ) -> None:
-        """Class construcotr.
+        """Class constructor.
 
         Args:
             auth_type (Literal["jwt"]): Type of auth*
