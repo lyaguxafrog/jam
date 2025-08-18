@@ -70,14 +70,15 @@ class RedisSessions(BaseSessionModule):
             str: The unique ID of the created session.
         """
         session_id = self.id
-        if self.ttl:
-            data["_session_exp"] = (
-                datetime.datetime.now().timestamp() + self.ttl
-            )
         self._redis.hset(
             name=f"{self.session_path}:{session_key}",
             key=session_id,
             value=json.dumps(data),
+        )
+        self._redis.hexpire(
+            f"{self.session_path}:{session_key}",
+            self.ttl,
+            session_id,
         )
 
         if hasattr(self, "_code_session_key"):
@@ -187,13 +188,14 @@ class RedisSessions(BaseSessionModule):
         Returns:
             str: The new session ID.
         """
+        session_id_ = session_id
         if hasattr(self, "_code_session_key"):
             try:
-                session_id = self._decode_session_id(session_id)
+                session_id_ = self._decode_session_id(session_id)
             except ValueError as e:
                 SessionNotFoundError(f"Failed to decode session ID: {e}")
 
-        session_key, old_session_id = session_id.split(":", 1)
+        session_key, old_session_id = session_id_.split(":", 1)
         data = self.get(session_id)
 
         if not data:
