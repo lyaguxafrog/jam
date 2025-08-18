@@ -39,11 +39,11 @@ token = jam.gen_jwt_token(**payload)
 
 ## Asynchronous support
 !!! note
-    You can use `jam.asyncio` module to work with async functions. **The methods are the same**, but you need to use `await` keyword.
+    You can use `jam.aio` module to work with async functions. **The methods are the same**, but you need to use `await` keyword.
 
 
 ```python
-from jam.asyncio import Jam
+from jam.aio import Jam
 
 config = {
     "alg": "HS256",

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABC, abstractmethod
-from typing import Any, Literal, Protocol
+from typing import Any, Literal
 
 
 class ABCList(ABC):
@@ -25,21 +25,3 @@ class ABCList(ABC):
     def delete(self, token: str) -> Any:
         """Method for removing a token from a list."""
         raise NotImplementedError
-
-
-class JWTList(Protocol):
-    """Protocol class for lists."""
-
-    __list_type__: Literal["black", "white"]
-
-    def add(self, token: str) -> Any:
-        """Method for adding token to list."""
-        pass
-
-    def check(self, token: str) -> Any:
-        """Method for checking if a token is present in the list."""
-        pass
-
-    def delete(self, token: str) -> Any:
-        """Method for removing a token from a list."""
-        pass

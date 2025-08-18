@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from jam.asyncio.jwt.tools import __gen_jwt_async__, __validate_jwt_async__
+from jam.aio.jwt.tools import __gen_jwt_async__, __validate_jwt_async__
 from jam.exceptions import (
     EmptyPublicKey,
     EmptySecretKey,

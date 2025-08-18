@@ -4,9 +4,9 @@ import pytest
 from fakeredis import FakeAsyncRedis
 from pytest import fixture, raises
 
-from jam.asyncio import Jam
-from jam.asyncio.jwt.lists.json import JSONList
-from jam.asyncio.jwt.lists.redis import RedisList
+from jam.aio import Jam
+from jam.aio.jwt.lists.json import JSONList
+from jam.aio.jwt.lists.redis import RedisList
 from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
 from jam.utils import make_jwt_config
 

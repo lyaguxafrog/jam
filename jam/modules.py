@@ -6,7 +6,7 @@ from uuid import uuid4
 
 from jam.__logger__ import logger
 from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
-from jam.jwt.lists.__abc_list_repo__ import JWTList
+from jam.jwt.lists.__abc_list_repo__ import ABCList
 from jam.jwt.tools import __gen_jwt__, __validate_jwt__
 
 
@@ -52,7 +52,7 @@ class JWTModule(BaseModule):
         public_key: str | None = None,
         private_key: str | None = None,
         expire: int = 3600,
-        list: JWTList | None = None,
+        list: ABCList | None = None,
     ) -> None:
         """Class constructor.
 
@@ -62,7 +62,7 @@ class JWTModule(BaseModule):
             private_key (str | None): Private key for RSA enecryption
             public_key (str | None): Public key for RSA
             expire (int): Token lifetime in seconds
-            list (JWTList | None): List module
+            list (ABCList | None): List module
         """
         super().__init__(module_type="jwt")
         self._secret_key = secret_key
