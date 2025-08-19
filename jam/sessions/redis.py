@@ -15,7 +15,7 @@ except ImportError:
 
 from jam.__logger__ import logger
 from jam.exceptions import SessionNotFoundError
-from jam.sessions.modules.__abc_session_repo__ import BaseSessionModule
+from jam.sessions.__abc_session_repo__ import BaseSessionModule
 
 
 class RedisSessions(BaseSessionModule):
