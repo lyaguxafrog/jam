@@ -7,6 +7,8 @@ from uuid import uuid4
 
 from cryptography.fernet import Fernet
 
+from jam.__logger__ import logger
+
 
 class BaseSessionModule(ABC):
     """Abstract base class for session management modules.
@@ -58,6 +60,17 @@ class BaseSessionModule(ABC):
         return self._code_session_key.decrypt(
             data[len(self._sk_mark_symbol) :].encode()
         ).decode()
+
+    def _decode_session_id_if_needed(self, data: str) -> str:
+        """Decode the session ID if it is encoded."""
+        if hasattr(self, "_code_session_key"):
+            try:
+                data = self._decode_session_id(data)
+            except ValueError as e:
+                logger.error("Failed to decode session ID: %s", e)
+            return data
+        else:
+            return data
 
     @property
     def id(self) -> str:
