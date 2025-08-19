@@ -204,7 +204,10 @@ class SessionModule(BaseModule):
         elif sessions_type == "memory":
             raise NotImplementedError
         else:
-            raise ValueError(f"Unsupported session type: {sessions_type}")
+            raise ValueError(
+                f"Unsupported session type: {sessions_type} \n"
+                f"See docs: https://jam.makridenko.ru/sessions/"
+            )
 
     def create(self, session_key: str, data: dict) -> str:
         """Create a new session with the given session key and data.
