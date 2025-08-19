@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-from typing import Any, Literal
+from collections.abc import Callable
+from typing import Any, Literal, Optional, Union
 from uuid import uuid4
 
 from jam.__logger__ import logger
@@ -162,3 +163,119 @@ class JWTModule(BaseModule):
         )
 
         return payload
+
+
+class SessionModule(BaseModule):
+    """Module for session management."""
+
+    def __init__(
+        self,
+        sessions_type: Literal["redis", "memory"],
+        id_factory: Callable[[], str] = lambda: str(uuid4()),
+        is_session_crypt: bool = False,
+        session_aes_secret: Optional[Union[str, bytes]] = None,
+        **module_kwargs: Any,
+    ) -> None:
+        """Class constructor.
+
+        Args:
+            sessions_type (Literal["redis", "memory"]): Type of session storage. For memory sessions need to `pip install jamlib[json]`.
+            id_factory (Callable[[], str], optional): A callable that generates unique IDs. Defaults to a UUID factory.
+            is_session_crypt (bool, optional): If True, session keys will be encoded. Defaults to False.
+            session_aes_secret (Optional[str, bytes], optional): AES secret for encoding session keys.
+            **module_kwargs (Any): Additional keyword arguments for the session module.
+        """
+        super().__init__(module_type="session")
+        if sessions_type == "redis":
+            from jam.sessions.redis import RedisSessions
+
+            self.module = RedisSessions(
+                redis_uri=module_kwargs.get(
+                    "redis_uri", "redis://localhost:6379/0"
+                ),
+                redis_sessions_key=module_kwargs.get(
+                    "sessions_path", "sessions"
+                ),
+                default_ttl=module_kwargs.get("session_ttl"),
+                is_session_crypt=is_session_crypt,
+                session_aes_secret=session_aes_secret,
+                id_factory=id_factory,
+            )
+        elif sessions_type == "memory":
+            raise NotImplementedError
+        else:
+            raise ValueError(f"Unsupported session type: {sessions_type}")
+
+    def create(self, session_key: str, data: dict) -> str:
+        """Create a new session with the given session key and data.
+
+        Args:
+            session_key (str): The key for the session.
+            data (dict): The data to be stored in the session.
+
+        Returns:
+            str: The ID of the created session.
+        """
+        return self.module.create(session_key, data)
+
+    def get(self, session_id: str) -> Optional[dict]:
+        """Retrieve a session by its key or ID.
+
+        Args:
+            session_id (str): The ID of the session to retrieve.
+
+        Returns:
+            dict | None: The data stored in the session.
+
+        Raises:
+            SessionNotFoundError: If the session does not exist.
+        """
+        return self.module.get(session_id)
+
+    def rework(self, session_id: str) -> str:
+        """Reworks a session and returns its new ID.
+
+        Args:
+            session_id (str): The ID of the session to rework.
+
+        Returns:
+            str: The new ID of the reworked session.
+
+        Raises:
+            SessionNotFoundError: If the session does not exist.
+        """
+        return self.module.rework(session_id)
+
+    def delete(self, session_id: str) -> None:
+        """Delete a session by its key or ID.
+
+        Args:
+            session_id (str): The ID of the session to delete.
+
+        Raises:
+            SessionNotFoundError: If the session does not exist.
+        """
+        self.module.delete(session_id)
+
+    def update(self, session_id: str, data: dict) -> None:
+        """Update an existing session with new data.
+
+        Args:
+            session_id (str): The ID of the session to update.
+            data (dict): The new data to be stored in the session.
+
+        Raises:
+            SessionNotFoundError: If the session does not exist.
+        """
+        self.module.update(session_id, data)
+
+    def clear(self, session_key: str) -> None:
+        """Clear all sessions by key.
+
+        Args:
+            session_key (str): The session key to clear.
+
+        Raises:
+            SessionNotFoundError: If the session does not exist.
+        """
+        self.module.clear(session_key)

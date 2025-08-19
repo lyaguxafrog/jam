@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import Any, Optional
+from typing import Any, Optional, Union
 from uuid import uuid4
 
 from cryptography.fernet import Fernet
@@ -25,7 +25,7 @@ class BaseSessionModule(ABC):
         self,
         id_factory: Callable[[], str] = lambda: str(uuid4()),
         is_session_crypt: bool = False,
-        session_aes_secret: Optional[bytes] = None,
+        session_aes_secret: Optional[Union[str, bytes]] = None,
     ) -> None:
         """Class constructor.
 
