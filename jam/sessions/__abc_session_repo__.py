@@ -61,6 +61,17 @@ class BaseSessionModule(ABC):
             data[len(self._sk_mark_symbol) :].encode()
         ).decode()
 
+    def _encode_session_id_if_needed(self, data: str) -> str:
+        """Encode the session ID if it is not already encoded."""
+        if hasattr(self, "_code_session_key"):
+            try:
+                data = self._encode_session_id(data)
+            except ValueError as e:
+                logger.error("Failed to encode session ID: %s", e)
+            return data
+        else:
+            return data
+
     def _decode_session_id_if_needed(self, data: str) -> str:
         """Decode the session ID if it is encoded."""
         if hasattr(self, "_code_session_key"):
