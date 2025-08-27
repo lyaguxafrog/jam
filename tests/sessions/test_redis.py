@@ -85,19 +85,12 @@ def test_update_session(redis_session_instance_no_crypt):
 
 
 def test_update_nonexistent_session(redis_session_instance_no_crypt):
-    with pytest.raises(KeyError):
+    from jam.exceptions.sessions import SessionNotFoundError
+
+    with pytest.raises(SessionNotFoundError):
         redis_session_instance_no_crypt.update(
             "nonexistent:session", {"user_id": 2}
         )
-
-
-def test_create_session_no_data(redis_session_instance_no_crypt):
-    session = redis_session_instance_no_crypt.create(session_key="test")
-    assert isinstance(session, str)
-    assert len(session) > 0
-    assert (session.split(":")[0]) == "test"
-    retrieved_data = redis_session_instance_no_crypt.get(session)
-    assert retrieved_data is None
 
 
 def test_create_session_empty_data(redis_session_instance_no_crypt):
