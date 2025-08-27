@@ -65,7 +65,7 @@ class JSONSessions(BaseSessionModule):
         """
         session_id = self._encode_session_id_if_needed(self.id)
         doc = self._SessionDoc(
-            key=session_key, session_id=session_id, data=data
+            key=session_key, session_id=f"{session_key}:{session_id}", data=data
         )
         self._db.insert(doc.__dict__)
         logger.debug("Session created with ID %s", session_id)
@@ -80,9 +80,7 @@ class JSONSessions(BaseSessionModule):
         Returns:
             dict | None: The session data if found, otherwise None.
         """
-        session_id = self._decode_session_id_if_needed(session_id).split(":")[
-            -1
-        ]
+        session_id = self._decode_session_id_if_needed(session_id)
         result = self._db.search(self._qs.session_id == session_id)
         if result:
             return result[0]["data"]
@@ -97,9 +95,7 @@ class JSONSessions(BaseSessionModule):
         Returns:
             None
         """
-        session_id = self._decode_session_id_if_needed(session_id).split(":")[
-            -1
-        ]
+        session_id = self._decode_session_id_if_needed(session_id)
         self._db.remove(self._qs.session_id == session_id)
         logger.debug("Session with ID %s deleted", session_id)
 
@@ -113,9 +109,7 @@ class JSONSessions(BaseSessionModule):
         Returns:
             None
         """
-        session_id = self._decode_session_id_if_needed(session_id).split(":")[
-            -1
-        ]
+        session_id = self._decode_session_id_if_needed(session_id)
         self._db.update({"data": data}, self._qs.session_id == session_id)
         logger.debug("Session with ID %s updated", session_id)
 
@@ -139,9 +133,7 @@ class JSONSessions(BaseSessionModule):
         Returns:
             str: The new session ID.
         """
-        session_id_decoded = self._decode_session_id_if_needed(
-            session_id
-        ).split(":")[-1]
+        session_id_decoded = self._decode_session_id_if_needed(session_id)
         result = self._db.search(self._qs.session_id == session_id_decoded)
         if not result:
             raise SessionNotFoundError(
