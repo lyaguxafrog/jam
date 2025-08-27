@@ -170,7 +170,7 @@ class SessionModule(BaseModule):
 
     def __init__(
         self,
-        sessions_type: Literal["redis", "memory"],
+        sessions_type: Literal["redis", "json", "custom"],
         id_factory: Callable[[], str] = lambda: str(uuid4()),
         is_session_crypt: bool = False,
         session_aes_secret: Optional[Union[str, bytes]] = None,
@@ -179,13 +179,17 @@ class SessionModule(BaseModule):
         """Class constructor.
 
         Args:
-            sessions_type (Literal["redis", "memory"]): Type of session storage. For memory sessions need to `pip install jamlib[json]`.
+            sessions_type (Literal["redis", "json"]): Type of session storage.
             id_factory (Callable[[], str], optional): A callable that generates unique IDs. Defaults to a UUID factory.
             is_session_crypt (bool, optional): If True, session keys will be encoded. Defaults to False.
             session_aes_secret (Optional[str, bytes], optional): AES secret for encoding session keys.
-            **module_kwargs (Any): Additional keyword arguments for the session module.
+            **module_kwargs (Any): Additional keyword arguments for the session module. See <DOCS>
         """
         super().__init__(module_type="session")
+        from jam.sessions.__abc_session_repo__ import BaseSessionModule
+
+        self.module: BaseSessionModule
+
         if sessions_type == "redis":
             from jam.sessions.redis import RedisSessions
 
@@ -201,8 +205,32 @@ class SessionModule(BaseModule):
                 session_aes_secret=session_aes_secret,
                 id_factory=id_factory,
             )
-        elif sessions_type == "memory":
-            raise NotImplementedError
+        elif sessions_type == "json":
+            from jam.sessions.tinydb import JSONSessions
+
+            self.module = JSONSessions(
+                json_path=module_kwargs.get("json_path", "sessions.json"),
+                is_session_crypt=is_session_crypt,
+                session_aes_secret=session_aes_secret,
+                id_factory=id_factory,
+            )
+        elif sessions_type == "custom":
+            _module: Callable | None = module_kwargs.get("custom_module")
+            if not _module:
+                raise ValueError("Custom module not provided")
+            self.module: BaseSessionModule = _module(
+                is_session_crypt=is_session_crypt,
+                session_aes_secret=session_aes_secret,
+                id_factory=id_factory,
+                **module_kwargs,
+            )
+            del _module
+            if not self.module:
+                raise ValueError("Custom module not provided")
+            if not isinstance(self.module, BaseSessionModule):
+                raise TypeError(
+                    "Custom module must be an instance of BaseSessionModule. See <DOCS>"
+                )
         else:
             raise ValueError(
                 f"Unsupported session type: {sessions_type} \n"
