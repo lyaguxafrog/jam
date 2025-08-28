@@ -97,7 +97,7 @@ class JSONSessions(BaseSessionModule):
             try:
                 loads_data = self._decode_session_data(result[0]["data"])
             except AttributeError:
-                loads_data = result[0]["data"]
+                loads_data = json.loads(result[0]["data"])
             del result
             return loads_data
         return None

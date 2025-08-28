@@ -48,7 +48,7 @@ def test_create_session(json_sessions_no_crypt):
     assert (session.split(":")[0]) == "test"
 
     stored_data = t.search(ts.session_id == session)
-    assert stored_data[0]["data"] == {"user": "test_user"}
+    assert stored_data[0]["data"] == '{"user": "test_user"}'
 
     t.truncate()
 
