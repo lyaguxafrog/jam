@@ -24,7 +24,7 @@ config = {
 jam = Jam(auth_type="session", config=config)
 ```
 
-Now, when generating a session, the session ID will be encrypted using AES:
+Now, when generating a session, the session ID and data will be encrypted using AES:
 ```python
 session_id: str = jam.create_session(
     session_key="some_username",
