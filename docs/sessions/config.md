@@ -1,4 +1,4 @@
-from sessions import BaseSessionModule---
+---
 title: Jam sessions configuration
 ---
 
@@ -49,7 +49,7 @@ Session lifetime in seconds. The default is 3600 (1 hour). If `None`, the sessio
 ### `session_path`
 Prefix for session keys in Redis. The default is `sessions`.
 
-More details: [jam.sessions.redis.RedisSession]
+More details: [jam.sessions.redis.RedisSessions](/api/sessions/redis/)
 
 ## JSON
 
@@ -58,7 +58,7 @@ In JSON, sessions are stored as files in the directory specified in the `json_pa
 ### `json_path`
 The path to the directory where session files will be stored.
 
-More details: [jam.sessions.json.JsonSession]
+More details: [jam.sessions.json.JsonSessions](/api/sessions/tinydb/)
 
 ## Custom
 
