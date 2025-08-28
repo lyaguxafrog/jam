@@ -4,7 +4,7 @@ from typing import Any, Literal
 
 from jam.__abc_instances__ import __AbstractInstance
 from jam.__logger__ import logger
-from jam.modules import JWTModule
+from jam.modules import JWTModule, SessionModule
 
 
 class Jam(__AbstractInstance):
@@ -15,7 +15,7 @@ class Jam(__AbstractInstance):
         auth_type: Literal["jwt"],
         config: dict[str, Any],
     ) -> None:
-        """Class construcotr.
+        """Class constructor.
 
         Args:
             auth_type (Literal["jwt"]): Type of auth*
@@ -32,6 +32,9 @@ class Jam(__AbstractInstance):
                 expire=config["expire"],
                 list=config["list"],
             )
+        elif self.type == "session":
+            logger.debug("Create Session instance")
+            self.module = SessionModule(**config)
         else:
             raise NotImplementedError
 
@@ -96,3 +99,113 @@ class Jam(__AbstractInstance):
             )
 
         return self.module.make_payload(exp=exp, **data)
+
+    def create_session(self, session_key: str, data: dict) -> str:
+        """Create a new session.
+
+        Args:
+            session_key (str): Session key
+            data (dict): Data to store in session
+
+        Raises:
+            NotImplementedError: If the auth type is not "session"
+
+        Returns:
+            str: The created session key
+        """
+        if self.type != "session":
+            raise NotImplementedError(
+                "This method is only available for Session auth*."
+            )
+        return self.module.create(session_key, data)
+
+    def get_session(self, session_id: str) -> dict | None:
+        """Retrieve session data by session ID.
+
+        Args:
+            session_id (str): The ID of the session to retrieve.
+
+        Raises:
+            NotImplementedError: If the auth type is not "session".
+
+        Returns:
+            dict | None: The session data if found, otherwise None.
+        """
+        if self.type != "session":
+            raise NotImplementedError(
+                "This method is only available for Session auth*."
+            )
+        return self.module.get(session_id)
+
+    def delete_session(self, session_id: str) -> None:
+        """Delete a session by its ID.
+
+        Args:
+            session_id (str): The ID of the session to delete.
+
+        Raises:
+            NotImplementedError: If the auth type is not "session".
+
+        Returns:
+            None
+        """
+        if self.type != "session":
+            raise NotImplementedError(
+                "This method is only available for Session auth*."
+            )
+        return self.module.delete(session_id)
+
+    def update_session(self, session_id: str, data: dict) -> None:
+        """Update session data by session ID.
+
+        Args:
+            session_id (str): The ID of the session to update.
+            data (dict): The new data to update the session with.
+
+        Raises:
+            NotImplementedError: If the auth type is not "session".
+
+        Returns:
+            None
+        """
+        if self.type != "session":
+            raise NotImplementedError(
+                "This method is only available for Session auth*."
+            )
+        return self.module.update(session_id, data)
+
+    def clear_sessions(self, session_key: str) -> None:
+        """Clear all sessions associated with a specific session key.
+
+        Args:
+            session_key (str): The session key whose sessions are to be cleared.
+
+        Raises:
+            NotImplementedError: If the auth type is not "session".
+
+        Returns:
+            None
+        """
+        if self.type != "session":
+            raise NotImplementedError(
+                "This method is only available for Session auth*."
+            )
+        return self.module.clear(session_key)
+
+    def rework_session(self, old_session_key: str) -> str:
+        """Rework an existing session key to a new one.
+
+        Args:
+            old_session_key (str): The old session key to be reworked.
+
+        Raises:
+            NotImplementedError: If the auth type is not "session".
+
+        Returns:
+            str: The new session key.
+        """
+        if self.type != "session":
+            raise NotImplementedError(
+                "This method is only available for Session auth*."
+            )
+        return self.module.rework(old_session_key)

@@ -13,3 +13,6 @@ from .jwt import (
     TokenLifeTimeExpired,
     TokenNotInWhiteList,
 )
+from .sessions import (
+    SessionNotFoundError,
+)

@@ -3,12 +3,17 @@
 import pytest
 from fakeredis import FakeAsyncRedis
 from pytest import fixture, raises
+from tinydb import TinyDB
 
 from jam.aio import Jam
 from jam.aio.jwt.lists.json import JSONList
 from jam.aio.jwt.lists.redis import RedisList
 from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
 from jam.utils import make_jwt_config
+
+
+t = TinyDB(":memory:")
+t.truncate()
 
 
 @fixture(scope="function")
@@ -33,12 +38,12 @@ def redis_white_list(fake_aioredis):
 
 @fixture(scope="function")
 def json_black_list():
-    return JSONList(type="black", json_path="another-json-for-tests.json")
+    return JSONList(type="black", json_path=":memory:")
 
 
 @fixture(scope="function")
 def json_white_list():
-    return JSONList(type="white", json_path="another-json-for-tests.json")
+    return JSONList(type="white", json_path=":memory:")
 
 
 def test_redis_list_init(fake_aioredis):
@@ -118,6 +123,7 @@ async def test_json_black_lists(json_black_list):
         await jam.verify_jwt_token(token, check_list=True, check_exp=False)
 
     await jam.module.list.delete(token)
+    t.truncate()
 
 
 @pytest.mark.asyncio
@@ -139,3 +145,5 @@ async def test_json_white_lists(json_white_list):
     await jam.module.list.delete(token)
     with raises(TokenNotInWhiteList):
         await jam.verify_jwt_token(token, check_exp=False, check_list=True)
+
+    t.truncate()

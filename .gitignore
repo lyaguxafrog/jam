@@ -172,5 +172,4 @@ cython_debug/
 .pytest_cache/
 debug.py
 .idea/
-json-for-tests.json
-another-json-for-tests.json
+:memory:

@@ -296,8 +296,14 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+json = [
+    { name = "tinydb" },
+]
 json-lists = [
     { name = "tinydb" },
+]
+redis = [
+    { name = "redis" },
 ]
 redis-lists = [
     { name = "redis" },
@@ -327,10 +333,12 @@ dev = [
 requires-dist = [
     { name = "cryptography", specifier = ">=44.0.2,<45.0.0" },
     { name = "pycryptodome", specifier = ">=3.21.0,<4.0.0" },
-    { name = "redis", marker = "extra == 'redis-lists'", specifier = ">=5.2.1" },
+    { name = "redis", marker = "extra == 'redis'", specifier = ">=6.4.0" },
+    { name = "redis", marker = "extra == 'redis-lists'", specifier = ">=6.4.0" },
+    { name = "tinydb", marker = "extra == 'json'", specifier = ">=4.8.2" },
     { name = "tinydb", marker = "extra == 'json-lists'", specifier = ">=4.8.2" },
 ]
-provides-extras = ["json-lists", "redis-lists"]
+provides-extras = ["json-lists", "redis-lists", "redis", "json"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -346,7 +354,7 @@ dev = [
     { name = "pre-commit", specifier = ">=4.2.0" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-asyncio", specifier = ">=1.1.0" },
-    { name = "redis", specifier = ">=5.2.1" },
+    { name = "redis", specifier = ">=6.4.0" },
     { name = "ruff", specifier = ">=0.11.2" },
     { name = "termynal", specifier = ">=0.13.0" },
     { name = "tinydb", specifier = ">=4.8.2" },
@@ -741,11 +749,11 @@ wheels = [
 
 [[package]]
 name = "redis"
-version = "5.2.1"
+version = "6.4.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/47/da/d283a37303a995cd36f8b92db85135153dc4f7a8e4441aa827721b442cfb/redis-5.2.1.tar.gz", hash = "sha256:16f2e22dff21d5125e8481515e386711a34cbec50f0e44413dd7d9c060a54e0f", size = 4608355 }
+sdist = { url = "https://files.pythonhosted.org/packages/0d/d6/e8b92798a5bd67d659d51a18170e91c16ac3b59738d91894651ee255ed49/redis-6.4.0.tar.gz", hash = "sha256:b01bc7282b8444e28ec36b261df5375183bb47a07eb9c603f284e89cbc5ef010", size = 4647399 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3c/5f/fa26b9b2672cbe30e07d9a5bdf39cf16e3b80b42916757c5f92bca88e4ba/redis-5.2.1-py3-none-any.whl", hash = "sha256:ee7e1056b9aea0f04c6c2ed59452947f34c4940ee025f5dd83e6a6418b6989e4", size = 261502 },
+    { url = "https://files.pythonhosted.org/packages/e8/02/89e2ed7e85db6c93dfa9e8f691c5087df4e3551ab39081a4d7c6d1f90e05/redis-6.4.0-py3-none-any.whl", hash = "sha256:f0544fa9604264e9464cdf4814e7d4830f74b165d52f2a330a760a88dd248b7f", size = 279847 },
 ]
 
 [[package]]
