@@ -23,3 +23,33 @@ class __AbstractInstance(ABC):
     def make_payload(self, **payload) -> Any:
         """Generate new template."""
         raise NotImplementedError
+
+    @abstractmethod
+    def create_session(self, session_key: str, data: dict) -> str:
+        """Create new session."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_session(self, session_id: str) -> dict | None:
+        """Retrieve session data by session ID."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def delete_session(self, session_id: str) -> None:
+        """Delete a session by its ID."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def update_session(self, session_id: str, data: dict) -> None:
+        """Update session data by session ID."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def clear_sessions(self, session_key: str) -> None:
+        """Clear all sessions associated with a specific session key."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def rework_session(self, old_session_key: str) -> str:
+        """Rework an existing session key to a new one."""
+        raise NotImplementedError
