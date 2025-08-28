@@ -206,31 +206,7 @@ class RedisSessions(BaseSessionModule):
                 f"Session with ID {session_id} not found."
             )
 
-        new_session_id = self._encode_session_id_if_needed(
-            f"{decoded_session_key[0]}:{self.id}"
-        )
-        self._redis.hset(
-            name=f"{self.session_path}:{decoded_session_key[0]}",
-            key=new_session_id,
-            value=json.dumps(session_data),
-        )
-        logger.debug(
-            "Session %s reworked to new ID %s successfully.",
-            session_id,
-            new_session_id,
-        )
-
-        if self.ttl:
-            self._redis.hexpire(
-                f"{self.session_path}:{decoded_session_key[0]}",
-                self.ttl,
-                new_session_id,
-            )
-            logger.debug(
-                "TTL for new session %s set to %d seconds.",
-                new_session_id,
-                self.ttl,
-            )
+        new_session_id = self.create(decoded_session_key[0], session_data)
 
         self.delete(session_id)
         return new_session_id
