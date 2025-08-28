@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import json
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -50,8 +51,8 @@ class JSONSessions(BaseSessionModule):
     class _SessionDoc:
         key: str
         session_id: str
+        data: str
         created_at: float = field(default_factory=datetime.now().timestamp)
-        data: dict = field(default_factory=dict)
 
     def create(self, session_key: str, data: dict) -> str:
         """Create a new session.
@@ -64,9 +65,19 @@ class JSONSessions(BaseSessionModule):
             str: The ID of the created session.
         """
         session_id = self._encode_session_id_if_needed(self.id)
+
+        try:
+            dumps_data = self._encode_session_data(data)
+        except AttributeError:
+            dumps_data = json.dumps(data)
+        del data
+
         doc = self._SessionDoc(
-            key=session_key, session_id=f"{session_key}:{session_id}", data=data
+            key=session_key,
+            session_id=f"{session_key}:{session_id}",
+            data=dumps_data,
         )
+
         self._db.insert(doc.__dict__)
         logger.debug("Session created with ID %s", session_id)
         return f"{session_key}:{session_id}"
@@ -83,7 +94,12 @@ class JSONSessions(BaseSessionModule):
         session_id = self._decode_session_id_if_needed(session_id)
         result = self._db.search(self._qs.session_id == session_id)
         if result:
-            return result[0]["data"]
+            try:
+                loads_data = self._decode_session_data(result[0]["data"])
+            except AttributeError:
+                loads_data = result[0]["data"]
+            del result
+            return loads_data
         return None
 
     def delete(self, session_id: str) -> None:
@@ -110,7 +126,14 @@ class JSONSessions(BaseSessionModule):
             None
         """
         session_id = self._decode_session_id_if_needed(session_id)
-        self._db.update({"data": data}, self._qs.session_id == session_id)
+
+        try:
+            dumps_data = self._encode_session_data(data)
+        except AttributeError:
+            dumps_data = json.dumps(data)
+        del data
+
+        self._db.update({"data": dumps_data}, self._qs.session_id == session_id)
         logger.debug("Session with ID %s updated", session_id)
 
     def clear(self, session_key: str) -> None:
@@ -129,6 +152,9 @@ class JSONSessions(BaseSessionModule):
 
         Args:
             session_id (str): The current session ID to be reworked.
+
+        Raises:
+            SessionNotFoundError: If session not found
 
         Returns:
             str: The new session ID.
