@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import json
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Any, Optional, Union
@@ -82,6 +83,21 @@ class BaseSessionModule(ABC):
             return data
         else:
             return data
+
+    def _encode_session_data(self, data: dict) -> str:
+        """Encode session data."""
+        if not hasattr(self, "_code_session_key"):
+            raise AttributeError("Session data encoding is not enabled.")
+
+        data_json = json.dumps(data)
+        return self._encode_session_id(data_json)
+
+    def _decode_session_data(self, data: str) -> dict:
+        """Decode session data."""
+        if not hasattr(self, "_code_session_key"):
+            raise AttributeError("Session key encoding is not enabled.")
+        data = self._decode_session_id(data)
+        return json.loads(data)
 
     @property
     def id(self) -> str:

@@ -72,10 +72,18 @@ class RedisSessions(BaseSessionModule):
             f"{session_key}:{self.id}"
         )
         logger.debug("Gen session: %s", session_id)
+
+        # trying to encode data
+        try:
+            dumps_data = self._encode_session_data(data)
+        except AttributeError:
+            dumps_data = json.dumps(data)
+        del data
+
         self._redis.hset(
             name=f"{self.session_path}:{session_key}",
             key=session_id,
-            value=json.dumps(data),
+            value=dumps_data,
         )
         logger.debug("Set session %s successfully.", session_id)
         if self.ttl:
@@ -108,8 +116,13 @@ class RedisSessions(BaseSessionModule):
             logger.debug("Session %s not found.", session_id)
             return None
 
-        data = json.loads(session)
-        return data
+        try:
+            loads_data = self._decode_session_data(session)
+        except AttributeError:
+            loads_data = json.loads(session)
+        del session
+
+        return loads_data
 
     def delete(self, session_id: str) -> None:
         """Delete a session by its ID.
@@ -151,10 +164,16 @@ class RedisSessions(BaseSessionModule):
                 f"Session with ID {session_id} not found."
             )
 
+        try:
+            dumps_data = self._encode_session_data(data)
+        except AttributeError:
+            dumps_data = json.dumps(data)
+        del data
+
         self._redis.hset(
             name=f"{self.session_path}:{decoded_session_key[0]}",
             key=session_id,
-            value=json.dumps(data),
+            value=dumps_data,
         )
         logger.debug("Session %s updated successfully.", session_id)
 
@@ -187,31 +206,7 @@ class RedisSessions(BaseSessionModule):
                 f"Session with ID {session_id} not found."
             )
 
-        new_session_id = self._encode_session_id_if_needed(
-            f"{decoded_session_key[0]}:{self.id}"
-        )
-        self._redis.hset(
-            name=f"{self.session_path}:{decoded_session_key[0]}",
-            key=new_session_id,
-            value=json.dumps(session_data),
-        )
-        logger.debug(
-            "Session %s reworked to new ID %s successfully.",
-            session_id,
-            new_session_id,
-        )
-
-        if self.ttl:
-            self._redis.hexpire(
-                f"{self.session_path}:{decoded_session_key[0]}",
-                self.ttl,
-                new_session_id,
-            )
-            logger.debug(
-                "TTL for new session %s set to %d seconds.",
-                new_session_id,
-                self.ttl,
-            )
+        new_session_id = self.create(decoded_session_key[0], session_data)
 
         self.delete(session_id)
         return new_session_id
