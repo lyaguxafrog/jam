@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import tomllib
 from typing import Any, Literal
 
 import yaml
@@ -86,7 +87,7 @@ def __yaml_config_parser__(path: str) -> dict[str, Any]:
         ValueError: If invalid YML
 
     Returns:
-        (dict[str, Any]): Dict with cofigs params
+        (dict[str, Any]): Dict with configs params
     """
     try:
         with open(path) as file:
@@ -96,3 +97,26 @@ def __yaml_config_parser__(path: str) -> dict[str, Any]:
         raise FileNotFoundError(f"YAML config file not found at: {path}")
     except yaml.YAMLError as e:
         raise ValueError(f"Error parsing YAML file: {e}")
+
+
+def __toml_config_parser__(path: str = "pyproject.toml") -> dict[str, Any]:
+    """Private method for parsing TOML config.
+
+    Args:
+        path (str): Path to config.toml
+
+    Raises:
+        FileNotFoundError: If file not found
+        ValueError: If invalid TOML file
+
+    Returns:
+        (dict[str, Any]): Dict with config param
+    """
+    try:
+        with open(path, "rb") as file:
+            config = tomllib.load(file)
+        return config.get("jam", {}).get("config", {})
+    except FileNotFoundError:
+        raise FileNotFoundError(f"TOML config file not found at: {path}")
+    except tomllib.TOMLDecodeError as e:
+        raise ValueError(f"Error parsing TOML file: {e}")
