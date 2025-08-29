@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import tomllib
+from collections.abc import Callable
+from importlib import import_module
 from typing import Any, Literal, Union
 
 import yaml
@@ -140,3 +142,22 @@ def __config_maker__(config: Union[str, dict[str, Any]]) -> dict[str, Any]:
             raise ValueError("YML/YAML or TOML configs only!")
     else:
         return config
+
+
+def __module_loader__(path: str) -> Callable:
+    """Loader custom modules from config.
+
+    Args:
+        path (str): Path to module. For example: `my_app.classes.SomeClass`
+
+    Raises:
+        TypeError: If path not str
+
+    Returns:
+        Callable
+    """
+    if not isinstance(path, str):
+        raise TypeError("Path must be a string")
+    module_path, class_name = path.rsplit(".", 1)
+    module = import_module(module_path)
+    return getattr(module, class_name)
