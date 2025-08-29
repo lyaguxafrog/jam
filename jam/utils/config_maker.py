@@ -2,6 +2,8 @@
 
 from typing import Any, Literal
 
+import yaml
+
 from jam.__logger__ import logger
 from jam.exceptions.jwt import EmptyPublicKey, EmptySecretKey, EmtpyPrivateKey
 from jam.jwt.lists.__abc_list_repo__ import ABCList
@@ -73,20 +75,24 @@ def make_jwt_config(
     }
 
 
-# def __yaml_config_parser__(path: str) -> dict[str, Any]:
-#     """Private method for parsinf YML config.
-#
-#     Args:
-#         path (str): Path to config.yml
-#
-#     Returns:
-#         (dict[str, Any]): Dict with cofigs params
-#     """
-#     try:
-#         with open(path) as file:
-#             config = yaml.safe_load(file)
-#         return config if config else {}
-#     except FileNotFoundError:
-#         raise FileNotFoundError(f"YAML config file not found at: {path}")
-#     except yaml.YAMLError as e:
-#         raise ValueError(f"Error parsing YAML file: {e}")
+def __yaml_config_parser__(path: str) -> dict[str, Any]:
+    """Private method for parsing YML config.
+
+    Args:
+        path (str): Path to config.yml
+
+    Raises:
+        FileNotFoundError: If file not found
+        ValueError: If invalid YML
+
+    Returns:
+        (dict[str, Any]): Dict with cofigs params
+    """
+    try:
+        with open(path) as file:
+            config = yaml.safe_load(file)
+        return config["jam"] if config else {}
+    except FileNotFoundError:
+        raise FileNotFoundError(f"YAML config file not found at: {path}")
+    except yaml.YAMLError as e:
+        raise ValueError(f"Error parsing YAML file: {e}")
