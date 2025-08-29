@@ -4,7 +4,7 @@ import pytest
 from cryptography.fernet import Fernet
 from tinydb import Query, TinyDB
 
-from jam.sessions.tinydb import JSONSessions
+from jam.sessions.json import JSONSessions
 
 
 t = TinyDB(":memory:")

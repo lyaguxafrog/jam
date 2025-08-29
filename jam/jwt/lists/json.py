@@ -12,7 +12,7 @@ except ImportError:
     raise ImportError(
         """
         No required packages found, looks like you didn't install them:
-        `pip install "jamlib[json-lists]"`
+        `pip install "jamlib[json]"`
         """
     )
 

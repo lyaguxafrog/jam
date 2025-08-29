@@ -206,7 +206,7 @@ class SessionModule(BaseModule):
                 id_factory=id_factory,
             )
         elif sessions_type == "json":
-            from jam.sessions.tinydb import JSONSessions
+            from jam.sessions.json import JSONSessions
 
             self.module = JSONSessions(
                 json_path=module_kwargs.get("json_path", "sessions.json"),
