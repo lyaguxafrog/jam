@@ -32,6 +32,5 @@ token = jam.gen_jwt_token({"user_id": 1})
 ```
 
 ## Roadmap
-![Roadmap](https://github.com/lyaguxafrog/jam/blob/master/docs/assets/roadmap.png?raw=true)
+![Roadmap](https://jam.makridenko.ru/assets/roadmap.png?raw=true)
 
-&copy; [Adrian Makridenko](https://github.com/lyaguxafrog) 2025
