@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import tomllib
-from typing import Any, Literal
+from typing import Any, Literal, Union
 
 import yaml
 
@@ -120,3 +120,23 @@ def __toml_config_parser__(path: str = "pyproject.toml") -> dict[str, Any]:
         raise FileNotFoundError(f"TOML config file not found at: {path}")
     except tomllib.TOMLDecodeError as e:
         raise ValueError(f"Error parsing TOML file: {e}")
+
+
+def __config_maker__(config: Union[str, dict[str, Any]]) -> dict[str, Any]:
+    """Base config masker.
+
+    Args:
+        config (Union[str, dict[str, Any]): Config dict or file path
+
+    Returns:
+        dict[str, Any]: Parsed config
+    """
+    if isinstance(config, str):
+        if config.split(".")[1] == ("yml" or "yaml"):
+            return __yaml_config_parser__(config)
+        elif config.split(".")[1] == "toml":
+            return __toml_config_parser__(config)
+        else:
+            raise ValueError("YML/YAML or TOML configs only!")
+    else:
+        return config
