@@ -25,31 +25,31 @@ class __AbstractInstance(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def create_session(self, session_key: str, data: dict) -> str:
+    def create_session(self, session_key: str, data: dict) -> Any:
         """Create new session."""
         raise NotImplementedError
 
     @abstractmethod
-    def get_session(self, session_id: str) -> dict | None:
+    def get_session(self, session_id: str) -> Any:
         """Retrieve session data by session ID."""
         raise NotImplementedError
 
     @abstractmethod
-    def delete_session(self, session_id: str) -> None:
+    def delete_session(self, session_id: str) -> Any:
         """Delete a session by its ID."""
         raise NotImplementedError
 
     @abstractmethod
-    def update_session(self, session_id: str, data: dict) -> None:
+    def update_session(self, session_id: str, data: dict) -> Any:
         """Update session data by session ID."""
         raise NotImplementedError
 
     @abstractmethod
-    def clear_sessions(self, session_key: str) -> None:
+    def clear_sessions(self, session_key: str) -> Any:
         """Clear all sessions associated with a specific session key."""
         raise NotImplementedError
 
     @abstractmethod
-    def rework_session(self, old_session_key: str) -> str:
+    def rework_session(self, old_session_key: str) -> Any:
         """Rework an existing session key to a new one."""
         raise NotImplementedError
