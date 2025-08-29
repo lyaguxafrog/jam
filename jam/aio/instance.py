@@ -10,7 +10,7 @@ class Jam(__AbstractInstance):
     """Main instance for aio."""
 
     def __init__(
-        self, auth_type: Literal["jwt"], config: dict[str, Any]
+        self, auth_type: Literal["jwt", "session"], config: dict[str, Any]
     ) -> None:
         """Class constructor.
 
@@ -27,6 +27,12 @@ class Jam(__AbstractInstance):
                 public_key=config["public_key"],
                 expire=config["expire"],
                 list=config["list"],
+            )
+        elif self.type == "session":
+            raise NotImplementedError(
+                "Asynchronous methods are not yet \
+                implemented in this version. \
+                Please check for updates at https://github.com/lyaguxafrog/jam/releases"
             )
         else:
             raise NotImplementedError

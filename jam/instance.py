@@ -12,7 +12,7 @@ class Jam(__AbstractInstance):
 
     def __init__(
         self,
-        auth_type: Literal["jwt"],
+        auth_type: Literal["jwt", "session"],
         config: dict[str, Any],
     ) -> None:
         """Class constructor.
@@ -34,7 +34,7 @@ class Jam(__AbstractInstance):
             )
         elif self.type == "session":
             logger.debug("Create Session instance")
-            self.module = SessionModule(**config)
+            self.module = SessionModule(**config)  # type: ignore
         else:
             raise NotImplementedError
 
