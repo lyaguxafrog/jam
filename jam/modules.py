@@ -221,6 +221,7 @@ class SessionModule(BaseModule):
             )
             if not _module:
                 raise ValueError("Custom module not provided")
+            module_kwargs.__delitem__("custom_module")
             if isinstance(_module, str):
                 _m = __module_loader__(_module)
                 self.module = _m(
