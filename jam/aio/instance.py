@@ -98,3 +98,39 @@ class Jam(__AbstractInstance):
             )
 
         return await self.module.make_payload(exp=exp, **data)
+
+    async def create_session(self, session_key: str, data: dict) -> str:
+        """Create new session."""
+        raise NotImplementedError(
+            "Asynchronous methods are not yet implemented in this version. Please check for updates at https://github.com/lyaguxafrog/jam/releases"
+        )
+
+    async def get_session(self, session_id: str) -> dict | None:
+        """Retrieve session data by session ID."""
+        raise NotImplementedError(
+            "Asynchronous methods are not yet implemented in this version. Please check for updates at https://github.com/lyaguxafrog/jam/releases"
+        )
+
+    async def delete_session(self, session_id: str) -> None:
+        """Delete a session by its ID."""
+        raise NotImplementedError(
+            "Asynchronous methods are not yet implemented in this version. Please check for updates at https://github.com/lyaguxafrog/jam/releases"
+        )
+
+    async def update_session(self, session_id: str, data: dict) -> None:
+        """Update session data by session ID."""
+        raise NotImplementedError(
+            "Asynchronous methods are not yet implemented in this version. Please check for updates at https://github.com/lyaguxafrog/jam/releases"
+        )
+
+    async def clear_sessions(self, session_key: str) -> None:
+        """Clear all sessions associated with a specific session key."""
+        raise NotImplementedError(
+            "Asynchronous methods are not yet implemented in this version. Please check for updates at https://github.com/lyaguxafrog/jam/releases"
+        )
+
+    async def rework_session(self, old_session_key: str) -> str:
+        """Rework an existing session key to a new one."""
+        raise NotImplementedError(
+            "Asynchronous methods are not yet implemented in this version. Please check for updates at https://github.com/lyaguxafrog/jam/releases"
+        )

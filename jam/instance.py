@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any, Literal
+from typing import Any, Literal, Optional
 
 from jam.__abc_instances__ import __AbstractInstance
 from jam.__logger__ import logger
@@ -119,7 +119,7 @@ class Jam(__AbstractInstance):
             )
         return self.module.create(session_key, data)
 
-    def get_session(self, session_id: str) -> dict | None:
+    def get_session(self, session_id: str) -> Optional[dict]:
         """Retrieve session data by session ID.
 
         Args:
