@@ -23,6 +23,7 @@ nav:
           - Config: sessions/config.md
           - Instance: sessions/instance.md
           - Sessions crypt: sessions/session_crypt.md
+          - Own sessions backend: sessions/own_module.md
       - Quick: quick.md
   - API:
       - Jam: api/instance.md
@@ -44,7 +45,7 @@ nav:
       - jam.sessions:
           - __abc_session_repo__.py: api/sessions/abc_sessions_repo.md
           - redis.py: api/sessions/redis.md
-          - tinydb.py: api/sessions/tinydb.md
+          - json.py: api/sessions/json.md
       - jam.utils:
           - generate_rsa_key_pair: api/utils/rsa.md
           - generate_aes_key: api/utils/aes.md
