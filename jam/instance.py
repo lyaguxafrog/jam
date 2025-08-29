@@ -18,9 +18,10 @@ class Jam(__AbstractInstance):
         """Class constructor.
 
         Args:
-            auth_type (Literal["jwt"]): Type of auth*
+            auth_type (Literal["jwt", "sessions"]): Type of auth*
             config (dict[str, Any] | str): Config for Jam, can use `jam.utils.config_maker`
         """
+        # TODO: Refactor this to MODULES and typedict/dataclasses instances
         self.type = auth_type
         if self.type == "jwt":
             logger.debug("Create JWT instance")
