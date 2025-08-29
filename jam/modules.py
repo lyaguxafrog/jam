@@ -2,13 +2,14 @@
 
 import datetime
 from collections.abc import Callable
-from typing import Any, Literal, Optional
+from typing import Any, Literal, Optional, Union
 from uuid import uuid4
 
 from jam.__logger__ import logger
 from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
 from jam.jwt.lists.__abc_list_repo__ import ABCList
 from jam.jwt.tools import __gen_jwt__, __validate_jwt__
+from jam.utils.config_maker import __module_loader__
 
 
 class BaseModule:
@@ -215,15 +216,27 @@ class SessionModule(BaseModule):
                 id_factory=id_factory,
             )
         elif sessions_type == "custom":
-            _module: Callable | None = module_kwargs.get("custom_module")
+            _module: Optional[Union[Callable, str]] = module_kwargs.get(
+                "custom_module"
+            )
             if not _module:
                 raise ValueError("Custom module not provided")
-            self.module: BaseSessionModule = _module(
-                is_session_crypt=is_session_crypt,
-                session_aes_secret=session_aes_secret,
-                id_factory=id_factory,
-                **module_kwargs,
-            )
+            if isinstance(_module, str):
+                _m = __module_loader__(_module)
+                self.module = _m(
+                    is_session_crypt=is_session_crypt,
+                    session_aes_secret=session_aes_secret,
+                    id_factory=id_factory,
+                    **module_kwargs,
+                )
+                del _m
+            elif callable(_module):
+                self.module = _module(
+                    is_session_crypt=is_session_crypt,
+                    session_aes_secret=session_aes_secret,
+                    id_factory=id_factory,
+                    **module_kwargs,
+                )
             del _module
             if not self.module:
                 raise ValueError("Custom module not provided")
