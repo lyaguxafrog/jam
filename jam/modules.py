@@ -2,7 +2,7 @@
 
 import datetime
 from collections.abc import Callable
-from typing import Any, Literal, Optional, Union
+from typing import Any, Literal, Optional
 from uuid import uuid4
 
 from jam.__logger__ import logger
@@ -173,7 +173,7 @@ class SessionModule(BaseModule):
         sessions_type: Literal["redis", "json", "custom"],
         id_factory: Callable[[], str] = lambda: str(uuid4()),
         is_session_crypt: bool = False,
-        session_aes_secret: Optional[Union[str, bytes]] = None,
+        session_aes_secret: Optional[bytes] = None,
         **module_kwargs: Any,
     ) -> None:
         """Class constructor.
@@ -182,7 +182,7 @@ class SessionModule(BaseModule):
             sessions_type (Literal["redis", "json"]): Type of session storage.
             id_factory (Callable[[], str], optional): A callable that generates unique IDs. Defaults to a UUID factory.
             is_session_crypt (bool, optional): If True, session keys will be encoded. Defaults to False.
-            session_aes_secret (Optional[str, bytes], optional): AES secret for encoding session keys.
+            session_aes_secret (Optional[bytes], optional): AES secret for encoding session keys.
             **module_kwargs (Any): Additional keyword arguments for the session module. See <DOCS>
         """
         super().__init__(module_type="session")

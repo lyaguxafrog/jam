@@ -29,8 +29,8 @@ Sometimes you need to encrypt the session ID so that it cannot be forged.
 If you want to encrypt the session ID, set this parameter to `True` and pass the encryption key in the `session_aes_secret` parameter.
 
 ### `session_aes_secret`
-The encryption key for the session ID. Must be a string or byte. 
-You can use `jam.utils.generate_aes_key()` to generate it.
+The encryption key for the session ID. Key must be 32 url-safe base64-encoded bytes. 
+You can use [`jam.utils.generate_aes_key`](/api/utils/aes/) to generate it.
 
 ### `id_factory`
 The function for generating the session ID. The default is `uuid.uuid4()`.
@@ -63,7 +63,7 @@ More details: [jam.sessions.json.JsonSessions](/api/sessions/tinydb/)
 ## Custom
 
 ### `custom_module`
-Your custom session module. It must be a subclass of `BaseSessionModule`.
+Your custom session module. It must be a subclass of [`BaseSessionModule`](/api/sessions/abc_sessions_repo/).
 
 ### Other parameters
 
@@ -81,3 +81,5 @@ config = {
     "my_param2": "value2",
 }
 ```
+
+See more: [Own sessions backend](/sessions/own_module/)

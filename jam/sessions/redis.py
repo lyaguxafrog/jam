@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
-from typing import Callable, Optional, Union
+from typing import Callable, Optional
 from uuid import uuid4
 
 
@@ -26,7 +26,7 @@ class RedisSessions(BaseSessionModule):
         redis_sessions_key: str = "sessions",
         default_ttl: Optional[int] = 3600,
         is_session_crypt: bool = False,
-        session_aes_secret: Optional[Union[bytes, str]] = None,
+        session_aes_secret: Optional[bytes] = None,
         id_factory: Callable[[], str] = lambda: str(uuid4()),
     ) -> None:
         """Initialize the Redis session management module.
@@ -36,7 +36,7 @@ class RedisSessions(BaseSessionModule):
             redis_sessions_key (str): The key under which sessions are stored in Redis.
             default_ttl (Optional[int]): Default time-to-live for sessions in seconds. Defaults to 3600 seconds (1 hour).
             is_session_crypt (bool): If True, session keys will be encoded.
-            session_aes_secret (Optional[Union[bytes, str]): AES secret for encoding session keys. Required if `is_session_key_crypt` is True.
+            session_aes_secret (Optional[bytes]): AES secret for encoding session keys. Required if `is_session_key_crypt` is True.
             id_factory (Callable[[], str], optional): A callable that generates unique IDs. Defaults to a UUID factory.
         """
         super().__init__(

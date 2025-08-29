@@ -4,7 +4,7 @@ import json
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Optional, Union
+from typing import Optional
 from uuid import uuid4
 
 
@@ -27,7 +27,7 @@ class JSONSessions(BaseSessionModule):
         self,
         json_path: str = "sessions.json",
         is_session_crypt: bool = False,
-        session_aes_secret: Optional[Union[bytes, str]] = None,
+        session_aes_secret: Optional[bytes] = None,
         id_factory: Callable[[], str] = lambda: str(uuid4()),
     ) -> None:
         """Initialize the JSON session management module.
@@ -35,7 +35,7 @@ class JSONSessions(BaseSessionModule):
         Args:
             json_path (str): Path to the JSON file where sessions will be stored.
             is_session_crypt (bool): If True, session keys will be encoded.
-            session_aes_secret (Optional[Union[bytes, str]]): AES secret for encoding session keys. Required if `is_session_crypt` is True.
+            session_aes_secret (Optional[bytes]): AES secret for encoding session keys. Required if `is_session_crypt` is True.
             id_factory (Callable[[], str], optional): A callable that generates unique IDs. Defaults to a UUID factory.
         """
         super().__init__(
