@@ -7,7 +7,7 @@ You need a running redis instance for this to work.
 ## Installing extra packages
 <!-- termynal -->
 ```
-pip install jamlib[redis-lists]
+pip install jamlib[redis]
 ---> 100%
 Installed!
 ```

@@ -19,6 +19,11 @@ nav:
               - JSONList: jwt/lists/json.md
               - RedisList: jwt/lists/redis.md
               - CustomList: jwt/lists/own_module.md
+      - Sessions:
+          - Config: sessions/config.md
+          - Instance: sessions/instance.md
+          - Sessions crypt: sessions/session_crypt.md
+          - Own sessions backend: sessions/own_module.md
       - Quick: quick.md
   - API:
       - Jam: api/instance.md
@@ -37,8 +42,13 @@ nav:
               - __abc_list_repo__.py: api/jwt/lists/abc_lists.md
               - JSONList: api/jwt/lists/json.md
               - RedisList: api/jwt/lists/redis.md
+      - jam.sessions:
+          - __abc_session_repo__.py: api/sessions/abc_sessions_repo.md
+          - redis.py: api/sessions/redis.md
+          - json.py: api/sessions/json.md
       - jam.utils:
           - generate_rsa_key_pair: api/utils/rsa.md
+          - generate_aes_key: api/utils/aes.md
           - make_jwt_config: api/utils/jwt_config.md
       - jam.quick:
           - jwt: api/quick/jwt.md

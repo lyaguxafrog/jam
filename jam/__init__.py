@@ -10,5 +10,5 @@ Documentation: https://jam.makridenko.ru
 from jam.instance import Jam
 
 
-__version__ = "1.1.4"
+__version__ = "1.2.0"
 __all__ = ["Jam"]

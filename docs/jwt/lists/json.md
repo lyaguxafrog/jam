@@ -5,7 +5,7 @@ JSONList is a module to store tokens in json, suitable if you can't use a standa
 ## Installing extra packages
 <!-- termynal -->
 ```
-pip install jamlib[json-lists]
+pip install jamlib[json]
 ---> 100%
 Installed!
 ```
