@@ -27,14 +27,7 @@ class Jam(__AbstractInstance):
         self.type = auth_type
         if self.type == "jwt":
             logger.debug("Create JWT instance")
-            self.module = JWTModule(
-                alg=config["alg"],
-                secret_key=config["secret_key"],
-                private_key=config["private_key"],
-                public_key=config["public_key"],
-                expire=config["expire"],
-                list=config["list"],
-            )
+            self.module = JWTModule(**config)
         elif self.type == "session":
             logger.debug("Create Session instance")
             self.module = SessionModule(**config)  # type: ignore
