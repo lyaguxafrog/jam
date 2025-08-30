@@ -7,7 +7,6 @@ from uuid import uuid4
 
 from jam.__logger__ import logger
 from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
-from jam.jwt.lists.__abc_list_repo__ import ABCList
 from jam.jwt.tools import __gen_jwt__, __validate_jwt__
 from jam.utils.config_maker import __module_loader__
 
@@ -51,7 +50,9 @@ class JWTModule(BaseModule):
         public_key: str | None = None,
         private_key: str | None = None,
         expire: int = 3600,
-        list: ABCList | None = None,
+        # TODO: Make another way
+        list_module: Callable | str | None = None,
+        list_configs: dict[str, Any] | None = None,
     ) -> None:
         """Class constructor.
 
@@ -61,7 +62,8 @@ class JWTModule(BaseModule):
             private_key (str | None): Private key for RSA enecryption
             public_key (str | None): Public key for RSA
             expire (int): Token lifetime in seconds
-            list (ABCList | None): List module
+            list_module (Callable[ABCList] | str | None): List module
+            list_configs (dict): List config
         """
         super().__init__(module_type="jwt")
         self._secret_key = secret_key
@@ -69,7 +71,14 @@ class JWTModule(BaseModule):
         self._private_key = private_key
         self.public_key = public_key
         self.exp = expire
-        self.list = list
+
+        # FIXME
+        if isinstance(list_module, str):
+            self.list = __module_loader__(list_module)
+        elif isinstance(list_module, Callable):  # type: ignore
+            self.list = list_module(**list_configs)  # type: ignore
+        else:
+            self.list = None  # type: ignore
 
     def make_payload(self, exp: int | None = None, **data) -> dict[str, Any]:
         """Payload maker tool.
@@ -114,7 +123,7 @@ class JWTModule(BaseModule):
         logger.debug(f"Token header: {header}")
         logger.debug(f"Token payload: {payload}")
 
-        if self.list:
+        if self.list:  # type: ignore
             if self.list.__list_type__ == "white":
                 logger.debug("Add JWT token to white list")
                 self.list.add(token)
