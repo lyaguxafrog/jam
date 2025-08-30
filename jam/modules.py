@@ -17,12 +17,12 @@ class BaseModule:
 
     def __init__(
         self,
-        module_type: Literal["jwt", "session"],
+        module_type: str = "custom",
     ) -> None:
         """Class constructor.
 
         Args:
-            module_type (Litetal["jwt", "session"]): Type of module
+            module_type (str): Type of module
         """
         self._type = module_type
 

@@ -2,11 +2,11 @@
 
 from typing import Any, Literal
 
-from jam.__abc_instances__ import __AbstractInstance
+from jam.__abc_instances__ import BaseJam
 from jam.aio.modules import JWTModule
 
 
-class Jam(__AbstractInstance):
+class Jam(BaseJam):
     """Main instance for aio."""
 
     def __init__(

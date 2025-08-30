@@ -2,13 +2,13 @@
 
 from typing import Any, Literal, Optional, Union
 
-from jam.__abc_instances__ import __AbstractInstance
+from jam.__abc_instances__ import BaseJam
 from jam.__logger__ import logger
 from jam.modules import JWTModule, SessionModule
 from jam.utils.config_maker import __config_maker__
 
 
-class Jam(__AbstractInstance):
+class Jam(BaseJam):
     """Main instance."""
 
     def __init__(
