@@ -55,6 +55,7 @@ nav:
       - jam.__logger__: api/logger.md
   - Changelog: https://github.com/lyaguxafrog/jam/releases
   - Contributing: contributing.md
+  - Philosophy: philosophy.md
   - License: LICENSE.md
 
 
