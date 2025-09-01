@@ -1,1 +1,1 @@
-::: jam.__abc_instances__.__AbstractInstance
+::: jam.__abc_instances__.BaseJam

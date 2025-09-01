@@ -28,9 +28,9 @@ jam = Jam(config="my_config.yml")
 ```
 
 ## TOML
-To configure via toml, you need to describe all parameters in the config in the `jam.config` block, for example:
+To configure via toml, you need to describe all parameters in the config in the `jam` block, for example:
 ```toml
-[jam.config]
+[jam]
 auth_type = "jwt"
 alg = "HS256"
 secret_key = "my_secret"
