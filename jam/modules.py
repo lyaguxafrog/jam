@@ -5,6 +5,9 @@ from collections.abc import Callable
 from typing import Any, Literal, Optional, Union
 from uuid import uuid4
 
+from jwt.lists.json import JSONList
+from jwt.lists.redis import RedisList
+
 from jam.__logger__ import logger
 from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
 from jam.jwt.tools import __gen_jwt__, __validate_jwt__
@@ -50,9 +53,7 @@ class JWTModule(BaseModule):
         public_key: str | None = None,
         private_key: str | None = None,
         expire: int = 3600,
-        # TODO: Make another way
-        list_module: Callable | str | None = None,
-        list_configs: dict[str, Any] | None = None,
+        list: dict[str, Any] | None = None,
     ) -> None:
         """Class constructor.
 
@@ -62,8 +63,7 @@ class JWTModule(BaseModule):
             private_key (str | None): Private key for RSA enecryption
             public_key (str | None): Public key for RSA
             expire (int): Token lifetime in seconds
-            list_module (Callable[ABCList] | str | None): List module
-            list_configs (dict): List config
+            list (dict[str, Any]): List config
         """
         super().__init__(module_type="jwt")
         self._secret_key = secret_key
@@ -72,13 +72,31 @@ class JWTModule(BaseModule):
         self.public_key = public_key
         self.exp = expire
 
-        # FIXME
-        if isinstance(list_module, str):
-            self.list = __module_loader__(list_module)
-        elif isinstance(list_module, Callable):  # type: ignore
-            self.list = list_module(**list_configs)  # type: ignore
-        else:
-            self.list = None  # type: ignore
+        self.list = None
+        if list is not None:
+            self.list = self._init_list(list)
+
+    @staticmethod
+    def _init_list(config: dict[str, Any]):
+        match config["list_type"]:
+            case "redis":
+                return RedisList(
+                    type=config["type"],
+                    redis_uri=config["redis_uri"],
+                    in_list_life_time=config["in_list_life_time"],
+                )
+            case "json":
+                return JSONList(
+                    type=config["type"], json_path=config["json_path"]
+                )
+            case "custom":
+                module = __module_loader__(config["custom_module"])
+                cfg = dict(config)
+                cfg.pop("list_type")
+                cfg.pop("custom_module")
+                return module(**cfg)
+            case _:
+                raise ValueError(f"Unknown list_type: {config['list_type']}")
 
     def make_payload(self, exp: int | None = None, **data) -> dict[str, Any]:
         """Payload maker tool.

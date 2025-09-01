@@ -25,6 +25,7 @@ class Jam(BaseJam):
         # TODO: Refactor this to MODULES and typedict/dataclasses instances
         config = __config_maker__(config)
         self.type = auth_type
+        config.pop("auth_type")
         if self.type == "jwt":
             logger.debug("Create JWT instance")
             self.module = JWTModule(**config)
