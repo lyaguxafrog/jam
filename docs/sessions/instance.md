@@ -6,7 +6,7 @@ title: Jam instance with sessions
 ```python
 from jam import Jam
 
-jam = Jam(auth_type="session", config=config)
+jam = Jam(config=config)
 ```
 
 ## Create new session

@@ -1,9 +1,6 @@
 ---
 image: assets/logo_n_title.png
 ---
-
-# Jam
-
 <div style="text-align: center;">
     <img alt="logo" src="assets/loog_n_title.png" />
     <p>Welcome to Jam documentation!</p>
@@ -25,14 +22,15 @@ Installed!
 ```python
 from jam import Jam
 
-# you can use jam.utils.make_jwt_config to generate the config easily
+# you can use yml ot toml files for configuration, seeL jam.makridenko.ru/config
 config = {
+    "auth_type": "jwt",
     "alg": "HS256",
     "secret_key": "secret",
     "expire": 2600
 }
 
-jam = Jam(auth_type="jwt", config=config)
+jam = Jam(config=config)
 payload = jam.make_payload(**{"user_id": 1})
 token = jam.gen_jwt_token(**payload)
 ```
@@ -46,11 +44,12 @@ token = jam.gen_jwt_token(**payload)
 from jam.aio import Jam
 
 config = {
+    "auth_type": "jwt"
     "alg": "HS256",
     "secret_key": "secret",
     "expire": 2600
 }
-jam = Jam(auth_type="jwt", config=config)
+jam = Jam(config=config)
 payload = await jam.make_payload(**{"user_id": 1})
 token = await jam.gen_jwt_token(**payload)
 ```

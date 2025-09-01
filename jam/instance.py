@@ -1,40 +1,35 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any, Literal, Optional
+from typing import Any, Optional, Union
 
-from jam.__abc_instances__ import __AbstractInstance
+from jam.__abc_instances__ import BaseJam
 from jam.__logger__ import logger
 from jam.modules import JWTModule, SessionModule
+from jam.utils.config_maker import __config_maker__
 
 
-class Jam(__AbstractInstance):
+class Jam(BaseJam):
     """Main instance."""
 
     def __init__(
         self,
-        auth_type: Literal["jwt"],
-        config: dict[str, Any],
+        config: Union[dict[str, Any], str] = "pyproject.toml",
     ) -> None:
         """Class constructor.
 
         Args:
-            auth_type (Literal["jwt"]): Type of auth*
-            config (dict[str, Any] | str): Config for Jam, can use `jam.utils.config_maker`
+            config (dict[str, Any] | str): Dict or path to config file
         """
-        self.type = auth_type
+        # TODO: Refactor this to MODULES and typedict/dataclasses instances
+        config = __config_maker__(config)
+        self.type = config["auth_type"]
+        config.pop("auth_type")
         if self.type == "jwt":
             logger.debug("Create JWT instance")
-            self.module = JWTModule(
-                alg=config["alg"],
-                secret_key=config["secret_key"],
-                private_key=config["private_key"],
-                public_key=config["public_key"],
-                expire=config["expire"],
-                list=config["list"],
-            )
+            self.module = JWTModule(**config)
         elif self.type == "session":
             logger.debug("Create Session instance")
-            self.module = SessionModule(**config)
+            self.module = SessionModule(**config)  # type: ignore
         else:
             raise NotImplementedError
 

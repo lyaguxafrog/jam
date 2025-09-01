@@ -10,6 +10,7 @@ edit_uri: blob/release/docs/
 nav:
   - Home: index.md
   - Usage:
+      - Configuration: config.md
       - JWT:
           - Config: jwt/config.md
           - Instance: jwt/instance.md
@@ -27,7 +28,7 @@ nav:
       - Quick: quick.md
   - API:
       - Jam: api/instance.md
-      - __AbstractInstance: api/abc_instance.md
+      - BaseJam: api/abc_instance.md
       - jam.aio:
           - Jam: api/aio/instance.md
           - jam.aio.jwt:
@@ -49,12 +50,15 @@ nav:
       - jam.utils:
           - generate_rsa_key_pair: api/utils/rsa.md
           - generate_aes_key: api/utils/aes.md
-          - make_jwt_config: api/utils/jwt_config.md
+          - config_maker: api/utils/config_maker.md
       - jam.quick:
           - jwt: api/quick/jwt.md
       - jam.__logger__: api/logger.md
   - Changelog: https://github.com/lyaguxafrog/jam/releases
+  - Breaking changes:
+      - 1.1.4 -> 2.0.0: breaking_changes/jam114_to_200
   - Contributing: contributing.md
+  - License: https://github.com/lyaguxafrog/jam/blob/master/LICENSE.md
   - Philosophy: philosophy.md
   - License: LICENSE.md
 

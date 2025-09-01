@@ -16,10 +16,10 @@ except ImportError:
         """
     )
 
-from jam.jwt.lists.__abc_list_repo__ import ABCList
+from jam.jwt.lists.__abc_list_repo__ import BaseJWTList
 
 
-class JSONList(ABCList):
+class JSONList(BaseJWTList):
     """Black/White list in JSON format, not recommended for blacklists  because it is not convenient to control token lifetime.
 
     Dependency required:

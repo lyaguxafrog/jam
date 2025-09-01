@@ -4,10 +4,12 @@ import datetime
 from typing import Any, Literal
 from uuid import uuid4
 
+from jam.aio.jwt.lists.json import JSONList
+from jam.aio.jwt.lists.redis import RedisList
 from jam.aio.jwt.tools import __gen_jwt_async__, __validate_jwt_async__
 from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
-from jam.jwt.lists.__abc_list_repo__ import ABCList
 from jam.modules import BaseModule
+from jam.utils.config_maker import __module_loader__
 
 
 class JWTModule(BaseModule):
@@ -30,17 +32,17 @@ class JWTModule(BaseModule):
         public_key: str | None = None,
         private_key: str | None = None,
         expire: int = 3600,
-        list: ABCList | None = None,
+        list: dict[str, Any] | None = None,
     ) -> None:
         """Class constructor.
 
         Args:
             alg (Literal["HS256", "HS384", "HS512", "RS256", "RS384", "RS512", "PS512", "PS384", "PS512"]): Algorithm for token encryption
-            secret_key (str | None): Secret key for HMAC encryption
-            private_key (str | None): Private key for RSA encryption
+            secret_key (str | None): Secret key for HMAC enecryption
+            private_key (str | None): Private key for RSA enecryption
             public_key (str | None): Public key for RSA
             expire (int): Token lifetime in seconds
-            list (ABCList | None): List module
+            list (dict[str, Any]): List config
         """
         super().__init__(module_type="jwt")
         self._secret_key = secret_key
@@ -48,7 +50,33 @@ class JWTModule(BaseModule):
         self._private_key = private_key
         self.public_key = public_key
         self.exp = expire
-        self.list = list
+
+        self.list = None
+        if list is not None:
+            self.list = self._init_list(list)
+
+    @staticmethod
+    def _init_list(config: dict[str, Any]):
+        match config["backend"]:
+            case "redis":
+                return RedisList(
+                    type=config["type"],
+                    redis_uri=config["redis_uri"],
+                    in_list_life_time=config["in_list_life_time"],
+                )
+            case "json":
+                return JSONList(
+                    type=config["type"], json_path=config["json_path"]
+                )
+            case "custom":
+                module = __module_loader__(config["custom_module"])
+                cfg = dict(config)
+                cfg.pop("type")
+                cfg.pop("custom_module")
+                cfg.pop("backend")
+                return module(**cfg)
+            case _:
+                raise ValueError(f"Unknown list_type: {config['list_type']}")
 
     async def make_payload(
         self, exp: int | None = None, **data

@@ -4,7 +4,7 @@ import datetime
 from asyncio import to_thread
 from typing import Literal
 
-from jam.jwt.lists.__abc_list_repo__ import ABCList
+from jam.jwt.lists.__abc_list_repo__ import BaseJWTList
 
 
 try:
@@ -18,7 +18,7 @@ except ImportError:
     )
 
 
-class JSONList(ABCList):
+class JSONList(BaseJWTList):
     """Black/White list in JSON format, not recommended for blacklists because it is not convenient to control token lifetime.
 
     Dependency required:

@@ -3,7 +3,7 @@
 import datetime
 from typing import Literal
 
-from jam.jwt.lists.__abc_list_repo__ import ABCList
+from jam.jwt.lists.__abc_list_repo__ import BaseJWTList
 
 
 try:
@@ -17,7 +17,7 @@ except ImportError:
     )
 
 
-class RedisList(ABCList):
+class RedisList(BaseJWTList):
     """Black/White lists in Redis, most optimal format.
 
     Dependency required: `pip install jamlib[redis-lists]`
@@ -30,18 +30,18 @@ class RedisList(ABCList):
     def __init__(
         self,
         type: Literal["white", "black"],
-        redis_instance: Redis,
+        redis_uri: str,
         in_list_life_time: int | None,
     ) -> None:
         """Class constructor.
 
         Args:
             type (Literal["white", "black"]): Type of list
-            redis_instance (Redis): `redis.Redis`
+            redis_uri (str): Uri to redis connect
             in_list_life_time (int | None): The lifetime of a token in the list
         """
         super().__init__(list_type=type)
-        self.__list__ = redis_instance
+        self.__list__ = Redis.from_url(redis_uri, decode_responses=True)
         self.exp = in_list_life_time
 
     async def add(self, token: str) -> None:

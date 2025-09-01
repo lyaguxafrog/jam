@@ -170,6 +170,6 @@ cython_debug/
 .pypirc
 
 .pytest_cache/
-debug.py
+debug*
 .idea/
 :memory:

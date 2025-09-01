@@ -2,13 +2,15 @@
 
 import datetime
 from collections.abc import Callable
-from typing import Any, Literal, Optional
+from typing import Any, Literal, Optional, Union
 from uuid import uuid4
 
 from jam.__logger__ import logger
 from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
-from jam.jwt.lists.__abc_list_repo__ import ABCList
+from jam.jwt.lists.json import JSONList
+from jam.jwt.lists.redis import RedisList
 from jam.jwt.tools import __gen_jwt__, __validate_jwt__
+from jam.utils.config_maker import __module_loader__
 
 
 class BaseModule:
@@ -16,12 +18,12 @@ class BaseModule:
 
     def __init__(
         self,
-        module_type: Literal["jwt", "session"],
+        module_type: str = "custom",
     ) -> None:
         """Class constructor.
 
         Args:
-            module_type (Litetal["jwt", "session"]): Type of module
+            module_type (str): Type of module
         """
         self._type = module_type
 
@@ -50,7 +52,7 @@ class JWTModule(BaseModule):
         public_key: str | None = None,
         private_key: str | None = None,
         expire: int = 3600,
-        list: ABCList | None = None,
+        list: dict[str, Any] | None = None,
     ) -> None:
         """Class constructor.
 
@@ -60,7 +62,7 @@ class JWTModule(BaseModule):
             private_key (str | None): Private key for RSA enecryption
             public_key (str | None): Public key for RSA
             expire (int): Token lifetime in seconds
-            list (ABCList | None): List module
+            list (dict[str, Any]): List config
         """
         super().__init__(module_type="jwt")
         self._secret_key = secret_key
@@ -68,7 +70,33 @@ class JWTModule(BaseModule):
         self._private_key = private_key
         self.public_key = public_key
         self.exp = expire
-        self.list = list
+
+        self.list = None
+        if list is not None:
+            self.list = self._init_list(list)
+
+    @staticmethod
+    def _init_list(config: dict[str, Any]):
+        match config["backend"]:
+            case "redis":
+                return RedisList(
+                    type=config["type"],
+                    redis_uri=config["redis_uri"],
+                    in_list_life_time=config["in_list_life_time"],
+                )
+            case "json":
+                return JSONList(
+                    type=config["type"], json_path=config["json_path"]
+                )
+            case "custom":
+                module = __module_loader__(config["custom_module"])
+                cfg = dict(config)
+                cfg.pop("type")
+                cfg.pop("custom_module")
+                cfg.pop("backend")
+                return module(**cfg)
+            case _:
+                raise ValueError(f"Unknown list_type: {config['list_type']}")
 
     def make_payload(self, exp: int | None = None, **data) -> dict[str, Any]:
         """Payload maker tool.
@@ -113,7 +141,7 @@ class JWTModule(BaseModule):
         logger.debug(f"Token header: {header}")
         logger.debug(f"Token payload: {payload}")
 
-        if self.list:
+        if self.list:  # type: ignore
             if self.list.__list_type__ == "white":
                 logger.debug("Add JWT token to white list")
                 self.list.add(token)
@@ -215,15 +243,28 @@ class SessionModule(BaseModule):
                 id_factory=id_factory,
             )
         elif sessions_type == "custom":
-            _module: Callable | None = module_kwargs.get("custom_module")
+            _module: Optional[Union[Callable, str]] = module_kwargs.get(
+                "custom_module"
+            )
             if not _module:
                 raise ValueError("Custom module not provided")
-            self.module: BaseSessionModule = _module(
-                is_session_crypt=is_session_crypt,
-                session_aes_secret=session_aes_secret,
-                id_factory=id_factory,
-                **module_kwargs,
-            )
+            module_kwargs.__delitem__("custom_module")
+            if isinstance(_module, str):
+                _m = __module_loader__(_module)
+                self.module = _m(
+                    is_session_crypt=is_session_crypt,
+                    session_aes_secret=session_aes_secret,
+                    id_factory=id_factory,
+                    **module_kwargs,
+                )
+                del _m
+            elif callable(_module):
+                self.module = _module(
+                    is_session_crypt=is_session_crypt,
+                    session_aes_secret=session_aes_secret,
+                    id_factory=id_factory,
+                    **module_kwargs,
+                )
             del _module
             if not self.module:
                 raise ValueError("Custom module not provided")

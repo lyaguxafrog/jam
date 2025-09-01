@@ -19,16 +19,15 @@ pip install jamlib
 # -*- coding: utf-8 -*-
 
 from jam import Jam
-from jam.utils import make_jwt_config
 
-config = make_jwt_config(
-    alg="HS256",
-    secret_key="some-key",
-    expire=36000,
-)
+config = {
+    "auth_type": "jwt",
+    "secret_key": "secret",
+    "expire": 3600
+}
 
-jam = Jam(auth_type="jwt", config=config)
-token = jam.gen_jwt_token({"user_id": 1})
+jam = Jam(config=config)
+token = jam.gen_jwt_token({"user_id": 1})  # eyJhbGciOiAiSFMyN...
 ```
 
 ## Roadmap
