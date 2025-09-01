@@ -59,6 +59,8 @@ nav:
       - 1.1.4 -> 2.0.0: breaking_changes/jam114_to_200
   - Contributing: contributing.md
   - License: https://github.com/lyaguxafrog/jam/blob/master/LICENSE.md
+  - Philosophy: philosophy.md
+  - License: LICENSE.md
 
 
 
