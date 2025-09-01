@@ -14,6 +14,7 @@ To configure via yml, you need to describe all configuration parameters in the `
 
 ```yml
 jam:
+  auth_type: "jwt"
   alg: HS256
   secret_key: my_secret
   expire: 3600
@@ -23,13 +24,14 @@ And specify the path to the file in the instance:
 ```python
 from jam import Jam
 
-jam = Jam(auth_type="jwt", config="my_config.yml")
+jam = Jam(config="my_config.yml")
 ```
 
 ## TOML
 To configure via toml, you need to describe all parameters in the config in the `jam.config` block, for example:
 ```toml
 [jam.config]
+auth_type = "jwt"
 alg = "HS256"
 secret_key = "my_secret"
 expire = 3600
@@ -39,7 +41,7 @@ And specify the path to the file in the instance:
 ```python
 from jam import Jam
 
-jam = Jam(auth_type="jwt", config="my_config.toml") # By default config=pyproject.toml
+jam = Jam(config="my_config.toml") # By default config=pyproject.toml
 ```
 
 ## Dict
@@ -48,10 +50,11 @@ To configure via dict, you need to describe all parameters in dict and pass it t
 from jam import Jam
 
 config = {
+    "auth_type": "jwt",
     "alg": "HS256",
     "secret_key": "my_secret",
     "expire": 3600
 }
 
-jam = Jam(auth_type="jwt", config=config)
+jam = Jam(config=config)
 ```

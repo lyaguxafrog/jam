@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any, Literal, Optional, Union
+from typing import Any, Optional, Union
 
 from jam.__abc_instances__ import BaseJam
 from jam.__logger__ import logger
@@ -13,18 +13,16 @@ class Jam(BaseJam):
 
     def __init__(
         self,
-        auth_type: Literal["jwt", "session"],
         config: Union[dict[str, Any], str] = "pyproject.toml",
     ) -> None:
         """Class constructor.
 
         Args:
-            auth_type (Literal["jwt", "sessions"]): Type of auth*
-            config (dict[str, Any] | str): Config for Jam, can use `jam.utils.config_maker`
+            config (dict[str, Any] | str): Dict or path to config file
         """
         # TODO: Refactor this to MODULES and typedict/dataclasses instances
         config = __config_maker__(config)
-        self.type = auth_type
+        self.type = config["auth_type"]
         config.pop("auth_type")
         if self.type == "jwt":
             logger.debug("Create JWT instance")
