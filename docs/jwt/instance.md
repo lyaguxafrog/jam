@@ -5,7 +5,7 @@
 ```python
 from jam import Jam
 
-jam = Jam(auth_type="jwt", config=config)
+jam = Jam(config=config)
 ```
 
 ## Gen payload
