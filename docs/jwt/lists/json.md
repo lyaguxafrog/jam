@@ -12,19 +12,36 @@ Installed!
 
 ## Basic usage
 
+### Configuration
+
+### `type`: `str`
+List type, black or white.
+
+### `backend`: `str`
+Which backend to use for storing the list.
+
+### `json_path`: `str`
+Path to json file.
+
+Example `toml` config:
+```toml
+[jam]
+auth_type = "jwt"
+secret_key = "SECRET"
+expire = 3600
+
+[jam.list]
+type="white" # or black
+backend="json"
+json_path="my_whitelist.json"
+```
+
 ### Blacklists
 ```python
 from jam import Jam
 from jam.exceptions import TokenInBlackList
-from jam.jwt.lists.json import JSONList
 
-config = {
-    "alg": "HS256",
-    "secret_key": "some_key",
-    "expire": 3600,
-    "list": JSONList(type="black", json_path="blacklist.json")
-}
-jam = Jam(auth_type="jwt", config=config)
+jam = Jam(config="config.toml")
 
 some_token = "eyJhbGc0..."
 
@@ -43,15 +60,8 @@ jam.module.list.add(some_token)
 ```python
 from jam import Jam
 from jam.exceptions import TokenNotInWhiteList
-from jam.jwt.lists.json import JSONList
 
-config = {
-    "alg": "HS256",
-    "secret_key": "some_key",
-    "expire": 3600,
-    "list": JSONList(type="white", json_path="whitelist.json")
-}
-jam = Jam(auth_type="jwt", config=config)
+jam = Jam(config="config.toml")
 
 # As soon as you create a new token, it goes on the whitelist
 new_token = jam.gen_jwt_token({"user_id": 1})
@@ -74,8 +84,7 @@ jam.module.list.delete(new_token)
 
 token: str = "some_token"
 
-jam.module.list.add(token) # Adding a token
-jam.module.list.delete(token) # Deleting a token
-result: bool = jam.module.list.check(token) # Check token presence in list
-
+jam.list.add(token) # Adding a token
+jam.list.delete(token) # Deleting a token
+result: bool = jam.list.check(token) # Check token presence in list
 ```

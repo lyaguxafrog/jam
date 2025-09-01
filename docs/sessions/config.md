@@ -4,19 +4,6 @@ title: Jam sessions configuration
 
 # Config
 
-Config is a dict that stores session settings.
-
-```python
-config = {
-    "session_type": "redis",
-    "is_session_crypt": False,
-    # Settings for a specific module here
-    "redis_uri": "redis://localhost:6379/0",
-    "session_path": "sessions",
-    "default_ttl": 3600,
-}
-```
-
 ## General parameters
 
 ### `session_type`
@@ -32,8 +19,14 @@ If you want to encrypt the session ID, set this parameter to `True` and pass the
 The encryption key for the session ID. Key must be 32 url-safe base64-encoded bytes. 
 You can use [`jam.utils.generate_aes_key`](/api/utils/aes/) to generate it.
 
-### `id_factory`
-The function for generating the session ID. The default is `uuid.uuid4()`.
+Example `toml` config:
+```toml
+[jam]
+auth_type = "session"
+session_type = "redis"
+is_session_crypt = false
+redis_uri = "redis://0.0.0.0:6379/0"
+```
 
 ## Redis
 
@@ -68,18 +61,13 @@ Your custom session module. It must be a subclass of [`BaseSessionModule`](/api/
 ### Other parameters
 
 For a custom module, simply specify the parameters you need in dict, for example:
-```python
-from jam.sessions import BaseSessionModule
-
-class MySession(BaseSessionModule):
-    ...
-
-config = {
-    "session_type": "custom",
-    "custom_module": MySession,
-    "my_param1": "value1",
-    "my_param2": "value2",
-}
+```toml
+[jam]
+auth_type = "session"
+sessions_type = "custom"
+custom_module = "myapp.custom_session.CustomModule"
+param1 = "value1"
+param2 = "value2"
 ```
 
 See more: [Own sessions backend](/sessions/own_module/)

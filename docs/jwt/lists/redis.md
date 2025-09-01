@@ -14,30 +14,40 @@ Installed!
 
 ## Basic usage
 
+## Configuration
+
+### `type`: `str`
+List type, black or white.
+
+### `backend`: `str`
+Which backend to use for storing the list.
+
+### `redis_uri`: `str`
+URI to redis connection.
+
+### `in_list_life_time`: `int`
+Token lifetime in seconds.
+
+Example `toml` config:
+```toml
+[jam]
+auth_type = "jwt"
+expire = 3600
+secret_key = "SECRET_KEY"
+
+[jam.list]
+type = "white" # or black
+backend = "redis"
+redis_uri = "redis://0.0.0.0:6379/0"
+in_list_life_time = 3600
+```
+
 ### Blacklists
 ```python
 from jam import Jam
 from jam.exceptions import TokenInBlackList
-from jam.jwt.lists.redis import RedisList
 
-from redis import Redis
-
-redis = Redis(
-    host="0.0.0.0",
-    port=6379
-)
-
-config = {
-    "alg": "HS256",
-    "secret_key": "some_key",
-    "expire": 3600,
-    "list": RedisList(
-        type="black",
-        redis_instance=redis,
-        in_list_life_time=(3600*2)
-    )
-}
-jam = Jam(auth_type="jwt", config=config)
+jam = Jam(config="config.toml")
 
 some_token = "eyJhbGc0..."
 
@@ -56,26 +66,8 @@ jam.module.list.add(some_token)
 ```python
 from jam import Jam
 from jam.exceptions import TokenNotInWhiteList
-from jam.jwt.lists.redis import RedisList
 
-from redis import Redis
-
-redis = Redis(
-    host="0.0.0.0",
-    port=6379
-)
-
-config = {
-    "alg": "HS256",
-    "secret_key": "some_key",
-    "expire": 3600,
-    "list": RedisList(
-        type="white",
-        redis_instance=redis,
-        in_list_life_time=(3600*2)
-    )
-}
-jam = Jam(auth_type="jwt", config=config)
+jam = Jam(config="config.toml")
 
 # As soon as you create a new token, it goes on the whitelist
 new_token = jam.gen_jwt_token({"user_id": 1})
@@ -88,7 +80,7 @@ except TokenNotInWhiteList:
     print("Token not in whitelist!")
 
 # To remove a token from the whitelist
-jam.module.list.delete(new_token)
+jam.list.delete(new_token)
 ```
 
 ## Other methods
@@ -98,8 +90,7 @@ jam.module.list.delete(new_token)
 
 token: str = "some_token"
 
-jam.module.list.add(token) # Adding a token
-jam.module.list.delete(token) # Deleting a token
-result: bool = jam.module.list.check(token) # Check token presence in list
-
+jam.list.add(token) # Adding a token
+jam.list.delete(token) # Deleting a token
+result: bool = jam.list.check(token) # Check token presence in list
 ```

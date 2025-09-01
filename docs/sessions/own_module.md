@@ -36,17 +36,12 @@ class MyCustomSession(BaseSessionModule):
 
 After that, it will need to be transferred to the config with your custom parameters.
 
-```python
-
-from jam import Jam
-
-config = {
-    "session_type": "custom",
-    "custom_module": MyCustomSession,
-    "some_param": "some_value",
-    "another_param": 123
-}
-
-jam = Jam(auth_type="session", config=config)
-jam.create_session(session_key="some_username", data={"user_id": 1})
+```toml
+[jam]
+auth_type = "session"
+session_type = "custom"
+custom_module = "myapp.custom_session.MyCustomSession"
+# your params
+some_param = "value"
+another_param = 123
 ```

@@ -10,6 +10,7 @@ edit_uri: blob/release/docs/
 nav:
   - Home: index.md
   - Usage:
+      - Configuration: config.md
       - JWT:
           - Config: jwt/config.md
           - Instance: jwt/instance.md
