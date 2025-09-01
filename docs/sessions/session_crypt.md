@@ -21,7 +21,7 @@ config = {
     "default_ttl": 3600,
 }
 
-jam = Jam(auth_type="session", config=config)
+jam = Jam(config=config)
 ```
 
 Now, when generating a session, the session ID and data will be encrypted using AES:

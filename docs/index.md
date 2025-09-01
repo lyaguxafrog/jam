@@ -1,9 +1,6 @@
 ---
 image: assets/logo_n_title.png
 ---
-
-# Jam
-
 <div style="text-align: center;">
     <img alt="logo" src="assets/loog_n_title.png" />
     <p>Welcome to Jam documentation!</p>
