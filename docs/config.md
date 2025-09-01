@@ -5,6 +5,7 @@ title: How to config Jam?
 # Jam configuration
 
 There are several ways to configure Jam:
+
 * yaml file
 * toml file (recommended)
 * python-dict
