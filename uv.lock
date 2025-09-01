@@ -288,7 +288,7 @@ wheels = [
 
 [[package]]
 name = "jamlib"
-version = "1.2.0"
+version = "2.0.0"
 source = { virtual = "." }
 dependencies = [
     { name = "cryptography" },
@@ -299,13 +299,7 @@ dependencies = [
 json = [
     { name = "tinydb" },
 ]
-json-lists = [
-    { name = "tinydb" },
-]
 redis = [
-    { name = "redis" },
-]
-redis-lists = [
     { name = "redis" },
 ]
 
@@ -334,11 +328,9 @@ requires-dist = [
     { name = "cryptography", specifier = ">=44.0.2,<45.0.0" },
     { name = "pycryptodome", specifier = ">=3.21.0,<4.0.0" },
     { name = "redis", marker = "extra == 'redis'", specifier = ">=6.4.0" },
-    { name = "redis", marker = "extra == 'redis-lists'", specifier = ">=6.4.0" },
     { name = "tinydb", marker = "extra == 'json'", specifier = ">=4.8.2" },
-    { name = "tinydb", marker = "extra == 'json-lists'", specifier = ">=4.8.2" },
 ]
-provides-extras = ["json-lists", "redis-lists", "redis", "json"]
+provides-extras = ["redis", "json"]
 
 [package.metadata.requires-dev]
 dev = [
