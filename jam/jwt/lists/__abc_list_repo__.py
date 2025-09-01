@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Literal
 
 
-class ABCList(ABC):
+class BaseJWTList(ABC):
     """Abstract class for lists manipulation."""
 
     def __init__(self, list_type: Literal["white", "black"]) -> None:

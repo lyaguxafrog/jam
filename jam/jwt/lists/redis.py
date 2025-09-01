@@ -16,10 +16,10 @@ except ImportError:
         """
     )
 
-from jam.jwt.lists.__abc_list_repo__ import ABCList
+from jam.jwt.lists.__abc_list_repo__ import BaseJWTList
 
 
-class RedisList(ABCList):
+class RedisList(BaseJWTList):
     """Black/White lists in Redis, most optimal format.
 
     Dependency required: `pip install jamlib[redis-lists]`
