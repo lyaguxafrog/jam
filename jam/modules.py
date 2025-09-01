@@ -78,7 +78,7 @@ class JWTModule(BaseModule):
 
     @staticmethod
     def _init_list(config: dict[str, Any]):
-        match config["list_type"]:
+        match config["backend"]:
             case "redis":
                 return RedisList(
                     type=config["type"],
@@ -92,8 +92,9 @@ class JWTModule(BaseModule):
             case "custom":
                 module = __module_loader__(config["custom_module"])
                 cfg = dict(config)
-                cfg.pop("list_type")
+                cfg.pop("type")
                 cfg.pop("custom_module")
+                cfg.pop("backend")
                 return module(**cfg)
             case _:
                 raise ValueError(f"Unknown list_type: {config['list_type']}")
