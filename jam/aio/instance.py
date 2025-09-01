@@ -1,33 +1,28 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any, Literal
+from typing import Any, Union
 
 from jam.__abc_instances__ import BaseJam
 from jam.aio.modules import JWTModule
+from jam.utils.config_maker import __config_maker__
 
 
 class Jam(BaseJam):
     """Main instance for aio."""
 
     def __init__(
-        self, auth_type: Literal["jwt", "session"], config: dict[str, Any]
+        self, config: Union[dict[str, Any], str] = "pyproject.toml"
     ) -> None:
         """Class constructor.
 
         Args:
-            auth_type (str): Type of auth*
             config (dict[str, Any] | str): Config for Jam, can use `jam.utils.config_maker`
         """
-        self.type = auth_type
+        config = __config_maker__(config)
+        self.type = config["auth_type"]
+        config.pop("auth_type")
         if self.type == "jwt":
-            self.module = JWTModule(
-                alg=config["alg"],
-                secret_key=config["secret_key"],
-                private_key=config["private_key"],
-                public_key=config["public_key"],
-                expire=config["expire"],
-                list=config["list"],
-            )
+            self.module = JWTModule(**config)
         elif self.type == "session":
             raise NotImplementedError(
                 "Asynchronous methods are not yet \

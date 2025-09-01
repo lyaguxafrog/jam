@@ -5,11 +5,10 @@ from collections.abc import Callable
 from typing import Any, Literal, Optional, Union
 from uuid import uuid4
 
-from jwt.lists.json import JSONList
-from jwt.lists.redis import RedisList
-
 from jam.__logger__ import logger
 from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
+from jam.jwt.lists.json import JSONList
+from jam.jwt.lists.redis import RedisList
 from jam.jwt.tools import __gen_jwt__, __validate_jwt__
 from jam.utils.config_maker import __module_loader__
 
