@@ -54,6 +54,8 @@ nav:
           - jwt: api/quick/jwt.md
       - jam.__logger__: api/logger.md
   - Changelog: https://github.com/lyaguxafrog/jam/releases
+  - Breaking changes:
+      - 1.1.4 -> 2.0.0: breaking_changes/jam114_to_200
   - Contributing: contributing.md
   - License: LICENSE.md
 
