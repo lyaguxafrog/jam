@@ -26,7 +26,7 @@ class BaseOTP:
         """
         if isinstance(secret, str):
             secret = base64.b32decode(secret.upper() + "=" * (-len(secret) % 8))
-        self.secret = secret
+        self._secret = secret
         self.digits = digits
         self.digest = digest
 
@@ -60,7 +60,7 @@ class BaseOTP:
             bytes: HMAC.
         """
         h = hmac.new(
-            self.secret,
+            self._secret,
             struct.pack(">Q", counter),
             getattr(hashlib, self.digest),
         )
@@ -86,7 +86,7 @@ class BaseOTP:
         """
         label = urllib.parse.quote(f"{issuer}:{name}")
         params = {
-            "secret": base64.b32encode(self.secret)
+            "secret": base64.b32encode(self._secret)
             .decode("utf-8")
             .replace("=", ""),
             "issuer": issuer,
