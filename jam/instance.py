@@ -22,7 +22,7 @@ class Jam(BaseJam):
         """
         # TODO: Refactor this to MODULES and typedict/dataclasses instances
         config = __config_maker__(config)
-        otp_config = config["otp"]
+        otp_config = config.get("otp", None)
 
         if not otp_config:
             del otp_config
@@ -31,10 +31,10 @@ class Jam(BaseJam):
 
             self._otp = OTPConfig(**otp_config)
             self._otp_module = self._otp_module_setup()
+            config.pop("otp")
 
         self.type = config["auth_type"]
         config.pop("auth_type")
-        config.pop("otp")
         if self.type == "jwt":
             logger.debug("Create JWT instance")
             self.module = JWTModule(**config)
@@ -58,7 +58,7 @@ class Jam(BaseJam):
                 raise ValueError("OTP type can only be totp or hotp.")
 
     def _otp_checker(self) -> None:
-        if not self._otp:
+        if not hasattr(self, "_otp"):
             raise NotImplementedError(
                 "OTP not configure. Check documentation: "
             )
@@ -270,6 +270,7 @@ class Jam(BaseJam):
         Returns:
             str: A string of the form "otpauth://..."
         """
+        self._otp_checker()
         return self._otp_module(
             secret=secret, digits=self._otp.digits, digest=self._otp.digest
         ).provisioning_uri(name, issuer, self._otp.type, counter)
@@ -292,6 +293,7 @@ class Jam(BaseJam):
         Returns:
             bool: True if the code matches, otherwise False.
         """
+        self._otp_checker()
         return self._otp_module(
             secret=secret, digits=self._otp.digits, digest=self._otp.digest
         ).verify(secret, code, factor, look_ahead)
