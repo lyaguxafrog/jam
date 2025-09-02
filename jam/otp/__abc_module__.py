@@ -5,6 +5,7 @@ import hashlib
 import hmac
 import struct
 import urllib.parse
+from dataclasses import dataclass
 from typing import Literal
 
 
@@ -97,3 +98,12 @@ class BaseOTP:
             params["counter"] = str(counter)
         query = urllib.parse.urlencode(params)
         return f"otpauth://{type_}/{label}?{query}"
+
+
+@dataclass
+class _OTPConfig:
+    """Config for Jam instance."""
+
+    type_: Literal["otp", "hotp"]
+    digits: int
+    digest: Literal["sha1", "sha256", "sha512"]
