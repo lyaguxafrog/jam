@@ -53,21 +53,21 @@ class TOTP(BaseOTP):
         return self.at()
 
     def verify(
-        self, code: str, for_time: int | None = None, window: int = 1
+        self, code: str, factor: int | None = None, look_ahead: int = 1
     ) -> bool:
         """Checks the TOTP code, taking into account the acceptable window.
 
         Args:
             code (str): The code entered.
-            for_time (int | None, optional): Time in UNIX seconds. If None, the current time. Default is None.
-            window (int, optional): Acceptable deviation in intervals (±window). Default is 1.
+            factor (int | None, optional): Time in UNIX seconds. If None, the current time. Default is None.
+            look_ahead (int, optional): Acceptable deviation in intervals (±window). Default is 1.
 
         Returns:
             bool: True if the code matches, otherwise False.
         """
-        if for_time is None:
-            for_time = int(time.time())
-        for offset in range(-window, window + 1):
-            if self.at(for_time + offset * self.interval) == code:
+        if factor is None:
+            factor = int(time.time())
+        for offset in range(-look_ahead, look_ahead + 1):
+            if self.at(factor + offset * self.interval) == code:
                 return True
         return False

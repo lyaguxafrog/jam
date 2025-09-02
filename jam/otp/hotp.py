@@ -19,18 +19,18 @@ class HOTP(BaseOTP):
             self.digits
         )
 
-    def verify(self, code: str, counter: int, look_ahead: int = 1) -> bool:
+    def verify(self, code: str, factor: int, look_ahead: int = 1) -> bool:
         """Verify HOTP-code.
 
         Args:
             code (str): Code.
-            counter (int): Now counter.
+            factor (int): Now counter.
             look_ahead (int, optional): Allowable forward offset (to compensate for desynchronization). Default is 1..
 
         Returns:
             bool: True if the code matches, otherwise False.
         """
-        for i in range(counter, counter + look_ahead + 1):
+        for i in range(factor, factor + look_ahead + 1):
             if self.at(i) == code:
                 return True
         return False

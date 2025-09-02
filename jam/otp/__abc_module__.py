@@ -101,9 +101,9 @@ class BaseOTP:
 
 
 @dataclass
-class _OTPConfig:
+class OTPConfig:
     """Config for Jam instance."""
 
-    type_: Literal["otp", "hotp"]
+    type: Literal["otp", "hotp"]
     digits: int
     digest: Literal["sha1", "sha256", "sha512"]
