@@ -27,18 +27,18 @@ class TOTP(BaseOTP):
         super().__init__(secret, digits, digest)
         self.interval = interval
 
-    def at(self, for_time: int | None = None) -> str:
+    def at(self, factor: int | None = None) -> str:
         """Generates a TOTP code for a specified time.
 
         Args:
-            for_time (int | None, optional): Time in UNIX seconds. If None, the current time is used. Default is None.
+            factor (int | None, optional): Time in UNIX seconds. If None, the current time is used. Default is None.
 
         Returns:
             str: TOTP code (fixed-length string).
         """
-        if for_time is None:
-            for_time = int(time.time())
-        counter = for_time // self.interval
+        if factor is None:
+            factor = int(time.time())
+        counter = factor // self.interval
         return str(self._dynamic_truncate(self._hmac(counter))).zfill(
             self.digits
         )

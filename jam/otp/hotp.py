@@ -6,16 +6,16 @@ from jam.otp.__abc_module__ import BaseOTP
 class HOTP(BaseOTP):
     """HOTP instance."""
 
-    def at(self, counter: int) -> str:
+    def at(self, factor: int) -> str:
         """Generates a HOTP code for the specified counter.
 
         Args:
-            counter (int): Counter (increases after each use).
+            factor (int): Counter (increases after each use).
 
         Returns:
             str: HOTP code (fixed-length string).
         """
-        return str(self._dynamic_truncate(self._hmac(counter))).zfill(
+        return str(self._dynamic_truncate(self._hmac(factor))).zfill(
             self.digits
         )
 
