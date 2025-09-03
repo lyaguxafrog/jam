@@ -61,12 +61,12 @@ class BaseJam(ABC):
         name: Optional[str] = None,
         issuer: Optional[str] = None,
         counter: Optional[int] = None,
-    ) -> str:
+    ) -> Any:
         """Generates an otpauth:// URI for Google Authenticator."""
         raise NotImplementedError
 
     @abstractmethod
-    def get_otp_code(self, secret: str, factor: Optional[int] = None) -> str:
+    def get_otp_code(self, secret: str, factor: Optional[int] = None) -> Any:
         """Generates a OTP code."""
         raise NotImplementedError
 
@@ -77,6 +77,6 @@ class BaseJam(ABC):
         code: str,
         factor: Optional[int] = None,
         look_ahead: Optional[int] = None,
-    ) -> bool:
+    ) -> Any:
         """Verify TOTP code."""
         raise NotImplementedError

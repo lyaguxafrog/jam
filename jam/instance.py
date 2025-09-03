@@ -44,6 +44,7 @@ class Jam(BaseJam):
         else:
             raise NotImplementedError
 
+    # TODO: Refactor this too
     def _otp_module_setup(self) -> Callable:
         match self._otp.type:
             case "hotp":
