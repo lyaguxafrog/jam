@@ -52,6 +52,10 @@ nav:
           - __abc_session_repo__.py: api/sessions/abc_sessions_repo.md
           - redis.py: api/sessions/redis.md
           - json.py: api/sessions/json.md
+      - jam.otp:
+          - __abc_module__.py: api/otp/base_otp.md
+          - HOTP: api/otp/hotp.md
+          - TOTP: api/otp/totp.md
       - jam.utils:
           - generate_rsa_key_pair: api/utils/rsa.md
           - generate_aes_key: api/utils/aes.md
