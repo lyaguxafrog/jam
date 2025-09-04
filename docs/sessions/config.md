@@ -4,7 +4,7 @@ title: Jam sessions configuration
 
 # Config
 
-## General parameters
+## Params
 
 ### `session_type`
 
@@ -19,7 +19,7 @@ If you want to encrypt the session ID, set this parameter to `True` and pass the
 The encryption key for the session ID. Key must be 32 url-safe base64-encoded bytes. 
 You can use [`jam.utils.generate_aes_key`](/api/utils/aes/) to generate it.
 
-Example `toml` config:
+## Example `toml` config:
 ```toml
 [jam]
 auth_type = "session"

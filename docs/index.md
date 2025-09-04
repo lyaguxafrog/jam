@@ -54,5 +54,15 @@ payload = await jam.make_payload(**{"user_id": 1})
 token = await jam.gen_jwt_token(**payload)
 ```
 
+## Why Jam?
+| Library                               | JWT | White/Black lists for JWT | Serverside sessions | OTP | OAuth2 | Flexible config |
+|---------------------------------------|-----|---------------------------|--------------------|-----|--------|-------|
+| **Jam**                               | ✅   | ✅                         | ✅                  | ✅   | ⏳      | ✅     |
+| [Authx](https://authx.yezz.me/)       | ✅   |  ❌                       |  ✅                  | ❌   | ✅      | ❌     |
+| [PyJWT](https://pyjwt.readthedocs.io) | ✅   | ❌                         | ❌                  | ❌   | ❌      | ❌     |
+| [AuthLib](https://docs.authlib.org)   | ✅   | ❌                         | ❌                  | ❌  | ✅      | ❌     |
+| [OTP Auth](https://otp.authlib.org/)  | ❌   | ❌                         | ❌                  | ✅   | ❌      | ❌     |
+
+
 ## Roadmap
 ![ROADMAP](assets/roadmap.png)
