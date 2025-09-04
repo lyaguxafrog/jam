@@ -4,6 +4,7 @@
 
 ![Static Badge](https://img.shields.io/badge/Python-3.13-blue?logo=python&logoColor=white)
 ![PyPI - Version](https://img.shields.io/pypi/v/jamlib)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/jamlib?period=total&units=INTERNATIONAL_SYSTEM&left_color=GRAY&right_color=RED&left_text=Downloads)](https://pypi.org/project/jamlib/)
 ![tests](https://github.com/lyaguxafrog/jam/actions/workflows/run-tests.yml/badge.svg)
 ![GitHub License](https://img.shields.io/github/license/lyaguxafrog/jam)
 
