@@ -25,6 +25,11 @@ nav:
           - Instance: sessions/instance.md
           - Sessions crypt: sessions/session_crypt.md
           - Own sessions backend: sessions/own_module.md
+      - OTP:
+          - Config: otp/config.md
+          - HOTP or TOTP: otp/hotp_and_totp.md
+          - HOTP: otp/hotp.md
+          - TOTP: otp/totp.md
       - Quick: quick.md
   - API:
       - Jam: api/instance.md
