@@ -14,6 +14,7 @@ code = jam.get_otp_code(
 ```
 !!! tip
     In OTP, you need to use the **secret specifically for each user and store it securely.**
+    You can use: [`jam.utils.generate_otp_key`](/api/utils/otp_keys/)
 
 ## Verify code
 
