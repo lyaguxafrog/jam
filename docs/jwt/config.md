@@ -1,5 +1,6 @@
 # Config
 
+## Params
 
 ### `alg`: `str`
 
@@ -28,7 +29,7 @@ Configuration for lists.
 See [Jam List documentaion](lists/what.md).
 
 
-Example `toml` config:
+## Example `toml` config:
 ```toml
 [jam]
 auth_type = "jwt"
