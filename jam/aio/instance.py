@@ -33,7 +33,6 @@ class Jam(BaseJam):
 
         self.type = config["auth_type"]
         config.pop("auth_type")
-        config.pop("otp")
         if self.type == "jwt":
             self.module = JWTModule(**config)
         elif self.type == "session":
