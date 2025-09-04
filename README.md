@@ -32,6 +32,8 @@ token = jam.gen_jwt_token({"user_id": 1})  # eyJhbGciOiAiSFMyN...
 ```
 
 ## Why Jam?
+Jam is a library that provides the most popular AUTH* mechanisms right out of the box.
+
 | Library                               | JWT | White/Black lists for JWT | Serverside sessions | OTP | OAuth2 | Flexible config |
 |---------------------------------------|-----|---------------------------|--------------------|-----|--------|-------|
 | **Jam**                               | ✅   | ✅                         | ✅                  | ✅   | ⏳      | ✅     |

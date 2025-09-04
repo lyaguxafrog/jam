@@ -55,6 +55,8 @@ token = await jam.gen_jwt_token(**payload)
 ```
 
 ## Why Jam?
+Jam is a library that provides the most popular AUTH* mechanisms right out of the box.
+
 | Library                               | JWT | White/Black lists for JWT | Serverside sessions | OTP | OAuth2 | Flexible config |
 |---------------------------------------|-----|---------------------------|--------------------|-----|--------|-------|
 | **Jam**                               | ✅   | ✅                         | ✅                  | ✅   | ⏳      | ✅     |
