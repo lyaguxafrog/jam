@@ -30,6 +30,15 @@ jam = Jam(config=config)
 token = jam.gen_jwt_token({"user_id": 1})  # eyJhbGciOiAiSFMyN...
 ```
 
+## Why Jam?
+| Library                               | JWT | White/Black lists for JWT | Serverside sessions | OTP | OAuth2 | Flexible config |
+|---------------------------------------|-----|---------------------------|--------------------|-----|--------|-------|
+| **Jam**                               | ✅   | ✅                         | ✅                  | ✅   | ⏳      | ✅     |
+| [Authx](https://authx.yezz.me/)       | ✅   |  ❌                       |  ✅                  | ❌   | ✅      | ❌     |
+| [PyJWT](https://pyjwt.readthedocs.io) | ✅   | ❌                         | ❌                  | ❌   | ❌      | ❌     |
+| [AuthLib](https://docs.authlib.org)   | ✅   | ❌                         | ❌                  | ❌  | ✅      | ❌     |
+| [OTP Auth](https://otp.authlib.org/)  | ❌   | ❌                         | ❌                  | ✅   | ❌      | ❌     |
+
 ## Roadmap
 ![Roadmap](https://jam.makridenko.ru/assets/roadmap.png?raw=true)
 
