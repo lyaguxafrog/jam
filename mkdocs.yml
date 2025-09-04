@@ -59,6 +59,7 @@ nav:
       - jam.utils:
           - generate_rsa_key_pair: api/utils/rsa.md
           - generate_aes_key: api/utils/aes.md
+          - generate_otp_key: api/utils/otp_keys.md
           - config_maker: api/utils/config_maker.md
       - jam.quick:
           - jwt: api/quick/jwt.md
