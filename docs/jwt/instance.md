@@ -43,4 +43,4 @@ If everything went well you just get your payload, if the keys didn't match then
 If we specify this flag, we check the same way, for the lifetime of the token.
 
 ### `check_list`
-If you specify this flag, we do a check for sheets, see [Jam lists documentation](lists/what.md).
+If you specify this flag, we do a check for lists, see [Jam lists documentation](lists/what.md).
