@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from threading import Thread
-
 import pytest
 from cryptography.fernet import Fernet
 from fakeredis import FakeRedis
 from pytest import fixture
-from redis import Redis
 
 from jam.sessions.redis import RedisSessions
 
