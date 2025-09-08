@@ -32,7 +32,7 @@ class RedisList(BaseJWTList):
     def __init__(
         self,
         type: Literal["white", "black"],
-        redis_uri: str,
+        redis_uri: str | Redis,
         in_list_life_time: int | None,
     ) -> None:
         """Class constructor.
@@ -43,7 +43,10 @@ class RedisList(BaseJWTList):
             in_list_life_time (int | None): The lifetime of a token in the list
         """
         super().__init__(list_type=type)
-        self.__list__ = Redis.from_url(redis_uri, decode_responses=True)
+        if isinstance(redis_uri, str):
+            self.__list__ = Redis.from_url(redis_uri, decode_responses=True)
+        else:
+            self.__list__ = redis_uri
         self.exp = in_list_life_time
 
     def add(self, token: str) -> None:
