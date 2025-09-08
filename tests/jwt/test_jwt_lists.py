@@ -2,7 +2,7 @@
 
 from threading import Thread
 
-from fakeredis import TcpFakeServer
+from fakeredis import FakeRedis
 from pytest import fixture, raises
 from tinydb import TinyDB
 
@@ -15,31 +15,21 @@ from jam.jwt.lists.redis import RedisList
 t = TinyDB(":memory:")
 t.truncate()
 
-# @fixture(scope="function")
-# def fake_redis() -> FakeRedis:
-#     """Mock redis instance."""
-#     return FakeRedis()
 
-
-@fixture(scope="module", autouse=True)
-def fake_redis():
-    server = TcpFakeServer(("0.0.0.0", 1111), server_type="redis")
-    t = Thread(target=server.serve_forever, daemon=True)
-    t.start()
+@fixture(scope="function")
+def fake_redis() -> FakeRedis:
+    """Mock redis instance."""
+    return FakeRedis()
 
 
 @fixture(scope="function")
 def redis_black_list(fake_redis):
-    return RedisList(
-        type="black", redis_uri="redis://0.0.0.0:1111", in_list_life_time=None
-    )
+    return RedisList(type="black", redis_uri=fake_redis, in_list_life_time=None)
 
 
 @fixture(scope="function")
 def redis_white_list(fake_redis):
-    return RedisList(
-        type="white", redis_uri="redis://0.0.0.0:1111", in_list_life_time=None
-    )
+    return RedisList(type="white", redis_uri=fake_redis, in_list_life_time=None)
 
 
 @fixture(scope="function")
@@ -53,14 +43,12 @@ def json_white_list():
 
 
 def test_redis_list_init(fake_redis):
-    list = RedisList(
-        type="black", redis_uri="redis://0.0.0.0:1111", in_list_life_time=10
-    )
+    list = RedisList(type="black", redis_uri=fake_redis, in_list_life_time=10)
 
     assert list.__list_type__ == "black"
 
 
-def test_redis_black_lists(redis_black_list):
+def test_redis_black_lists(fake_redis):
     config = {
         "auth_type": "jwt",
         "alg": "HS256",
@@ -68,7 +56,7 @@ def test_redis_black_lists(redis_black_list):
         "list": {
             "type": "black",
             "backend": "redis",
-            "redis_uri": "redis://0.0.0.0:1111/0",
+            "redis_uri": fake_redis,
             "in_list_life_time": 3600,
         },
     }
@@ -92,7 +80,7 @@ def test_redis_black_lists(redis_black_list):
         )
 
 
-def test_redis_white_lists(redis_white_list):
+def test_redis_white_lists(fake_redis):
     config = {
         "auth_type": "jwt",
         "alg": "HS256",
@@ -100,7 +88,7 @@ def test_redis_white_lists(redis_white_list):
         "list": {
             "type": "white",
             "backend": "redis",
-            "redis_uri": "redis://0.0.0.0:1111/0",
+            "redis_uri": fake_redis,
             "in_list_life_time": 3600,
         },
     }
