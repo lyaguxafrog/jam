@@ -22,7 +22,7 @@ class RedisSessions(BaseSessionModule):
 
     def __init__(
         self,
-        redis_uri: str = "redis://localhost:6379/0",
+        redis_uri: str | Redis = "redis://localhost:6379/0",
         redis_sessions_key: str = "sessions",
         default_ttl: Optional[int] = 3600,
         is_session_crypt: bool = False,
@@ -32,7 +32,7 @@ class RedisSessions(BaseSessionModule):
         """Initialize the Redis session management module.
 
         Args:
-            redis_uri (str): The URI for the Redis server.
+            redis_uri (str | Redis): The URI for the Redis server.
             redis_sessions_key (str): The key under which sessions are stored in Redis.
             default_ttl (Optional[int]): Default time-to-live for sessions in seconds. Defaults to 3600 seconds (1 hour).
             is_session_crypt (bool): If True, session keys will be encoded.
@@ -44,7 +44,10 @@ class RedisSessions(BaseSessionModule):
             is_session_crypt=is_session_crypt,
             session_aes_secret=session_aes_secret,
         )
-        self._redis = Redis.from_url(redis_uri, decode_responses=True)
+        if isinstance(redis_uri, str):
+            self._redis = Redis.from_url(redis_uri, decode_responses=True)
+        else:
+            self._redis = redis_uri
         logger.debug("Redis connection established at %s", redis_uri)
 
         self.ttl = default_ttl

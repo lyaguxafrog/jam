@@ -1,27 +1,22 @@
 # -*- coding: utf-8 -*-
 
-from threading import Thread
-
 import pytest
 from cryptography.fernet import Fernet
-from fakeredis import TcpFakeServer
+from fakeredis import FakeRedis
 from pytest import fixture
-from redis import Redis
 
 from jam.sessions.redis import RedisSessions
 
 
-@fixture(scope="session", autouse=True)
+@fixture(scope="function")
 def fake_redis():
-    server = TcpFakeServer(("0.0.0.0", 2828), server_type="redis")
-    t = Thread(target=server.serve_forever, daemon=True)
-    t.start()
+    return FakeRedis(decode_responses=True)
 
 
 @fixture(scope="function")
 def redis_session_instance_no_crypt(fake_redis):
     return RedisSessions(
-        redis_uri="redis://0.0.0.0:2828",
+        redis_uri=fake_redis,
         redis_sessions_key="test",
         default_ttl=None,
         is_session_crypt=False,
@@ -43,7 +38,7 @@ def f(aes_key):
 @fixture(scope="function")
 def redis_session_with_crypt(fake_redis, aes_key):
     return RedisSessions(
-        redis_uri="redis://0.0.0.0:2828",
+        redis_uri=fake_redis,
         redis_sessions_key="test",
         default_ttl=None,
         is_session_crypt=True,
@@ -51,7 +46,7 @@ def redis_session_with_crypt(fake_redis, aes_key):
     )
 
 
-def test_create_new_session(redis_session_instance_no_crypt):
+def test_create_new_session(redis_session_instance_no_crypt, fake_redis):
     session = redis_session_instance_no_crypt.create(
         session_key="test", data={"user_id": 1}
     )
@@ -60,8 +55,7 @@ def test_create_new_session(redis_session_instance_no_crypt):
     assert len(session) > 0
     assert (session.split(":")[0]) == "test"
 
-    redis = Redis.from_url("redis://0.0.0.0:2828", decode_responses=True)
-    stored_data = redis.hget(name="test:test", key=session)
+    stored_data = fake_redis.hget(name="test:test", key=session)
 
     assert stored_data == '{"user_id": 1}'
 
@@ -89,13 +83,12 @@ def test_delete_session(redis_session_instance_no_crypt):
     assert retrieved_data is None
 
 
-def test_session_ttl(redis_session_instance_no_crypt):
+def test_session_ttl(redis_session_instance_no_crypt, fake_redis):
     redis_session_instance_no_crypt.ttl = 20  # Set TTL to 2 seconds
     session = redis_session_instance_no_crypt.create(
         session_key="test", data={"user_id": 1}
     )
-    redis = Redis.from_url("redis://0.0.0.0:2828", decode_responses=True)
-    ttl = redis.httl("test:test", session)[0]
+    ttl = fake_redis.httl("test:test", session)[0]
     assert ttl <= 20 and ttl > 0
 
 
@@ -128,7 +121,7 @@ def test_create_session_empty_data(redis_session_instance_no_crypt):
     assert retrieved_data == {}
 
 
-def test_create_new_session_crypt(redis_session_with_crypt, f):
+def test_create_new_session_crypt(redis_session_with_crypt, f, fake_redis):
     session = redis_session_with_crypt.create(
         session_key="test", data={"user_id": 1}
     )
@@ -136,8 +129,7 @@ def test_create_new_session_crypt(redis_session_with_crypt, f):
     assert isinstance(session, str)
     assert len(session) > 0
 
-    redis = Redis.from_url("redis://0.0.0.0:2828", decode_responses=True)
-    stored_data = redis.hget(name="test:test", key=session)
+    stored_data = fake_redis.hget(name="test:test", key=session)
 
     assert stored_data != '{"user_id": 1}'
 
@@ -147,7 +139,7 @@ def test_create_new_session_crypt(redis_session_with_crypt, f):
     assert decoded_data == '{"user_id": 1}'
 
 
-def test_get_crypt_session(redis_session_with_crypt, f):
+def test_get_crypt_session(redis_session_with_crypt, f, fake_redis):
     session = redis_session_with_crypt.create(
         session_key="test", data={"user_id": 1}
     )
@@ -157,9 +149,7 @@ def test_get_crypt_session(redis_session_with_crypt, f):
     retrieved_data = redis_session_with_crypt.get(session)
     assert retrieved_data == {"user_id": 1}
 
-    r = Redis.from_url("redis://0.0.0.0:2828", decode_responses=True)
-
-    retrieved_data_from_redis = r.hget("test:test", session)
+    retrieved_data_from_redis = fake_redis.hget("test:test", session)
     assert retrieved_data_from_redis != '{"user_id": 1}'
     decoded_retrieved_data_from_redis = f.decrypt(
         retrieved_data_from_redis.split("J$_")[1]

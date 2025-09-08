@@ -7,8 +7,6 @@ from uuid import uuid4
 
 from jam.__logger__ import logger
 from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
-from jam.jwt.lists.json import JSONList
-from jam.jwt.lists.redis import RedisList
 from jam.jwt.tools import __gen_jwt__, __validate_jwt__
 from jam.utils.config_maker import __module_loader__
 
@@ -79,12 +77,16 @@ class JWTModule(BaseModule):
     def _init_list(config: dict[str, Any]):
         match config["backend"]:
             case "redis":
+                from jam.jwt.lists.redis import RedisList
+
                 return RedisList(
                     type=config["type"],
                     redis_uri=config["redis_uri"],
                     in_list_life_time=config["in_list_life_time"],
                 )
             case "json":
+                from jam.jwt.lists.json import JSONList
+
                 return JSONList(
                     type=config["type"], json_path=config["json_path"]
                 )

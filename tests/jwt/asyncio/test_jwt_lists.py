@@ -3,7 +3,7 @@
 from threading import Thread
 
 import pytest
-from fakeredis import FakeAsyncRedis, TcpFakeServer
+from fakeredis import FakeAsyncRedis, FakeRedis
 from pytest import fixture, raises
 from tinydb import TinyDB
 
@@ -23,24 +23,17 @@ def fake_aioredis() -> FakeAsyncRedis:
     return FakeAsyncRedis()
 
 
-@fixture(scope="module", autouse=True)
-def fake_redis():
-    server = TcpFakeServer(("0.0.0.0", 6379), server_type="redis")
-    t = Thread(target=server.serve_forever, daemon=True)
-    t.start()
-
-
 @fixture(scope="function")
 def redis_black_list(fake_aioredis):
     return RedisList(
-        type="black", redis_uri="redis://0.0.0.0:6379/0", in_list_life_time=None
+        type="black", redis_uri=fake_aioredis, in_list_life_time=None
     )
 
 
 @fixture(scope="function")
 def redis_white_list(fake_aioredis):
     return RedisList(
-        type="white", redis_uri="redis://0.0.0.0:6379/0", in_list_life_time=None
+        type="white", redis_uri=fake_aioredis, in_list_life_time=None
     )
 
 
@@ -56,14 +49,14 @@ def json_white_list():
 
 def test_redis_list_init(fake_aioredis):
     list = RedisList(
-        type="black", redis_uri="redis://0.0.0.0:6379", in_list_life_time=10
+        type="black", redis_uri=fake_aioredis, in_list_life_time=10
     )
 
     assert list.__list_type__ == "black"
 
 
 @pytest.mark.asyncio
-async def test_redis_black_lists(redis_black_list):
+async def test_redis_black_lists(fake_aioredis):
     config = {
         "auth_type": "jwt",
         "alg": "HS256",
@@ -71,7 +64,7 @@ async def test_redis_black_lists(redis_black_list):
         "list": {
             "type": "black",
             "backend": "redis",
-            "redis_uri": "redis://0.0.0.0:6379/0",
+            "redis_uri": fake_aioredis,
             "in_list_life_time": 3600,
         },
     }
@@ -98,7 +91,7 @@ async def test_redis_black_lists(redis_black_list):
 
 
 @pytest.mark.asyncio
-async def test_redis_white_lists(redis_white_list):
+async def test_redis_white_lists(fake_aioredis):
     config = {
         "auth_type": "jwt",
         "alg": "HS256",
@@ -106,7 +99,7 @@ async def test_redis_white_lists(redis_white_list):
         "list": {
             "type": "white",
             "backend": "redis",
-            "redis_uri": "redis://0.0.0.0:6379/0",
+            "redis_uri": fake_aioredis,
             "in_list_life_time": 3600,
         },
     }
