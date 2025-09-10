@@ -4,8 +4,6 @@ import datetime
 from typing import Any, Literal
 from uuid import uuid4
 
-from jam.aio.jwt.lists.json import JSONList
-from jam.aio.jwt.lists.redis import RedisList
 from jam.aio.jwt.tools import __gen_jwt_async__, __validate_jwt_async__
 from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
 from jam.modules import BaseModule
@@ -59,12 +57,16 @@ class JWTModule(BaseModule):
     def _init_list(config: dict[str, Any]):
         match config["backend"]:
             case "redis":
+                from jam.aio.jwt.lists.redis import RedisList
+
                 return RedisList(
                     type=config["type"],
                     redis_uri=config["redis_uri"],
                     in_list_life_time=config["in_list_life_time"],
                 )
             case "json":
+                from jam.aio.jwt.lists.json import JSONList
+
                 return JSONList(
                     type=config["type"], json_path=config["json_path"]
                 )
