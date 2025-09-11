@@ -278,7 +278,7 @@ class Jam(BaseJam):
 
     def verify_otp_code(
         self,
-        secret: str,
+        secret: str | bytes,
         code: str,
         factor: Optional[int] = None,
         look_ahead: Optional[int] = 1,
@@ -286,7 +286,7 @@ class Jam(BaseJam):
         """Checks the OTP code, taking into account the acceptable window.
 
         Args:
-            secret (str): User secret key.
+            secret (str | bytes): User secret key.
             code (str): The code entered.
             factor (int | None, optional): Unixtime for TOTP(if none, use now time) / Counter for HOTP.
             look_ahead (int, optional): Acceptable deviation in intervals (±window(totp) / ±look ahead(hotp)). Default is 1.
@@ -297,4 +297,4 @@ class Jam(BaseJam):
         self._otp_checker()
         return self._otp_module(
             secret=secret, digits=self._otp.digits, digest=self._otp.digest
-        ).verify(secret, code, factor, look_ahead)
+        ).verify(code=code, factor=factor, look_ahead=look_ahead)
