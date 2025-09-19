@@ -34,6 +34,7 @@ nav:
   - Examples:
       - Starlette: examples/starlette.md
       - Litestar: examples/litestar.md
+      - Strawberry: examples/strawberry.md
       - FastAPI: examples/fastapi.md
       - Flask: examples/flask.md
   - API:

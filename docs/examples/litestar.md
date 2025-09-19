@@ -31,7 +31,7 @@ async def get_user(token: str) -> Response:
 app = Litestar(route_handlers=[auth_user, get_user])
 ```
 
-## Sessions (Litestar)
+## Sessions
 
 ```python
 from litestar import Litestar, post, get

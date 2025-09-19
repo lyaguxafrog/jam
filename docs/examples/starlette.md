@@ -1,4 +1,4 @@
-## JWT (Starlette)
+## JWT
 
 ```python
 from starlette.applications import Starlette
@@ -36,8 +36,6 @@ routes = [
 
 app = Starlette(routes=routes)
 ```
-
----
 
 ## Sessions
 
