@@ -32,6 +32,7 @@ nav:
           - TOTP: otp/totp.md
       - Quick: quick.md
   - Examples:
+      - Starlette: examples/starlette.md
       - FastAPI: examples/fastapi.md
   - API:
       - Jam: api/instance.md
