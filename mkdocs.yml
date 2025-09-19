@@ -35,6 +35,7 @@ nav:
       - Starlette: examples/starlette.md
       - Litestar: examples/litestar.md
       - FastAPI: examples/fastapi.md
+      - Flask: examples/flask.md
   - API:
       - Jam: api/instance.md
       - BaseJam: api/abc_instance.md
