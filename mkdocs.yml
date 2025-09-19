@@ -31,6 +31,8 @@ nav:
           - HOTP: otp/hotp.md
           - TOTP: otp/totp.md
       - Quick: quick.md
+  - Examples:
+      - FastAPI: examples/fastapi.md
   - API:
       - Jam: api/instance.md
       - BaseJam: api/abc_instance.md
