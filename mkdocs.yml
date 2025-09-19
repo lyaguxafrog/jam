@@ -33,6 +33,7 @@ nav:
       - Quick: quick.md
   - Examples:
       - Starlette: examples/starlette.md
+      - Litestar: examples/litestar.md
       - FastAPI: examples/fastapi.md
   - API:
       - Jam: api/instance.md
