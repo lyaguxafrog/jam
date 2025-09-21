@@ -31,6 +31,12 @@ nav:
           - HOTP: otp/hotp.md
           - TOTP: otp/totp.md
       - Quick: quick.md
+  - Examples:
+      - Starlette: examples/starlette.md
+      - Litestar: examples/litestar.md
+      - Strawberry: examples/strawberry.md
+      - FastAPI: examples/fastapi.md
+      - Flask: examples/flask.md
   - API:
       - Jam: api/instance.md
       - BaseJam: api/abc_instance.md
