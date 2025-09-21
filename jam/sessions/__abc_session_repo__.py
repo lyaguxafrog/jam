@@ -2,7 +2,7 @@
 
 import json
 from abc import ABC, abstractmethod
-from collections.abc import Callable
+from collections.abc import Callable, Coroutine
 from typing import Any, Optional
 from uuid import uuid4
 
@@ -128,7 +128,9 @@ class BaseSessionModule(ABC):
         return self._id()
 
     @abstractmethod
-    def create(self, session_key: str, data: dict) -> str:
+    def create(
+        self, session_key: str, data: dict
+    ) -> str | Coroutine[Any, Any, str]:
         """Create a new session with the given session key and data.
 
         Args:
@@ -150,7 +152,7 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def delete(self, session_id: str) -> None:
+    def delete(self, session_id: str) -> None | Coroutine[Any, Any, None]:
         """Delete a session by its key or ID.
 
         Args:
@@ -159,7 +161,9 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def update(self, session_id: str, data: dict) -> None:
+    def update(
+        self, session_id: str, data: dict
+    ) -> None | Coroutine[Any, Any, None]:
         """Update an existing session with new data.
 
         Args:
@@ -169,7 +173,7 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def rework(self, session_id: str) -> str:
+    def rework(self, session_id: str) -> str | Coroutine[Any, Any, str]:
         """Rework a session and return its new ID.
 
         Args:
@@ -181,7 +185,7 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def clear(self, session_key: str) -> None:
+    def clear(self, session_key: str) -> None | Coroutine[Any, Any, None]:
         """Clear all sessions by key.
 
         Args:
