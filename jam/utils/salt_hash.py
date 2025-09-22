@@ -24,6 +24,7 @@ def hash_password(
         tuple[str, str]: (hex_salt, hex_hash)
 
     Example:
+        ```python
         >>> salt, hash_ = hash_password("my_password")
         >>> isinstance(salt, str)
         True
@@ -32,6 +33,7 @@ def hash_password(
 
         # Using custom iterations and salt size
         >>> salt, hash_ = hash_password("my_password", iterations=150_000, salt_size=24)
+        ```
     """
     if salt is None:
         salt = os.urandom(salt_size)
@@ -58,6 +60,7 @@ def check_password(
         bool: True if the password is correct, False otherwise.
 
     Example:
+        ```python
         >>> salt, hash_ = hash_password("my_password")
         >>> check_password("my_password", salt, hash_)
         True
@@ -68,6 +71,7 @@ def check_password(
         >>> salt, hash_ = hash_password("my_password", iterations=150_000)
         >>> check_password("my_password", salt, hash_, iterations=150_000)
         True
+        ```
     """
     salt = bytes.fromhex(salt_hex)
     stored_hash = bytes.fromhex(hash_hex)
@@ -83,10 +87,12 @@ def serialize_hash(salt_hex: str, hash_hex: str) -> str:
     """Combines salt and hash into a single string for database storage.
 
     Example:
+        ```python
         >>> salt, hash_ = hash_password("my_password")
         >>> serialized = serialize_hash(salt, hash_)
         >>> isinstance(serialized, str)
         True
+        ```
     """
     return f"{salt_hex}${hash_hex}"
 
@@ -95,11 +101,13 @@ def deserialize_hash(data: str) -> tuple[str, str]:
     """Splits a stored string into salt and hash.
 
     Example:
+        ```python
         >>> salt, hash_ = deserialize_hash("abcdef1234$9876543210")
         >>> isinstance(salt, str)
         True
         >>> isinstance(hash_, str)
         True
+        ```
     """
     salt_hex, hash_hex = data.split("$")
     return salt_hex, hash_hex
