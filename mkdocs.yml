@@ -47,6 +47,9 @@ nav:
               - jam.aio.jwt.lists:
                   - JSONList: api/aio/jwt/lists/json.md
                   - RedisList: api/aio/jwt/lists/redis.md
+          - jam.aio.sessions:
+              - redis: api/aio/sessions/redis.md
+              - json: api/aio/sessions/json.md
       - jam.jwt:
           - tools.py: api/jwt/tools.md
           - __utils__.py: api/jwt/utils.md
