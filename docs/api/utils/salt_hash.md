@@ -1,0 +1,1 @@
+::: jam.utils.salt_hash
