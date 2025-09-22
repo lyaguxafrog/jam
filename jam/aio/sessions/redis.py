@@ -65,7 +65,9 @@ class RedisSessions(SyncRedisSessions):
         Returns:
             str: The unique ID of the created session.
         """
-        session_id = self._encode_session_id(f"{session_key}:{self.id}")
+        session_id = self._encode_session_id_if_needed(
+            f"{session_key}:{self.id}"
+        )
         logger.debug("Gen session: %s", session_id)
 
         try:
