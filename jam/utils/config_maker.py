@@ -8,11 +8,17 @@ from typing import Any, Union
 import yaml
 
 
-def __yaml_config_parser__(path: str) -> dict[str, Any]:
+GENERIC_POINTER = "jam"
+
+
+def __yaml_config_parser__(
+    path: str, pointer: str = GENERIC_POINTER
+) -> dict[str, Any]:
     """Private method for parsing YML config.
 
     Args:
         path (str): Path to config.yml
+        pointer (str): Pointer to config read
 
     Raises:
         FileNotFoundError: If file not found
@@ -24,18 +30,21 @@ def __yaml_config_parser__(path: str) -> dict[str, Any]:
     try:
         with open(path) as file:
             config = yaml.safe_load(file)
-        return config["jam"] if config else {}
+        return config[pointer] if config else {}
     except FileNotFoundError:
         raise FileNotFoundError(f"YAML config file not found at: {path}")
     except yaml.YAMLError as e:
         raise ValueError(f"Error parsing YAML file: {e}")
 
 
-def __toml_config_parser__(path: str = "pyproject.toml") -> dict[str, Any]:
+def __toml_config_parser__(
+    path: str = "pyproject.toml", pointer: str = GENERIC_POINTER
+) -> dict[str, Any]:
     """Private method for parsing TOML config.
 
     Args:
         path (str): Path to config.toml
+        pointer (str): Pointer to config read
 
     Raises:
         FileNotFoundError: If file not found
@@ -47,27 +56,30 @@ def __toml_config_parser__(path: str = "pyproject.toml") -> dict[str, Any]:
     try:
         with open(path, "rb") as file:
             config = tomllib.load(file)
-        return config.get("jam", {})
+        return config.get(pointer, {})
     except FileNotFoundError:
         raise FileNotFoundError(f"TOML config file not found at: {path}")
     except tomllib.TOMLDecodeError as e:
         raise ValueError(f"Error parsing TOML file: {e}")
 
 
-def __config_maker__(config: Union[str, dict[str, Any]]) -> dict[str, Any]:
+def __config_maker__(
+    config: Union[str, dict[str, Any]], pointer: str = GENERIC_POINTER
+) -> dict[str, Any]:
     """Base config masker.
 
     Args:
         config (Union[str, dict[str, Any]): Config dict or file path
+        pointer (str): Pointer to config read
 
     Returns:
         dict[str, Any]: Parsed config
     """
     if isinstance(config, str):
         if config.split(".")[1] == ("yml" or "yaml"):
-            return __yaml_config_parser__(config)
+            return __yaml_config_parser__(config, pointer)
         elif config.split(".")[1] == "toml":
-            return __toml_config_parser__(config)
+            return __toml_config_parser__(config, pointer)
         else:
             raise ValueError("YML/YAML or TOML configs only!")
     else:
