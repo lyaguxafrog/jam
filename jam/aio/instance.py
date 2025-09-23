@@ -12,12 +12,15 @@ class Jam(BaseJam):
     """Main instance for aio."""
 
     def __init__(
-        self, config: Union[dict[str, Any], str] = "pyproject.toml"
+        self,
+        config: Union[dict[str, Any], str] = "pyproject.toml",
+        pointer: str = "jam",
     ) -> None:
         """Class constructor.
 
         Args:
             config (dict[str, Any] | str): Config for Jam, can use `jam.utils.config_maker`
+            pointer (str): Config read point
         """
         config = __config_maker__(config)
         otp_config = config.get("otp", None)
