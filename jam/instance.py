@@ -244,7 +244,7 @@ class Jam(BaseJam):
         """Generates an OTP.
 
         Args:
-            secret (str): User secret key.
+            secret (str | bytes): User secret key.
             factor (int | None, optional): Unixtime for TOTP(if none, use now time) / Counter for HOTP.
 
         Returns:
@@ -276,7 +276,9 @@ class Jam(BaseJam):
         self._otp_checker()
         return self._otp_module(
             secret=secret, digits=self._otp.digits, digest=self._otp.digest
-        ).provisioning_uri(name, issuer, self._otp.type, counter)
+        ).provisioning_uri(
+            name=name, issuer=issuer, type_=self._otp.type, counter=counter
+        )
 
     def verify_otp_code(
         self,
