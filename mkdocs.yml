@@ -78,6 +78,7 @@ nav:
       - 1.1.4 -> 2.0.0: breaking_changes/jam114_to_200
   - Contributing: contributing.md
   - Changelog: https://github.com/lyaguxafrog/jam/releases
+  - Security Policy: https://github.com/lyaguxafrog/jam/blob/master/SECURITY.md
   - Philosophy: philosophy.md
   - License: https://github.com/lyaguxafrog/jam/blob/master/LICENSE.md
 
