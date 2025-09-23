@@ -22,7 +22,7 @@ class Jam(BaseJam):
             config (dict[str, Any] | str): Config for Jam, can use `jam.utils.config_maker`
             pointer (str): Config read point
         """
-        config = __config_maker__(config)
+        config = __config_maker__(config, pointer)
         otp_config = config.get("otp", None)
 
         if not otp_config:
