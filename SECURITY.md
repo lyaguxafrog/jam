@@ -6,8 +6,8 @@ Older versions are **not** patched — please update to the latest version.
 
 | Version | Supported          |
 |---------|--------------------|
-| 2.2.3   | ✅ latest release   |
-| < 2.2.3 | ❌ not supported    |
+| 2.2.4   | ✅ latest release   |
+| < 2.2.4 | ❌ not supported    |
 
 ## Reporting a Vulnerability
 If you discover a security vulnerability, please **do not** create a public issue.  
