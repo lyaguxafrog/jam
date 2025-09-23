@@ -14,14 +14,16 @@ class Jam(BaseJam):
     def __init__(
         self,
         config: Union[dict[str, Any], str] = "pyproject.toml",
+        pointer: str = "jam",
     ) -> None:
         """Class constructor.
 
         Args:
             config (dict[str, Any] | str): Dict or path to config file
+            pointer (str): Config read point
         """
         # TODO: Refactor this to MODULES and typedict/dataclasses instances
-        config = __config_maker__(config)
+        config = __config_maker__(config, pointer)
         otp_config = config.get("otp", None)
 
         if not otp_config:
