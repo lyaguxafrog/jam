@@ -64,10 +64,10 @@ class JSONSessions(BaseSessionModule):
         Returns:
             str: The ID of the created session.
         """
-        session_id = self._encode_session_id_if_needed(self.id)
+        session_id = self.__encode_session_id_if_needed__(self.id)
 
         try:
-            dumps_data = self._encode_session_data(data)
+            dumps_data = self.__encode_session_data__(data)
         except AttributeError:
             dumps_data = json.dumps(data)
         del data
@@ -91,11 +91,11 @@ class JSONSessions(BaseSessionModule):
         Returns:
             dict | None: The session data if found, otherwise None.
         """
-        session_id = self._decode_session_id_if_needed(session_id)
+        session_id = self.__decode_session_id_if_needed__(session_id)
         result = self._db.search(self._qs.session_id == session_id)
         if result:
             try:
-                loads_data = self._decode_session_data(result[0]["data"])
+                loads_data = self.__decode_session_data__(result[0]["data"])
             except AttributeError:
                 loads_data = json.loads(result[0]["data"])
             del result
@@ -111,7 +111,7 @@ class JSONSessions(BaseSessionModule):
         Returns:
             None
         """
-        session_id = self._decode_session_id_if_needed(session_id)
+        session_id = self.__decode_session_id_if_needed__(session_id)
         self._db.remove(self._qs.session_id == session_id)
         logger.debug("Session with ID %s deleted", session_id)
 
@@ -125,10 +125,10 @@ class JSONSessions(BaseSessionModule):
         Returns:
             None
         """
-        session_id = self._decode_session_id_if_needed(session_id)
+        session_id = self.__decode_session_id_if_needed__(session_id)
 
         try:
-            dumps_data = self._encode_session_data(data)
+            dumps_data = self.__encode_session_data__(data)
         except AttributeError:
             dumps_data = json.dumps(data)
         del data
@@ -159,14 +159,14 @@ class JSONSessions(BaseSessionModule):
         Returns:
             str: The new session ID.
         """
-        session_id_decoded = self._decode_session_id_if_needed(session_id)
+        session_id_decoded = self.__decode_session_id_if_needed__(session_id)
         result = self._db.search(self._qs.session_id == session_id_decoded)
         if not result:
             raise SessionNotFoundError(
                 f"Session with ID {session_id} not found."
             )
 
-        new_session_id = self._encode_session_id_if_needed(self.id)
+        new_session_id = self.__encode_session_id_if_needed__(self.id)
         self._db.update(
             {"session_id": new_session_id},
             self._qs.session_id == session_id_decoded,

@@ -71,14 +71,14 @@ class RedisSessions(BaseSessionModule):
         Returns:
             str: The unique ID of the created session.
         """
-        session_id = self._encode_session_id_if_needed(
+        session_id = self.__encode_session_id_if_needed__(
             f"{session_key}:{self.id}"
         )
         logger.debug("Gen session: %s", session_id)
 
         # trying to encode data
         try:
-            dumps_data = self._encode_session_data(data)
+            dumps_data = self.__encode_session_data__(data)
         except AttributeError:
             dumps_data = json.dumps(data)
         del data
@@ -108,7 +108,7 @@ class RedisSessions(BaseSessionModule):
         Returns:
             dict | None: The session data if found, otherwise None.
         """
-        decoded_session_key = self._decode_session_id_if_needed(
+        decoded_session_key = self.__decode_session_id_if_needed__(
             session_id
         ).split(":", 1)
         session = self._redis.hget(
@@ -120,7 +120,7 @@ class RedisSessions(BaseSessionModule):
             return None
 
         try:
-            loads_data = self._decode_session_data(session)
+            loads_data = self.__decode_session_data__(session)
         except AttributeError:
             loads_data = json.loads(session)
         del session
@@ -133,7 +133,7 @@ class RedisSessions(BaseSessionModule):
         Args:
             session_id (str): The session ID.
         """
-        decoded_session_key = self._decode_session_id_if_needed(
+        decoded_session_key = self.__decode_session_id_if_needed__(
             session_id
         ).split(":", 1)
         self._redis.hdel(
@@ -159,7 +159,7 @@ class RedisSessions(BaseSessionModule):
             session_id (str): The ID of the session to update.
             data (dict): The new data to be stored in the session.
         """
-        decoded_session_key = self._decode_session_id_if_needed(
+        decoded_session_key = self.__decode_session_id_if_needed__(
             session_id
         ).split(":", 1)
         if not self.get(session_id):
@@ -168,7 +168,7 @@ class RedisSessions(BaseSessionModule):
             )
 
         try:
-            dumps_data = self._encode_session_data(data)
+            dumps_data = self.__encode_session_data__(data)
         except AttributeError:
             dumps_data = json.dumps(data)
         del data
@@ -200,7 +200,7 @@ class RedisSessions(BaseSessionModule):
         Returns:
             str: The new session ID.
         """
-        decoded_session_key = self._decode_session_id_if_needed(
+        decoded_session_key = self.__decode_session_id_if_needed__(
             session_id
         ).split(":", 1)
         session_data = self.get(session_id)
