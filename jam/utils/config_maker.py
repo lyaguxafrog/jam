@@ -5,8 +5,6 @@ from collections.abc import Callable
 from importlib import import_module
 from typing import Any, Union
 
-import yaml
-
 
 GENERIC_POINTER = "jam"
 
@@ -21,12 +19,19 @@ def __yaml_config_parser__(
         pointer (str): Pointer to config read
 
     Raises:
+        ImportError: If pyyaml not installed
         FileNotFoundError: If file not found
         ValueError: If invalid YML
 
     Returns:
         (dict[str, Any]): Dict with configs params
     """
+    try:
+        import yaml
+    except ImportError:
+        raise ImportError(
+            "To generate a configuration file from YAML/YML, you need to install PyYaml: `pip install pyyaml` or `pip install jamlib[yaml]`"
+        )
     try:
         with open(path) as file:
             config = yaml.safe_load(file)

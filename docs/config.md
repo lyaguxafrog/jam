@@ -11,7 +11,8 @@ There are several ways to configure Jam:
 * python-dict
 
 ## YML/YAML
-To configure via yml, you need to describe all configuration parameters in the `jam` block, for example:
+To configure via yml, you need to install the [`pyyaml`](https://pypi.org/project/PyYAML/) module: `pip install jamlib[yaml]`
+and describe all configuration parameters in the `jam` block, for example:
 
 ```yml
 jam:
