@@ -69,13 +69,13 @@ class BaseSessionModule(ABC):
         if is_session_crypt:
             self._code_session_key = Fernet(session_aes_secret)
 
-    def _encode_session_id(self, data: str) -> str:
+    def __encode_session_id__(self, data: str) -> str:
         """Encode the session using AES encryption."""
         if not hasattr(self, "_code_session_key"):
             raise AttributeError("Session key encoding is not enabled.")
         return f"{self._sk_mark_symbol}{self._code_session_key.encrypt(data.encode()).decode()}"
 
-    def _decode_session_id(self, data: str) -> str:
+    def __decode_session_id__(self, data: str) -> str:
         """Decode the session using AES decryption."""
         if not hasattr(self, "_code_session_key"):
             raise AttributeError("Session key encoding is not enabled.")
@@ -85,41 +85,41 @@ class BaseSessionModule(ABC):
             data[len(self._sk_mark_symbol) :].encode()
         ).decode()
 
-    def _encode_session_id_if_needed(self, data: str) -> str:
+    def __encode_session_id_if_needed__(self, data: str) -> str:
         """Encode the session ID if it is not already encoded."""
         if hasattr(self, "_code_session_key"):
             try:
-                data = self._encode_session_id(data)
+                data = self.__encode_session_id__(data)
             except ValueError as e:
                 logger.error("Failed to encode session ID: %s", e)
             return data
         else:
             return data
 
-    def _decode_session_id_if_needed(self, data: str) -> str:
+    def __decode_session_id_if_needed__(self, data: str) -> str:
         """Decode the session ID if it is encoded."""
         if hasattr(self, "_code_session_key"):
             try:
-                data = self._decode_session_id(data)
+                data = self.__decode_session_id__(data)
             except ValueError as e:
                 logger.error("Failed to decode session ID: %s", e)
             return data
         else:
             return data
 
-    def _encode_session_data(self, data: dict) -> str:
+    def __encode_session_data__(self, data: dict) -> str:
         """Encode session data."""
         if not hasattr(self, "_code_session_key"):
             raise AttributeError("Session data encoding is not enabled.")
 
         data_json = json.dumps(data)
-        return self._encode_session_id(data_json)
+        return self.__encode_session_id__(data_json)
 
-    def _decode_session_data(self, data: str) -> dict:
+    def __decode_session_data__(self, data: str) -> dict:
         """Decode session data."""
         if not hasattr(self, "_code_session_key"):
             raise AttributeError("Session key encoding is not enabled.")
-        data = self._decode_session_id(data)
+        data = self.__decode_session_id__(data)
         return json.loads(data)
 
     @property
