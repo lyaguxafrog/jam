@@ -65,13 +65,13 @@ class RedisSessions(SyncRedisSessions):
         Returns:
             str: The unique ID of the created session.
         """
-        session_id = self._encode_session_id_if_needed(
+        session_id = self.__encode_session_id_if_needed__(
             f"{session_key}:{self.id}"
         )
         logger.debug("Gen session: %s", session_id)
 
         try:
-            dumps_data = self._encode_session_data(data)
+            dumps_data = self.__encode_session_data__(data)
         except AttributeError:
             dumps_data = json.dumps(data)
         del data
@@ -101,7 +101,7 @@ class RedisSessions(SyncRedisSessions):
         Returns:
             dict | None: The session data if found, otherwise None.
         """
-        decode_session_key = self._decode_session_id_if_needed(
+        decode_session_key = self.__decode_session_id_if_needed__(
             session_id
         ).split(":", 1)
         session = await self._redis.hget(
@@ -112,7 +112,7 @@ class RedisSessions(SyncRedisSessions):
             return None
 
         try:
-            loads_data = self._decode_session_data(session)
+            loads_data = self.__decode_session_data__(session)
         except AttributeError:
             loads_data = json.loads(session)
         del session
@@ -125,7 +125,7 @@ class RedisSessions(SyncRedisSessions):
         Args:
             session_id (str): The session ID.
         """
-        decoded_session_key = self._decode_session_id_if_needed(
+        decoded_session_key = self.__decode_session_id_if_needed__(
             session_id
         ).split(":", 1)
         await self._redis.hdel(
@@ -151,7 +151,7 @@ class RedisSessions(SyncRedisSessions):
             session_id (str): The ID of the session to update.
             data (dict): The new data to be stored in the session.
         """
-        decoded_session_key = self._decode_session_id_if_needed(
+        decoded_session_key = self.__decode_session_id_if_needed__(
             session_id
         ).split(":", 1)
         if not await self.get(session_id):
@@ -160,7 +160,7 @@ class RedisSessions(SyncRedisSessions):
             )
 
         try:
-            dumps_data = self._encode_session_data(data)
+            dumps_data = self.__encode_session_data__(data)
         except AttributeError:
             dumps_data = json.dumps(data)
         del data
@@ -192,7 +192,7 @@ class RedisSessions(SyncRedisSessions):
         Returns:
             str: The new session ID.
         """
-        decoded_session_key = self._decode_session_id_if_needed(
+        decoded_session_key = self.__decode_session_id_if_needed__(
             session_id
         ).split(":", 1)
         session_data = await self.get(session_id)
