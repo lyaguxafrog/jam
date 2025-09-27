@@ -2,9 +2,9 @@
 
 """Quick JWT methods."""
 
-from typing import Any
+from typing import Any, Optional
 
-from jam.asyncio.jwt.tools import __gen_jwt_async__, __validate_jwt_async__
+from jam.aio.jwt.tools import __gen_jwt_async__, __validate_jwt_async__
 from jam.exceptions import EmptyPublicKey, EmptySecretKey, EmtpyPrivateKey
 from jam.jwt.tools import __gen_jwt__, __validate_jwt__
 
@@ -12,8 +12,8 @@ from jam.jwt.tools import __gen_jwt__, __validate_jwt__
 def get_jwt_token(
     alg: str,
     payload: dict[str, Any],
-    secret_key: str | None = None,
-    private_key: str | None = None,
+    secret_key: Optional[str] = None,
+    private_key: Optional[str] = None,
 ) -> str:
     """Quick method for generate JWT token.
 
@@ -50,8 +50,8 @@ def get_jwt_token(
 async def aget_jwt_token(
     alg: str,
     payload: dict[str, Any],
-    secret_key: str | None = None,
-    private_key: str | None = None,
+    secret_key: Optional[str] = None,
+    private_key: Optional[str] = None,
 ) -> str:
     """Quick method for generate JWT token (async).
 
@@ -86,7 +86,9 @@ async def aget_jwt_token(
 
 
 def verify_jwt_token(
-    token: str, secret_key: str | None = None, public_key: str | None = None
+    token: str,
+    secret_key: Optional[str] = None,
+    public_key: Optional[str] = None,
 ) -> bool:
     """Method to verify the token.
 
@@ -115,7 +117,9 @@ def verify_jwt_token(
 
 
 async def averify_jwt_token(
-    token: str, secret_key: str | None = None, public_key: str | None = None
+    token: str,
+    secret_key: Optional[str] = None,
+    public_key: Optional[str] = None,
 ) -> bool:
     """Method to verify the token (async).
 
@@ -146,7 +150,9 @@ async def averify_jwt_token(
 
 
 def decode_jwt_token(
-    token: str, secret_key: str | None = None, public_key: str | None = None
+    token: str,
+    secret_key: Optional[str] = None,
+    public_key: Optional[str] = None,
 ) -> dict[str, Any]:
     """Token decoding.
 
@@ -177,7 +183,9 @@ def decode_jwt_token(
 
 
 async def adecode_jwt_token(
-    token: str, secret_key: str | None = None, public_key: str | None = None
+    token: str,
+    secret_key: Optional[str] = None,
+    public_key: Optional[str] = None,
 ) -> dict[str, Any]:
     """Token decoding (async).
 

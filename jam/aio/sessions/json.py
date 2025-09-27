@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from asyncio import to_thread
+from typing import Optional
 
 from jam.sessions.json import JSONSessions as SyncJSONSessions
 
@@ -20,7 +21,7 @@ class JSONSessions(SyncJSONSessions):
         """
         return await to_thread(super().create, session_key, data)
 
-    async def get(self, session_id) -> dict | None:
+    async def get(self, session_id) -> Optional[dict]:
         """Retrieve session data by session ID.
 
         Args:

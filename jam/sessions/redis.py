@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 from uuid import uuid4
 
 
@@ -22,7 +22,7 @@ class RedisSessions(BaseSessionModule):
 
     def __init__(
         self,
-        redis_uri: str | Redis = "redis://localhost:6379/0",
+        redis_uri: Union[str, Redis] = "redis://localhost:6379/0",
         redis_sessions_key: str = "sessions",
         default_ttl: Optional[int] = 3600,
         is_session_crypt: bool = False,
@@ -99,7 +99,7 @@ class RedisSessions(BaseSessionModule):
 
         return session_id
 
-    def get(self, session_id: str) -> dict | None:
+    def get(self, session_id: str) -> Optional[dict]:
         """Retrieve a session by its key or ID.
 
         Args:
