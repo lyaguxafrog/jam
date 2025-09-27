@@ -19,7 +19,7 @@ class Jam(BaseJam):
         """Class constructor.
 
         Args:
-            config (dict[str, Any] | str): Dict or path to config file
+            config (dict[str, Any] | str): dict or path to config file
             pointer (str): Config read point
         """
         # TODO: Refactor this to MODULES and typedict/dataclasses instances
@@ -48,23 +48,37 @@ class Jam(BaseJam):
 
     # TODO: Refactor this too
     def _otp_module_setup(self) -> Callable:
-        match self._otp.type:
-            case "hotp":
-                from jam.otp import HOTP
+        otp_type = self._otp.type
+        if otp_type == "hotp":
+            from jam.otp import HOTP
 
-                return HOTP
-            case "totp":
-                from jam.otp import TOTP
+            return HOTP
+        elif otp_type == "totp":
+            from jam.otp import TOTP
 
-                return TOTP
-            case _:
-                raise ValueError("OTP type can only be totp or hotp.")
+            return TOTP
+        else:
+            raise ValueError("OTP type can only be totp or hotp.")
 
     def _otp_checker(self) -> None:
         if not hasattr(self, "_otp"):
             raise NotImplementedError(
                 "OTP not configure. Check documentation: "
             )
+
+    def make_payload(self, exp: Optional[int] = None, **data) -> dict[str, Any]:
+        """Payload maker tool.
+
+        Args:
+            exp (int | None): If none exp = JWTModule.exp
+            **data: Custom data
+        """
+        if self.type != "jwt":
+            raise NotImplementedError(
+                "This method is only available for JWT auth*."
+            )
+
+        return self.module.make_payload(exp=exp, **data)
 
     def gen_jwt_token(self, payload: dict[str, Any]) -> str:
         """Creating a new token.
@@ -113,20 +127,6 @@ class Jam(BaseJam):
         return self.module.validate_payload(
             token=token, check_exp=check_exp, check_list=check_list
         )
-
-    def make_payload(self, exp: int | None = None, **data) -> dict[str, Any]:
-        """Payload maker tool.
-
-        Args:
-            exp (int | None): If none exp = JWTModule.exp
-            **data: Custom data
-        """
-        if self.type != "jwt":
-            raise NotImplementedError(
-                "This method is only available for JWT auth*."
-            )
-
-        return self.module.make_payload(exp=exp, **data)
 
     def create_session(self, session_key: str, data: dict) -> str:
         """Create a new session.
@@ -239,7 +239,7 @@ class Jam(BaseJam):
         return self.module.rework(old_session_key)
 
     def get_otp_code(
-        self, secret: str | bytes, factor: int | None = None
+        self, secret: Union[str, bytes], factor: Optional[int] = None
     ) -> str:
         """Generates an OTP.
 
@@ -282,7 +282,7 @@ class Jam(BaseJam):
 
     def verify_otp_code(
         self,
-        secret: str | bytes,
+        secret: Union[str, bytes],
         code: str,
         factor: Optional[int] = None,
         look_ahead: Optional[int] = 1,

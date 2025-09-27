@@ -4,7 +4,7 @@ import hashlib
 import hmac
 import json
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional
 from uuid import uuid4
 
 from Crypto.Hash import SHA256
@@ -24,8 +24,8 @@ from jam.jwt.__utils__ import __base64url_decode__, __base64url_encode__
 def __gen_jwt__(
     header: dict[str, Any],
     payload: dict[str, Any],
-    secret: str | None = None,
-    private_key: str | None = None,
+    secret: Optional[str] = None,
+    private_key: Optional[str] = None,
 ) -> str:
     """Method for generating JWT token with different algorithms.
 
@@ -44,8 +44,8 @@ def __gen_jwt__(
     ```
 
     Args:
-        header (Dict[str, str]): Dict with JWT headers
-        payload (Dict[str, Any]): Custom JWT payload
+        header (dict[str, str]): Dict with JWT headers
+        payload (dict[str, Any]): Custom JWT payload
         secret (str | None): Secret key for HMAC algorithms
         private_key (str | None): Private key for RSA algorithms
 
@@ -85,8 +85,8 @@ def __gen_jwt__(
 def __validate_jwt__(
     token: str,
     check_exp: bool = False,
-    secret: str | None = None,
-    public_key: str | None = None,
+    secret: Optional[str] = None,
+    public_key: Optional[str] = None,
 ) -> dict[str, Any]:
     """Validate a JWT token and return the payload if valid.
 
@@ -97,7 +97,7 @@ def __validate_jwt__(
         public_key (str | None): Public key for RSA algorithms.
 
     Returns:
-        (Dict[str, Any]): The payload if the token is valid.
+        (dict[str, Any]): The payload if the token is valid.
 
     Raises:
         ValueError: If the token is invalid.
@@ -148,7 +148,7 @@ def __validate_jwt__(
     return payload
 
 
-def __payload_maker__(exp: int | None, **data) -> dict[str, Any]:
+def __payload_maker__(exp: Optional[int], **data) -> dict[str, Any]:
     """Tool for making base payload.
 
     Args:
@@ -156,7 +156,7 @@ def __payload_maker__(exp: int | None, **data) -> dict[str, Any]:
         **data: Data for payload
 
     Returns:
-        (Dict[str, Any])
+        (dict[str, Any])
     """
     base_payload: dict = {
         "iat": datetime.now().timestamp(),

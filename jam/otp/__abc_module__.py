@@ -6,7 +6,7 @@ import hmac
 import struct
 import urllib.parse
 from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, Optional, Union
 
 
 class BaseOTP:
@@ -14,7 +14,7 @@ class BaseOTP:
 
     def __init__(
         self,
-        secret: bytes | str,
+        secret: Union[bytes, str],
         digits: int = 6,
         digest: Literal["sha1", "sha256", "sha512"] = "sha1",
     ) -> None:
@@ -72,7 +72,7 @@ class BaseOTP:
         name: str,
         issuer: str,
         type_: str = "totp",
-        counter: int | None = None,
+        counter: Optional[int] = None,
     ) -> str:
         """Generates an otpauth:// URI for Google Authenticator.
 
@@ -104,6 +104,6 @@ class BaseOTP:
 class OTPConfig:
     """Config for Jam instance."""
 
-    type: Literal["otp", "hotp"]
+    type: str
     digits: int
     digest: Literal["sha1", "sha256", "sha512"]

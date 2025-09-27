@@ -46,11 +46,11 @@ class JWTModule(BaseModule):
             # "PS384",
             # "PS512",
         ] = "HS256",
-        secret_key: str | None = None,
-        public_key: str | None = None,
-        private_key: str | None = None,
+        secret_key: Optional[str] = None,
+        public_key: Optional[str] = None,
+        private_key: Optional[str] = None,
         expire: int = 3600,
-        list: dict[str, Any] | None = None,
+        list: Optional[dict[str, Any]] = None,
     ) -> None:
         """Class constructor.
 
@@ -75,36 +75,36 @@ class JWTModule(BaseModule):
 
     @staticmethod
     def _init_list(config: dict[str, Any]):
-        match config["backend"]:
-            case "redis":
-                from jam.jwt.lists.redis import RedisList
+        backend = config["backend"]
+        if backend == "redis":
+            from jam.jwt.lists.redis import RedisList
 
-                return RedisList(
-                    type=config["type"],
-                    redis_uri=config["redis_uri"],
-                    in_list_life_time=config["in_list_life_time"],
-                )
-            case "json":
-                from jam.jwt.lists.json import JSONList
+            return RedisList(
+                type=config["type"],
+                redis_uri=config["redis_uri"],
+                in_list_life_time=config["in_list_life_time"],
+            )
+        elif backend == "json":
+            from jam.jwt.lists.json import JSONList
 
-                return JSONList(
-                    type=config["type"], json_path=config["json_path"]
-                )
-            case "custom":
-                module = __module_loader__(config["custom_module"])
-                cfg = dict(config)
-                cfg.pop("type")
-                cfg.pop("custom_module")
-                cfg.pop("backend")
-                return module(**cfg)
-            case _:
-                raise ValueError(f"Unknown list_type: {config['list_type']}")
+            return JSONList(type=config["type"], json_path=config["json_path"])
+        elif backend == "custom":
+            module = __module_loader__(config["custom_module"])
+            cfg = dict(config)
+            cfg.pop("type")
+            cfg.pop("custom_module")
+            cfg.pop("backend")
+            return module(**cfg)
+        else:
+            raise ValueError(
+                f"Unknown list_type: {config.get('list_type', backend)}"
+            )
 
-    def make_payload(self, exp: int | None = None, **data) -> dict[str, Any]:
+    def make_payload(self, exp: Optional[int] = None, **data) -> dict[str, Any]:
         """Payload maker tool.
 
         Args:
-            exp (int | None): If none exp = JWTModule.exp
+            exp (Optional[int]): If none exp = JWTModule.exp
             **data: Custom data
         """
         if not exp:
@@ -177,13 +177,11 @@ class JWTModule(BaseModule):
                     raise TokenNotInWhiteList
                 else:
                     logger.debug("Token in white list")
-                    pass
             if self.list.__list_type__ == "black":  # type: ignore
                 if self.list.check(token):  # type: ignore
                     raise TokenInBlackList
                 else:
                     logger.debug("Token not in black list")
-                    pass
 
         payload = __validate_jwt__(
             token=token,

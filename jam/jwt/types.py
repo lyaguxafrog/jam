@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import Literal, TypedDict
+from typing import Literal, TypedDict, Union
 
 
 class BaseListConfig(TypedDict):
@@ -29,6 +29,6 @@ class CustomListConfig(BaseListConfig, total=False):
     custom_module: str
 
 
-ListConfig = (
-    RedisListConfig | JSONListConfig | CustomListConfig | BaseListConfig
-)
+ListConfig = Union[
+    RedisListConfig, JSONListConfig, CustomListConfig, BaseListConfig
+]

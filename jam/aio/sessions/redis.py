@@ -2,7 +2,7 @@
 
 import json
 from collections.abc import Callable
-from typing import Optional
+from typing import Optional, Union
 from uuid import uuid4
 
 from redis.asyncio import Redis
@@ -17,7 +17,7 @@ class RedisSessions(SyncRedisSessions):
 
     def __init__(
         self,
-        redis_uri: str | Redis = "redis://localhost:6379/0",
+        redis_uri: Union[str, Redis] = "redis://localhost:6379/0",
         redis_sessions_key: str = "sessions",
         default_ttl: Optional[int] = 3600,
         is_session_crypt: bool = False,
@@ -92,7 +92,7 @@ class RedisSessions(SyncRedisSessions):
 
         return session_id
 
-    async def get(self, session_id: str) -> dict | None:
+    async def get(self, session_id: str) -> Optional[dict]:
         """Retrieve a session by its key or ID.
 
         Args:
