@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*_
 
 import pytest
+from fakeredis import FakeRedis
 
 from jam.modules import JWTModule
 
@@ -19,6 +20,40 @@ def jwt_module_rs():
 
     return JWTModule(
         alg="RS256", private_key=keys["private"], public_key=keys["public"]
+    )
+
+
+@pytest.fixture
+def jwt_module_hs_redis_black_list():
+    return JWTModule(
+        alg="HS256",
+        secret_key="SECRET",
+        list={
+            "backend": "redis",
+            "type": "black",
+            "redis_uri": FakeRedis(decode_responses=True),
+            "in_list_life_time": 6000,
+        },
+    )
+
+
+@pytest.fixture
+def jwt_module_rs_redis_black_list():
+
+    from jam.utils import generate_rsa_key_pair
+
+    keys = generate_rsa_key_pair()
+
+    return JWTModule(
+        alg="RS256",
+        public_key=keys["public"],
+        private_key=keys["private"],
+        list={
+            "backend": "redis",
+            "type": "black",
+            "redis_uri": FakeRedis(decode_responses=True),
+            "in_list_life_time": 6000,
+        },
     )
 
 
@@ -110,4 +145,47 @@ def test_jwt_token_validation(jwt_module_hs, jwt_module_rs):
     with pytest.raises(ValueError):
         jwt_module_rs.validate_payload(
             token=token + "corrupted", check_exp=False, check_list=False
+        )
+
+
+def test_jwt_redis_black_lists(
+    jwt_module_hs_redis_black_list, jwt_module_rs_redis_black_list
+):
+
+    from jam.exceptions import TokenInBlackList
+
+    # hs
+    payload_dict = {"user": 1}
+
+    payload = jwt_module_hs_redis_black_list.make_payload(**payload_dict)
+    token = jwt_module_hs_redis_black_list.gen_token(payload=payload)
+
+    # no raises
+    token_payload = jwt_module_hs_redis_black_list.validate_payload(
+        token=token, check_list=True, check_exp=False
+    )
+
+    assert token_payload["payload"]["user"] == payload["user"]
+
+    ## add token to black list
+    jwt_module_hs_redis_black_list.list.add(token)
+
+    with pytest.raises(TokenInBlackList):
+        jwt_module_hs_redis_black_list.validate_payload(token, check_list=True)
+
+    # rs
+    payload = jwt_module_rs_redis_black_list.make_payload(**payload_dict)
+    token = jwt_module_rs_redis_black_list.gen_token(payload=payload)
+
+    token_payload = jwt_module_rs_redis_black_list.validate_payload(
+        token, check_list=True, check_exp=False
+    )
+
+    assert token_payload["payload"]["user"] == payload["user"]
+
+    jwt_module_rs_redis_black_list.list.add(token)
+
+    with pytest.raises(TokenInBlackList):
+        jwt_module_rs_redis_black_list.validate_payload(
+            token, check_list=True, check_exp=False
         )
