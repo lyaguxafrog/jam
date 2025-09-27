@@ -104,7 +104,7 @@ class JWTModule(BaseModule):
         """Payload maker tool.
 
         Args:
-            exp (int | None): If none exp = JWTModule.exp
+            exp (Optional[int]): If none exp = JWTModule.exp
             **data: Custom data
         """
         if not exp:
