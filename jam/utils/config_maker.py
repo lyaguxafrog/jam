@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import tomllib
 from collections.abc import Callable
 from importlib import import_module
 from typing import Any, Union
@@ -59,12 +58,18 @@ def __toml_config_parser__(
         (dict[str, Any]): Dict with config param
     """
     try:
+        import toml
+    except ImportError:
+        raise ImportError(
+            "To generate a configuration file from TOML, you need to install toml: `pip install toml` or `pip install jamlib[toml]`"
+        )
+    try:
         with open(path, "rb") as file:
-            config = tomllib.load(file)
+            config = toml.load(file)
         return config.get(pointer, {})
     except FileNotFoundError:
         raise FileNotFoundError(f"TOML config file not found at: {path}")
-    except tomllib.TOMLDecodeError as e:
+    except toml.TOMLDecodeError as e:
         raise ValueError(f"Error parsing TOML file: {e}")
 
 
