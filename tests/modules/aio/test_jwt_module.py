@@ -1,6 +1,7 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*_
 
 import pytest
+from fakeredis import FakeAsyncRedis
 from pytest_asyncio import fixture
 
 from jam.aio.modules import JWTModule
@@ -20,6 +21,119 @@ async def jwt_module_rs():
 
     return JWTModule(
         alg="RS256", private_key=keys["private"], public_key=keys["public"]
+    )
+
+
+@fixture
+async def jwt_module_hs_redis_black_list():
+    return JWTModule(
+        alg="HS256",
+        secret_key="SECRET",
+        list={
+            "backend": "redis",
+            "type": "black",
+            "redis_uri": FakeAsyncRedis(decode_responses=True),
+            "in_list_life_time": 6000,
+        },
+    )
+
+
+@fixture
+async def jwt_module_rs_redis_black_list():
+
+    from jam.utils import generate_rsa_key_pair
+
+    keys = generate_rsa_key_pair()
+
+    return JWTModule(
+        alg="RS256",
+        public_key=keys["public"],
+        private_key=keys["private"],
+        list={
+            "backend": "redis",
+            "type": "black",
+            "redis_uri": FakeAsyncRedis(decode_responses=True),
+            "in_list_life_time": 6000,
+        },
+    )
+
+
+@fixture
+async def jwt_module_hs_redis_white_list():
+    return JWTModule(
+        alg="HS256",
+        secret_key="SECRET",
+        list={
+            "backend": "redis",
+            "type": "white",
+            "redis_uri": FakeAsyncRedis(decode_responses=True),
+            "in_list_life_time": 6000,
+        },
+    )
+
+
+@fixture
+async def jwt_module_rs_redis_white_list():
+    from jam.utils import generate_rsa_key_pair
+
+    keys = generate_rsa_key_pair()
+
+    return JWTModule(
+        alg="RS256",
+        public_key=keys["public"],
+        private_key=keys["private"],
+        list={
+            "backend": "redis",
+            "type": "white",
+            "redis_uri": FakeAsyncRedis(decode_responses=True),
+            "in_list_life_time": 6000,
+        },
+    )
+
+
+@fixture
+async def jwt_module_hs_json_black_list():
+    return JWTModule(
+        alg="HS256",
+        secret_key="SECRET",
+        list={"backend": "json", "type": "black", "json_path": ":memory:"},
+    )
+
+
+@fixture
+async def jwt_module_rs_json_black_list():
+    from jam.utils import generate_rsa_key_pair
+
+    keys = generate_rsa_key_pair()
+
+    return JWTModule(
+        alg="RS256",
+        public_key=keys["public"],
+        private_key=keys["private"],
+        list={"backend": "json", "type": "black", "json_path": ":memory:"},
+    )
+
+
+@fixture
+async def jwt_module_hs_json_white_list():
+    return JWTModule(
+        alg="HS256",
+        secret_key="SECRET",
+        list={"backend": "json", "type": "white", "json_path": ":memory:"},
+    )
+
+
+@fixture
+async def jwt_module_rs_json_white_list():
+    from jam.utils import generate_rsa_key_pair
+
+    keys = generate_rsa_key_pair()
+
+    return JWTModule(
+        alg="RS256",
+        public_key=keys["public"],
+        private_key=keys["private"],
+        list={"backend": "json", "type": "white", "json_path": ":memory:"},
     )
 
 
@@ -119,3 +233,190 @@ async def test_jwt_token_validation(jwt_module_hs, jwt_module_rs):
         await jwt_module_rs.validate_payload(
             token=token + "corrupted", check_exp=False, check_list=False
         )
+
+
+@pytest.mark.asyncio
+async def test_jwt_redis_black_lists(
+    jwt_module_hs_redis_black_list, jwt_module_rs_redis_black_list
+):
+
+    from jam.exceptions import TokenInBlackList
+
+    # hs
+    payload_dict = {"user": 1}
+
+    payload = await jwt_module_hs_redis_black_list.make_payload(**payload_dict)
+    token = await jwt_module_hs_redis_black_list.gen_token(payload=payload)
+
+    # no raises
+    token_payload = await jwt_module_hs_redis_black_list.validate_payload(
+        token=token, check_list=True, check_exp=False
+    )
+
+    assert token_payload["payload"]["user"] == payload["user"]
+
+    ## add token to black list
+    await jwt_module_hs_redis_black_list.list.add(token)
+
+    with pytest.raises(TokenInBlackList):
+        await jwt_module_hs_redis_black_list.validate_payload(
+            token, check_list=True
+        )
+
+    # rs
+    payload = await jwt_module_rs_redis_black_list.make_payload(**payload_dict)
+    token = await jwt_module_rs_redis_black_list.gen_token(payload=payload)
+
+    token_payload = await jwt_module_rs_redis_black_list.validate_payload(
+        token, check_list=True, check_exp=False
+    )
+
+    assert token_payload["payload"]["user"] == payload["user"]
+
+    await jwt_module_rs_redis_black_list.list.add(token)
+
+    with pytest.raises(TokenInBlackList):
+        await jwt_module_rs_redis_black_list.validate_payload(
+            token, check_list=True, check_exp=False
+        )
+
+
+@pytest.mark.asyncio
+async def test_jwt_json_black_lists(
+    jwt_module_hs_json_black_list, jwt_module_rs_json_black_list
+):
+    from tinydb import TinyDB
+
+    t = TinyDB(":memory:")
+    t.truncate()
+
+    from jam.exceptions import TokenInBlackList
+
+    payload_dict = {"user": 1}
+
+    payload = await jwt_module_hs_json_black_list.make_payload(**payload_dict)
+    token = await jwt_module_hs_json_black_list.gen_token(payload=payload)
+
+    decoded_payload = await jwt_module_hs_json_black_list.validate_payload(
+        token=token, check_list=True, check_exp=False
+    )
+
+    assert decoded_payload["payload"]["user"] == payload_dict["user"]
+
+    await jwt_module_hs_json_black_list.list.add(token)
+
+    with pytest.raises(TokenInBlackList):
+        await jwt_module_hs_json_black_list.validate_payload(
+            token, check_list=True, check_exp=False
+        )
+
+    t.truncate()
+
+    payload = await jwt_module_rs_json_black_list.make_payload(**payload_dict)
+    token = await jwt_module_rs_json_black_list.gen_token(payload=payload)
+
+    decoded_payload = await jwt_module_rs_json_black_list.validate_payload(
+        token=token, check_list=True, check_exp=False
+    )
+
+    assert decoded_payload["payload"]["user"] == payload_dict["user"]
+
+    await jwt_module_rs_json_black_list.list.add(token)
+
+    with pytest.raises(TokenInBlackList):
+        await jwt_module_rs_json_black_list.validate_payload(
+            token, check_list=True, check_exp=False
+        )
+
+    t.truncate()
+
+
+@pytest.mark.asyncio
+async def test_jwt_redis_white_lists(
+    jwt_module_hs_redis_white_list, jwt_module_rs_redis_white_list
+):
+    from jam.exceptions import TokenNotInWhiteList
+
+    payload_dict = {"user": 1}
+
+    payload = await jwt_module_hs_redis_white_list.make_payload(**payload_dict)
+    token = await jwt_module_hs_redis_white_list.gen_token(payload=payload)
+
+    decoded_payload = await jwt_module_hs_redis_white_list.validate_payload(
+        token, check_list=True, check_exp=False
+    )
+
+    assert decoded_payload["payload"]["user"] == payload_dict["user"]
+
+    await jwt_module_hs_redis_white_list.list.delete(token)
+
+    with pytest.raises(TokenNotInWhiteList):
+        await jwt_module_hs_redis_white_list.validate_payload(
+            token, check_list=True, check_exp=False
+        )
+
+    payload = await jwt_module_rs_redis_white_list.make_payload(**payload_dict)
+    token = await jwt_module_rs_redis_white_list.gen_token(payload=payload)
+
+    decoded_payload = await jwt_module_rs_redis_white_list.validate_payload(
+        token, check_list=True, check_exp=False
+    )
+
+    assert decoded_payload["payload"]["user"] == payload_dict["user"]
+
+    await jwt_module_rs_redis_white_list.list.delete(token)
+
+    with pytest.raises(TokenNotInWhiteList):
+        await jwt_module_rs_redis_white_list.validate_payload(
+            token, check_list=True, check_exp=False
+        )
+
+
+@pytest.mark.asyncio
+async def test_jwt_json_white_lists(
+    jwt_module_hs_json_white_list, jwt_module_rs_json_white_list
+):
+    from tinydb import TinyDB
+
+    t = TinyDB(":memory:")
+    t.truncate()
+
+    from jam.exceptions import TokenNotInWhiteList
+
+    payload_dict = {"user": 1}
+
+    payload = await jwt_module_hs_json_white_list.make_payload(**payload_dict)
+    token = await jwt_module_hs_json_white_list.gen_token(payload=payload)
+
+    decoded_payload = await jwt_module_hs_json_white_list.validate_payload(
+        token=token, check_list=True, check_exp=False
+    )
+
+    assert decoded_payload["payload"]["user"] == payload_dict["user"]
+
+    await jwt_module_hs_json_white_list.list.delete(token)
+
+    with pytest.raises(TokenNotInWhiteList):
+        await jwt_module_hs_json_white_list.validate_payload(
+            token, check_list=True, check_exp=False
+        )
+
+    t.truncate()
+
+    payload = await jwt_module_rs_json_white_list.make_payload(**payload_dict)
+    token = await jwt_module_rs_json_white_list.gen_token(payload=payload)
+
+    decoded_payload = await jwt_module_rs_json_white_list.validate_payload(
+        token=token, check_list=True, check_exp=False
+    )
+
+    assert decoded_payload["payload"]["user"] == payload_dict["user"]
+
+    await jwt_module_rs_json_white_list.list.delete(token)
+
+    with pytest.raises(TokenNotInWhiteList):
+        await jwt_module_rs_json_white_list.validate_payload(
+            token, check_list=True, check_exp=False
+        )
+
+    t.truncate()
