@@ -118,7 +118,7 @@ def jwt_module_hs_json_white_list():
     return JWTModule(
         alg="HS256",
         secret_key="SECRET",
-        list={"backend": "json", "type": "black", "json_path": ":memory:"},
+        list={"backend": "json", "type": "white", "json_path": ":memory:"},
     )
 
 
@@ -132,7 +132,7 @@ def jwt_module_rs_json_white_list():
         alg="RS256",
         public_key=keys["public"],
         private_key=keys["private"],
-        list={"backend": "json", "type": "black", "json_path": ":memory:"},
+        list={"backend": "json", "type": "white", "json_path": ":memory:"},
     )
 
 
