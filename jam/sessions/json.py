@@ -145,7 +145,7 @@ class JSONSessions(BaseSessionModule):
         Returns:
             None
         """
-        self._db.delete(self._qs.session_key == session_key)
+        self._db.remove(self._qs.key == session_key)
 
     def rework(self, session_id: str) -> str:
         """Rework (regenerate) a session ID.
