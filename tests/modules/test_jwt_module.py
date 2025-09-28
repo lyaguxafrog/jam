@@ -57,6 +57,29 @@ def jwt_module_rs_redis_black_list():
     )
 
 
+@pytest.fixture
+def jwt_module_hs_json_black_list():
+    return JWTModule(
+        alg="HS256",
+        secret_key="SECRET",
+        list={"backend": "json", "type": "black", "json_path": ":memory:"},
+    )
+
+
+@pytest.fixture
+def jwt_module_rs_json_black_list():
+    from jam.utils import generate_rsa_key_pair
+
+    keys = generate_rsa_key_pair()
+
+    return JWTModule(
+        alg="RS256",
+        public_key=keys["public"],
+        private_key=keys["private"],
+        list={"backend": "json", "type": "black", "json_path": ":memory:"},
+    )
+
+
 def test_payload_maker(jwt_module_hs, jwt_module_rs):
     payload = jwt_module_hs.make_payload(
         exp=3600, **{"user_id": 1, "username": "test_user"}
@@ -189,3 +212,52 @@ def test_jwt_redis_black_lists(
         jwt_module_rs_redis_black_list.validate_payload(
             token, check_list=True, check_exp=False
         )
+
+
+def test_jwt_json_black_lists(
+    jwt_module_hs_json_black_list, jwt_module_rs_json_black_list
+):
+    from tinydb import TinyDB
+
+    t = TinyDB(":memory:")
+    t.truncate()
+
+    from jam.exceptions import TokenInBlackList
+
+    payload_dict = {"user": 1}
+
+    payload = jwt_module_hs_json_black_list.make_payload(**payload_dict)
+    token = jwt_module_hs_json_black_list.gen_token(payload=payload)
+
+    decoded_payload = jwt_module_hs_json_black_list.validate_payload(
+        token=token, check_list=True, check_exp=False
+    )
+
+    assert decoded_payload["payload"]["user"] == payload_dict["user"]
+
+    jwt_module_hs_json_black_list.list.add(token)
+
+    with pytest.raises(TokenInBlackList):
+        jwt_module_hs_json_black_list.validate_payload(
+            token, check_list=True, check_exp=False
+        )
+
+    t.truncate()
+
+    payload = jwt_module_rs_json_black_list.make_payload(**payload_dict)
+    token = jwt_module_rs_json_black_list.gen_token(payload=payload)
+
+    decoded_payload = jwt_module_rs_json_black_list.validate_payload(
+        token=token, check_list=True, check_exp=False
+    )
+
+    assert decoded_payload["payload"]["user"] == payload_dict["user"]
+
+    jwt_module_rs_json_black_list.list.add(token)
+
+    with pytest.raises(TokenInBlackList):
+        jwt_module_rs_json_black_list.validate_payload(
+            token, check_list=True, check_exp=False
+        )
+
+    t.truncate()
