@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from .clients import TestJam
+from .clients import TestAsyncJam, TestJam
