@@ -37,6 +37,7 @@ nav:
       - Strawberry: examples/strawberry.md
       - FastAPI: examples/fastapi.md
       - Flask: examples/flask.md
+  - Testing: testing.md
   - API:
       - Jam: api/instance.md
       - BaseJam: api/abc_instance.md
@@ -61,6 +62,9 @@ nav:
           - __abc_session_repo__.py: api/sessions/abc_sessions_repo.md
           - redis.py: api/sessions/redis.md
           - json.py: api/sessions/json.md
+      - jam.tests:
+          - clients: api/tests/clients.md
+          - fakers: api/tests/fakers.md
       - jam.otp:
           - __abc_module__.py: api/otp/base_otp.md
           - HOTP: api/otp/hotp.md
