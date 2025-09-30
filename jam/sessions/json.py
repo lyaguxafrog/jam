@@ -74,13 +74,13 @@ class JSONSessions(BaseSessionModule):
 
         doc = self._SessionDoc(
             key=session_key,
-            session_id=f"{session_key}:{session_id}",
+            session_id=session_id,
             data=dumps_data,
         )
 
         self._db.insert(doc.__dict__)
         logger.debug("Session created with ID %s", session_id)
-        return f"{session_key}:{session_id}"
+        return session_id
 
     def get(self, session_id) -> dict | None:
         """Retrieve session data by session ID.
@@ -91,7 +91,7 @@ class JSONSessions(BaseSessionModule):
         Returns:
             dict | None: The session data if found, otherwise None.
         """
-        session_id = self.__decode_session_id_if_needed__(session_id)
+        # session_id = self.__decode_session_id_if_needed__(session_id)
         result = self._db.search(self._qs.session_id == session_id)
         if result:
             try:
@@ -111,7 +111,6 @@ class JSONSessions(BaseSessionModule):
         Returns:
             None
         """
-        session_id = self.__decode_session_id_if_needed__(session_id)
         self._db.remove(self._qs.session_id == session_id)
         logger.debug("Session with ID %s deleted", session_id)
 
@@ -125,8 +124,6 @@ class JSONSessions(BaseSessionModule):
         Returns:
             None
         """
-        session_id = self.__decode_session_id_if_needed__(session_id)
-
         try:
             dumps_data = self.__encode_session_data__(data)
         except AttributeError:
@@ -159,8 +156,7 @@ class JSONSessions(BaseSessionModule):
         Returns:
             str: The new session ID.
         """
-        session_id_decoded = self.__decode_session_id_if_needed__(session_id)
-        result = self._db.search(self._qs.session_id == session_id_decoded)
+        result = self._db.search(self._qs.session_id == session_id)
         if not result:
             raise SessionNotFoundError(
                 f"Session with ID {session_id} not found."
@@ -169,7 +165,7 @@ class JSONSessions(BaseSessionModule):
         new_session_id = self.__encode_session_id_if_needed__(self.id)
         self._db.update(
             {"session_id": new_session_id},
-            self._qs.session_id == session_id_decoded,
+            self._qs.session_id == session_id,
         )
         logger.debug("Session ID %s reworked to %s", session_id, new_session_id)
         return new_session_id
