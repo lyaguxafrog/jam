@@ -6,6 +6,9 @@ works according to its own rules (for example, always succeeds).
 
 For example, you have a service for generating JWT tokens.
 
+!!! tip
+    For async services, you can use [`TestAsyncJam`](/api/tests/clients/#jam.tests.clients.TestAsyncJam) instead of `TestJam`.
+
 ```python
 
 from jam import Jam
