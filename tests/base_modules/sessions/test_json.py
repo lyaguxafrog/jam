@@ -45,7 +45,6 @@ def test_create_session(json_sessions_no_crypt):
 
     assert isinstance(session, str)
     assert len(session) > 0
-    assert (session.split(":")[0]) == "test"
 
     stored_data = t.search(ts.session_id == session)
     assert stored_data[0]["data"] == '{"user": "test_user"}'
@@ -109,7 +108,7 @@ def test_create_new_crypt_session(json_session_with_crypt, f):
 
     assert isinstance(session, str)
     assert len(session) > 0
-    assert session.startswith("test:J$_")
+    assert session.startswith("J$_")
 
     stored_data = t.search(ts.session_id == session)
     assert stored_data[0]["data"] != {"user": "test_user"}
