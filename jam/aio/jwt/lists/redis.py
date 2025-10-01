@@ -30,7 +30,7 @@ class RedisList(BaseJWTList):
     def __init__(
         self,
         type: Literal["white", "black"],
-        redis_uri: Union[str, "Redis"],
+        redis_uri: Union[str, Redis],
         in_list_life_time: Optional[int] = None,
     ) -> None:
         """Class constructor.
