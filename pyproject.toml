@@ -23,12 +23,6 @@ dependencies = [
     "cryptography (>=44.0.2,<45.0.0)",
 ]
 
-[project.urls]
-Homepage = "https://jam.makridenko.ru"
-Repository = "https://github.com/lyaguxafrog/jam"
-Issues = "https://github.com/lyaguxafrog/jam/issues"
-Changelog = "https://github.com/lyaguxafrog/jam/releases"
-
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Development Status :: 5 - Production/Stable,",
@@ -48,6 +42,13 @@ classifiers = [
     "Topic :: Internet",
     "Typing :: Typed",
 ]
+
+[project.urls]
+Homepage = "https://jam.makridenko.ru"
+Repository = "https://github.com/lyaguxafrog/jam"
+Issues = "https://github.com/lyaguxafrog/jam/issues"
+Changelog = "https://github.com/lyaguxafrog/jam/releases"
+
 
 [project.optional-dependencies]
 redis=["redis>=6.4.0"]
