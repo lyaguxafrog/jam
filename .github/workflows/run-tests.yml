@@ -1,7 +1,12 @@
-name: Run tests
+name: Run test
 
 on:
+  push:
+    branches:
+      - 'master'
   pull_request:
+  tags:
+    - 'v*'
 
 jobs:
   run-tests:
@@ -13,6 +18,10 @@ jobs:
           - 'macos-latest'
         python-version:
           - '3.9'
+          - '3.10'
+          - '3.11'
+          - '3.12'
+          - '3.13'
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
