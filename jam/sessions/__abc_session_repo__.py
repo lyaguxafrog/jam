@@ -152,7 +152,7 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def delete(self, session_id: str) -> Union[None, Coroutine[Any, Any, None]]:
+    def delete(self, session_id: str) -> Optional[Coroutine[Any, Any, None]]:
         """Delete a session by its key or ID.
 
         Args:
