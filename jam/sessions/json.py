@@ -82,7 +82,7 @@ class JSONSessions(BaseSessionModule):
         logger.debug("Session created with ID %s", session_id)
         return session_id
 
-    def get(self, session_id) -> dict | None:
+    def get(self, session_id) -> Optional[dict]:
         """Retrieve session data by session ID.
 
         Args:

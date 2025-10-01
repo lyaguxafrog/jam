@@ -4,11 +4,12 @@
 import hashlib
 import hmac
 import os
+from typing import Optional
 
 
 def hash_password(
     password: str,
-    salt: bytes | None = None,
+    salt: Optional[bytes] = None,
     iterations: int = 100_000,
     salt_size: int = 16,
 ) -> tuple[str, str]:

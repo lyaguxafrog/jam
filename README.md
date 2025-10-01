@@ -2,11 +2,11 @@
 
 ![logo](https://github.com/lyaguxafrog/jam/blob/master/docs/assets/h_logo_n_title.png?raw=true)
 
-![Static Badge](https://img.shields.io/badge/Python-3.13-blue?logo=python&logoColor=white)
-![PyPI - Version](https://img.shields.io/pypi/v/jamlib)
+![Static Badge](https://img.shields.io/badge/Python-3.9%2B-blue?logo=python&logoColor=white)
+[![PyPI - Version](https://img.shields.io/pypi/v/jamlib)](https://pypi.org/project/jamlib/)
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/jamlib?period=total&units=INTERNATIONAL_SYSTEM&left_color=GRAY&right_color=RED&left_text=Downloads)](https://pypi.org/project/jamlib/)
 ![tests](https://github.com/lyaguxafrog/jam/actions/workflows/run-tests.yml/badge.svg)
-![GitHub License](https://img.shields.io/github/license/lyaguxafrog/jam)
+[![GitHub License](https://img.shields.io/github/license/lyaguxafrog/jam)](https://github.com/lyaguxafrog/jam/blob/master/LICENSE.md)
 
 Documentation: [jam.makridenko.ru](https://jam.makridenko.ru)
 

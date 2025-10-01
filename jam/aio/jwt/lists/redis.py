@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-from typing import Literal
+from typing import Literal, Optional, Union
 
 from jam.jwt.lists.__abc_list_repo__ import BaseJWTList
 
@@ -30,8 +30,8 @@ class RedisList(BaseJWTList):
     def __init__(
         self,
         type: Literal["white", "black"],
-        redis_uri: str | Redis,
-        in_list_life_time: int | None,
+        redis_uri: Union[str, Redis],
+        in_list_life_time: Optional[int] = None,
     ) -> None:
         """Class constructor.
 

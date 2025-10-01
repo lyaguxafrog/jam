@@ -12,7 +12,7 @@ keywords = [
     "backend",
     "jwt"
 ]
-requires-python = ">=3.13"
+requires-python = ">=3.9"
 dependencies = [
     "pycryptodome>=3.21.0,<4.0.0",
     "cryptography (>=44.0.2,<45.0.0)",
@@ -28,6 +28,7 @@ Changelog = "https://github.com/lyaguxafrog/jam/releases"
 redis=["redis>=6.4.0"]
 json=["tinydb>=4.8.2"]
 yaml=["pyyaml>=6.0.2"]
+toml=["toml>=0.10.2"]
 
 [dependency-groups]
 dev = [
@@ -47,6 +48,7 @@ dev = [
     "ruff>=0.11.2",
     "termynal>=0.13.0",
     "tinydb>=4.8.2",
+    "toml>=0.10.2",
 ]
 
 

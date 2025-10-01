@@ -3,7 +3,7 @@
 import json
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Coroutine
-from typing import Any, Optional
+from typing import Any, Optional, Union
 from uuid import uuid4
 
 from cryptography.fernet import Fernet
@@ -130,7 +130,7 @@ class BaseSessionModule(ABC):
     @abstractmethod
     def create(
         self, session_key: str, data: dict
-    ) -> str | Coroutine[Any, Any, str]:
+    ) -> Union[str, Coroutine[Any, Any, str]]:
         """Create a new session with the given session key and data.
 
         Args:
@@ -152,7 +152,7 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def delete(self, session_id: str) -> None | Coroutine[Any, Any, None]:
+    def delete(self, session_id: str) -> Optional[Coroutine[Any, Any, None]]:
         """Delete a session by its key or ID.
 
         Args:
@@ -163,7 +163,7 @@ class BaseSessionModule(ABC):
     @abstractmethod
     def update(
         self, session_id: str, data: dict
-    ) -> None | Coroutine[Any, Any, None]:
+    ) -> Union[None, Coroutine[Any, Any, None]]:
         """Update an existing session with new data.
 
         Args:
@@ -173,7 +173,7 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def rework(self, session_id: str) -> str | Coroutine[Any, Any, str]:
+    def rework(self, session_id: str) -> Union[str, Coroutine[Any, Any, str]]:
         """Rework a session and return its new ID.
 
         Args:
@@ -185,7 +185,7 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def clear(self, session_key: str) -> None | Coroutine[Any, Any, None]:
+    def clear(self, session_key: str) -> Union[None, Coroutine[Any, Any, None]]:
         """Clear all sessions by key.
 
         Args:
