@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import sys
 from collections.abc import Callable
 from importlib import import_module
 from typing import Any, Union
@@ -57,12 +58,16 @@ def __toml_config_parser__(
     Returns:
         (dict[str, Any]): Dict with config param
     """
-    try:
-        import toml
-    except ImportError:
-        raise ImportError(
-            "To generate a configuration file from TOML, you need to install toml: `pip install toml` or `pip install jamlib[toml]`"
-        )
+    if sys.version_info >= (3, 11):
+        import tomllib as toml
+    else:
+        try:
+            import toml
+        except ImportError:
+            raise ImportError(
+                "To generate a configuration file from TOML, you need to install toml: "
+                "`pip install toml` or `pip install jamlib[toml]`"
+            )
     try:
         with open(path, "rb") as file:
             config = toml.load(file)
