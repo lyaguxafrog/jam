@@ -31,6 +31,8 @@ jam = Jam(config="my_config.yml")
 
 ## TOML
 To configure via toml, you need to describe all parameters in the config in the `jam` block, for example:
+!!! tip
+    For `python < 3.11` you need to install the [`toml`](https://pypi.org/project/toml/) module: `pip intall jamlib[toml]`
 ```toml
 [jam]
 auth_type = "jwt"
