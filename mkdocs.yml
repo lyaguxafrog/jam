@@ -38,6 +38,7 @@ nav:
       - FastAPI: examples/fastapi.md
       - Flask: examples/flask.md
   - Testing: testing.md
+  - API Reference: api.md
   - Breaking changes:
       - 1.1.4 -> 2.0.0: breaking_changes/jam114_to_200
   - Contributing: contributing.md
