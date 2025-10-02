@@ -4,8 +4,6 @@ title: jam.sessions
 
 Module for making server auth sessions.
 
-See docs: https://jam.makridenko.ru/
-
 ## Instances
 
 * [`BaseSessionModule`](sessions/base_session_module.md)

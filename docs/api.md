@@ -22,7 +22,7 @@ Documentation: https://jam.makridenko.ru
 * [`otp`](api/otp.md)
 * [`sessions`](api/sessions.md)
 * [`tests`](api/tests.md)
-* `utils`
+* [`utils`](api/utils.md)
 * [`modules`](api/modules.md)
 
 FILE PATH: `jam/__init__.py`
