@@ -12,6 +12,7 @@ Various utilities that help with authorization.
 * [`deserialize_hash`](utils/salt_hash.md#jam.utils.salt_hash.deserialize_hash)
 * [`hash_password`](utils/salt_hash.md#jam.utils.salt_hash.hash_password)
 * [`serialize_hash`](utils/salt_hash.md#jam.utils.salt_hash.serialize_hash)
+* [`xor_my_data`](utils/xor.md#jam.utils.xor_my_data)
 
 ## Modules
 * [`aes`](utils/aes.md)
@@ -19,5 +20,6 @@ Various utilities that help with authorization.
 * [`otp_keys`](utils/otp_keys.md)
 * [`rsa`](utils/rsa.md)
 * [`salt_hash`](utils/salt_hash.md)
+* [`xor`](utils/xor.md)
 
 FILE PATH: `jam/utils/__init__.py`
