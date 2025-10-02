@@ -13,7 +13,11 @@ from jam.sessions.redis import RedisSessions as SyncRedisSessions
 
 
 class RedisSessions(SyncRedisSessions):
-    """Async redis sessions module."""
+    """Async redis sessions module.
+
+    Dependency required:
+    `pip install jamlib[redis]`
+    """
 
     def __init__(
         self,

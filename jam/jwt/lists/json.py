@@ -23,7 +23,7 @@ class JSONList(BaseJWTList):
     """Black/White list in JSON format, not recommended for blacklists  because it is not convenient to control token lifetime.
 
     Dependency required:
-    `pip install jamlib[json-lists]`
+    `pip install jamlib[json]`
 
     Attributes:
         __list__ (TinyDB): TinyDB instance

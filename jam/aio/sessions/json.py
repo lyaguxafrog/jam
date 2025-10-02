@@ -7,7 +7,11 @@ from jam.sessions.json import JSONSessions as SyncJSONSessions
 
 
 class JSONSessions(SyncJSONSessions):
-    """Async session management module for JSON storage."""
+    """Async session management module for JSON storage.
+
+    Dependency required:
+    `pip install jamlib[json]`
+    """
 
     async def create(self, session_key: str, data: dict) -> str:
         """Create a new session.

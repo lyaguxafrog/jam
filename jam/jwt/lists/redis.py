@@ -22,7 +22,7 @@ from jam.jwt.lists.__abc_list_repo__ import BaseJWTList
 class RedisList(BaseJWTList):
     """Black/White lists in Redis, most optimal format.
 
-    Dependency required: `pip install jamlib[redis-lists]`
+    Dependency required: `pip install jamlib[redis]`
 
     Attributes:
         __list__ (Redis): Redis instance

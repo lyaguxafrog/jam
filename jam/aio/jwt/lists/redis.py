@@ -12,7 +12,7 @@ except ImportError:
     raise ImportError(
         """
         No required packages found, looks like you didn't install them:
-        `pip install "jamlib[redis-lists]"`
+        `pip install "jamlib[redis]"`
         """
     )
 
@@ -20,7 +20,7 @@ except ImportError:
 class RedisList(BaseJWTList):
     """Black/White lists in Redis, most optimal format.
 
-    Dependency required: `pip install jamlib[redis-lists]`
+    Dependency required: `pip install jamlib[redis]`
 
     Attributes:
         __list__ (Redis): Redis instance
