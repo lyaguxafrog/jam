@@ -18,7 +18,7 @@ Documentation: https://jam.makridenko.ru
 
 * [`aio`](api/aio.md)
 * [`exceptions`](api/exceptions.md)
-* `jwt`
+* [`jwt`](api/jwt.md)
 * `otp`
 * `quick`
 * `sessions`
