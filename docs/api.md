@@ -20,8 +20,7 @@ Documentation: https://jam.makridenko.ru
 * [`exceptions`](api/exceptions.md)
 * [`jwt`](api/jwt.md)
 * [`otp`](api/otp.md)
-* `quick`
-* `sessions`
+* [`sessions`](api/sessions.md)
 * `tests`
 * `utils`
 * [`modules`](api/modules.md)
