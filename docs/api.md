@@ -19,7 +19,7 @@ Documentation: https://jam.makridenko.ru
 * [`aio`](api/aio.md)
 * [`exceptions`](api/exceptions.md)
 * [`jwt`](api/jwt.md)
-* `otp`
+* [`otp`](api/otp.md)
 * `quick`
 * `sessions`
 * `tests`
