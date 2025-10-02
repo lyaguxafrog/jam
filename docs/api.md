@@ -21,7 +21,7 @@ Documentation: https://jam.makridenko.ru
 * [`jwt`](api/jwt.md)
 * [`otp`](api/otp.md)
 * [`sessions`](api/sessions.md)
-* `tests`
+* [`tests`](api/tests.md)
 * `utils`
 * [`modules`](api/modules.md)
 
