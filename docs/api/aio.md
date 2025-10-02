@@ -2,6 +2,8 @@
 title: jam.aio
 ---
 
+Async jam version.
+
 ## Instances
 
 * [`Jam`](aio/jam.md)
@@ -10,6 +12,6 @@ title: jam.aio
 
 * [`jwt`](aio/jwt.md)
 * [`sessions`](aio/sessions.md)
-* `modules`
+* [`modules`](aio/modules.md)
 
 FILE PATH: `jam/aio/__init__.py`

@@ -25,3 +25,5 @@ Documentation: https://jam.makridenko.ru
 * `tests`
 * `utils`
 * [`modules`](api/modules.md)
+
+FILE PATH: `jam/__init__.py`
