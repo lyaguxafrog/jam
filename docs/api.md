@@ -16,7 +16,7 @@ Documentation: https://jam.makridenko.ru
 
 ## Modules
 
-* `aio`
+* [`aio`](api/aio.md)
 * `exceptions`
 * `jwt`
 * `otp`
