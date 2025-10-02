@@ -11,3 +11,4 @@ from .salt_hash import (
     hash_password,
     serialize_hash,
 )
+from .xor import xor_my_data
