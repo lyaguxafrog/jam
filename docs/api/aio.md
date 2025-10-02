@@ -9,7 +9,7 @@ title: jam.aio
 ## Modules
 
 * [`jwt`](aio/jwt.md)
-* `sessions`
+* [`sessions`](aio/sessions.md)
 * `modules`
 
 FILE PATH: `jam/aio/__init__.py`
