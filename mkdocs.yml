@@ -30,7 +30,9 @@ nav:
           - HOTP or TOTP: otp/hotp_and_totp.md
           - HOTP: otp/hotp.md
           - TOTP: otp/totp.md
-      - Quick: quick.md
+      - Utils:
+          - Key generators: utils/key_generations.md
+          - Passwords utils: utils/password_hashing.md
   - Examples:
       - Starlette: examples/starlette.md
       - Litestar: examples/litestar.md
