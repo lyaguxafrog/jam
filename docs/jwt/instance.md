@@ -37,7 +37,7 @@ jam.verify_jwt_token(
 ```
 
 If everything went well you just get your payload, if the keys didn't match then raise errors.
-(see [API](../api/instance.md#jam.instance.Jam.verify_jwt_token))
+(see [API](../api/jam.md#jam.instance.Jam.verify_jwt_token))
 
 ### `check_exp`
 If we specify this flag, we check the same way, for the lifetime of the token.

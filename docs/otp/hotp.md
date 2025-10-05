@@ -68,5 +68,3 @@ hotp.at(factor=counter)
 
 result: bool = hotp.verify(code="123456", factor=counter, look_ahead=30)
 ```
-
-For more information see [API](/api/otp/hotp).
