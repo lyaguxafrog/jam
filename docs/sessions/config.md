@@ -17,7 +17,11 @@ If you want to encrypt the session ID, set this parameter to `True` and pass the
 
 ### `session_aes_secret`
 The encryption key for the session ID. Key must be 32 url-safe base64-encoded bytes. 
-You can use [`jam.utils.generate_aes_key`](/api/utils/aes/) to generate it.
+You can use [`jam.utils.generate_aes_key`](/api/utils/aes/#jam.utils.aes.generate_aes_key) to generate it.
+
+!!! tip
+    By default, Jam reads the `JAM_SESSION_AES_SECRET` environment variable.
+
 
 ## Example `toml` config:
 ```toml
