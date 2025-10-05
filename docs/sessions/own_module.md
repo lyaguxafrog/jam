@@ -5,7 +5,7 @@ title: Custom sessions backend
 You can also create your own session module, for example,
 to store sessions in PSQL or for other purposes.
 To do this, you need to create your own class inheriting
-from [BaseSessionModule](/api/sessions/abc_sessions_repo/).
+from [BaseSessionModule](/api/sessions/base_session_module/).
 
 For example:
 ```python

@@ -42,6 +42,3 @@ jam.clear_sessions("some_username")
 new_session_id: str = jam.rework_session(session_id)
 ```
 Returns new session id and deletes old session.
-
-
-See API for more details: [Jam](../api/instance.md).

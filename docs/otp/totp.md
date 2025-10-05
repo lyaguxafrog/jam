@@ -62,5 +62,3 @@ totp.at(factor=1756944388)
 
 result: bool = totp.verify(code="123456", look_ahead=30)
 ```
-
-For more information see [API](/api/otp/totp).
