@@ -28,6 +28,12 @@ def generate_otp_key(entropy_bits: int = 128) -> str:
 def otp_key_from_string(s: str) -> str:
     """Generate OTP-valid key from string.
 
+    Args:
+        s (str): String for key
+
+    Returns:
+        bytes: OTP key
+
     Example:
         ```python
         >>> from jam.utils import otp_key_from_string
@@ -35,13 +41,7 @@ def otp_key_from_string(s: str) -> str:
         >>> key = otp_key_from_string(user_email)
         >>> print(key)
         'O54O6YRKTH3IPNEBIUMKMK3FZ35OF6Q5'
-        ...
-
-    Args:
-        s (str): String for key
-
-    Returns:
-        bytes: OTP key
+        ```
     """
     hashed = hashlib.sha1(s.encode()).digest()
     key = base64.b32encode(hashed).decode("utf-8").rstrip("=")
