@@ -17,7 +17,11 @@ If you want to encrypt the session ID, set this parameter to `True` and pass the
 
 ### `session_aes_secret`
 The encryption key for the session ID. Key must be 32 url-safe base64-encoded bytes. 
-You can use [`jam.utils.generate_aes_key`](/api/utils/aes/) to generate it.
+You can use [`jam.utils.generate_aes_key`](/api/utils/aes/#jam.utils.aes.generate_aes_key) to generate it.
+
+!!! tip
+    By default, Jam reads the `JAM_SESSION_AES_SECRET` environment variable.
+
 
 ## Example `toml` config:
 ```toml
@@ -42,7 +46,7 @@ Session lifetime in seconds. The default is 3600 (1 hour). If `None`, the sessio
 ### `session_path`
 Prefix for session keys in Redis. The default is `sessions`.
 
-More details: [jam.sessions.redis.RedisSessions](/api/sessions/redis/)
+More details: [jam.sessions.redis.RedisSessions](/api/sessions/redis)
 
 ## JSON
 
@@ -51,12 +55,12 @@ In JSON, sessions are stored as files in the directory specified in the `json_pa
 ### `json_path`
 The path to the directory where session files will be stored.
 
-More details: [jam.sessions.json.JsonSessions](/api/sessions/tinydb/)
+More details: [jam.sessions.json.JsonSessions](/api/sessions/json)
 
 ## Custom
 
 ### `custom_module`
-Your custom session module. It must be a subclass of [`BaseSessionModule`](/api/sessions/abc_sessions_repo/).
+Your custom session module. It must be a subclass of [`BaseSessionModule`](/api/sessions/base_session_module/).
 
 ### Other parameters
 

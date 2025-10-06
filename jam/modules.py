@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import os
 from collections.abc import Callable
 from typing import Any, Literal, Optional, Union
 from uuid import uuid4
@@ -46,9 +47,9 @@ class JWTModule(BaseModule):
             # "PS384",
             # "PS512",
         ] = "HS256",
-        secret_key: Optional[str] = None,
-        public_key: Optional[str] = None,
-        private_key: Optional[str] = None,
+        secret_key: Optional[str] = os.getenv("JAM_JWT_SECRET_KEY", None),
+        public_key: Optional[str] = os.getenv("JAM_JWT_PUBLIC_KEY", None),
+        private_key: Optional[str] = os.getenv("JAM_JWT_PRIVATE_KEY", None),
         expire: int = 3600,
         list: Optional[dict[str, Any]] = None,
     ) -> None:
@@ -230,7 +231,9 @@ class SessionModule(BaseModule):
                 ),
                 default_ttl=module_kwargs.get("session_ttl"),
                 is_session_crypt=is_session_crypt,
-                session_aes_secret=session_aes_secret,
+                session_aes_secret=os.getenv(
+                    "JAM_SESSION_AES_SECRET", session_aes_secret
+                ),
                 id_factory=id_factory,
             )
         elif sessions_type == "json":
@@ -239,7 +242,9 @@ class SessionModule(BaseModule):
             self.module = JSONSessions(
                 json_path=module_kwargs.get("json_path", "sessions.json"),
                 is_session_crypt=is_session_crypt,
-                session_aes_secret=session_aes_secret,
+                session_aes_secret=os.getenv(
+                    "JAM_SESSION_AES_SECRET", session_aes_secret
+                ),
                 id_factory=id_factory,
             )
         elif sessions_type == "custom":
@@ -253,7 +258,9 @@ class SessionModule(BaseModule):
                 _m = __module_loader__(_module)
                 self.module = _m(
                     is_session_crypt=is_session_crypt,
-                    session_aes_secret=session_aes_secret,
+                    session_aes_secret=os.getenv(
+                        "JAM_SESSION_AES_SECRET", session_aes_secret
+                    ),
                     id_factory=id_factory,
                     **module_kwargs,
                 )
