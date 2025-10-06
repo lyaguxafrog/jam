@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import base64
+import hashlib
 import math
 import secrets
 
@@ -22,3 +23,26 @@ def generate_otp_key(entropy_bits: int = 128) -> str:
 
     b32 = base64.b32encode(raw).decode("ascii")
     return b32.rstrip("=").upper()
+
+
+def otp_key_from_string(s: str) -> str:
+    """Generate OTP-valid key from string.
+
+    Args:
+        s (str): String for key
+
+    Returns:
+        bytes: OTP key
+
+    Example:
+        ```python
+        >>> from jam.utils import otp_key_from_string
+        >>> user_email: str = "some.email@mail.com"
+        >>> key = otp_key_from_string(user_email)
+        >>> print(key)
+        'O54O6YRKTH3IPNEBIUMKMK3FZ35OF6Q5'
+        ```
+    """
+    hashed = hashlib.sha1(s.encode()).digest()
+    key = base64.b32encode(hashed).decode("utf-8").rstrip("=")
+    return key
