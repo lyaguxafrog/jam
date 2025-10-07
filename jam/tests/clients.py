@@ -6,7 +6,7 @@ from typing import Any, Optional, Union
 from jam.aio import Jam as AioJam
 from jam.instance import Jam
 from jam.jwt.tools import __base64url_decode__
-from jam.tests.fakers import fake_jwt_token
+from jam.tests.fakers import fake_jwt_token, fake_oauth2_token
 
 
 class TestJam(Jam):
@@ -224,6 +224,59 @@ class TestJam(Jam):
         if counter is not None:
             uri += f"&counter={counter}"
         return uri
+
+    def oauth2_get_authorized_url(
+        self, provider: str, scope: list[str], **extra_params: Any
+    ) -> str:
+        """Test oauth2 URL method.
+
+        Return FAKE url
+        """
+        return f"https://{provider}/auth&client_id=TEST_CLIENT&redirect_uri=https%3A%2F%2Fexample.com&response_type=code"
+
+    def oauth2_fetch_token(
+        self,
+        provider: str,
+        code: str,
+        grant_type: str = "authorization_code",
+        **extra_params: Any,
+    ) -> dict[str, Any]:
+        """Fake fetch token."""
+        return {
+            "access_token": fake_oauth2_token(),
+            "access_expire": 9999999,
+            "refresh_token": fake_oauth2_token(),
+            "refresh_expire": 999999,
+            "token_type": "bearer",
+        }
+
+    def oauth2_refresh_token(
+        self,
+        provider: str,
+        refresh_token: str,
+        grant_type: str = "refresh_token",
+        **extra_params: Any,
+    ) -> dict[str, Any]:
+        """Fake refresh token."""
+        return {
+            "access_token": fake_oauth2_token(),
+            "access_expire": 9999999,
+            "refresh_token": fake_oauth2_token(),
+            "refresh_expire": 999999,
+            "token_type": "bearer",
+        }
+
+    def oauth2_client_credentials_flow(
+        self, scope: Optional[list[str]] = None, **extra_params: Any
+    ) -> dict[str, Any]:
+        """Fake client MtM flow."""
+        return {
+            "access_token": fake_oauth2_token(),
+            "access_expire": 9999999,
+            "refresh_token": fake_oauth2_token(),
+            "refresh_expire": 999999,
+            "token_type": "bearer",
+        }
 
 
 class TestAsyncJam(AioJam):
