@@ -2,6 +2,8 @@
 title: Jam instance with sessions
 ---
 
+# Jam Sessions
+
 ## Instance
 ```python
 from jam import Jam

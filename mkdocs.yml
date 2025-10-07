@@ -25,6 +25,11 @@ nav:
           - Instance: sessions/instance.md
           - Sessions crypt: sessions/session_crypt.md
           - Own sessions backend: sessions/own_module.md
+      - OAuth2:
+          - Config: oauth2/config.md
+          - Instance: oauth2/instance.md
+          - Built-In providers: oauth2/builtins.md
+          - Custom Module: oauth2/custom_module.md
       - OTP:
           - Config: otp/config.md
           - HOTP or TOTP: otp/hotp_and_totp.md

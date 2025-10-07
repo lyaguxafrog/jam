@@ -11,6 +11,7 @@ Async jam version.
 ## Modules
 
 * [`jwt`](aio/jwt.md)
+* [`oauth2`](aio/oauth2.md)
 * [`sessions`](aio/sessions.md)
 * [`modules`](aio/modules.md)
 
