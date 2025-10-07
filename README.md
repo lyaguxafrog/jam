@@ -14,6 +14,8 @@ Documentation: [jam.makridenko.ru](https://jam.makridenko.ru)
 ```bash
 pip install jamlib
 ```
+How to install dev version: -> [Jam Unstable](https://jam.makridenko.ru/install_unstable/)
+
 
 ## Getting start
 ```python
