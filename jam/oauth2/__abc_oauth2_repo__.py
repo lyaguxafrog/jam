@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABC, abstractmethod
+from typing import Any, Optional
 
 
 class BaseOAuth2Client(ABC):
@@ -24,7 +25,7 @@ class BaseOAuth2Client(ABC):
             redirect_url (str): Your app url
         """
         self.client_id = client_id
-        self.__client_secret = client_secret
+        self._client_secret = client_secret
         self.auth_url = auth_url
         self.token_url = token_url
         self.redirect_url = redirect_url
@@ -62,5 +63,19 @@ class BaseOAuth2Client(ABC):
 
         Returns:
             str: New access token
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def client_credentials_flow(
+        self, scope: Optional[list[str]] = None
+    ) -> dict[str, Any]:
+        """Obtain access token using client credentials flow (no user interaction).
+
+        Args:
+            scope (Optional[list[str]]): Auth scope
+
+        Returns:
+            dict: JSON with access token
         """
         raise NotImplementedError
