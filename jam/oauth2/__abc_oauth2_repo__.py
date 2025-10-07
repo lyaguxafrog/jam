@@ -30,11 +30,11 @@ class BaseOAuth2Client(ABC):
         self.redirect_url = redirect_url
 
     @abstractmethod
-    def get_authorization_url(self, scope: dict[str, str]) -> str:
+    def get_authorization_url(self, scope: list[str]) -> str:
         """Get OAuth2 url.
 
         Args:
-            scope (dict[str, str]): Auth scope
+            scope (list[str]): Auth scope
 
         Returns:
             str: URL for auth
