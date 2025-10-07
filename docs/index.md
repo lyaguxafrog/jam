@@ -17,6 +17,7 @@ of auth* in your application!
 ---> 100%
 Installed!
 ```
+How to install dev version: -> [Jam Unstable](install_unstable.md)
 
 ## Quick start
 ```python
