@@ -141,7 +141,7 @@ class OAuth2Client(BaseOAuth2Client):
         try:
             data = json.loads(raw)
         except json.JSONDecodeError:
-            raise ValueError(f"Invalid JSON response: {raw}")
+            data = {k: v[0] for k, v in urllib.parse.parse_qs(raw).items()}
 
         if response.status >= 400:
             raise RuntimeError(f"OAuth2 error ({response.status}): {data}")
