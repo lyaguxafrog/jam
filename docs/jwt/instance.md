@@ -1,4 +1,4 @@
-# Jam
+# Jam JWT
 
 ## Instance
 

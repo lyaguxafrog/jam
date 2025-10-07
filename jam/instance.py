@@ -368,15 +368,21 @@ class Jam(BaseJam):
         )
 
     def oauth2_client_credentials_flow(
-        self, scope: Optional[list[str]] = None, **extra_params: Any
+        self,
+        provider: str,
+        scope: Optional[list[str]] = None,
+        **extra_params: Any,
     ) -> dict[str, Any]:
         """Obtain access token using client credentials flow (no user interaction).
 
         Args:
+            provider (str): OAuth2 provider
             scope (list[str] | None): Auth scope
             extra_params (Any): Extra auth params if needed
 
         Returns:
             dict: JSON with access token
         """
-        return self.module.client_credentials_flow(scope, **extra_params)
+        return self.module.client_credentials_flow(
+            provider, scope, **extra_params
+        )
