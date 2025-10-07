@@ -2,6 +2,8 @@
 title: jam.oauth2.builtin
 ---
 
+Built-in OAuth2 providers.
+
 ## Modules
 
 * [`github`](builtin/github.md)

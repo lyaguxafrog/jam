@@ -2,6 +2,8 @@
 title: jam.oath2
 ---
 
+OAuth2 module.
+
 ## Instances
 
 * [`BaseOAuth2Client`](oauth2/base_client.md#jam.oauth2.__abc_oauth2_repo__.BaseOAuth2Client)
