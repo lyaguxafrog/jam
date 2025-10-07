@@ -385,7 +385,7 @@ class OAuth2Module(BaseModule):
         super().__init__(module_type="oauth2")
         from jam.oauth2.client import OAuth2Client
 
-        # TODO: Make build in providers: github, google, etc
+        # TODO: Make build-in providers: github, google, etc
         if not provider:
             self.module = OAuth2Client(
                 client_id, client_secret, auth_url, token_url, redirect_url
