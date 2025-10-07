@@ -334,13 +334,13 @@ class OAuth2Module(BaseModule):
     """OAuth2 module."""
 
     BUILTIN_PROVIDERS = {
-        "github": "jam.oauth2.GitHubOAuth2Client",
-        "gitlab": "jam.oauth2.GitLabOAuth2Client",
-        "google": "jam.oauth2.GoogleOAuth2Client",
-        "yandex": "jam.oauth2.YandexOAuth2Client",
+        "github": "jam.aio.oauth2.GitHubOAuth2Client",
+        "gitlab": "jam.aio.oauth2.GitLabOAuth2Client",
+        "google": "jam.aio.oauth2.GoogleOAuth2Client",
+        "yandex": "jam.aio.oauth2.YandexOAuth2Client",
     }
 
-    DEFAULT_CLIENT = "jam.oauth2.client.OAuth2Client"
+    DEFAULT_CLIENT = "jam.aio.oauth2.client.OAuth2Client"
 
     def __init__(self, config: dict[str, str]) -> None:
         """Constructor.
@@ -383,9 +383,8 @@ class OAuth2Module(BaseModule):
         Returns:
             str: Authorization url
         """
-        return await self.__provider_getter(provider).get_authorization_url(
-            scope, **extra_params
-        )
+        prv_ = self.__provider_getter(provider)
+        return await prv_.get_authorization_url(scope, **extra_params)
 
     async def fetch_token(
         self,
