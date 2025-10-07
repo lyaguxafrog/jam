@@ -7,8 +7,13 @@ from typing import Any, Literal, Optional, Union
 from uuid import uuid4
 
 from jam.__logger__ import logger
-from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
+from jam.exceptions import (
+    ProviderNotConfigurError,
+    TokenInBlackList,
+    TokenNotInWhiteList,
+)
 from jam.jwt.tools import __gen_jwt__, __validate_jwt__
+from jam.oauth2.client import OAuth2Client
 from jam.utils.config_maker import __module_loader__
 
 
@@ -363,52 +368,63 @@ class SessionModule(BaseModule):
 class OAuth2Module(BaseModule):
     """OAuth2 module."""
 
-    def __init__(
-        self,
-        provider: Optional[str],
-        client_id: str,
-        client_secret: str,
-        auth_url: str,
-        token_url: str,
-        redirect_url: str,
-    ) -> None:
+    BUILTIN_PROVIDERS = {
+        "github": "jam.oauth2.GitHubOAuth2Client",
+        "gitlab": "jam.oauth2.GitLabOAuth2Client",
+        "google": "jam.oauth2.GoogleOAuth2Client",
+        "yandex": "jam.oauth2.YandexOAuth2Client",
+    }
+
+    DEFAULT_CLIENT = "jam.oauth2.client.OAuth2Client"
+
+    def __init__(self, config: dict[str, str]) -> None:
         """Constructor.
 
         Args:
-            provider (str | None): Provider name, check docs
-            client_id (str): ID OAuth2 app
-            client_secret (str): Secret key for OAuth2 app
-            auth_url (str): URL for auth server
-            token_url (str): URL for token getter
-            redirect_url (str): Your app URL
+            config (dict[str, str]): Config
         """
         super().__init__(module_type="oauth2")
-        from jam.oauth2.client import OAuth2Client
+        self.providers = {}
+        providers_cfg = config.get("providers", {})
 
-        # TODO: Make build-in providers: github, google, etc
-        if not provider:
-            self.module = OAuth2Client(
-                client_id, client_secret, auth_url, token_url, redirect_url
+        self.providers = {
+            name: (
+                __module_loader__(cfg.pop("module"))(**cfg)
+                if "module" in cfg
+                else __module_loader__(
+                    self.BUILTIN_PROVIDERS.get(name, self.DEFAULT_CLIENT)
+                )(**cfg)
             )
+            for name, cfg in providers_cfg.items()
+        }
+
+    def __provider_getter(self, provider: str) -> OAuth2Client:
+        prv_: OAuth2Client = self.providers.get(provider)
+        if not prv_:
+            raise ProviderNotConfigurError
         else:
-            raise NotImplementedError
+            return prv_
 
     def get_authorization_url(
-        self, scope: list[str], **extra_params: Any
+        self, provider: str, scope: list[str], **extra_params: Any
     ) -> str:
         """Generate full OAuth2 authorization URL.
 
         Args:
+            provider (str): Provider name
             scope (list[str]): Auth scope
             extra_params (Any): Extra ath params
 
         Returns:
             str: Authorization url
         """
-        return self.module.get_authorization_url(scope, **extra_params)
+        return self.__provider_getter(provider).get_authorization_url(
+            scope, **extra_params
+        )
 
     def fetch_token(
         self,
+        provider: str,
         code: str,
         grant_type: str = "authorization_code",
         **extra_params: Any,
@@ -416,6 +432,7 @@ class OAuth2Module(BaseModule):
         """Exchange authorization code for access token.
 
         Args:
+            provider (str): Provider name
             code (str): OAuth2 code
             grant_type (str): Type of oauth2 grant
             extra_params (Any): Extra auth params if needed
@@ -423,10 +440,13 @@ class OAuth2Module(BaseModule):
         Returns:
             dict: OAuth2 token
         """
-        return self.module.fetch_token(code, grant_type, **extra_params)
+        return self.__provider_getter(provider).fetch_token(
+            code, grant_type, **extra_params
+        )
 
     def refresh_token(
         self,
+        provider: str,
         refresh_token: str,
         grant_type: str = "refresh_token",
         **extra_params: Any,
@@ -434,6 +454,7 @@ class OAuth2Module(BaseModule):
         """Use refresh token to obtain a new access token.
 
         Args:
+            provider (str): Provider name
             refresh_token (str): Refresh token
             grant_type (str): Grant type
             extra_params (Any): Extra auth params if needed
@@ -441,20 +462,26 @@ class OAuth2Module(BaseModule):
         Returns:
             dict: Refresh token
         """
-        return self.module.refresh_token(
+        return self.__provider_getter(provider).refresh_token(
             refresh_token, grant_type, **extra_params
         )
 
     def client_credentials_flow(
-        self, scope: Optional[list[str]] = None, **extra_params: Any
+        self,
+        provider: str,
+        scope: Optional[list[str]] = None,
+        **extra_params: Any,
     ) -> dict[str, Any]:
         """Obtain access token using client credentials flow (no user interaction).
 
         Args:
+            provider (str): Provider name
             scope (list[str] | None): Auth scope
             extra_params (Any): Extra auth params if needed
 
         Returns:
             dict: JSON with access token
         """
-        return self.module.client_credentials_flow(scope, **extra_params)
+        return self.__provider_getter(provider).client_credentials_flow(
+            scope, **extra_params
+        )

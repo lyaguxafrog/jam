@@ -45,7 +45,7 @@ class Jam(BaseJam):
             self.module = SessionModule(**config)  # type: ignore
         elif self.type == "oauth2":
             logger.debug("Create OAuth2 instance")
-            self.module = OAuth2Module(**config)
+            self.module = OAuth2Module(config)
         else:
             raise NotImplementedError
 
@@ -307,21 +307,25 @@ class Jam(BaseJam):
         ).verify(code=code, factor=factor, look_ahead=look_ahead)
 
     def oauth2_get_authorized_url(
-        self, scope: list[str], **extra_params: Any
+        self, provider: str, scope: list[str], **extra_params: Any
     ) -> str:
         """Generate full OAuth2 authorization URL.
 
         Args:
+            provider (str): Provider name
             scope (list[str]): Auth scope
             extra_params (Any): Extra ath params
 
         Returns:
             str: Authorization url
         """
-        return self.module.get_authorization_url(scope, **extra_params)
+        return self.module.get_authorization_url(
+            provider, scope, **extra_params
+        )
 
     def oauth2_fetch_token(
         self,
+        provider: str,
         code: str,
         grant_type: str = "authorization_code",
         **extra_params: Any,
@@ -329,6 +333,7 @@ class Jam(BaseJam):
         """Exchange authorization code for access token.
 
         Args:
+            provider (str): Provider name
             code (str): OAuth2 code
             grant_type (str): Type of oauth2 grant
             extra_params (Any): Extra auth params if needed
@@ -336,10 +341,13 @@ class Jam(BaseJam):
         Returns:
             dict: OAuth2 token
         """
-        return self.module.fetch_token(code, grant_type, **extra_params)
+        return self.module.fetch_token(
+            provider, code, grant_type, **extra_params
+        )
 
     def oauth2_refresh_token(
         self,
+        provider: str,
         refresh_token: str,
         grant_type: str = "refresh_token",
         **extra_params: Any,
@@ -347,6 +355,7 @@ class Jam(BaseJam):
         """Use refresh token to obtain a new access token.
 
         Args:
+            provider (str): Provider name
             refresh_token (str): Refresh token
             grant_type (str): Grant type
             extra_params (Any): Extra auth params if needed
@@ -355,7 +364,7 @@ class Jam(BaseJam):
             dict: Refresh token
         """
         return self.module.refresh_token(
-            refresh_token, grant_type, **extra_params
+            provider, refresh_token, grant_type, **extra_params
         )
 
     def oauth2_client_credentials_flow(
