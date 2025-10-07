@@ -2,6 +2,8 @@
 
 """
 Module for quick use of auth* without an instance.
+
+This will be removed in the next major version.
 """
 
 from .jwt import (
