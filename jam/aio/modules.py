@@ -6,7 +6,12 @@ from typing import Any, Literal, Optional, Union
 from uuid import uuid4
 
 from jam.aio.jwt.tools import __gen_jwt_async__, __validate_jwt_async__
-from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
+from jam.aio.oauth2.client import OAuth2Client
+from jam.exceptions import (
+    ProviderNotConfigurError,
+    TokenInBlackList,
+    TokenNotInWhiteList,
+)
 from jam.modules import BaseModule
 from jam.utils.config_maker import __module_loader__
 
@@ -323,3 +328,124 @@ class SessionModule(BaseModule):
             SessionNotFoundError: If the session does not exist.
         """
         await self.module.clear(session_key)
+
+
+class OAuth2Module(BaseModule):
+    """OAuth2 module."""
+
+    BUILTIN_PROVIDERS = {
+        "github": "jam.aio.oauth2.GitHubOAuth2Client",
+        "gitlab": "jam.aio.oauth2.GitLabOAuth2Client",
+        "google": "jam.aio.oauth2.GoogleOAuth2Client",
+        "yandex": "jam.aio.oauth2.YandexOAuth2Client",
+    }
+
+    DEFAULT_CLIENT = "jam.aio.oauth2.client.OAuth2Client"
+
+    def __init__(self, config: dict[str, str]) -> None:
+        """Constructor.
+
+        Args:
+            config (dict[str, str]): Config
+        """
+        super().__init__(module_type="oauth2")
+        self.providers = {}
+        providers_cfg = config.get("providers", {})
+
+        self.providers = {
+            name: (
+                __module_loader__(cfg.pop("module"))(**cfg)
+                if "module" in cfg
+                else __module_loader__(
+                    self.BUILTIN_PROVIDERS.get(name, self.DEFAULT_CLIENT)
+                )(**cfg)
+            )
+            for name, cfg in providers_cfg.items()
+        }
+
+    def __provider_getter(self, provider: str) -> OAuth2Client:
+        prv_: OAuth2Client = self.providers.get(provider)
+        if not prv_:
+            raise ProviderNotConfigurError
+        else:
+            return prv_
+
+    async def get_authorization_url(
+        self, provider: str, scope: list[str], **extra_params: Any
+    ) -> str:
+        """Generate full OAuth2 authorization URL.
+
+        Args:
+            provider (str): Provider name
+            scope (list[str]): Auth scope
+            extra_params (Any): Extra ath params
+
+        Returns:
+            str: Authorization url
+        """
+        prv_ = self.__provider_getter(provider)
+        return await prv_.get_authorization_url(scope, **extra_params)
+
+    async def fetch_token(
+        self,
+        provider: str,
+        code: str,
+        grant_type: str = "authorization_code",
+        **extra_params: Any,
+    ) -> dict[str, Any]:
+        """Exchange authorization code for access token.
+
+        Args:
+            provider (str): Provider name
+            code (str): OAuth2 code
+            grant_type (str): Type of oauth2 grant
+            extra_params (Any): Extra auth params if needed
+
+        Returns:
+            dict: OAuth2 token
+        """
+        return await self.__provider_getter(provider).fetch_token(
+            code, grant_type, **extra_params
+        )
+
+    async def refresh_token(
+        self,
+        provider: str,
+        refresh_token: str,
+        grant_type: str = "refresh_token",
+        **extra_params: Any,
+    ) -> dict[str, Any]:
+        """Use refresh token to obtain a new access token.
+
+        Args:
+            provider (str): Provider name
+            refresh_token (str): Refresh token
+            grant_type (str): Grant type
+            extra_params (Any): Extra auth params if needed
+
+        Returns:
+            dict: Refresh token
+        """
+        return await self.__provider_getter(provider).refresh_token(
+            refresh_token, grant_type, **extra_params
+        )
+
+    async def client_credentials_flow(
+        self,
+        provider: str,
+        scope: Optional[list[str]] = None,
+        **extra_params: Any,
+    ) -> dict[str, Any]:
+        """Obtain access token using client credentials flow (no user interaction).
+
+        Args:
+            provider (str): Provider name
+            scope (list[str] | None): Auth scope
+            extra_params (Any): Extra auth params if needed
+
+        Returns:
+            dict: JSON with access token
+        """
+        return await self.__provider_getter(provider).client_credentials_flow(
+            scope, **extra_params
+        )

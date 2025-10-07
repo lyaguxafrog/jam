@@ -4,7 +4,7 @@ from collections.abc import Callable
 from typing import Any, Optional, Union
 
 from jam.__abc_instances__ import BaseJam
-from jam.aio.modules import JWTModule, SessionModule
+from jam.aio.modules import JWTModule, OAuth2Module, SessionModule
 from jam.utils.config_maker import __config_maker__
 
 
@@ -41,9 +41,7 @@ class Jam(BaseJam):
         elif self.type == "session":
             self.module = SessionModule(**config)
         elif self.type == "oauth2":
-            raise NotImplementedError(
-                "OAuth2 not implemented in async instance."
-            )
+            self.module = OAuth2Module(config)
         else:
             raise NotImplementedError
 
@@ -308,7 +306,9 @@ class Jam(BaseJam):
         Returns:
             str: Authorization url
         """
-        raise NotImplementedError
+        return await self.module.get_authorization_url(
+            provider, scope, **extra_params
+        )
 
     async def oauth2_fetch_token(
         self,
@@ -328,7 +328,9 @@ class Jam(BaseJam):
         Returns:
             dict: OAuth2 token
         """
-        raise NotImplementedError
+        return await self.module.fetch_token(
+            provider, code, grant_type, **extra_params
+        )
 
     async def oauth2_refresh_token(
         self,
@@ -348,7 +350,9 @@ class Jam(BaseJam):
         Returns:
             dict: Refresh token
         """
-        raise NotImplementedError
+        return await self.module.refresh_token(
+            provider, refresh_token, grant_type, **extra_params
+        )
 
     async def oauth2_client_credentials_flow(
         self,
@@ -366,4 +370,6 @@ class Jam(BaseJam):
         Returns:
             dict: JSON with access token
         """
-        raise NotImplementedError
+        return await self.module.client_credentials_flow(
+            provider, scope, **extra_params
+        )

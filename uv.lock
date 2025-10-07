@@ -485,7 +485,7 @@ wheels = [
 
 [[package]]
 name = "jamlib"
-version = "2.4.0a5"
+version = "2.4.0a6"
 source = { virtual = "." }
 dependencies = [
     { name = "cryptography" },
