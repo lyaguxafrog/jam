@@ -32,3 +32,16 @@ from jam.utils import generate_otp_key
 
 key = generate_otp_key(entropy_bits=128) # RQTC2QCAFRVB6DETJCZ2CST4PI
 ```
+
+
+Sometimes you need to generate an OTP key based on specific values,
+for example, to send a code to an email address during registration.
+There is a utility for this - `otp_key_from_string`:
+
+```python
+from jam.utils import otp_key_from_string
+
+user_email = "user@email.com"
+key = otp_key_from_string(user_email) # GZUHYNJCATBH3HRCRKNTJUAMRIOTNIAA
+# Now, using this key, you can generate an OTP code or verify it.
+```
