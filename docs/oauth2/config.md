@@ -24,7 +24,7 @@ URL for obtaining tokens. Not used in [built-in clients](builtins.md).
 URL where the user will be redirected with scope and code.
 
 #### `module`: `str`
-Path to the module in the format `app.some_modules.MyOAuth2Client`, used only in custom modules.
+Path to the module in the format `app.some_modules.MyOAuth2Client`, used only in [custom modules](custom_module.md).
 
 Example:
 
