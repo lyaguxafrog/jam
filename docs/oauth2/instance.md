@@ -2,6 +2,8 @@
 title: Jam OAuth2
 ---
 
+# Jam OAuth2
+
 ## Instance
 
 ```python

@@ -1,4 +1,5 @@
 ---
+title: Home
 image: assets/logo_n_title.png
 ---
 <div style="text-align: center;">
