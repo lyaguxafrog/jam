@@ -19,7 +19,7 @@ class Jam(BaseJam):
         """Class constructor.
 
         Args:
-            config (dict[str, Any] | str): Config for Jam, can use `jam.utils.config_maker`
+            config (dict[str, Any] | str): Config for Jam
             pointer (str): Config read point
         """
         config = __config_maker__(config, pointer)
@@ -40,6 +40,10 @@ class Jam(BaseJam):
             self.module = JWTModule(**config)
         elif self.type == "session":
             self.module = SessionModule(**config)
+        elif self.type == "oauth2":
+            raise NotImplementedError(
+                "OAuth2 not implemented in async instance."
+            )
         else:
             raise NotImplementedError
 
@@ -290,3 +294,76 @@ class Jam(BaseJam):
         return self._otp_module(
             secret=secret, digits=self._otp.digits, digest=self._otp.digest
         ).verify(code=code, factor=factor, look_ahead=look_ahead)
+
+    async def oauth2_get_authorized_url(
+        self, provider: str, scope: list[str], **extra_params: Any
+    ) -> str:
+        """Generate full OAuth2 authorization URL.
+
+        Args:
+            provider (str): Provider name
+            scope (list[str]): Auth scope
+            extra_params (Any): Extra ath params
+
+        Returns:
+            str: Authorization url
+        """
+        raise NotImplementedError
+
+    async def oauth2_fetch_token(
+        self,
+        provider: str,
+        code: str,
+        grant_type: str = "authorization_code",
+        **extra_params: Any,
+    ) -> dict[str, Any]:
+        """Exchange authorization code for access token.
+
+        Args:
+            provider (str): Provider name
+            code (str): OAuth2 code
+            grant_type (str): Type of oauth2 grant
+            extra_params (Any): Extra auth params if needed
+
+        Returns:
+            dict: OAuth2 token
+        """
+        raise NotImplementedError
+
+    async def oauth2_refresh_token(
+        self,
+        provider: str,
+        refresh_token: str,
+        grant_type: str = "refresh_token",
+        **extra_params: Any,
+    ) -> dict[str, Any]:
+        """Use refresh token to obtain a new access token.
+
+        Args:
+            provider (str): Provider name
+            refresh_token (str): Refresh token
+            grant_type (str): Grant type
+            extra_params (Any): Extra auth params if needed
+
+        Returns:
+            dict: Refresh token
+        """
+        raise NotImplementedError
+
+    async def oauth2_client_credentials_flow(
+        self,
+        provider: str,
+        scope: Optional[list[str]] = None,
+        **extra_params: Any,
+    ) -> dict[str, Any]:
+        """Obtain access token using client credentials flow (no user interaction).
+
+        Args:
+            provider (str): Provider name
+            scope (list[str] | None): Auth scope
+            extra_params (Any): Extra auth params if needed
+
+        Returns:
+            dict: JSON with access token
+        """
+        raise NotImplementedError
