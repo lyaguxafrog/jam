@@ -7,7 +7,7 @@ to help with testing during the development of a new version,
 or if you need functionality that is not yet fully ready/tested right now.
 
 ```commandline
-pip install git+https://github.com/lyaguxafrog/jam.git@develop
+pip install git+https://github.com/lyaguxafrog/jam.git
 ```
 
 !!! Warning
