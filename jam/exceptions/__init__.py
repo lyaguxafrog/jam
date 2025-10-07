@@ -13,6 +13,7 @@ from .jwt import (
     TokenLifeTimeExpired,
     TokenNotInWhiteList,
 )
+from .oauth2 import ProviderNotConfigurError
 from .sessions import (
     SessionNotFoundError,
 )
