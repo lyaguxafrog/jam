@@ -15,10 +15,10 @@ Your OAuth2 client ID
 Secret of your OAuth2 client
 
 #### `auth_url`: `str`
-URL for obtaining an authorization code. Not used in built-in clients.
+URL for obtaining an authorization code. Not used in [built-in clients](builtins.md).
 
 #### `token_url`: `str`
-URL for obtaining tokens. Not used in built-in clients.
+URL for obtaining tokens. Not used in [built-in clients](builtins.md).
 
 #### `redirect_url`: `str`
 URL where the user will be redirected with scope and code.
