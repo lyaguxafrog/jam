@@ -485,7 +485,7 @@ wheels = [
 
 [[package]]
 name = "jamlib"
-version = "2.4.0a1"
+version = "2.4.0a2"
 source = { virtual = "." }
 dependencies = [
     { name = "cryptography" },
@@ -526,6 +526,16 @@ dev = [
     { name = "tinydb" },
     { name = "toml" },
 ]
+docs = [
+    { name = "mkdocs" },
+    { name = "mkdocs-material" },
+    { name = "mkdocstrings" },
+    { name = "mkdocstrings-python" },
+]
+tests = [
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -557,6 +567,16 @@ dev = [
     { name = "termynal", specifier = ">=0.13.0" },
     { name = "tinydb", specifier = ">=4.8.2" },
     { name = "toml", specifier = ">=0.10.2" },
+]
+docs = [
+    { name = "mkdocs", specifier = ">=1.6.1" },
+    { name = "mkdocs-material", specifier = ">=9.6.19" },
+    { name = "mkdocstrings", specifier = ">=0.30.0" },
+    { name = "mkdocstrings-python", specifier = ">=1.18.2" },
+]
+tests = [
+    { name = "pytest", specifier = ">=8.4.2" },
+    { name = "pytest-asyncio", specifier = ">=1.1.0" },
 ]
 
 [[package]]

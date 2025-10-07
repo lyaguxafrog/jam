@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable
+from secrets import token_urlsafe
 from typing import Any, Optional
 
 
@@ -79,3 +81,28 @@ class BaseOAuth2Client(ABC):
             dict: JSON with access token
         """
         raise NotImplementedError
+
+
+class __BaseOAuth2Server(ABC):
+    """Base OAuth2 server instance."""
+
+    def __init__(
+        self,
+        app_url: str,
+        code_factory: Callable[[], str] = lambda: token_urlsafe(8),
+    ) -> None:
+        """Constructor.
+
+        Args:
+            app_url (str): URL of your app
+            code_factory (Callable[[] ,str]): Factory for code generation
+        """
+        self.app_url = app_url
+        self.code_factory = code_factory
+        raise NotImplementedError("Not implemented in the current version!")
+
+    @property
+    def code(self) -> str:
+        return self.code_factory()
+
+    ...

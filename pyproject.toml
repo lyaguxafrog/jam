@@ -1,6 +1,6 @@
 [project]
 name = "jamlib"
-version = "2.4.0a1"
+version = "2.4.0a2"
 description = "Simple and univirsal library for authorization."
 authors = [
     {name = "Makridenko Adrian",email = "adrianmakridenko@duck.com"}
@@ -75,6 +75,16 @@ dev = [
     "termynal>=0.13.0",
     "tinydb>=4.8.2",
     "toml>=0.10.2",
+]
+docs = [
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.6.19",
+    "mkdocstrings>=0.30.0",
+    "mkdocstrings-python>=1.18.2",
+]
+tests = [
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.1.0",
 ]
 
 

@@ -4,7 +4,7 @@ from typing import Any, Optional, Union
 
 from jam.__abc_instances__ import BaseJam
 from jam.__logger__ import logger
-from jam.modules import JWTModule, SessionModule
+from jam.modules import JWTModule, OAuth2Module, SessionModule
 from jam.utils.config_maker import __config_maker__
 
 
@@ -43,6 +43,9 @@ class Jam(BaseJam):
         elif self.type == "session":
             logger.debug("Create Session instance")
             self.module = SessionModule(**config)  # type: ignore
+        elif self.type == "oauth2":
+            logger.debug("Create OAuth2 instance")
+            self.module = OAuth2Module(**config)
         else:
             raise NotImplementedError
 
@@ -302,3 +305,69 @@ class Jam(BaseJam):
         return self._otp_module(
             secret=secret, digits=self._otp.digits, digest=self._otp.digest
         ).verify(code=code, factor=factor, look_ahead=look_ahead)
+
+    def oauth2_get_authorized_url(
+        self, scope: list[str], **extra_params: Any
+    ) -> str:
+        """Generate full OAuth2 authorization URL.
+
+        Args:
+            scope (list[str]): Auth scope
+            extra_params (Any): Extra ath params
+
+        Returns:
+            str: Authorization url
+        """
+        return self.module.get_authorization_url(scope, **extra_params)
+
+    def oauth2_fetch_token(
+        self,
+        code: str,
+        grant_type: str = "authorization_code",
+        **extra_params: Any,
+    ) -> dict[str, Any]:
+        """Exchange authorization code for access token.
+
+        Args:
+            code (str): OAuth2 code
+            grant_type (str): Type of oauth2 grant
+            extra_params (Any): Extra auth params if needed
+
+        Returns:
+            dict: OAuth2 token
+        """
+        return self.module.fetch_token(code, grant_type, **extra_params)
+
+    def oauth2_refresh_token(
+        self,
+        refresh_token: str,
+        grant_type: str = "refresh_token",
+        **extra_params: Any,
+    ) -> dict[str, Any]:
+        """Use refresh token to obtain a new access token.
+
+        Args:
+            refresh_token (str): Refresh token
+            grant_type (str): Grant type
+            extra_params (Any): Extra auth params if needed
+
+        Returns:
+            dict: Refresh token
+        """
+        return self.module.refresh_token(
+            refresh_token, grant_type, **extra_params
+        )
+
+    def oauth2_client_credentials_flow(
+        self, scope: Optional[list[str]] = None, **extra_params: Any
+    ) -> dict[str, Any]:
+        """Obtain access token using client credentials flow (no user interaction).
+
+        Args:
+            scope (list[str] | None): Auth scope
+            extra_params (Any): Extra auth params if needed
+
+        Returns:
+            dict: JSON with access token
+        """
+        return self.module.client_credentials_flow(scope, **extra_params)
