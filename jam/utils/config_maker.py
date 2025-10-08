@@ -98,7 +98,7 @@ def __config_maker__(
         else:
             raise ValueError("YML/YAML or TOML configs only!")
     else:
-        return config
+        return config.copy()
 
 
 def __module_loader__(path: str) -> Callable:
