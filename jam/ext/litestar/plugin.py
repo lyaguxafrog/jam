@@ -9,16 +9,18 @@ from litestar.plugins import InitPlugin
 from jam.__abc_instances__ import BaseJam
 
 
-class JamPlugin(InitPlugin):
-    """Jam plugin for litestar.
+class SimpleJamPlugin(InitPlugin):
+    """Simple Jam plugin for litestar.
+
+    The plugin adds Jam to Litestar DI.
 
     Example:
         ```python
         from litestar import Litestar
-        from jam.ext.litestar import JamPlugin
+        from jam.ext.litestar import SimpleJamPlugin
 
         app = Litestar(
-            plugins=[JamPlugin(config="jam_config.toml")],
+            plugins=[SimpleJamPlugin(config="jam_config.toml")],
             router_handlers=[your_router]
         )
         ```
