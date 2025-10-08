@@ -11,7 +11,7 @@ from jam.__abc_instances__ import BaseJam
 from .value import AuthMiddlewareSettings, Token, User
 
 
-class SimpleJamPlugin(InitPlugin):
+class JamPlugin(InitPlugin):
     """Simple Jam plugin for litestar.
 
     The plugin adds Jam to Litestar DI.

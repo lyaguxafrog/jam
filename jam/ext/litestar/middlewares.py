@@ -22,6 +22,7 @@ class JamJWTMiddleware(AbstractAuthenticationMiddleware):
         settings: AuthMiddlewareSettings = (
             connection.app.state.middleware_settings
         )
+        # TODO: Exec jam.modules.JWTModule, not main instance
         instance: BaseJam = connection.app.state.jam_instance
 
         cookie = (

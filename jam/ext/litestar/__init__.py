@@ -6,7 +6,7 @@ Litestar integration.
 Litestar docs: https://docs.litestar.dev
 """
 
-from .plugin import SimpleJamPlugin
+from .plugin import JamPlugin, JWTPlugin
 
 
-__all__ = ["SimpleJamPlugin"]
+__all__ = ["JamPlugin", "JWTPlugin"]
