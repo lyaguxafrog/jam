@@ -57,6 +57,7 @@ redis=["redis>=6.4.0"]
 json=["tinydb>=4.8.2"]
 yaml=["pyyaml>=6.0.2"]
 toml=["toml>=0.10.2"]
+litestar=["litestar>=2.18.0"]
 
 [dependency-groups]
 dev = [
@@ -64,6 +65,7 @@ dev = [
     "fakeredis>=2.28.1",
     "icecream>=2.1.4",
     "isort>=6.0.1",
+    "litestar[standard]>=2.18.0",
     "mkdocs>=1.6.1",
     "mkdocs-material>=9.6.9",
     "mkdocstrings>=0.29.0",
