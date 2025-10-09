@@ -6,7 +6,7 @@ from litestar.middleware import (
     AuthenticationResult,
 )
 
-from jam.modules import JWTModule
+from jam.modules import JWTModule, SessionModule
 from jam.utils.await_maybe import await_maybe
 
 
@@ -68,5 +68,44 @@ class JamJWTMiddleware(AbstractAuthenticationMiddleware):
 
             except Exception:
                 pass
+
+        return AuthenticationResult(None, None)
+
+
+class JamSessionsMiddleware(AbstractAuthenticationMiddleware):
+    """Jam sessions middleware for litestar."""
+
+    async def authenticate_request(
+        self, connection: ASGIConnection
+    ) -> AuthenticationResult:
+        """Auth request."""
+        from jam.ext.litestar.value import AuthMiddlewareSettings
+
+        settings: AuthMiddlewareSettings = connection.state.middleware_settings
+        instance: SessionModule = connection.state.session_instane
+
+        cookie = (
+            connection.cookies.get(settings.cookie_name, None)
+            if settings.cookie_name
+            else None
+        )
+        header = (
+            connection.headers.get(settings.header_name, None)
+            if settings.header_name
+            else None
+        )
+
+        if cookie:
+            payload = await await_maybe(instance.get(cookie))
+            return AuthenticationResult(
+                settings.user_dataclass(payload=payload),
+                settings.auth_dataclass(token=cookie),
+            )
+        if header:
+            payload = await await_maybe(instance.get(header))
+            return AuthenticationResult(
+                settings.user_dataclass(payload=payload),
+                settings.auth_dataclass(token=header),
+            )
 
         return AuthenticationResult(None, None)
