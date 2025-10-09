@@ -110,8 +110,56 @@ class JWTPlugin(InitPlugin):
             app_config.state.use_list = True
         else:
             app_config.state.use_list = False
-        middleware_settings = self._settings
-        app_config.state.middleware_settings = middleware_settings
+        app_config.state.middleware_settings = self._settings
         app_config.state.jam_instance = self._instance
-        app_config.middleware = [JamJWTMiddleware]
+        app_config.middleware.append(JamJWTMiddleware)
+        return app_config
+
+
+class SessionsPlugin(InitPlugin):
+    """Server side sessions plugin for litestar."""
+
+    def __init__(
+        self,
+        config: Union[str, dict[str, Any]] = "pyproject.toml",
+        pointer: str = "jam",
+        aio: bool = False,
+        cookie_name: Optional[str] = None,
+        header_name: Optional[str] = None,
+        user_dataclass: Any = User,
+        auth_dataclass: Any = Token,
+    ) -> None:
+        """Constructor.
+
+        Args:
+            config (str | dict[str, Any]): Jam config
+            pointer (str): Config pointer
+            aio (bool): Use async jam?
+            cookie_name (str): Cookie name for token check
+            header_name (str): Header name for token check
+            user_dataclass (Any): Specific user dataclass
+            auth_dataclass (Any): Specific auth dataclass
+        """
+        cfg = __config_maker__(config, pointer).copy()
+        cfg.pop("auth_type")
+        if aio:
+            from jam.aio.modules import SessionModule
+
+            self._instance = SessionModule(**cfg)
+        else:
+            from jam.modules import SessionModule
+
+            self._instance = SessionModule(**cfg)
+
+        self._settings = AuthMiddlewareSettings(
+            cookie_name, header_name, user_dataclass, auth_dataclass
+        )
+
+    def on_app_init(self, app_config: AppConfig) -> AppConfig:
+        """Init application."""
+        from jam.ext.litestar.middlewares import JamSessionsMiddleware
+
+        app_config.middleware.append(JamSessionsMiddleware)
+        app_config.state.middleware_settings = self._settings
+        app_config.state.session_instance = self._instance
         return app_config
