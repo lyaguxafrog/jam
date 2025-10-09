@@ -81,8 +81,10 @@ class JamSessionsMiddleware(AbstractAuthenticationMiddleware):
         """Auth request."""
         from jam.ext.litestar.value import AuthMiddlewareSettings
 
-        settings: AuthMiddlewareSettings = connection.state.middleware_settings
-        instance: SessionModule = connection.state.session_instane
+        settings: AuthMiddlewareSettings = (
+            connection.app.state.middleware_settings
+        )
+        instance: SessionModule = connection.app.state.session_instance
 
         cookie = (
             connection.cookies.get(settings.cookie_name, None)
