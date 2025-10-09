@@ -1,9 +1,10 @@
 [project]
 name = "jamlib"
-version = "2.4.0"
-description = "Simple and univirsal library for authorization."
+version = "2.4.1"
+description = "Simple and universal library for authorization."
 authors = [
-    {name = "Makridenko Adrian",email = "adrianmakridenko@duck.com"}
+    {name = "Makridenko Adrian",email = "adrianmakridenko@duck.com"},
+    {name = "Ksenia Travnikova",email = "kseniatravnikova@duck.com"}
 ]
 license = {text = "MIT License"}
 readme = {file = "README.md", content-type = "text/markdown"}

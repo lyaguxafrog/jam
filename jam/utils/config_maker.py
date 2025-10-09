@@ -92,13 +92,13 @@ def __config_maker__(
     """
     if isinstance(config, str):
         if config.split(".")[1] == ("yml" or "yaml"):
-            return __yaml_config_parser__(config, pointer)
+            config = __yaml_config_parser__(config, pointer)
         elif config.split(".")[1] == "toml":
-            return __toml_config_parser__(config, pointer)
+            config = __toml_config_parser__(config, pointer)
         else:
             raise ValueError("YML/YAML or TOML configs only!")
-    else:
-        return config
+
+    return config.copy()
 
 
 def __module_loader__(path: str) -> Callable:
