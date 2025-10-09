@@ -6,7 +6,7 @@ from litestar.middleware import (
     AuthenticationResult,
 )
 
-from jam.__abc_instances__ import BaseJam
+from jam.modules import JWTModule
 from jam.utils.await_maybe import await_maybe
 
 
@@ -22,8 +22,7 @@ class JamJWTMiddleware(AbstractAuthenticationMiddleware):
         settings: AuthMiddlewareSettings = (
             connection.app.state.middleware_settings
         )
-        # TODO: Exec jam.modules.JWTModule, not main instance
-        instance: BaseJam = connection.app.state.jam_instance
+        instance: JWTModule = connection.app.state.jam_instance
 
         cookie = (
             connection.cookies.get(settings.cookie_name, None)
@@ -38,9 +37,9 @@ class JamJWTMiddleware(AbstractAuthenticationMiddleware):
         if cookie:
             try:
                 payload = await await_maybe(
-                    instance.verify_jwt_token(
+                    instance.validate_payload(
                         token=cookie,
-                        check_exp=False,
+                        check_exp=True,  # NOTE: Expire always check
                         check_list=connection.app.state.use_list,
                     )
                 )
@@ -55,7 +54,7 @@ class JamJWTMiddleware(AbstractAuthenticationMiddleware):
         if header:
             try:
                 payload = await await_maybe(
-                    instance.verify_jwt_token(
+                    instance.validate_payload(
                         token=cookie,
                         check_exp=True,
                         check_list=connection.app.state.use_list,

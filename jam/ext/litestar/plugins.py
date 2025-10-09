@@ -7,6 +7,7 @@ from litestar.di import Provide
 from litestar.plugins import InitPlugin
 
 from jam.__abc_instances__ import BaseJam
+from jam.utils.config_maker import __config_maker__
 
 from .value import AuthMiddlewareSettings, Token, User
 
@@ -86,17 +87,16 @@ class JWTPlugin(InitPlugin):
             user_dataclass (Any): Specific user dataclass
             auth_dataclass (Any): Specific auth dataclass
         """
+        cfg = __config_maker__(config, pointer).copy()
+        cfg.pop("auth_type")
         if aio:
-            from jam.aio import Jam
+            from jam.modules import JWTModule
 
-            self._instance = Jam(config, pointer)
+            self._instance = JWTModule(**cfg)
         else:
-            from icecream import ic
+            from jam.modules import JWTModule
 
-            from jam import Jam
-
-            ic(config)
-            self._instance = Jam(config=config, pointer=pointer)
+            self._instance = JWTModule(**cfg)
 
         self._settings = AuthMiddlewareSettings(
             cookie_name, header_name, user_dataclass, auth_dataclass
@@ -106,7 +106,7 @@ class JWTPlugin(InitPlugin):
         """Init app config."""
         from jam.ext.litestar.middlewares import JamJWTMiddleware
 
-        if self._instance.module.list:
+        if self._instance.list:
             app_config.state.use_list = True
         else:
             app_config.state.use_list = False

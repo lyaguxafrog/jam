@@ -6,7 +6,7 @@ Litestar integration.
 Litestar docs: https://docs.litestar.dev
 """
 
-from .plugin import JamPlugin, JWTPlugin
+from .plugins import JamPlugin, JWTPlugin
 from .value import Token, User
 
 
