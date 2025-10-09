@@ -44,7 +44,7 @@ auth_type = "oauth2"
 
 [jam.providers.providername]
 some_param = "some_value"
-moduke = "app.auth.oauth2.MyCustomClient"
+module = "app.auth.oauth2.MyCustomClient"
 ```
 
 And use it:
