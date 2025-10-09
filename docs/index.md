@@ -29,7 +29,7 @@ How to install dev version: -> [Jam Unstable](install_unstable.md)
 from jam.aio import Jam
 
 config = {
-    "auth_type": "jwt"
+    "auth_type": "jwt",
     "alg": "HS256",
     "secret_key": "secret",
     "expire": 2600
