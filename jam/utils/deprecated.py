@@ -2,38 +2,26 @@
 
 import functools
 import warnings
+from typing import Optional
 
 
-def __deprecated__(reason: str = ""):
-    """Decorator for deprecated methods.
-
-    Args:
-        reason (str): Reason
-    """
+def __deprecated__(replacement: Optional[str] = None):
+    """Mark funcs are deprecated."""
 
     def decorator(func):
-        message = f"Call to deprecated function {func.__name__}()."
-        if reason:
-            message += f" {reason}"
+        msg = f"Function {func.__name__}() is deprecated."
+        if replacement:
+            msg += f" {replacement}"
 
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            warnings.simplefilter("always", DeprecationWarning)
-            warnings.warn(message, category=DeprecationWarning, stacklevel=2)
-            warnings.simplefilter("default", DeprecationWarning)
+            warnings.warn(msg, category=DeprecationWarning, stacklevel=2)
             return func(*args, **kwargs)
 
-        if func.__doc__:
-            wrapper.__doc__ = (
-                func.__doc__.rstrip()
-                + f"\n\nDeprecated:\n    {reason or 'This function is deprecated.'}"
-            )
-        else:
-            wrapper.__doc__ = (
-                f"Deprecated:\n    {reason or 'This function is deprecated.'}"
-            )
-
         wrapper.__deprecated__ = True
+        wrapper.__doc__ = (
+            func.__doc__ or ""
+        ) + f"\n\n⚠️ Deprecated: {replacement or ''}".strip()
         return wrapper
 
     return decorator
