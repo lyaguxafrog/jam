@@ -12,7 +12,7 @@ class User:
 
 
 @dataclass
-class Token:
+class Auth:
     """Auth model."""
 
     token: str

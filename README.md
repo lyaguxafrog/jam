@@ -10,6 +10,7 @@
 
 Documentation: [jam.makridenko.ru](https://jam.makridenko.ru)
 
+
 ## Install
 ```bash
 pip install jamlib
