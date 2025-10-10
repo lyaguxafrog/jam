@@ -20,7 +20,7 @@ class JamJWTMiddleware(AbstractAuthenticationMiddleware):
         from jam.ext.litestar.value import AuthMiddlewareSettings
 
         settings: AuthMiddlewareSettings = (
-            connection.app.state.middleware_settings
+            connection.app.state.jwt_middleware_settings
         )
         instance: JWTModule = connection.app.state.jam_instance
 
@@ -82,7 +82,7 @@ class JamSessionsMiddleware(AbstractAuthenticationMiddleware):
         from jam.ext.litestar.value import AuthMiddlewareSettings
 
         settings: AuthMiddlewareSettings = (
-            connection.app.state.middleware_settings
+            connection.app.state.session_middleware_settings
         )
         instance: SessionModule = connection.app.state.session_instance
 

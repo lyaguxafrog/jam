@@ -9,7 +9,7 @@ from litestar.plugins import InitPlugin
 from jam.__abc_instances__ import BaseJam
 from jam.utils.config_maker import __config_maker__
 
-from .value import AuthMiddlewareSettings, Token, User
+from .value import Auth, AuthMiddlewareSettings, User
 
 
 class JamPlugin(InitPlugin):
@@ -20,10 +20,10 @@ class JamPlugin(InitPlugin):
     Example:
         ```python
         from litestar import Litestar
-        from jam.ext.litestar import SimpleJamPlugin
+        from jam.ext.litestar import JamPlugin
 
         app = Litestar(
-            plugins=[SimpleJamPlugin(config="jam_config.toml")],
+            plugins=[JamPlugin(config="jam_config.toml")],
             router_handlers=[your_router]
         )
         ```
@@ -72,9 +72,9 @@ class JWTPlugin(InitPlugin):
         pointer: str = "jam",
         aio: bool = False,
         cookie_name: Optional[str] = None,
-        header_name: Optional[str] = None,
+        header_name: Optional[str] = "Authorization",
         user_dataclass: Any = User,
-        auth_dataclass: Any = Token,
+        auth_dataclass: Any = Auth,
     ) -> None:
         """Constructor.
 
@@ -110,7 +110,7 @@ class JWTPlugin(InitPlugin):
             app_config.state.use_list = True
         else:
             app_config.state.use_list = False
-        app_config.state.middleware_settings = self._settings
+        app_config.state.jwt_middleware_settings = self._settings
         app_config.state.jam_instance = self._instance
         app_config.middleware.append(JamJWTMiddleware)
         return app_config
@@ -125,9 +125,9 @@ class SessionsPlugin(InitPlugin):
         pointer: str = "jam",
         aio: bool = False,
         cookie_name: Optional[str] = None,
-        header_name: Optional[str] = None,
+        header_name: Optional[str] = "Authorization",
         user_dataclass: Any = User,
-        auth_dataclass: Any = Token,
+        auth_dataclass: Any = Auth,
     ) -> None:
         """Constructor.
 
@@ -160,6 +160,6 @@ class SessionsPlugin(InitPlugin):
         from jam.ext.litestar.middlewares import JamSessionsMiddleware
 
         app_config.middleware.append(JamSessionsMiddleware)
-        app_config.state.middleware_settings = self._settings
+        app_config.state.session_middleware_settings = self._settings
         app_config.state.session_instance = self._instance
         return app_config

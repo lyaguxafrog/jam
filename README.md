@@ -10,6 +10,9 @@
 
 Documentation: [jam.makridenko.ru](https://jam.makridenko.ru)
 
+!!! Warn
+    Unstable dev version, see: https://pypi.org/project/jamlib/
+
 ## Install
 ```bash
 pip install jamlib
