@@ -33,6 +33,9 @@ def get_jwt_token(
     Returns:
         (str): New jwt token
 
+    Deprecated:
+       All `quick` methods are deprecated and will be removed in version 3.0.0+.
+
     Raises:
         EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
         EmtpyPrivateKey: If RSA algorithm is selected, but private key None
@@ -72,6 +75,9 @@ async def aget_jwt_token(
     Returns:
         (str): New jwt token
 
+    Deprecated:
+       All `quick` methods are deprecated and will be removed in version 3.0.0+.
+
     Raises:
         EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
         EmtpyPrivateKey: If RSA algorithm is selected, but private key None
@@ -109,6 +115,9 @@ def verify_jwt_token(
     Returns:
         (bool): If token is valid
 
+    Deprecated:
+       All `quick` methods are deprecated and will be removed in version 3.0.0+.
+
     Raises:
         EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None.
         EmtpyPublicKey: If RSA algorithm is selected, but public key None.
@@ -140,6 +149,9 @@ async def averify_jwt_token(
 
     Returns:
         (bool): If token is valid
+
+    Deprecated:
+       All `quick` methods are deprecated and will be removed in version 3.0.0+.
 
     Raises:
         EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None.
@@ -175,6 +187,9 @@ def decode_jwt_token(
     Returns:
         (dict[str, Any]): Decoded payload
 
+    Deprecated:
+       All `quick` methods are deprecated and will be removed in version 3.0.0+.
+
     Raises:
         ValueError: If the token is invalid.
         EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None.
@@ -208,6 +223,9 @@ async def adecode_jwt_token(
 
     Returns:
         (dict[str, Any]): Decoded payload
+
+    Deprecated:
+       All `quick` methods are deprecated and will be removed in version 3.0.0+.
 
     Raises:
         ValueError: If the token is invalid.
