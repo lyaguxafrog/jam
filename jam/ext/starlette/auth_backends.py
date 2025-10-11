@@ -2,17 +2,13 @@
 
 from typing import Any, Optional
 
-
-try:
-    from starlette.authentication import (
-        AuthCredentials,
-        AuthenticationBackend,
-        AuthenticationError,
-        BaseUser,
-    )
-    from starlette.requests import HTTPConnection
-except ImportError:
-    raise ImportError("Do you install extension? pip install jamlib[starlette]")
+from starlette.authentication import (
+    AuthCredentials,
+    AuthenticationBackend,
+    AuthenticationError,
+    BaseUser,
+)
+from starlette.requests import HTTPConnection
 
 from jam.__abc_instances__ import BaseJam
 from jam.__logger__ import logger
