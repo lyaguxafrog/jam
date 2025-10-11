@@ -33,6 +33,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install uv
-          uv sync --no-group docs --no-group dev
+          uv sync --group tests --all-extras
       - name: Run tests
         run: uv run pytest -x
