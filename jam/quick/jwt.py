@@ -4,11 +4,18 @@
 
 from typing import Any, Optional
 
+from jam.__deprecated__ import deprecated
 from jam.aio.jwt.tools import __gen_jwt_async__, __validate_jwt_async__
 from jam.exceptions import EmptyPublicKey, EmptySecretKey, EmtpyPrivateKey
 from jam.jwt.tools import __gen_jwt__, __validate_jwt__
 
 
+_DEPRECATED_MESSAGE: str = (
+    "All `quick` methods are deprecated and will be removed in version 3.0.0+."
+)
+
+
+@deprecated(_DEPRECATED_MESSAGE)
 def get_jwt_token(
     alg: str,
     payload: dict[str, Any],
@@ -25,6 +32,9 @@ def get_jwt_token(
 
     Returns:
         (str): New jwt token
+
+    Deprecated:
+       All `quick` methods are deprecated and will be removed in version 3.0.0+.
 
     Raises:
         EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
@@ -47,6 +57,7 @@ def get_jwt_token(
         raise EmtpyPrivateKey(e)
 
 
+@deprecated(_DEPRECATED_MESSAGE)
 async def aget_jwt_token(
     alg: str,
     payload: dict[str, Any],
@@ -63,6 +74,9 @@ async def aget_jwt_token(
 
     Returns:
         (str): New jwt token
+
+    Deprecated:
+       All `quick` methods are deprecated and will be removed in version 3.0.0+.
 
     Raises:
         EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
@@ -85,6 +99,7 @@ async def aget_jwt_token(
         raise EmtpyPrivateKey(e)
 
 
+@deprecated(_DEPRECATED_MESSAGE)
 def verify_jwt_token(
     token: str,
     secret_key: Optional[str] = None,
@@ -99,6 +114,9 @@ def verify_jwt_token(
 
     Returns:
         (bool): If token is valid
+
+    Deprecated:
+       All `quick` methods are deprecated and will be removed in version 3.0.0+.
 
     Raises:
         EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None.
@@ -116,6 +134,7 @@ def verify_jwt_token(
     return True
 
 
+@deprecated(_DEPRECATED_MESSAGE)
 async def averify_jwt_token(
     token: str,
     secret_key: Optional[str] = None,
@@ -130,6 +149,9 @@ async def averify_jwt_token(
 
     Returns:
         (bool): If token is valid
+
+    Deprecated:
+       All `quick` methods are deprecated and will be removed in version 3.0.0+.
 
     Raises:
         EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None.
@@ -149,6 +171,7 @@ async def averify_jwt_token(
     return True
 
 
+@deprecated(_DEPRECATED_MESSAGE)
 def decode_jwt_token(
     token: str,
     secret_key: Optional[str] = None,
@@ -163,6 +186,9 @@ def decode_jwt_token(
 
     Returns:
         (dict[str, Any]): Decoded payload
+
+    Deprecated:
+       All `quick` methods are deprecated and will be removed in version 3.0.0+.
 
     Raises:
         ValueError: If the token is invalid.
@@ -182,6 +208,7 @@ def decode_jwt_token(
         raise EmptySecretKey(e)
 
 
+@deprecated(_DEPRECATED_MESSAGE)
 async def adecode_jwt_token(
     token: str,
     secret_key: Optional[str] = None,
@@ -196,6 +223,9 @@ async def adecode_jwt_token(
 
     Returns:
         (dict[str, Any]): Decoded payload
+
+    Deprecated:
+       All `quick` methods are deprecated and will be removed in version 3.0.0+.
 
     Raises:
         ValueError: If the token is invalid.
