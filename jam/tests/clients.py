@@ -41,6 +41,8 @@ class TestJam(Jam):
         ```
     """
 
+    __test__ = False
+
     def __init__(
         self,
         config: Optional[Union[str, dict[str, Any]]] = None,
@@ -310,6 +312,8 @@ class TestAsyncJam(AioJam):
             assert verified_payload == payload
         ```
     """
+
+    __test__ = False
 
     def __init__(
         self,
