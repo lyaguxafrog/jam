@@ -2,7 +2,7 @@
 
 from typing import Any, Optional
 
-from flask import Flask, request
+from flask import Flask, g, request
 
 from jam import Jam
 from jam.__logger__ import logger
@@ -59,6 +59,7 @@ class JWTExtension(JamExtension):
 
     def _get_payload(self) -> Optional[dict[str, Any]]:
         token = None
+        g.payload = None
         if self.cookie:
             token = request.cookies.get(self.cookie)
 
@@ -77,6 +78,7 @@ class JWTExtension(JamExtension):
             logger.warning(str(e))
             return None
 
+        g.payload = payload
         return payload
 
     def init_app(self, app: Flask) -> None:
@@ -109,6 +111,7 @@ class SessionExtension(JamExtension):
 
     def _get_payload(self) -> Optional[dict[str, Any]]:
         session_id = None
+        g.payload = None
         if self.cookie:
             session_id = request.cookies.get(self.cookie)
 
@@ -127,6 +130,7 @@ class SessionExtension(JamExtension):
             logger.warning(str(e))
             return None
 
+        g.payload = payload
         return payload
 
     def init_app(self, app: Flask) -> None:
