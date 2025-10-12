@@ -7,7 +7,6 @@ from litestar.middleware import (
 )
 
 from jam.__abc_instances__ import BaseJam
-from jam.modules import SessionModule
 from jam.utils.await_maybe import await_maybe
 
 
@@ -85,7 +84,7 @@ class JamSessionsMiddleware(AbstractAuthenticationMiddleware):
         settings: AuthMiddlewareSettings = (
             connection.app.state.session_middleware_settings
         )
-        instance: SessionModule = connection.app.state.session_instance
+        instance: BaseJam = connection.app.state.session_instance
 
         cookie = (
             connection.cookies.get(settings.cookie_name, None)
@@ -99,13 +98,13 @@ class JamSessionsMiddleware(AbstractAuthenticationMiddleware):
         )
 
         if cookie:
-            payload = await await_maybe(instance.get(cookie))
+            payload = await await_maybe(instance.get_session(cookie))
             return AuthenticationResult(
                 settings.user_dataclass(payload=payload),
                 settings.auth_dataclass(token=cookie),
             )
         if header:
-            payload = await await_maybe(instance.get(header))
+            payload = await await_maybe(instance.get_session(header))
             return AuthenticationResult(
                 settings.user_dataclass(payload=payload),
                 settings.auth_dataclass(token=header),

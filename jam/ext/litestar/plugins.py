@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from litestar.config.app import AppConfig
 from litestar.di import Provide
 from litestar.plugins import InitPlugin
 
 from jam.__abc_instances__ import BaseJam
-from jam.utils.config_maker import __config_maker__
 
 from .value import Auth, AuthMiddlewareSettings, User
 
@@ -92,9 +91,7 @@ class SessionsPlugin(InitPlugin):
 
     def __init__(
         self,
-        config: Union[str, dict[str, Any]] = "pyproject.toml",
-        pointer: str = "jam",
-        aio: bool = False,
+        jam: BaseJam,
         cookie_name: Optional[str] = None,
         header_name: Optional[str] = "Authorization",
         user_dataclass: Any = User,
@@ -103,25 +100,13 @@ class SessionsPlugin(InitPlugin):
         """Constructor.
 
         Args:
-            config (str | dict[str, Any]): Jam config
-            pointer (str): Config pointer
-            aio (bool): Use async jam?
+            jam (BaseJam): Jam instance
             cookie_name (str): Cookie name for token check
             header_name (str): Header name for token check
             user_dataclass (Any): Specific user dataclass
             auth_dataclass (Any): Specific auth dataclass
         """
-        cfg = __config_maker__(config, pointer).copy()
-        cfg.pop("auth_type")
-        if aio:
-            from jam.aio.modules import SessionModule
-
-            self._instance = SessionModule(**cfg)
-        else:
-            from jam.modules import SessionModule
-
-            self._instance = SessionModule(**cfg)
-
+        self._jam = jam
         self._settings = AuthMiddlewareSettings(
             cookie_name, header_name, user_dataclass, auth_dataclass
         )
@@ -132,5 +117,5 @@ class SessionsPlugin(InitPlugin):
 
         app_config.middleware.append(JamSessionsMiddleware)
         app_config.state.session_middleware_settings = self._settings
-        app_config.state.session_instance = self._instance
+        app_config.state.session_instance = self._jam
         return app_config
