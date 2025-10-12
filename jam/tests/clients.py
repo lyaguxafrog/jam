@@ -52,6 +52,7 @@ class TestJam(Jam):
             config (str | dict[str, Any] | None): Jam configuration.
             pointer (str): Pointer for the client instance.
         """
+        self.module = self
         self._fake_session: dict[str, Any] = {}
 
     def gen_jwt_token(self, payload: dict[str, Any]) -> str:
@@ -321,6 +322,7 @@ class TestAsyncJam(AioJam):
             config (str | dict[str, Any] | None): Jam configuration.
             pointer (str): Pointer for the client instance.
         """
+        self.module = self
         self._fake_session: dict[str, Any] = {}
 
     async def gen_jwt_token(self, payload: dict[str, Any]) -> str:
