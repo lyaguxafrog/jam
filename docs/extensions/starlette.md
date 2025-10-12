@@ -18,17 +18,17 @@ Middleware(
     backend=JWTBackend(jam, cookie_name, header_name)
 )
 ```
+### Middleware set
 Three parameters must be passed to `JWTBackend`:
 
-### `jam`: `BaseJam`
-The created Jam instance.
+#### `jam`: `BaseJam`
+Jam instance.
 
-### `cookie_name`: `str | None`
-
+#### `cookie_name`: `str | None`
 The cookie name for the access token. If passed, `Middleware` will
 read the token from it. If `None` is passed, `Middleware` will read the `header`.
 
-### `header_name`: `str | None`
+#### `header_name`: `str | None`
 
 The name of the header for the access token. If passed, `Middleware` will
 read the token from the header. If `None` is passed, `Middleware` will read the `cookie`.
@@ -36,7 +36,7 @@ read the token from the header. If `None` is passed, `Middleware` will read the 
 !!! tip
     `JWTBackend` expects the header to be in the format: `Bearer <token>`
 
-### Middleware set
+
 ```python
 
 jam = Jam()
@@ -54,6 +54,7 @@ app = Starlette(
     ]
 )
 ```
+
 After that, if the user has been authorized, their
 payload can be obtained using `request.user.payload`:
 ```python
@@ -62,9 +63,7 @@ def get_user(request: Request) -> Response:
     # another logic
 ```
 
-
-
-## JWTBackend full example
+### Usage example
 ```python
 from starlette.applications import Starlette
 from starlette.routing import Route
@@ -119,17 +118,18 @@ Middleware(
 )
 ```
 
+### Middleware set
 Three parameters must be passed to JWTBackend:
 
-### `jam`: `BaseJam`
+#### `jam`: `BaseJam`
 The created Jam instance.
 
-### `cookie_name`: `str | None`
+#### `cookie_name`: `str | None`
 The cookie name for the session id.
 If passed, `Middleware` will read the session id from it.
 If `None` is passed, `Middleware` will read the header.
 
-### `header_name`: `str | None`
+#### `header_name`: `str | None`
 The name of the header for the session id.
 If passed, `Middleware` will read the session id from the header.
 If `None` is passed, `Middleware` will read the cookie.
@@ -137,7 +137,6 @@ If `None` is passed, `Middleware` will read the cookie.
 !!! tip
     `SessionBackend` expects the header to be in the format: `Bearer <session_id>`
 
-### Middleware set
 ```python
 jam = Jam()
 app = Starlette(
@@ -154,6 +153,7 @@ app = Starlette(
     ]
 )
 ```
+
 After that, if the user has been authorized, their payload can be obtained using `request.user.payload`:
 ```python
 def get_user(request: Request) -> Response:
@@ -161,7 +161,7 @@ def get_user(request: Request) -> Response:
     # another logic
 ```
 
-## SessionBackend full example
+### Usage example
 ```python
 from starlette.applications import Starlette
 from starlette.routing import Route
