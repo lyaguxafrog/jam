@@ -58,6 +58,9 @@ redis=["redis>=6.4.0"]
 json=["tinydb>=4.8.2"]
 yaml=["pyyaml>=6.0.2"]
 toml=["toml>=0.10.2"]
+litestar=["litestar>=2.18.0"]
+starlette=["starlette>=0.48.0"]
+fastapi=["fastapi>=0.119.0"]
 
 [dependency-groups]
 dev = [
