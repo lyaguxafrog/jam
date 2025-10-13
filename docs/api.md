@@ -18,6 +18,7 @@ Documentation: https://jam.makridenko.ru
 
 * [`aio`](api/aio.md)
 * [`exceptions`](api/exceptions.md)
+* [`ext`](api/ext.md)
 * [`jwt`](api/jwt.md)
 * [`oauth2`](api/oauth2.md)
 * [`otp`](api/otp.md)
