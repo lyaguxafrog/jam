@@ -1,6 +1,6 @@
 [project]
 name = "jamlib"
-version = "2.5.1b0"
+version = "2.5.1b1"
 description = "Simple and universal library for authorization."
 authors = [
     {name = "Makridenko Adrian",email = "adrianmakridenko@duck.com"},
@@ -15,10 +15,11 @@ keywords = [
     "Sessions",
     "OTP",
     "TOTP",
-    "Oauth",
     "OAuth2",
     "Litestar",
-    "FastAPI"
+    "FastAPI",
+    "Starlette",
+    "Flask"
 ]
 requires-python = ">=3.9"
 dependencies = [
@@ -44,6 +45,10 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Internet",
     "Typing :: Typed",
+    "Framework :: Flask",
+    "Framework :: FastAPI",
+    "Framework :: Litestar",
+    "Framework :: Starlette"
 ]
 
 [project.urls]
