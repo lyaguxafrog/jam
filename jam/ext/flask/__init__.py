@@ -5,7 +5,7 @@
 Flask docs: https://flask.palletsprojects.com
 """
 
-from .extenstions import JamExtension, JWTExtension, SessionExtension
+from .extensions import JamExtension, JWTExtension, SessionExtension
 
 
 __all__ = ["JamExtension", "JWTExtension", "SessionExtension"]
