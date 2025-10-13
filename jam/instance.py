@@ -7,11 +7,17 @@ from typing import Any, Optional, Union
 from jam.__abc_instances__ import BaseJam
 from jam.__logger__ import logger
 from jam.modules import JWTModule, OAuth2Module, SessionModule
-from jam.utils.config_maker import __config_maker__
+from jam.utils.config_maker import __config_maker__, __module_loader__
 
 
 class Jam(BaseJam):
     """Main instance."""
+
+    _JAM_MODULES: dict[str, str] = {
+        "jwt": "jam.modules.JWTModule",
+        "session": "jam.modules.SessionModule",
+        "oauth2": "jam.modules.OAuth2Module",
+    }
 
     def __init__(
         self,
@@ -24,32 +30,41 @@ class Jam(BaseJam):
             config (dict[str, Any] | str): dict or path to config file
             pointer (str): Config read point
         """
-        # TODO: Refactor this to MODULES and typedict/dataclasses instances
-        config = __config_maker__(config, pointer)
-        otp_config = config.get("otp", None)
+        self.jwt: Optional[JWTModule] = None
+        self.session: Optional[SessionModule] = None
+        self.oauth2: Optional[OAuth2Module] = None
 
-        if not otp_config:
-            del otp_config
-        else:
+        config = __config_maker__(config, pointer)
+
+        # OTP
+        otp_config = config.pop("otp", None)
+        if otp_config:
             from jam.otp.__abc_module__ import OTPConfig
 
             self._otp = OTPConfig(**otp_config)
             self._otp_module = self._otp_module_setup()
-            config.pop("otp")
+            logger.debug("OTP module initialized")
 
-        self.type = config["auth_type"]
-        config.pop("auth_type")
-        if self.type == "jwt":
-            logger.debug("Create JWT instance")
-            self.module = JWTModule(**config)
-        elif self.type == "session":
-            logger.debug("Create Session instance")
-            self.module = SessionModule(**config)  # type: ignore
-        elif self.type == "oauth2":
-            logger.debug("Create OAuth2 instance")
-            self.module = OAuth2Module(config)
+        # Other modules
+        if config.get("auth_type", None):
+            logger.warning(
+                "This configuration type is deprecated, see: https://jam.makridenko.ru/config"
+            )
+            name = config.pop("auth_type")
+            module = __module_loader__(self._JAM_MODULES[name])
+            setattr(self, name, module(**config))
         else:
-            raise NotImplementedError
+            for name, cfg in config.items():
+                try:
+                    module = self.build_module(name, cfg)
+                    setattr(self, name, module)
+                    logger.debug(
+                        f"Auth module '{name}' successfully initialized"
+                    )
+                except Exception as e:
+                    logger.exception(
+                        f"Failed to initialize auth module '{name}': {e}"
+                    )
         gc.collect()
 
     # TODO: Refactor this too
@@ -79,12 +94,7 @@ class Jam(BaseJam):
             exp (int | None): If none exp = JWTModule.exp
             **data: Custom data
         """
-        if self.type != "jwt":
-            raise NotImplementedError(
-                "This method is only available for JWT auth*."
-            )
-
-        return self.module.make_payload(exp=exp, **data)
+        return self.jwt.make_payload(exp=exp, **data)
 
     def gen_jwt_token(self, payload: dict[str, Any]) -> str:
         """Creating a new token.
@@ -96,12 +106,7 @@ class Jam(BaseJam):
             EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
             EmtpyPrivateKey: If RSA algorithm is selected, but private key None
         """
-        if self.type != "jwt":
-            raise NotImplementedError(
-                "This method is only available for JWT auth*."
-            )
-
-        return self.module.gen_token(**payload)
+        return self.jwt.gen_token(**payload)
 
     def verify_jwt_token(
         self, token: str, check_exp: bool = True, check_list: bool = True
@@ -125,12 +130,7 @@ class Jam(BaseJam):
         Returns:
             (dict[str, Any]): Payload from token
         """
-        if self.type != "jwt":
-            raise NotImplementedError(
-                "This method is only available for JWT auth*."
-            )
-
-        return self.module.validate_payload(
+        return self.jwt.validate_payload(
             token=token, check_exp=check_exp, check_list=check_list
         )
 
@@ -147,11 +147,7 @@ class Jam(BaseJam):
         Returns:
             str: The created session key
         """
-        if self.type != "session":
-            raise NotImplementedError(
-                "This method is only available for Session auth*."
-            )
-        return self.module.create(session_key, data)
+        return self.session.create(session_key, data)
 
     def get_session(self, session_id: str) -> Optional[dict]:
         """Retrieve session data by session ID.
@@ -165,11 +161,7 @@ class Jam(BaseJam):
         Returns:
             dict | None: The session data if found, otherwise None.
         """
-        if self.type != "session":
-            raise NotImplementedError(
-                "This method is only available for Session auth*."
-            )
-        return self.module.get(session_id)
+        return self.session.get(session_id)
 
     def delete_session(self, session_id: str) -> None:
         """Delete a session by its ID.
@@ -183,11 +175,7 @@ class Jam(BaseJam):
         Returns:
             None
         """
-        if self.type != "session":
-            raise NotImplementedError(
-                "This method is only available for Session auth*."
-            )
-        return self.module.delete(session_id)
+        return self.session.delete(session_id)
 
     def update_session(self, session_id: str, data: dict) -> None:
         """Update session data by session ID.
@@ -202,11 +190,7 @@ class Jam(BaseJam):
         Returns:
             None
         """
-        if self.type != "session":
-            raise NotImplementedError(
-                "This method is only available for Session auth*."
-            )
-        return self.module.update(session_id, data)
+        return self.session.update(session_id, data)
 
     def clear_sessions(self, session_key: str) -> None:
         """Clear all sessions associated with a specific session key.
@@ -220,11 +204,7 @@ class Jam(BaseJam):
         Returns:
             None
         """
-        if self.type != "session":
-            raise NotImplementedError(
-                "This method is only available for Session auth*."
-            )
-        return self.module.clear(session_key)
+        return self.session.clear(session_key)
 
     def rework_session(self, old_session_key: str) -> str:
         """Rework an existing session key to a new one.
@@ -238,11 +218,7 @@ class Jam(BaseJam):
         Returns:
             str: The new session key.
         """
-        if self.type != "session":
-            raise NotImplementedError(
-                "This method is only available for Session auth*."
-            )
-        return self.module.rework(old_session_key)
+        return self.session.rework(old_session_key)
 
     def get_otp_code(
         self, secret: Union[str, bytes], factor: Optional[int] = None
@@ -322,7 +298,7 @@ class Jam(BaseJam):
         Returns:
             str: Authorization url
         """
-        return self.module.get_authorization_url(
+        return self.oauth2.get_authorization_url(
             provider, scope, **extra_params
         )
 
@@ -344,7 +320,7 @@ class Jam(BaseJam):
         Returns:
             dict: OAuth2 token
         """
-        return self.module.fetch_token(
+        return self.oauth2.fetch_token(
             provider, code, grant_type, **extra_params
         )
 
@@ -366,7 +342,7 @@ class Jam(BaseJam):
         Returns:
             dict: Refresh token
         """
-        return self.module.refresh_token(
+        return self.oauth2.refresh_token(
             provider, refresh_token, grant_type, **extra_params
         )
 
@@ -386,6 +362,6 @@ class Jam(BaseJam):
         Returns:
             dict: JSON with access token
         """
-        return self.module.client_credentials_flow(
+        return self.oauth2.client_credentials_flow(
             provider, scope, **extra_params
         )
