@@ -30,10 +30,10 @@ Jam is a library that provides the most popular AUTH* mechanisms right out of th
 
 Jam provides ready-to-use integrations for the most popular frameworks:
 
-* [FastAPI](https://jam.makridenko.ru/extensions/fastapi.md)
-* [Starlette](https://jam.makridenko.ru/extensions/starlette.md)
-* [Litestar](https://jam.makridenko.ru/extensions/litestar.md)
-* [Flask](https://jam.makridenko.ru/extensions/flask.md)
+* [FastAPI](https://jam.makridenko.ru/extensions/fastapi)
+* [Starlette](https://jam.makridenko.ru/extensions/starlette)
+* [Litestar](https://jam.makridenko.ru/extensions/litestar)
+* [Flask](https://jam.makridenko.ru/extensions/flask)
 
 Each integration offers built-in middleware or plugin support for JWT and session-based authentication.
 
