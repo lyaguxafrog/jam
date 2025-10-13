@@ -38,12 +38,11 @@ nav:
       - Utils:
           - Key generators: utils/key_generations.md
           - Passwords utils: utils/password_hashing.md
-  - Examples:
-      - Starlette: examples/starlette.md
-      - Litestar: examples/litestar.md
-      - Strawberry: examples/strawberry.md
-      - FastAPI: examples/fastapi.md
-      - Flask: examples/flask.md
+  - Frameworks integration:
+      - Litestar: extensions/litestar.md
+      - Starlette: extensions/starlette.md
+      - FastAPI: extensions/fastapi.md
+      - Flask: extensions/flask.md
   - Testing: testing.md
   - API Reference: api.md
   - Breaking changes:
