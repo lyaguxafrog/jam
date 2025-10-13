@@ -8,9 +8,7 @@ from jam import Jam
 
 @pytest.fixture
 def jam_jwt_instance():
-    jam = Jam(
-        config={"auth_type": "jwt", "alg": "HS256", "secret_key": "SECRET"}
-    )
+    jam = Jam(config={"jwt": {"alg": "HS256", "secret_key": "SECRET"}})
     return jam
 
 
@@ -18,9 +16,10 @@ def jam_jwt_instance():
 def jam_session_instance():
     jam = Jam(
         config={
-            "auth_type": "session",
-            "sessions_type": "redis",
-            "redis_uri": FakeRedis(decode_responses=True),
+            "session": {
+                "sessions_type": "redis",
+                "redis_uri": FakeRedis(decode_responses=True),
+            }
         }
     )
     return jam

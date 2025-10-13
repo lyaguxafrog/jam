@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from threading import Thread
-
 from fakeredis import FakeRedis
 from pytest import fixture, raises
 from tinydb import TinyDB
@@ -50,15 +48,16 @@ def test_redis_list_init(fake_redis):
 
 def test_redis_black_lists(fake_redis):
     config = {
-        "auth_type": "jwt",
-        "alg": "HS256",
-        "secret_key": "secret",
-        "list": {
-            "type": "black",
-            "backend": "redis",
-            "redis_uri": fake_redis,
-            "in_list_life_time": 3600,
-        },
+        "jwt": {
+            "alg": "HS256",
+            "secret_key": "secret",
+            "list": {
+                "type": "black",
+                "backend": "redis",
+                "redis_uri": fake_redis,
+                "in_list_life_time": 3600,
+            },
+        }
     }
 
     jam = Jam(config=config)
@@ -72,7 +71,7 @@ def test_redis_black_lists(fake_redis):
     assert payload == _payload
 
     # check blacklist
-    jam.module.list.add(token)
+    jam.jwt.list.add(token)
 
     with raises(TokenInBlackList):
         __payload = jam.verify_jwt_token(
@@ -82,15 +81,16 @@ def test_redis_black_lists(fake_redis):
 
 def test_redis_white_lists(fake_redis):
     config = {
-        "auth_type": "jwt",
-        "alg": "HS256",
-        "secret_key": "secret",
-        "list": {
-            "type": "white",
-            "backend": "redis",
-            "redis_uri": fake_redis,
-            "in_list_life_time": 3600,
-        },
+        "jwt": {
+            "alg": "HS256",
+            "secret_key": "secret",
+            "list": {
+                "type": "white",
+                "backend": "redis",
+                "redis_uri": fake_redis,
+                "in_list_life_time": 3600,
+            },
+        }
     }
 
     jam = Jam(config=config)
@@ -101,17 +101,22 @@ def test_redis_white_lists(fake_redis):
     _payload = jam.verify_jwt_token(token, check_exp=False, check_list=True)
     assert _payload == payload
 
-    jam.module.list.delete(token)
+    jam.jwt.list.delete(token)
     with raises(TokenNotInWhiteList):
         jam.verify_jwt_token(token, check_exp=False, check_list=True)
 
 
 def test_json_black_lists(json_black_list):
     config = {
-        "auth_type": "jwt",
-        "alg": "HS256",
-        "secret_key": "secret",
-        "list": {"type": "black", "backend": "json", "json_path": ":memory:"},
+        "jwt": {
+            "alg": "HS256",
+            "secret_key": "secret",
+            "list": {
+                "type": "black",
+                "backend": "json",
+                "json_path": ":memory:",
+            },
+        }
     }
     jam = Jam(config=config)
     payload = {"json_list": "penis"}
@@ -121,21 +126,26 @@ def test_json_black_lists(json_black_list):
 
     assert payload == _payload
 
-    jam.module.list.add(token)
+    jam.jwt.list.add(token)
 
     with raises(TokenInBlackList):
         jam.verify_jwt_token(token, check_list=True, check_exp=False)
 
-    jam.module.list.delete(token)
+    jam.jwt.list.delete(token)
     t.truncate()
 
 
 def test_json_white_lists(json_white_list):
     config = {
-        "auth_type": "jwt",
-        "alg": "HS256",
-        "secret_key": "secret",
-        "list": {"type": "white", "backend": "json", "json_path": ":memory:"},
+        "jwt": {
+            "alg": "HS256",
+            "secret_key": "secret",
+            "list": {
+                "type": "white",
+                "backend": "json",
+                "json_path": ":memory:",
+            },
+        }
     }
 
     jam = Jam(config=config)
@@ -146,7 +156,7 @@ def test_json_white_lists(json_white_list):
     _payload = jam.verify_jwt_token(token, check_exp=False, check_list=True)
     assert _payload == payload
 
-    jam.module.list.delete(token)
+    jam.jwt.list.delete(token)
     with raises(TokenNotInWhiteList):
         jam.verify_jwt_token(token, check_exp=False, check_list=True)
     t.truncate()

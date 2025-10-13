@@ -46,7 +46,7 @@ class Jam(BaseJam):
             logger.debug("OTP module initialized")
 
         # Other modules
-        if config["auth_type"]:
+        if config.get("auth_type", None):
             logger.warning(
                 "This configuration type is deprecated, see: https://jam.makridenko.ru/config"
             )

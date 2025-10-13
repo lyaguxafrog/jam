@@ -9,9 +9,7 @@ from jam.aio import Jam
 
 @fixture
 async def jam_jwt_instance():
-    jam = Jam(
-        config={"auth_type": "jwt", "alg": "HS256", "secret_key": "SECRET"}
-    )
+    jam = Jam(config={"jwt": {"alg": "HS256", "secret_key": "SECRET"}})
     return jam
 
 
@@ -19,9 +17,10 @@ async def jam_jwt_instance():
 async def jam_session_instance():
     jam = Jam(
         config={
-            "auth_type": "session",
-            "sessions_type": "redis",
-            "redis_uri": FakeAsyncRedis(decode_responses=True),
+            "session": {
+                "sessions_type": "redis",
+                "redis_uri": FakeAsyncRedis(decode_responses=True),
+            }
         }
     )
     return jam
