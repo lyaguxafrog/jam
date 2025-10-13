@@ -3,9 +3,33 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 
+from jam.__logger__ import logger
+from jam.utils.config_maker import __module_loader__
+
 
 class BaseJam(ABC):
     """Abstract Instance object."""
+
+    _JAM_MODULES: dict[str, str] = {}
+
+    def build_module(self, name: str, cfg: dict[str, Any]):
+        """Method for building module from config.
+
+        Args:
+            name (str): Module name
+            cfg (dict[str, Any]): Config
+        """
+        module_path = cfg.pop("module", None)
+
+        if not module_path:
+            module_path = self._JAM_MODULES.get(name)
+
+        if not module_path:
+            raise NotImplementedError(f"Auth module '{name}' is not supported")
+
+        logger.debug(f"Initializing module '{name}' from {module_path}")
+        module_cls = __module_loader__(module_path)
+        return module_cls(**cfg)
 
     @abstractmethod
     def gen_jwt_token(self, payload) -> str:
