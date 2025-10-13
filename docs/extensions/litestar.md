@@ -43,7 +43,7 @@ app = Litestar(
 ---
 ## JWT Plugin
 
-This plugin creates `Middleware` that checks tokens in
+This plugin creates [`Middleware`](/api/ext/litestar/middlewares/#jam.ext.litestar.middlewares.JamJWTMiddleware) that checks tokens in
 cookies/headers and passes the payload to `Request`.
 
 ### Setup plugin
@@ -124,7 +124,7 @@ app = Litestar(
 ---
 ## Sessions Plugin
 
-This plugin creates `Middleware` that checks sessions ids in
+This plugin creates [`Middleware`](/api/ext/litestar/middlewares/#jam.ext.litestar.middlewares.JamSessionsMiddleware) that checks sessions ids in
 cookies/headers and passes the payload to `Request`.
 
 ### Setup plugin
