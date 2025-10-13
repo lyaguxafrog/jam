@@ -41,6 +41,7 @@ def create_app() -> Flask:
     return app
 ```
 
+---
 ## JWT Extension
 
 This extension checks tokens from the header or cookie
@@ -112,6 +113,7 @@ def get_user() -> Response:
     return response
 ```
 
+---
 ## Session Extension
 
 This extension checks sessions ids from the header or cookie

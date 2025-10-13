@@ -108,6 +108,7 @@ app = Starlette(
 )
 ```
 
+---
 ## SessionBackend
 For sessions auth*, `jam.ext.starlette.SessionBackend`is used,
 which needs to be integrated into the standard AuthenticationMiddleware:
