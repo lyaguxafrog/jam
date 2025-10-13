@@ -33,8 +33,7 @@ See [Jam List documentaion](lists/what.md).
 
 ## Example `toml` config:
 ```toml
-[jam]
-auth_type = "jwt"
+[jam.jwt]
 alg = "HS256"
 secret_key = "SECRET"
 expire = 3600

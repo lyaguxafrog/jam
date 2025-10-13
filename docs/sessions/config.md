@@ -25,8 +25,7 @@ You can use [`jam.utils.generate_aes_key`](/api/utils/aes/#jam.utils.aes.generat
 
 ## Example `toml` config:
 ```toml
-[jam]
-auth_type = "session"
+[jam.session]
 session_type = "redis"
 is_session_crypt = false
 redis_uri = "redis://0.0.0.0:6379/0"
@@ -66,8 +65,7 @@ Your custom session module. It must be a subclass of [`BaseSessionModule`](/api/
 
 For a custom module, simply specify the parameters you need in dict, for example:
 ```toml
-[jam]
-auth_type = "session"
+[jam.session]
 sessions_type = "custom"
 custom_module = "myapp.custom_session.CustomModule"
 param1 = "value1"
