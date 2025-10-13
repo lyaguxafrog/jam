@@ -47,7 +47,6 @@ classifiers = [
     "Typing :: Typed",
     "Framework :: Flask",
     "Framework :: FastAPI",
-    "Framework :: Starlette"
 ]
 
 [project.urls]
