@@ -35,6 +35,7 @@ nav:
           - HOTP or TOTP: otp/hotp_and_totp.md
           - HOTP: otp/hotp.md
           - TOTP: otp/totp.md
+      - Testing: testing.md
       - Utils:
           - Key generators: utils/key_generations.md
           - Passwords utils: utils/password_hashing.md
@@ -43,7 +44,6 @@ nav:
       - Starlette: extensions/starlette.md
       - FastAPI: extensions/fastapi.md
       - Flask: extensions/flask.md
-  - Testing: testing.md
   - API Reference: api.md
   - Breaking changes:
       - 1.1.4 -> 2.0.0: breaking_changes/jam114_to_200
