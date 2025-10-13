@@ -119,7 +119,7 @@ Middleware(
 ```
 
 ### Middleware set
-Three parameters must be passed to JWTBackend:
+Three parameters must be passed to SessionBackend:
 
 #### `jam`: `BaseJam`
 The created Jam instance.
@@ -146,7 +146,7 @@ app = Starlette(
             AuthenticationMiddleware,
             backend=SessionBackend(
                 jam=jam,
-                cookie_name="jwt",
+                cookie_name="sessionId",
                 header_name=None
             )
         )
