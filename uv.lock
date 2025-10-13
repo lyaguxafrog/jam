@@ -609,8 +609,8 @@ wheels = [
 
 [[package]]
 name = "jamlib"
-version = "2.5.1b0"
-source = { virtual = "." }
+version = "2.5.1b1"
+source = { editable = "." }
 dependencies = [
     { name = "cryptography" },
     { name = "pycryptodome" },
