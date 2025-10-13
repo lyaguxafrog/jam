@@ -35,16 +35,15 @@ nav:
           - HOTP or TOTP: otp/hotp_and_totp.md
           - HOTP: otp/hotp.md
           - TOTP: otp/totp.md
+      - Testing: testing.md
       - Utils:
           - Key generators: utils/key_generations.md
           - Passwords utils: utils/password_hashing.md
-  - Examples:
-      - Starlette: examples/starlette.md
-      - Litestar: examples/litestar.md
-      - Strawberry: examples/strawberry.md
-      - FastAPI: examples/fastapi.md
-      - Flask: examples/flask.md
-  - Testing: testing.md
+  - Frameworks integration:
+      - Litestar: extensions/litestar.md
+      - Starlette: extensions/starlette.md
+      - FastAPI: extensions/fastapi.md
+      - Flask: extensions/flask.md
   - API Reference: api.md
   - Breaking changes:
       - 1.1.4 -> 2.0.0: breaking_changes/jam114_to_200

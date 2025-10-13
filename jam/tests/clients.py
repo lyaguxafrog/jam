@@ -41,6 +41,8 @@ class TestJam(Jam):
         ```
     """
 
+    __test__ = False
+
     def __init__(
         self,
         config: Optional[Union[str, dict[str, Any]]] = None,
@@ -52,6 +54,7 @@ class TestJam(Jam):
             config (str | dict[str, Any] | None): Jam configuration.
             pointer (str): Pointer for the client instance.
         """
+        self.module = self
         self._fake_session: dict[str, Any] = {}
 
     def gen_jwt_token(self, payload: dict[str, Any]) -> str:
@@ -310,6 +313,8 @@ class TestAsyncJam(AioJam):
         ```
     """
 
+    __test__ = False
+
     def __init__(
         self,
         config: Optional[Union[str, dict[str, Any]]] = None,
@@ -321,6 +326,7 @@ class TestAsyncJam(AioJam):
             config (str | dict[str, Any] | None): Jam configuration.
             pointer (str): Pointer for the client instance.
         """
+        self.module = self
         self._fake_session: dict[str, Any] = {}
 
     async def gen_jwt_token(self, payload: dict[str, Any]) -> str:

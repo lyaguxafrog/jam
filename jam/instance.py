@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+
+import gc
 from collections.abc import Callable
 from typing import Any, Optional, Union
 
@@ -48,6 +50,7 @@ class Jam(BaseJam):
             self.module = OAuth2Module(config)
         else:
             raise NotImplementedError
+        gc.collect()
 
     # TODO: Refactor this too
     def _otp_module_setup(self) -> Callable:

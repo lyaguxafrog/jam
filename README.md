@@ -10,6 +10,7 @@
 
 Documentation: [jam.makridenko.ru](https://jam.makridenko.ru)
 
+
 ## Install
 ```bash
 pip install jamlib
@@ -25,8 +26,19 @@ Jam is a library that provides the most popular AUTH* mechanisms right out of th
   * [HOTP](https://jam.makridenko.ru/otp/hotp/)
 * [OAuth2](https://jam.makridenko.ru/oauth2/instance/)
 
+### Framework integrations
 
-Why choose Jam? Jam supports many authentication methods out of the box with minimal dependencies.
+Jam provides ready-to-use integrations for the most popular frameworks:
+
+* [FastAPI](https://jam.makridenko.ru/extensions/fastapi.md)
+* [Starlette](https://jam.makridenko.ru/extensions/starlette.md)
+* [Litestar](https://jam.makridenko.ru/extensions/litestar.md)
+* [Flask](https://jam.makridenko.ru/extensions/flask.md)
+
+Each integration offers built-in middleware or plugin support for JWT and session-based authentication.
+
+### Why choose Jam?
+Jam supports many authentication methods out of the box with minimal dependencies.
 Here is a comparison with other libraries:
 
 | Features / Library    | **Jam**                                                                                              | [Authx](https://authx.yezz.me/) | [PyJWT](https://pyjwt.readthedocs.io) | [AuthLib](https://docs.authlib.org) | [OTP Auth](https://otp.authlib.org/) |
@@ -38,7 +50,4 @@ Here is a comparison with other libraries:
 | OAuth2                | ✅                                                                                                     | ✅ | ❌ | ✅ | ❌ |
 | Flexible config       | ✅                                                                                                    | ❌ | ❌ | ❌ | ❌ |
 | Modularity            | ✅                                                                                                    | ❌ | ❌ | ❌ | ❌ |
-
-## Roadmap
-![Roadmap](https://jam.makridenko.ru/assets/roadmap.png?raw=true)
 
