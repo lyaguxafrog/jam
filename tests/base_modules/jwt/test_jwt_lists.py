@@ -65,8 +65,8 @@ def test_redis_black_lists(fake_redis):
     payload = {"token": 1}
 
     # verify new token
-    token = jam.gen_jwt_token(payload)
-    _payload = jam.verify_jwt_token(token, check_exp=False, check_list=True)
+    token = jam.jwt_create_token(payload)
+    _payload = jam.jwt_verify_token(token, check_exp=False, check_list=True)
 
     assert payload == _payload
 
@@ -74,7 +74,7 @@ def test_redis_black_lists(fake_redis):
     jam.jwt.list.add(token)
 
     with raises(TokenInBlackList):
-        __payload = jam.verify_jwt_token(
+        __payload = jam.jwt_verify_token(
             token=token, check_exp=False, check_list=True
         )
 
@@ -96,14 +96,14 @@ def test_redis_white_lists(fake_redis):
     jam = Jam(config=config)
     payload = {"user_id": 1}
 
-    token = jam.gen_jwt_token(payload)
+    token = jam.jwt_create_token(payload)
 
-    _payload = jam.verify_jwt_token(token, check_exp=False, check_list=True)
+    _payload = jam.jwt_verify_token(token, check_exp=False, check_list=True)
     assert _payload == payload
 
     jam.jwt.list.delete(token)
     with raises(TokenNotInWhiteList):
-        jam.verify_jwt_token(token, check_exp=False, check_list=True)
+        jam.jwt_verify_token(token, check_exp=False, check_list=True)
 
 
 def test_json_black_lists(json_black_list):
@@ -121,15 +121,15 @@ def test_json_black_lists(json_black_list):
     jam = Jam(config=config)
     payload = {"json_list": "penis"}
 
-    token = jam.gen_jwt_token(payload)
-    _payload = jam.verify_jwt_token(token, check_exp=False, check_list=True)
+    token = jam.jwt_create_token(payload)
+    _payload = jam.jwt_verify_token(token, check_exp=False, check_list=True)
 
     assert payload == _payload
 
     jam.jwt.list.add(token)
 
     with raises(TokenInBlackList):
-        jam.verify_jwt_token(token, check_list=True, check_exp=False)
+        jam.jwt_verify_token(token, check_list=True, check_exp=False)
 
     jam.jwt.list.delete(token)
     t.truncate()
@@ -151,12 +151,12 @@ def test_json_white_lists(json_white_list):
     jam = Jam(config=config)
     payload = {"user_id": 1100}
 
-    token = jam.gen_jwt_token(payload)
+    token = jam.jwt_create_token(payload)
 
-    _payload = jam.verify_jwt_token(token, check_exp=False, check_list=True)
+    _payload = jam.jwt_verify_token(token, check_exp=False, check_list=True)
     assert _payload == payload
 
     jam.jwt.list.delete(token)
     with raises(TokenNotInWhiteList):
-        jam.verify_jwt_token(token, check_exp=False, check_list=True)
+        jam.jwt_verify_token(token, check_exp=False, check_list=True)
     t.truncate()
