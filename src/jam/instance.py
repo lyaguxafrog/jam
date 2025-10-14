@@ -200,6 +200,71 @@ class Jam(BaseJam):
         """
         return self.session.rework(old_session_id)
 
+    def otp_code(
+        self, secret: Union[str, bytes], factor: Optional[int] = None
+    ) -> str:
+        """Generates an OTP.
+
+        Args:
+            secret (str | bytes): User secret key.
+            factor (int | None, optional): Unixtime for TOTP(if none, use now time) / Counter for HOTP.
+
+        Returns:
+            str: OTP code (fixed-length string).
+        """
+        self._otp_checker()
+        return self._otp_module(
+            secret=secret, digits=self._otp.digits, digest=self._otp.digest
+        ).at(factor)
+
+    def otp_uri(
+        self,
+        secret: str,
+        name: Optional[str] = None,
+        issuer: Optional[str] = None,
+        counter: Optional[int] = None,
+    ) -> str:
+        """Generates an otpauth:// URI for Google Authenticator.
+
+        Args:
+            secret (str): User secret key.
+            name (str): Account name (e.g., email).
+            issuer (str): Service name (e.g., "GitHub").
+            counter (int | None, optional): Counter (for HOTP). Default is None.
+
+        Returns:
+            str: A string of the form "otpauth://..."
+        """
+        self._otp_checker()
+        return self._otp_module(
+            secret=secret, digits=self._otp.digits, digest=self._otp.digest
+        ).provisioning_uri(
+            name=name, issuer=issuer, type_=self._otp.type, counter=counter
+        )
+
+    def otp_verify_code(
+        self,
+        secret: Union[str, bytes],
+        code: str,
+        factor: Optional[int] = None,
+        look_ahead: Optional[int] = 1,
+    ) -> bool:
+        """Checks the OTP code, taking into account the acceptable window.
+
+        Args:
+            secret (str | bytes): User secret key.
+            code (str): The code entered.
+            factor (int | None, optional): Unixtime for TOTP(if none, use now time) / Counter for HOTP.
+            look_ahead (int, optional): Acceptable deviation in intervals (±window(totp) / ±look ahead(hotp)). Default is 1.
+
+        Returns:
+            bool: True if the code matches, otherwise False.
+        """
+        self._otp_checker()
+        return self._otp_module(
+            secret=secret, digits=self._otp.digits, digest=self._otp.digest
+        ).verify(code=code, factor=factor, look_ahead=look_ahead)
+
     @deprecated("This method is deprecated, use: Jam.jwt_make_payload")
     def make_payload(self, exp: Optional[int] = None, **data) -> dict[str, Any]:
         """Payload maker tool.
@@ -369,6 +434,7 @@ class Jam(BaseJam):
         """
         return self.session.rework(old_session_key)
 
+    @deprecated("This method is deprecated, use: Jam.otp_code")
     def get_otp_code(
         self, secret: Union[str, bytes], factor: Optional[int] = None
     ) -> str:
@@ -378,6 +444,9 @@ class Jam(BaseJam):
             secret (str | bytes): User secret key.
             factor (int | None, optional): Unixtime for TOTP(if none, use now time) / Counter for HOTP.
 
+        Deprecated:
+            Use: Jam.otp_code
+
         Returns:
             str: OTP code (fixed-length string).
         """
@@ -386,6 +455,7 @@ class Jam(BaseJam):
             secret=secret, digits=self._otp.digits, digest=self._otp.digest
         ).at(factor)
 
+    @deprecated("This method os deprecated, use: Jam.otp_uri")
     def get_otp_uri(
         self,
         secret: str,
@@ -401,6 +471,9 @@ class Jam(BaseJam):
             issuer (str): Service name (e.g., "GitHub").
             counter (int | None, optional): Counter (for HOTP). Default is None.
 
+        Deprecated:
+            Use: `Jam.otp_uri`
+
         Returns:
             str: A string of the form "otpauth://..."
         """
@@ -411,6 +484,7 @@ class Jam(BaseJam):
             name=name, issuer=issuer, type_=self._otp.type, counter=counter
         )
 
+    @deprecated("This method is deprecated, use: Jam.otp_verify_code")
     def verify_otp_code(
         self,
         secret: Union[str, bytes],
@@ -425,6 +499,9 @@ class Jam(BaseJam):
             code (str): The code entered.
             factor (int | None, optional): Unixtime for TOTP(if none, use now time) / Counter for HOTP.
             look_ahead (int, optional): Acceptable deviation in intervals (±window(totp) / ±look ahead(hotp)). Default is 1.
+
+        Deprecated:
+            Use: `Jam.otp_verify_code`
 
         Returns:
             bool: True if the code matches, otherwise False.
