@@ -12,24 +12,24 @@ jam = Jam(config=config)
 
 You can either create the payload yourself and pass it to kwargs or use `make_payload`.
 ```python
-jam.make_payload(**{"user_id": 1, "role": "admin"})
+jam.jwt_make_payload(**{"user_id": 1, "role": "admin"})
 
 # or if you need to specify a different exp, e.g. for access token
-jam.make_payload(exp=600, **{"user_id": 1})
+jam.make_payload(exp=600, data={"user_id": 1})
 ```
 The settings from config will be passed to payload.
 
 ## Gen jwt token
 
 ```python
-token = jam.gen_jwt_token(payload)
+token = jam.jwt_create_token(payload)
 ```
 and you'll receive a JWT token with your payload.
 
 ## Verify jwt token
 
 ```python
-jam.verify_jwt_token(
+jam.jwt_verify_token(
     token=my_token,
     check_exp=True,
     check_list=False
