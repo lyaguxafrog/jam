@@ -37,7 +37,7 @@ class JamJWTMiddleware(AbstractAuthenticationMiddleware):
         if cookie:
             try:
                 payload = await await_maybe(
-                    instance.verify_jwt_token(
+                    instance.jwt_verify_token(
                         token=cookie,
                         check_exp=True,  # NOTE: Expire always check
                         check_list=connection.app.state.use_list,
@@ -54,7 +54,7 @@ class JamJWTMiddleware(AbstractAuthenticationMiddleware):
         if header:
             try:
                 payload = await await_maybe(
-                    instance.verify_jwt_token(
+                    instance.jwt_verify_token(
                         token=cookie,
                         check_exp=True,
                         check_list=connection.app.state.use_list,
@@ -98,13 +98,13 @@ class JamSessionsMiddleware(AbstractAuthenticationMiddleware):
         )
 
         if cookie:
-            payload = await await_maybe(instance.get_session(cookie))
+            payload = await await_maybe(instance.session_get(cookie))
             return AuthenticationResult(
                 settings.user_dataclass(payload=payload),
                 settings.auth_dataclass(token=cookie),
             )
         if header:
-            payload = await await_maybe(instance.get_session(header))
+            payload = await await_maybe(instance.session_get(header))
             return AuthenticationResult(
                 settings.user_dataclass(payload=payload),
                 settings.auth_dataclass(token=header),
