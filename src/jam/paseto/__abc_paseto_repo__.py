@@ -10,7 +10,7 @@ PASETO = TypeVar("PASETO", bound="BasePASETO")
 class BasePASETO(ABC):
     """Base PASETO instance."""
 
-    _VERSION: int
+    _VERSION: str
 
     def __init__(self):
         """Constructor."""
