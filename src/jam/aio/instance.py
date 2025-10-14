@@ -52,11 +52,14 @@ class Jam(BaseJam):
             )
             name = config.pop("auth_type")
             module = __module_loader__(self._JAM_MODULES[name])
+            self.module = module
             setattr(self, name, module(**config))
         else:
             for name, cfg in config.items():
                 try:
                     module = self.build_module(name, cfg)
+                    if name == "jwt":
+                        self.module = module
                     setattr(self, name, module)
                     logger.debug(
                         f"Auth module '{name}' successfully initialized"
