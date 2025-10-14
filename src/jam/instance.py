@@ -4,9 +4,8 @@ import gc
 from collections.abc import Callable
 from typing import Any, Optional, Union
 
-from __deprecated__ import deprecated
-
 from jam.__abc_instances__ import BaseJam
+from jam.__deprecated__ import deprecated
 from jam.__logger__ import logger
 from jam.modules import JWTModule, OAuth2Module, SessionModule
 from jam.utils.config_maker import __config_maker__, __module_loader__
@@ -140,6 +139,66 @@ class Jam(BaseJam):
             TokenNotInWhiteList: If the list type is white, but the token is  not there
             TokenInBlackList: If the list type is black and the token is there
         """
+        return self.jwt.validate_payload(token, check_exp, check_list)
+
+    def session_create(self, session_key: str, data: dict[str, Any]) -> str:
+        """Create new session.
+
+        Args:
+            session_key (str): Key for session
+            data (dict[str, Any]): Session data
+
+        Returns:
+            str: New session ID
+        """
+        return self.session.create(session_key, data)
+
+    def session_get(self, session_id: str) -> Optional[dict[str, Any]]:
+        """Get data from session.
+
+        Args:
+            session_id (str): Session ID
+
+        Returns:
+            dict[str, Any] | None: Session data if exist
+        """
+        return self.session.get(session_id)
+
+    def session_delete(self, session_id: str) -> None:
+        """Delete session.
+
+        Args:
+            session_id (str): Session ID
+        """
+        return self.session.delete(session_id)
+
+    def session_update(self, session_id: str, data: dict[str, Any]) -> None:
+        """Update session data.
+
+        Args:
+            session_id (str): Session ID
+            data (dict[str, Any]): New data
+        """
+        return self.session.update(session_id, data)
+
+    def session_clear(self, session_key: str) -> None:
+        """Delete all sessions by key.
+
+        Args:
+            session_key (str): Key of session
+        """
+        return self.session.clear(session_key)
+
+    def session_rework(self, old_session_id: str) -> str:
+        """Rework session.
+
+        Args:
+            old_session_id (str): Old session id
+
+        Returns:
+            str: New session id
+        """
+        return self.session.rework(old_session_id)
 
     @deprecated("This method is deprecated, use: Jam.jwt_make_payload")
     def make_payload(self, exp: Optional[int] = None, **data) -> dict[str, Any]:
@@ -200,12 +259,16 @@ class Jam(BaseJam):
             token=token, check_exp=check_exp, check_list=check_list
         )
 
+    @deprecated("This method is deprecated, use: `Jam.session_create`")
     def create_session(self, session_key: str, data: dict) -> str:
         """Create a new session.
 
         Args:
             session_key (str): Session key
             data (dict): Data to store in session
+
+        Deprecated:
+            Use: `Jam.session_create`
 
         Raises:
             NotImplementedError: If the auth type is not "session"
@@ -215,6 +278,7 @@ class Jam(BaseJam):
         """
         return self.session.create(session_key, data)
 
+    @deprecated("This method is deprecates, use: Jam.session_get")
     def get_session(self, session_id: str) -> Optional[dict]:
         """Retrieve session data by session ID.
 
@@ -224,16 +288,23 @@ class Jam(BaseJam):
         Raises:
             NotImplementedError: If the auth type is not "session".
 
+        Deprecated:
+            Use: `Jam.session_get`
+
         Returns:
             dict | None: The session data if found, otherwise None.
         """
         return self.session.get(session_id)
 
+    @deprecated("This method is deprecated, use: Jam.session_delete")
     def delete_session(self, session_id: str) -> None:
         """Delete a session by its ID.
 
         Args:
             session_id (str): The ID of the session to delete.
+
+        Deprecated:
+            Use: `Jam.session_delete`
 
         Raises:
             NotImplementedError: If the auth type is not "session".
@@ -243,12 +314,16 @@ class Jam(BaseJam):
         """
         return self.session.delete(session_id)
 
+    @deprecated("This method is deprecated, use: Jam.session_update")
     def update_session(self, session_id: str, data: dict) -> None:
         """Update session data by session ID.
 
         Args:
             session_id (str): The ID of the session to update.
             data (dict): The new data to update the session with.
+
+        Deprecated:
+            Use: `Jam.session_update`
 
         Raises:
             NotImplementedError: If the auth type is not "session".
@@ -258,11 +333,15 @@ class Jam(BaseJam):
         """
         return self.session.update(session_id, data)
 
+    @deprecated("This method is deprecated, use: Jam.session_clear")
     def clear_sessions(self, session_key: str) -> None:
         """Clear all sessions associated with a specific session key.
 
         Args:
             session_key (str): The session key whose sessions are to be cleared.
+
+        Deprecated:
+            Use: `Jam.session_clear`
 
         Raises:
             NotImplementedError: If the auth type is not "session".
@@ -272,11 +351,15 @@ class Jam(BaseJam):
         """
         return self.session.clear(session_key)
 
+    @deprecated("This method is deprecated, use: Jam.session_rework")
     def rework_session(self, old_session_key: str) -> str:
         """Rework an existing session key to a new one.
 
         Args:
             old_session_key (str): The old session key to be reworked.
+
+        Deprecated:
+            Use: `Jam.session_rework`
 
         Raises:
             NotImplementedError: If the auth type is not "session".
