@@ -57,7 +57,7 @@ class TestJam(Jam):
         self.module = self
         self._fake_session: dict[str, Any] = {}
 
-    def gen_jwt_token(self, payload: dict[str, Any]) -> str:
+    def jwt_create_token(self, payload: dict[str, Any]) -> str:
         """Generate a fake JWT token for testing purposes.
 
         This token ALWAYS validates successfully.
@@ -69,6 +69,58 @@ class TestJam(Jam):
             str: A fake JWT token.
         """
         return fake_jwt_token(payload)
+
+    def jwt_make_payload(
+        self, exp: Optional[int], data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Payload maker tool.
+
+        Args:
+            exp (int | None): Expire
+            data: Arbitrary keyword arguments to include in the payload.
+
+        Returns:
+            dict[str, Any]: A dictionary representing the payload.
+        """
+        return data
+
+    def jwt_verify_token(
+        self, token: str, check_exp: bool = True, check_list: bool = True
+    ) -> dict[str, Any]:
+        """Verify JWT token.
+
+        Args:
+            token (str): JWT token to verify.
+            check_exp (bool): Whether to check the expiration time.
+            check_list (bool): Whether to check against a blacklist.
+
+        Returns:
+            dict[str, Any]: The payload of the verified JWT token.
+
+        Raises:
+            ValueError: If the token format is invalid.
+        """
+        headers, payload, _ = token.split(".")
+        headers = json.loads(__base64url_decode__(headers).decode("utf-8"))
+        payload = __base64url_decode__(payload).decode("utf-8")
+
+        if headers["typ"] == "fake-JWT":
+            return json.loads(payload)
+        else:
+            raise ValueError("Invalid token format.")
+
+    def gen_jwt_token(self, payload: dict[str, Any]) -> str:
+        """Generate a fake JWT token for testing purposes.
+
+        This token ALWAYS validates successfully.
+
+        Args:
+            payload (dict[str, Any]): Payload to include in the JWT token.
+
+        Returns:
+            str: A fake JWT token.
+        """
+        return self.jwt_create_token(payload)
 
     def verify_jwt_token(
         self, token: str, check_exp: bool = True, check_list: bool = True
@@ -106,6 +158,19 @@ class TestJam(Jam):
         """
         return payload
 
+    def session_create(self, session_key: str, data: dict[str, Any]) -> str:
+        """Create new session.
+
+        Args:
+            session_key (str): The key for the session.
+            data (dict): The data to store in the session.
+
+        Returns:
+            str: A fake session ID.
+        """
+        self._fake_session = data
+        return "fake-session-id"
+
     def create_session(self, session_key: str, data: dict[str, Any]) -> str:
         """Create new session.
 
@@ -118,6 +183,19 @@ class TestJam(Jam):
         """
         self._fake_session = data
         return "fake-session-id"
+
+    def session_get(self, session_id: str) -> Optional[dict[str, Any]]:
+        """Retrieve session data by session ID.
+
+        Args:
+            session_id (str): The ID of the session to retrieve.
+
+        Returns:
+            dict | None: The session data if found, otherwise None.
+        """
+        if session_id == "fake-session-id":
+            return self._fake_session
+        return None
 
     def get_session(self, session_id: str) -> Optional[dict[str, Any]]:
         """Retrieve session data by session ID.
@@ -132,6 +210,14 @@ class TestJam(Jam):
             return self._fake_session
         return None
 
+    def session_delete(self, session_id: str) -> None:
+        """Delete a session by its ID.
+
+        Args:
+            session_id (str): The ID of the session to delete.
+        """
+        ...
+
     def delete_session(self, session_id: str) -> None:
         """Delete a session by its ID.
 
@@ -139,6 +225,18 @@ class TestJam(Jam):
             session_id (str): The ID of the session to delete.
         """
         ...
+
+    def session_update(self, session_id: str, data: dict[str, Any]) -> None:
+        """Update session data by session ID.
+
+        Args:
+            session_id (str): The ID of the session to update.
+            data (dict): The new data for the session.
+        """
+        if session_id == "fake-session-id":
+            self._fake_session.update(data)
+        else:
+            ...
 
     def update_session(self, session_id: str, data: dict) -> None:
         """Update session data by session ID.
@@ -152,6 +250,14 @@ class TestJam(Jam):
         else:
             ...
 
+    def session_clear(self, session_key: str) -> None:
+        """Clear all sessions associated with a specific session key.
+
+        Args:
+            session_key (str): The session key whose sessions are to be cleared.
+        """
+        ...
+
     def clear_sessions(self, session_key: str) -> None:
         """Clear all sessions associated with a specific session key.
 
@@ -159,6 +265,17 @@ class TestJam(Jam):
             session_key (str): The session key whose sessions are to be cleared.
         """
         ...
+
+    def session_rework(self, old_session_id: str) -> str:
+        """Rework an existing session key to a new one.
+
+        Args:
+            old_session_id (str): The old session id to be reworked.
+
+        Returns:
+            str: A new fake session ID.
+        """
+        return "fake-session-id"
 
     def rework_session(self, old_session_key: str) -> str:
         """Rework an existing session key to a new one.
@@ -171,6 +288,20 @@ class TestJam(Jam):
         """
         return "fake-session-id"
 
+    def otp_code(
+        self, secret: Union[str, bytes], factor: Optional[int] = None
+    ) -> str:
+        """Generates a OTP code.
+
+        Args:
+            secret (str): The secret key used to generate the OTP code.
+            factor (int | None): An optional factor to influence the OTP generation.
+
+        Returns:
+            str: A fake OTP code.
+        """
+        return "123456"
+
     def get_otp_code(self, secret: str, factor: Optional[int] = None) -> str:
         """Generates a OTP code.
 
@@ -182,6 +313,26 @@ class TestJam(Jam):
             str: A fake OTP code.
         """
         return "123456"
+
+    def otp_verify_code(
+        self,
+        secret: Union[str, bytes],
+        code: str,
+        factor: Optional[int] = None,
+        look_ahead: Optional[int] = 1,
+    ) -> bool:
+        """Verifies a given OTP code.
+
+        Args:
+            secret (str): The secret key used to verify the OTP code.
+            code (str): The OTP code to verify.
+            factor (int | None): An optional factor that was used during OTP generation.
+            look_ahead (int | None): An optional look-ahead window for verification.
+
+        Returns:
+            bool: True if the OTP code is valid, False otherwise.
+        """
+        return code == "123456"
 
     def verify_otp_code(
         self,
@@ -202,6 +353,31 @@ class TestJam(Jam):
             bool: True if the OTP code is valid, False otherwise.
         """
         return code == "123456"
+
+    def otp_uri(
+        self,
+        secret: str,
+        name: Optional[str] = None,
+        issuer: Optional[str] = None,
+        counter: Optional[int] = None,
+    ) -> str:
+        """Generates an otpauth:// URI for Google Authenticator.
+
+        Args:
+            secret (str): The secret key used to generate the OTP URI.
+            name (str | None): An optional name for the OTP account.
+            issuer (str | None): An optional issuer for the OTP account.
+            counter (int | None): An optional counter for HOTP.
+
+        Returns:
+            str: A fake otpauth:// URI.
+        """
+        uri = f"otpauth://totp/{name or 'user'}?secret={secret}"
+        if issuer:
+            uri += f"&issuer={issuer}"
+        if counter is not None:
+            uri += f"&counter={counter}"
+        return uri
 
     def get_otp_uri(
         self,
@@ -329,6 +505,19 @@ class TestAsyncJam(AioJam):
         self.module = self
         self._fake_session: dict[str, Any] = {}
 
+    async def jwt_create_token(self, payload: dict[str, Any]) -> str:
+        """Generate a fake JWT token for testing purposes.
+
+        This token ALWAYS validates successfully.
+
+        Args:
+            payload (dict[str, Any]): Payload to include in the JWT token.
+
+        Returns:
+            str: A fake JWT token.
+        """
+        return fake_jwt_token(payload)
+
     async def gen_jwt_token(self, payload: dict[str, Any]) -> str:
         """Generate a fake JWT token for testing purposes.
 
@@ -341,6 +530,31 @@ class TestAsyncJam(AioJam):
             str: A fake JWT token.
         """
         return fake_jwt_token(payload)
+
+    async def jwt_verify_token(
+        self, token: str, check_exp: bool = True, check_list: bool = True
+    ) -> dict[str, Any]:
+        """Verify JWT token.
+
+        Args:
+            token (str): JWT token to verify.
+            check_exp (bool): Whether to check the expiration time.
+            check_list (bool): Whether to check against a blacklist.
+
+        Returns:
+            dict[str, Any]: The payload of the verified JWT token.
+
+        Raises:
+            ValueError: If the token format is invalid.
+        """
+        headers, payload, _ = token.split(".")
+        headers = json.loads(__base64url_decode__(headers).decode("utf-8"))
+        payload = __base64url_decode__(payload).decode("utf-8")
+
+        if headers["typ"] == "fake-JWT":
+            return json.loads(payload)
+        else:
+            raise ValueError("Invalid token format.")
 
     async def verify_jwt_token(
         self, token: str, check_exp: bool = True, check_list: bool = True
@@ -367,6 +581,20 @@ class TestAsyncJam(AioJam):
         else:
             raise ValueError("Invalid token format.")
 
+    async def jwt_make_payload(
+        self, exp: Optional[int], data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Payload maker tool.
+
+        Args:
+            exp (int): Expire
+            data: Arbitrary keyword arguments to include in the payload.
+
+        Returns:
+            dict[str, Any]: A dictionary representing the payload.
+        """
+        return data
+
     async def make_payload(self, **payload: dict[str, Any]) -> dict[str, Any]:
         """Payload maker tool.
 
@@ -377,6 +605,21 @@ class TestAsyncJam(AioJam):
             dict[str, Any]: A dictionary representing the payload.
         """
         return payload
+
+    async def session_create(
+        self, session_key: str, data: dict[str, Any]
+    ) -> str:
+        """Create new session.
+
+        Args:
+            session_key (str): The key for the session.
+            data (dict): The data to store in the session.
+
+        Returns:
+            str: A fake session ID.
+        """
+        self._fake_session = data
+        return "fake-session-id"
 
     async def create_session(
         self, session_key: str, data: dict[str, Any]
@@ -393,6 +636,19 @@ class TestAsyncJam(AioJam):
         self._fake_session = data
         return "fake-session-id"
 
+    async def session_get(self, session_id: str) -> Optional[dict[str, Any]]:
+        """Retrieve session data by session ID.
+
+        Args:
+            session_id (str): The ID of the session to retrieve.
+
+        Returns:
+            dict | None: The session data if found, otherwise None.
+        """
+        if session_id == "fake-session-id":
+            return self._fake_session
+        return None
+
     async def get_session(self, session_id: str) -> Optional[dict[str, Any]]:
         """Retrieve session data by session ID.
 
@@ -406,6 +662,14 @@ class TestAsyncJam(AioJam):
             return self._fake_session
         return None
 
+    async def session_delete(self, session_id: str) -> None:
+        """Delete a session by its ID.
+
+        Args:
+            session_id (str): The ID of the session to delete.
+        """
+        ...
+
     async def delete_session(self, session_id: str) -> None:
         """Delete a session by its ID.
 
@@ -413,6 +677,20 @@ class TestAsyncJam(AioJam):
             session_id (str): The ID of the session to delete.
         """
         ...
+
+    async def session_update(
+        self, session_id: str, data: dict[str, Any]
+    ) -> None:
+        """Update session data by session ID.
+
+        Args:
+            session_id (str): The ID of the session to update.
+            data (dict): The new data for the session.
+        """
+        if session_id == "fake-session-id":
+            self._fake_session.update(data)
+        else:
+            ...
 
     async def update_session(self, session_id: str, data: dict) -> None:
         """Update session data by session ID.
@@ -426,6 +704,14 @@ class TestAsyncJam(AioJam):
         else:
             ...
 
+    async def session_clear(self, session_key: str) -> None:
+        """Clear all sessions associated with a specific session key.
+
+        Args:
+            session_key (str): The session key whose sessions are to be cleared.
+        """
+        ...
+
     async def clear_sessions(self, session_key: str) -> None:
         """Clear all sessions associated with a specific session key.
 
@@ -433,6 +719,17 @@ class TestAsyncJam(AioJam):
             session_key (str): The session key whose sessions are to be cleared.
         """
         ...
+
+    async def session_rework(self, old_session_id: str) -> str:
+        """Rework an existing session key to a new one.
+
+        Args:
+            old_session_id (str): The old session id to be reworked.
+
+        Returns:
+            str: A new fake session ID.
+        """
+        return "fake-session-id"
 
     async def rework_session(self, old_session_key: str) -> str:
         """Rework an existing session key to a new one.
@@ -444,6 +741,20 @@ class TestAsyncJam(AioJam):
             str: A new fake session ID.
         """
         return "fake-session-id"
+
+    async def otp_code(
+        self, secret: Union[str, bytes], factor: Optional[int] = None
+    ) -> str:
+        """Generates a OTP code.
+
+        Args:
+            secret (str): The secret key used to generate the OTP code.
+            factor (int | None): An optional factor to influence the OTP generation.
+
+        Returns:
+            str: A fake OTP code.
+        """
+        return "123456"
 
     async def get_otp_code(
         self, secret: str, factor: Optional[int] = None
@@ -458,6 +769,26 @@ class TestAsyncJam(AioJam):
             str: A fake OTP code.
         """
         return "123456"
+
+    async def otp_verify_code(
+        self,
+        secret: Union[str, bytes],
+        code: str,
+        factor: Optional[int] = None,
+        look_ahead: Optional[int] = 1,
+    ) -> bool:
+        """Verifies a given OTP code.
+
+        Args:
+            secret (str): The secret key used to verify the OTP code.
+            code (str): The OTP code to verify.
+            factor (int | None): An optional factor that was used during OTP generation.
+            look_ahead (int | None): An optional look-ahead window for verification.
+
+        Returns:
+            bool: True if the OTP code is valid, False otherwise.
+        """
+        return code == "123456"
 
     async def verify_otp_code(
         self,
@@ -478,6 +809,31 @@ class TestAsyncJam(AioJam):
             bool: True if the OTP code is valid, False otherwise.
         """
         return code == "123456"
+
+    async def otp_uri(
+        self,
+        secret: str,
+        name: Optional[str] = None,
+        issuer: Optional[str] = None,
+        counter: Optional[int] = None,
+    ) -> str:
+        """Generates an otpauth:// URI for Google Authenticator.
+
+        Args:
+            secret (str): The secret key used to generate the OTP URI.
+            name (str | None): An optional name for the OTP account.
+            issuer (str | None): An optional issuer for the OTP account.
+            counter (int | None): An optional counter for HOTP.
+
+        Returns:
+            str: A fake otpauth:// URI.
+        """
+        uri = f"otpauth://totp/{name or 'user'}?secret={secret}"
+        if issuer:
+            uri += f"&issuer={issuer}"
+        if counter is not None:
+            uri += f"&counter={counter}"
+        return uri
 
     async def get_otp_uri(
         self,

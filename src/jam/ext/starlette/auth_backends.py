@@ -57,7 +57,7 @@ class JWTBackend(AuthenticationBackend):
 
         try:
             payload: dict[str, Any] = await await_maybe(
-                self._jam.verify_jwt_token(
+                self._jam.jwt_verify_token(
                     token=token, check_exp=True, check_list=self.__use_list
                 )
             )
@@ -107,7 +107,7 @@ class SessionBackend(AuthenticationBackend):
 
         try:
             payload: dict[str, Any] = await await_maybe(
-                self._jam.get_session(session_id)
+                self._jam.session_get(session_id)
             )
         except Exception as e:
             logger.warning(f"Token verify error: {e}")

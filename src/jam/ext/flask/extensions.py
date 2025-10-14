@@ -71,7 +71,7 @@ class JWTExtension(JamExtension):
         if not token:
             return None
         try:
-            payload: dict[str, Any] = self._jam.verify_jwt_token(
+            payload: dict[str, Any] = self._jam.jwt_verify_token(
                 token=token, check_exp=True, check_list=self.__use_list
             )
         except Exception as e:
@@ -123,7 +123,7 @@ class SessionExtension(JamExtension):
         if not session_id:
             return None
         try:
-            payload: Optional[dict[str, Any]] = self._jam.get_session(
+            payload: Optional[dict[str, Any]] = self._jam.session_get(
                 session_id
             )
         except Exception as e:

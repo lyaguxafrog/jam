@@ -27,7 +27,7 @@ async def test_jwt_backend_from_cookie(async_jam):
         {"type": "http", "headers": [(b"cookie", b"access_token=valid_token")]}
     )
 
-    async_jam.verify_jwt_token = async_jam._async_mock(
+    async_jam.jwt_verify_token = async_jam._async_mock(
         return_value={"user_id": 1, "username": "bob"}
     )
 
@@ -46,7 +46,7 @@ async def test_jwt_backend_from_header(async_jam):
         {"type": "http", "headers": [(b"authorization", b"Bearer valid_token")]}
     )
 
-    async_jam.verify_jwt_token = async_jam._async_mock(
+    async_jam.jwt_verify_token = async_jam._async_mock(
         return_value={"user": "header_user"}
     )
 
@@ -87,7 +87,7 @@ async def test_session_backend_from_cookie(async_jam):
         {"type": "http", "headers": [(b"cookie", b"sessionId=sid123")]}
     )
 
-    async_jam.get_session = async_jam._async_mock(
+    async_jam.session_get = async_jam._async_mock(
         return_value={"user_id": 42, "role": "admin"}
     )
 
@@ -108,7 +108,7 @@ async def test_session_backend_from_header(async_jam):
         {"type": "http", "headers": [(b"authorization", b"Bearer session123")]}
     )
 
-    async_jam.get_session = async_jam._async_mock(
+    async_jam.session_get = async_jam._async_mock(
         return_value={"user": "header_user"}
     )
 
@@ -135,7 +135,7 @@ async def test_session_backend_invalid_session(async_jam):
         }
     )
 
-    async_jam.get_session = async_jam._async_mock(return_value=None)
+    async_jam.session_get = async_jam._async_mock(return_value=None)
 
     result = await backend.authenticate(conn)
 

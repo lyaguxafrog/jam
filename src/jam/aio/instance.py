@@ -5,6 +5,7 @@ from collections.abc import Callable
 from typing import Any, Optional, Union
 
 from jam.__abc_instances__ import BaseJam
+from jam.__deprecated__ import deprecated
 from jam.__logger__ import logger
 from jam.aio.modules import JWTModule, OAuth2Module, SessionModule
 from jam.utils.config_maker import __config_maker__, __module_loader__
@@ -89,30 +90,47 @@ class Jam(BaseJam):
                 "OTP not configure. Check documentation: "
             )
 
-    async def gen_jwt_token(self, payload: dict[str, Any]) -> str:
-        """Creating a new token.
+    async def jwt_make_payload(
+        self, exp: Optional[int], data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Make JWT-specific payload.
 
         Args:
-            payload (dict[str, Any]): Payload with information
+            exp (int | None): Token expire, if None -> use default
+            data (dict[str, Any]): Data to payload
+
+        Returns:
+            dict[str, Any]: Payload
+        """
+        return await self.jwt.make_payload(exp=exp, **data)
+
+    async def jwt_create_token(self, payload: dict[str, Any]) -> str:
+        """Create JWT token.
+
+        Args:
+            payload (dict[str, Any]): Data payload
+
+        Returns:
+            str: New token
 
         Raises:
             EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
             EmtpyPrivateKey: If RSA algorithm is selected, but private key None
-
-        Returns:
-            (str): Generated token
         """
         return await self.jwt.gen_token(**payload)
 
-    async def verify_jwt_token(
+    async def jwt_verify_token(
         self, token: str, check_exp: bool = True, check_list: bool = True
     ) -> dict[str, Any]:
-        """A method for verifying a token.
+        """Verify and decode JWT token.
 
         Args:
-            token (str): The token to check
-            check_exp (bool): Check for expiration?
-            check_list (bool): Check if there is a black/white list
+            token (str): JWT token
+            check_exp (bool): Check expire
+            check_list (bool): Check white/black list. Docs: https://jam.makridenko.ru/jwt/lists/what/
+
+        Returns:
+            dict[str, Any]: Decoded payload
 
         Raises:
             ValueError: If the token is invalid.
@@ -122,98 +140,73 @@ class Jam(BaseJam):
             TokenLifeTimeExpired: If token has expired.
             TokenNotInWhiteList: If the list type is white, but the token is  not there
             TokenInBlackList: If the list type is black and the token is there
-
-        Returns:
-            (dict[str, Any]): Payload from token
         """
-        return await self.jwt.validate_payload(
-            token=token, check_exp=check_exp, check_list=check_list
-        )
+        return await self.jwt.validate_payload(token, check_exp, check_list)
 
-    async def make_payload(
-        self, exp: Optional[int] = None, **data: Any
-    ) -> dict[str, Any]:
-        """Payload maker tool.
-
-        Args:
-            exp (int | None): If none exp = JWTModule.exp
-            **data: Custom data
-        """
-        return await self.jwt.make_payload(exp=exp, **data)
-
-    async def create_session(
+    async def session_create(
         self, session_key: str, data: dict[str, Any]
     ) -> str:
         """Create new session.
 
         Args:
-            session_key (str): Key for sessions
-            data (dict[str, Any]): Session payload
+            session_key (str): Key for session
+            data (dict[str, Any]): Session data
 
         Returns:
             str: New session ID
         """
         return await self.session.create(session_key, data)
 
-    async def get_session(self, session_id: str) -> Optional[dict[str, Any]]:
-        """Retrieve session data by session ID.
+    async def session_get(self, session_id: str) -> Optional[dict[str, Any]]:
+        """Get data from session.
 
         Args:
             session_id (str): Session ID
 
         Returns:
-            dict | None: Session payload if exists
+            dict[str, Any] | None: Session data if exist
         """
         return await self.session.get(session_id)
 
-    async def delete_session(self, session_id: str) -> None:
-        """Delete a session by its ID.
+    async def session_delete(self, session_id: str) -> None:
+        """Delete session.
 
         Args:
             session_id (str): Session ID
-
-        Returns:
-            None
         """
         return await self.session.delete(session_id)
 
-    async def update_session(
+    async def session_update(
         self, session_id: str, data: dict[str, Any]
     ) -> None:
-        """Update session data by session ID.
+        """Update session data.
 
         Args:
             session_id (str): Session ID
-            data (dict[str, Any]): Data for update
-
-        Returns:
-            None
+            data (dict[str, Any]): New data
         """
         return await self.session.update(session_id, data)
 
-    async def clear_sessions(self, session_key: str) -> None:
-        """Clear all sessions associated with a specific session key.
+    async def session_clear(self, session_key: str) -> None:
+        """Delete all sessions by key.
 
         Args:
-            session_key (str): Key for session scope
-
-        Returns:
-            None
+            session_key (str): Key of session
         """
         return await self.session.clear(session_key)
 
-    async def rework_session(self, old_session_key: str) -> str:
-        """Rework an existing session key to a new one.
+    async def session_rework(self, old_session_id: str) -> str:
+        """Rework session.
 
         Args:
-            old_session_key (str): Rework session
+            old_session_id (str): Old session id
 
         Returns:
-            str: New session ID
+            str: New session id
         """
-        return await self.session.rework(old_session_key)
+        return await self.session.rework(old_session_id)
 
-    async def get_otp_code(
+    def otp_code(
         self, secret: Union[str, bytes], factor: Optional[int] = None
     ) -> str:
         """Generates an OTP.
@@ -230,7 +223,7 @@ class Jam(BaseJam):
             secret=secret, digits=self._otp.digits, digest=self._otp.digest
         ).at(factor)
 
-    async def get_otp_uri(
+    def otp_uri(
         self,
         secret: str,
         name: Optional[str] = None,
@@ -255,6 +248,240 @@ class Jam(BaseJam):
             name=name, issuer=issuer, type_=self._otp.type, counter=counter
         )
 
+    def otp_verify_code(
+        self,
+        secret: Union[str, bytes],
+        code: str,
+        factor: Optional[int] = None,
+        look_ahead: Optional[int] = 1,
+    ) -> bool:
+        """Checks the OTP code, taking into account the acceptable window.
+
+        Args:
+            secret (str | bytes): User secret key.
+            code (str): The code entered.
+            factor (int | None, optional): Unixtime for TOTP(if none, use now time) / Counter for HOTP.
+            look_ahead (int, optional): Acceptable deviation in intervals (±window(totp) / ±look ahead(hotp)). Default is 1.
+
+        Returns:
+            bool: True if the code matches, otherwise False.
+        """
+        self._otp_checker()
+        return self._otp_module(
+            secret=secret, digits=self._otp.digits, digest=self._otp.digest
+        ).verify(code=code, factor=factor, look_ahead=look_ahead)
+
+    @deprecated("This method is deprecated, use: Jam.jwt_create_token")
+    async def gen_jwt_token(self, payload: dict[str, Any]) -> str:
+        """Creating a new token.
+
+        Args:
+            payload (dict[str, Any]): Payload with information
+
+        Deprecated:
+            Use: `Jam.jwt_create_token`
+
+        Raises:
+            EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
+            EmtpyPrivateKey: If RSA algorithm is selected, but private key None
+
+        Returns:
+            (str): Generated token
+        """
+        return await self.jwt.gen_token(**payload)
+
+    @deprecated("This method is deprecated, use: Jam.jwt_verify_token")
+    async def verify_jwt_token(
+        self, token: str, check_exp: bool = True, check_list: bool = True
+    ) -> dict[str, Any]:
+        """A method for verifying a token.
+
+        Args:
+            token (str): The token to check
+            check_exp (bool): Check for expiration?
+            check_list (bool): Check if there is a black/white list
+
+        Deprecated:
+            Use: `Jam.jwt_verify_token`
+
+        Raises:
+            ValueError: If the token is invalid.
+            EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None.
+            EmtpyPublicKey: If RSA algorithm is selected, but public key None.
+            NotFoundSomeInPayload: If 'exp' not found in payload.
+            TokenLifeTimeExpired: If token has expired.
+            TokenNotInWhiteList: If the list type is white, but the token is  not there
+            TokenInBlackList: If the list type is black and the token is there
+
+        Returns:
+            (dict[str, Any]): Payload from token
+        """
+        return await self.jwt.validate_payload(
+            token=token, check_exp=check_exp, check_list=check_list
+        )
+
+    @deprecated("This method is deprecated, use: Jam.jwt_make_payload")
+    async def make_payload(
+        self, exp: Optional[int] = None, **data: Any
+    ) -> dict[str, Any]:
+        """Payload maker tool.
+
+        Args:
+            exp (int | None): If none exp = JWTModule.exp
+            **data: Custom data
+
+        Deprecated:
+            Use: `Jam.jwt_make_payload`
+        """
+        return await self.jwt.make_payload(exp=exp, **data)
+
+    @deprecated("This method is deprecated, use: `Jam.session_create`")
+    async def create_session(
+        self, session_key: str, data: dict[str, Any]
+    ) -> str:
+        """Create new session.
+
+        Args:
+            session_key (str): Key for sessions
+            data (dict[str, Any]): Session payload
+
+        Deprecated:
+            Use: `Jam.session_create`
+
+        Returns:
+            str: New session ID
+        """
+        return await self.session.create(session_key, data)
+
+    @deprecated("This method is deprecates, use: Jam.session_get")
+    async def get_session(self, session_id: str) -> Optional[dict[str, Any]]:
+        """Retrieve session data by session ID.
+
+        Args:
+            session_id (str): Session ID
+
+        Deprecated:
+            Use: `Jam.session_get`
+
+        Returns:
+            dict | None: Session payload if exists
+        """
+        return await self.session.get(session_id)
+
+    @deprecated("This method is deprecated, use: Jam.session_delete")
+    async def delete_session(self, session_id: str) -> None:
+        """Delete a session by its ID.
+
+        Args:
+            session_id (str): Session ID
+
+        Deprecated:
+            Use: `Jam.session_delete`
+
+        Returns:
+            None
+        """
+        return await self.session.delete(session_id)
+
+    @deprecated("This method is deprecated, use: Jam.session_update")
+    async def update_session(
+        self, session_id: str, data: dict[str, Any]
+    ) -> None:
+        """Update session data by session ID.
+
+        Args:
+            session_id (str): Session ID
+            data (dict[str, Any]): Data for update
+
+        Deprecated:
+            Use: `Jam.session_update`
+
+        Returns:
+            None
+        """
+        return await self.session.update(session_id, data)
+
+    @deprecated("This method is deprecated, use: Jam.session_clear")
+    async def clear_sessions(self, session_key: str) -> None:
+        """Clear all sessions associated with a specific session key.
+
+        Args:
+            session_key (str): Key for session scope
+
+        Deprecated:
+            Use: `Jam.session_clear`
+
+        Returns:
+            None
+        """
+        return await self.session.clear(session_key)
+
+    @deprecated("This method is deprecated, use: Jam.session_rework")
+    async def rework_session(self, old_session_key: str) -> str:
+        """Rework an existing session key to a new one.
+
+        Args:
+            old_session_key (str): Rework session
+
+        Deprecated:
+            Use: `Jam.session_rework`
+
+        Returns:
+            str: New session ID
+        """
+        return await self.session.rework(old_session_key)
+
+    @deprecated("This method is deprecated, use: Jam.otp_code")
+    async def get_otp_code(
+        self, secret: Union[str, bytes], factor: Optional[int] = None
+    ) -> str:
+        """Generates an OTP.
+
+        Args:
+            secret (str | bytes): User secret key.
+            factor (int | None, optional): Unixtime for TOTP(if none, use now time) / Counter for HOTP.
+
+        Deprecated:
+            Use: `Jam.otp_code`
+
+        Returns:
+            str: OTP code (fixed-length string).
+        """
+        self._otp_checker()
+        return self._otp_module(
+            secret=secret, digits=self._otp.digits, digest=self._otp.digest
+        ).at(factor)
+
+    @deprecated("This method os deprecated, use: Jam.otp_uri")
+    async def get_otp_uri(
+        self,
+        secret: str,
+        name: Optional[str] = None,
+        issuer: Optional[str] = None,
+        counter: Optional[int] = None,
+    ) -> str:
+        """Generates an otpauth:// URI for Google Authenticator.
+
+        Args:
+            secret (str): User secret key.
+            name (str): Account name (e.g., email).
+            issuer (str): Service name (e.g., "GitHub").
+            counter (int | None, optional): Counter (for HOTP). Default is None.
+
+        Deprecated:
+            Use: `Jam.otp_uri`
+
+        Returns:
+            str: A string of the form "otpauth://..."
+        """
+        self._otp_checker()
+        return self._otp_module(
+            secret=secret, digits=self._otp.digits, digest=self._otp.digest
+        ).provisioning_uri(
+            name=name, issuer=issuer, type_=self._otp.type, counter=counter
+        )
+
+    @deprecated("This method is deprecated, use: Jam.otp_verify_code")
     async def verify_otp_code(
         self,
         secret: Union[str, bytes],
@@ -269,6 +496,9 @@ class Jam(BaseJam):
             code (str): The code entered.
             factor (int | None, optional): Unixtime for TOTP(if none, use now time) / Counter for HOTP.
             look_ahead (int, optional): Acceptable deviation in intervals (±window(totp) / ±look ahead(hotp)). Default is 1.
+
+        Deprecated:
+            Use: `Jam.otp_verify_code`
 
         Returns:
             bool: True if the code matches, otherwise False.

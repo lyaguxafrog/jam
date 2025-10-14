@@ -8,7 +8,7 @@ from jam import Jam
 
 jam = Jam(config=config)
 
-code = jam.get_otp_code(
+code = jam.otp_code(
     secret="USERSECRETKEY"
 )
 ```
@@ -20,7 +20,7 @@ code = jam.get_otp_code(
 ## Verify code
 
 ```python
-result: bool = jam.verify_otp_code(
+result: bool = jam.otp_verify_code(
     secret="USERSECRETKEY",
     code="123456",
     look_ahead=1
@@ -33,7 +33,7 @@ a URI for generating codes that can be used in
 Google Authenticator or any other application.
 
 ```python
-uri = jam.get_otp_uri(
+uri = jam.otp_uri(
     secret="USER-SECRET-KEY",
     name="username/email/or-something",
     issuer="your-service-name",
