@@ -4,6 +4,8 @@ import gc
 from collections.abc import Callable
 from typing import Any, Optional, Union
 
+from __deprecated__ import deprecated
+
 from jam.__abc_instances__ import BaseJam
 from jam.__logger__ import logger
 from jam.modules import JWTModule, OAuth2Module, SessionModule
@@ -87,20 +89,28 @@ class Jam(BaseJam):
                 "OTP not configure. Check documentation: "
             )
 
-    def make_payload(self, exp: Optional[int] = None, **data) -> dict[str, Any]:
-        """Payload maker tool.
+    def jwt_make_payload(
+        self, exp: Optional[int], data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Make JWT-specific payload.
 
         Args:
-            exp (int | None): If none exp = JWTModule.exp
-            **data: Custom data
+            exp (int | None): Token expire, if None -> use default
+            data (dict[str, Any]): Data to payload
+
+        Returns:
+            dict[str, Any]: Payload
         """
         return self.jwt.make_payload(exp=exp, **data)
 
-    def gen_jwt_token(self, payload: dict[str, Any]) -> str:
-        """Creating a new token.
+    def jwt_create_token(self, payload: dict[str, Any]) -> str:
+        """Create JWT token.
 
         Args:
-            payload (dict[str, Any]): Payload with information
+            payload (dict[str, Any]): Data payload
+
+        Returns:
+            str: New token
 
         Raises:
             EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
@@ -108,6 +118,59 @@ class Jam(BaseJam):
         """
         return self.jwt.gen_token(**payload)
 
+    def jwt_verify_token(
+        self, token: str, check_exp: bool = True, check_list: bool = True
+    ) -> dict[str, Any]:
+        """Verify and decode JWT token.
+
+        Args:
+            token (str): JWT token
+            check_exp (bool): Check expire
+            check_list (bool): Check white/black list. Docs: https://jam.makridenko.ru/jwt/lists/what/
+
+        Returns:
+            dict[str, Any]: Decoded payload
+
+        Raises:
+            ValueError: If the token is invalid.
+            EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None.
+            EmtpyPublicKey: If RSA algorithm is selected, but public key None.
+            NotFoundSomeInPayload: If 'exp' not found in payload.
+            TokenLifeTimeExpired: If token has expired.
+            TokenNotInWhiteList: If the list type is white, but the token is  not there
+            TokenInBlackList: If the list type is black and the token is there
+        """
+
+    @deprecated("This method is deprecated, use: Jam.jwt_make_payload")
+    def make_payload(self, exp: Optional[int] = None, **data) -> dict[str, Any]:
+        """Payload maker tool.
+
+        Args:
+            exp (int | None): If none exp = JWTModule.exp
+            **data: Custom data
+
+        Deprecated:
+            Use `Jam.jwt_make_payload`
+        """
+        return self.jwt.make_payload(exp=exp, **data)
+
+    @deprecated("This method is deprecated, use: Jam.jwt_create_token")
+    def gen_jwt_token(self, payload: dict[str, Any]) -> str:
+        """Creating a new token.
+
+        Args:
+            payload (dict[str, Any]): Payload with information
+
+        Deprecated:
+            Use `Jam.jwt_create_token`
+
+        Raises:
+            EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
+            EmtpyPrivateKey: If RSA algorithm is selected, but private key None
+        """
+        return self.jwt.gen_token(**payload)
+
+    @deprecated("This method is deprecated, use: Jam.jwt_verify_token")
     def verify_jwt_token(
         self, token: str, check_exp: bool = True, check_list: bool = True
     ) -> dict[str, Any]:
@@ -117,6 +180,9 @@ class Jam(BaseJam):
             token (str): The token to check
             check_exp (bool): Check for expiration?
             check_list (bool): Check if there is a black/white list
+
+        Deprecated:
+            Use `Jam.jwt_verify_token`
 
         Raises:
             ValueError: If the token is invalid.
