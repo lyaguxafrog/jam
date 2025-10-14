@@ -22,14 +22,14 @@ class AuthService:
 
     # Generate new token
     def generate_token(self, user: User) -> str:
-        payload = self.jam.make_payload(user.to_payload())
-        token = self.jam.gen_jwt_token(payload)
+        payload = self.jam.jwt_make_payload(exp=None, data=user.to_payload())
+        token = self.jam.jwt_create_token(payload)
         return token
 
     # Validate token and return user or None
     def validate_token(self, token) -> User | None:
         try:
-            payload = self.jam.verify_jwt_token(
+            payload = self.jam.jwt_verify_token(
                 token, check_exp=True, check_list=False
             )
         except ValueError:
