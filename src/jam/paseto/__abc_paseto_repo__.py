@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import json
 from abc import ABC, abstractmethod
-from collections.abc import Callable
 from typing import Any, Literal, Optional, TypeVar, Union
+
+from jam.__abc_encoder__ import BaseEncoder
+from jam.encoders import JsonEncoder
 
 
 PASETO = TypeVar("PASETO", bound="BasePASETO")
@@ -47,18 +48,30 @@ class BasePASETO(ABC):
         self,
         payload: dict[str, Any],
         footer: Optional[Union[dict[str, Any], str]] = None,
-        serializer: Callable = json,
+        serializer: BaseEncoder = JsonEncoder,
     ) -> str:
-        """Generate token from key instance."""
+        """Generate token from key instance.
+
+        Args:
+            payload (dict[str, Any]): Payload for token
+            footer (dict[str, Any] | str  | None): Token footer
+            serializer (BaseEncoder): JSON Encoder
+        """
         raise NotImplementedError
 
     @staticmethod
     @abstractmethod
-    def decode(token: str) -> dict[str, Any]:
+    def decode(
+        token: str,
+        public_key: Optional[str] = None,
+        serializer: BaseEncoder = JsonEncoder,
+    ) -> dict[str, Any]:
         """Decode PASETO.
 
         Args:
             token (str): Token
+            public_key (str | None): Public key if needed
+            serializer (BaseEncoder): JSON Encoder
 
         Returns:
             dict[str, Any]: Payload
