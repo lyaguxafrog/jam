@@ -15,8 +15,6 @@ class BasePASETO(ABC):
     def __init__(self):
         """Constructor."""
         self._secret: Optional[str] = None
-        self._private: Optional[str] = None
-        self.public: Optional[str] = None
         self._purpose: Optional[Literal["local", "public"]] = None
 
     @property
