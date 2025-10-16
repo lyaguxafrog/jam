@@ -3,6 +3,9 @@
 
 from typing import Any, Literal, Optional, Union
 
+from jam.__abc_encoder__ import BaseEncoder
+from jam.encoders import JsonEncoder
+
 from .__abc_paseto_repo__ import PASETO, BasePASETO
 
 
@@ -35,11 +38,16 @@ class PASETOv1(BasePASETO):
         self,
         payload: dict[str, Any],
         footer: Optional[Union[dict[str, Any], str]] = None,
+        serializer: BaseEncoder = JsonEncoder,
     ) -> str:
         """Encode PASETO."""
         ...
 
     @staticmethod
-    def decode(token: str) -> dict[str, Any]:
+    def decode(
+        token: str,
+        public_key: Optional[str] = None,
+        serializer: BaseEncoder = JsonEncoder,
+    ) -> dict[str, Any]:
         """Decide PASETO."""
         ...
