@@ -609,7 +609,7 @@ wheels = [
 
 [[package]]
 name = "jamlib"
-version = "2.5.3a1+encoders"
+version = "2.6.0a2"
 source = { editable = "." }
 dependencies = [
     { name = "cryptography" },

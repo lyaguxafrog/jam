@@ -1,6 +1,6 @@
 [project]
 name = "jamlib"
-version = "2.5.3a1+encoders"
+version = "2.6.0a2"
 description = "Simple and universal library for authorization."
 authors = [
     {name = "Makridenko Adrian",email = "adrianmakridenko@duck.com"},
@@ -28,7 +28,6 @@ dependencies = [
 ]
 
 classifiers = [
-    "License :: OSI Approved :: MIT License",
     "Development Status :: 5 - Production/Stable",
     "Operating System :: OS Independent",
     "Intended Audience :: Developers",

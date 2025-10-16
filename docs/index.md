@@ -43,6 +43,7 @@ token = await jam.gen_jwt_token(payload)
 Jam is a library that provides the most popular AUTH* mechanisms right out of the box.
 
 * [JWT](jwt/instance.md)
+* PASETO
 * [Server side sessions](instance.md)
 * OTP
     * [TOTP](otp/totp.md)

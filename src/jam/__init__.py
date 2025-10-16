@@ -7,9 +7,11 @@ Source code: https://github.com/lyaguxafrog/jam
 Documentation: https://jam.makridenko.ru
 """
 
+from jam.__abc_encoder__ import BaseEncoder
 from jam.__abc_instances__ import BaseJam
+from jam.encoders import JsonEncoder
 from jam.instance import Jam
 
 
-__version__ = "2.5.3a1+encoders"
-__all__ = ["Jam", "BaseJam"]
+__version__ = "2.6.0a2"
+__all__ = ["Jam", "JsonEncoder", "BaseJam", "BaseEncoder"]

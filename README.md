@@ -16,10 +16,21 @@ Documentation: [jam.makridenko.ru](https://jam.makridenko.ru)
 pip install jamlib
 ```
 
+## Quick example
+```python
+from jam import Jam
+
+jam = Jam()
+
+jwt = jam.jwt_create_token({"user": 1})
+decoded_payload = jam.jwt_verify_token(jwt)
+```
+
 ## Why Jam?
 Jam is a library that provides the most popular AUTH* mechanisms right out of the box.
 
 * [JWT](https://jam.makridenko.ru/jwt/instance/)
+* PASETO
 * [Server side sessions](https://jam.makridenko.ru/sessions/instance/)
 * OTP
   * [TOTP](https://jam.makridenko.ru/otp/totp/)
