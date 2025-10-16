@@ -3,6 +3,8 @@
 from abc import ABC, abstractmethod
 from typing import Any, Literal, Optional, TypeVar, Union
 
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
 from jam.__abc_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
 
@@ -17,13 +19,23 @@ class BasePASETO(ABC):
 
     def __init__(self):
         """Constructor."""
-        self._secret: Optional[str] = None
+        self._secret: Optional[bytes] = None
         self._purpose: Optional[Literal["local", "public"]] = None
 
     @property
     def purpose(self) -> Optional[Literal["local", "public"]]:
         """Return PASETO purpose."""
         return self._purpose
+
+    @staticmethod
+    def _encrypt(key: bytes, nonce: bytes, data: bytes) -> bytes:
+        try:
+            encryptor = Cipher(
+                algorithms.AES(key), modes.CTR(nonce)
+            ).encryptor()
+            return encryptor.update(data)
+        except Exception as e:
+            raise ValueError(f"Failed to encrypt: {e}")
 
     @classmethod
     @abstractmethod
