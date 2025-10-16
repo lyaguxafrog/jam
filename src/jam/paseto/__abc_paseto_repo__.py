@@ -29,13 +29,25 @@ class BasePASETO(ABC):
 
     @staticmethod
     def _encrypt(key: bytes, nonce: bytes, data: bytes) -> bytes:
+        """Encrypt data using AES-256-CTR."""
         try:
-            encryptor = Cipher(
-                algorithms.AES(key), modes.CTR(nonce)
-            ).encryptor()
-            return encryptor.update(data)
+            cipher = Cipher(algorithms.AES(key), modes.CTR(nonce))
+            encryptor = cipher.encryptor()
+            ciphertext = encryptor.update(data) + encryptor.finalize()
+            return ciphertext
         except Exception as e:
             raise ValueError(f"Failed to encrypt: {e}")
+
+    @staticmethod
+    def _decrypt(key: bytes, nonce: bytes, data: bytes) -> bytes:
+        """Decrypt data using AES-256-CTR."""
+        try:
+            cipher = Cipher(algorithms.AES(key), modes.CTR(nonce))
+            decryptor = cipher.decryptor()
+            plaintext = decryptor.update(data) + decryptor.finalize()
+            return plaintext
+        except Exception as e:
+            raise ValueError(f"Failed to decrypt: {e}")
 
     @classmethod
     @abstractmethod
@@ -71,21 +83,19 @@ class BasePASETO(ABC):
         """
         raise NotImplementedError
 
-    @staticmethod
     @abstractmethod
     def decode(
+        self,
         token: str,
-        public_key: Optional[str] = None,
         serializer: BaseEncoder = JsonEncoder,
-    ) -> dict[str, Any]:
+    ) -> tuple[dict[str, Any], Optional[dict[str, Any]]]:
         """Decode PASETO.
 
         Args:
             token (str): Token
-            public_key (str | None): Public key if needed
             serializer (BaseEncoder): JSON Encoder
 
         Returns:
-            dict[str, Any]: Payload
+            tuple[dict[str, Any], Optional[dict[str, Any]]]: Payload, footer
         """
         raise NotImplementedError
