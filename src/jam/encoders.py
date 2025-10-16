@@ -28,7 +28,7 @@ class JsonEncoder(BaseEncoder):
         return json.loads(var)
 
 
-class MsgspecEncoder(BaseEncoder):
+class MsgspecJsonEncoder(BaseEncoder):
     """JSON encoder based on msgspec.
 
     To use it, you need to install the optional msgspec: `pip install msgspec`
