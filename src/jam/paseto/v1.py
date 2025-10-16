@@ -13,7 +13,7 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
 from jam.__abc_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
-from jam.paseto.__abc_paseto_repo__ import PASETO, BasePASETO
+from jam.paseto.__abc_paseto_repo__ import PASETO, BasePASETO, RSAKeyLike
 from jam.paseto.utils import (
     __gen_hash__,
     __pae__,
@@ -32,12 +32,14 @@ class PASETOv1(BasePASETO):
         cls: type[PASETO],
         purpose: Literal["local", "public"],
         key: Union[str, bytes, None, RSAPrivateKey],
+        public_key: Union[RSAKeyLike] = None,
     ) -> PASETO:
         """Return PASETO instance.
 
         Args:
             purpose (Literal["local", "public"]): Paseto purpose
             key (str | bytes): PEM or secret key
+            public_key (str | bytes | RSAPublicKey | None): Public key for RSA
 
         Returns:
             PASETO: Paseto instance
@@ -50,6 +52,7 @@ class PASETOv1(BasePASETO):
             if not isinstance(key, RSAPrivateKey):
                 raise ValueError("Invalid RSA private key")
             ky._secret = key
+            ky._public_key = cls.load_rsa_key(public_key, private=False)
         else:
             if purpose == "local":
                 if isinstance(key, str):
@@ -175,6 +178,63 @@ class PASETOv1(BasePASETO):
 
         return payload, footer
 
+    def _decode_public(
+        self,
+        token: str,
+        serializer: Union[type[BaseEncoder], BaseEncoder] = JsonEncoder,
+    ):
+        parts = token.encode("utf-8").split(b".")
+        if len(parts) < 3:
+            raise ValueError("Invalid token format")
+
+        header = b".".join(parts[:2]) + b"."
+        if header != b"v1.public.":
+            raise ValueError("Invalid PASETO header")
+
+        payload_part = parts[2]
+        footer_part = parts[3] if len(parts) > 3 else b""
+
+        decoded = base64url_decode(payload_part)
+        if len(decoded) < 256:
+            raise ValueError("Invalid token body")
+
+        key_size = self._public_key.key_size // 8
+        if len(decoded) < key_size:
+            raise ValueError("Invalid payload/signature size")
+
+        payload = decoded[:-key_size]
+        signature = decoded[-key_size:]
+
+        footer_decoded = base64url_decode(footer_part) if footer_part else b""
+
+        pre_auth = __pae__([header, payload, footer_decoded])
+        try:
+            self._public_key.verify(
+                signature,
+                pre_auth,
+                padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA384()),
+                    salt_length=padding.PSS.MAX_LENGTH,
+                ),
+                hashes.SHA384(),
+            )
+        except Exception:
+            raise ValueError("Invalid signature")
+
+        payload_data = serializer.loads(payload)
+
+        footer = None
+        if footer_decoded:
+            try:
+                footer = serializer.loads(footer_decoded)
+            except Exception:
+                try:
+                    footer = footer_decoded.decode("utf-8")
+                except Exception:
+                    footer = footer_decoded
+
+        return payload_data, footer
+
     def encode(
         self,
         payload: dict[str, Any],
@@ -206,5 +266,7 @@ class PASETOv1(BasePASETO):
         """
         if token.startswith(f"{self._VERSION}.local"):
             return self._decode_local(token, serializer)
+        elif token.startswith(f"{self._VERSION}.public"):
+            return self._decode_public(token, serializer)
         else:
             raise NotImplementedError

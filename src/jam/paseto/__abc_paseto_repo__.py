@@ -26,6 +26,7 @@ class BasePASETO(ABC):
     def __init__(self):
         """Constructor."""
         self._secret: Union[Optional[bytes], RSAKeyLike] = None
+        self._public_key: Optional[RSAPublicKey] = None
         self._purpose: Optional[Literal["local", "public"]] = None
 
     @property
