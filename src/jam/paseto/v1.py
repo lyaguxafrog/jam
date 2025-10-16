@@ -12,8 +12,12 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from jam.__abc_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
 from jam.paseto.__abc_paseto_repo__ import PASETO, BasePASETO
-
-from .utils import __gen_hash__, __pae__, base64url_encode
+from jam.paseto.utils import (
+    __gen_hash__,
+    __pae__,
+    base64url_decode,
+    base64url_encode,
+)
 
 
 class PASETOv1(BasePASETO):
@@ -75,11 +79,67 @@ class PASETOv1(BasePASETO):
             token += b"." + base64url_encode(footer)
         return token
 
+    def _decode_local(self, token: str, serializer):
+        """Decode local PASETO."""
+        parts = token.encode("utf-8").split(b".")
+        if len(parts) < 3:
+            raise ValueError("Invalid token format")
+
+        header = b".".join(parts[:2]) + b"."
+        if header != b"v1.local.":
+            raise ValueError("Invalid PASETO header")
+
+        payload_part = parts[2]
+        footer_part = parts[3] if len(parts) > 3 else b""
+
+        decoded = base64url_decode(payload_part)
+        if len(decoded) < 80:
+            raise ValueError("Invalid payload size")
+
+        pl = decoded[:32]
+        ciphertext_tag = decoded[32:]
+        tag = ciphertext_tag[-48:]
+        ciphertext = ciphertext_tag[:-48]
+
+        footer_decoded = base64url_decode(footer_part) if footer_part else b""
+
+        hkdf_params = {
+            "algorithm": hashes.SHA384(),
+            "length": 32,
+            "salt": pl[0:16],
+        }
+        ek = HKDF(info=b"paseto-encryption-key", **hkdf_params).derive(
+            self._secret
+        )
+        ak = HKDF(info=b"paseto-auth-key-for-aead", **hkdf_params).derive(
+            self._secret
+        )
+
+        pre_auth = __pae__([header, pl, ciphertext, footer_decoded])
+        expected_tag = hmac.new(ak, pre_auth, hashlib.sha384).digest()
+        if not hmac.compare_digest(tag, expected_tag):
+            raise ValueError("Invalid authentication tag")
+
+        payload_bytes = self._decrypt(ek, pl[16:], ciphertext)
+        payload = serializer.loads(payload_bytes)
+
+        footer = None
+        if footer_decoded:
+            try:
+                footer = serializer.loads(footer_decoded)
+            except Exception:
+                try:
+                    footer = footer_decoded.decode("utf-8")
+                except Exception:
+                    footer = footer_decoded
+
+        return payload, footer
+
     def encode(
         self,
         payload: dict[str, Any],
         footer: Optional[Union[dict[str, Any], str]] = None,
-        serializer: BaseEncoder = JsonEncoder,
+        serializer: Union[type[BaseEncoder], BaseEncoder] = JsonEncoder,
     ) -> str:
         """Encode PASETO."""
         header = f"{self._VERSION}.{self.purpose}."
@@ -91,11 +151,18 @@ class PASETOv1(BasePASETO):
         else:
             raise NotImplementedError
 
-    @staticmethod
     def decode(
+        self,
         token: str,
-        public_key: Optional[str] = None,
-        serializer: BaseEncoder = JsonEncoder,
-    ) -> dict[str, Any]:
-        """Decide PASETO."""
-        ...
+        serializer: Union[type[BaseEncoder], BaseEncoder] = JsonEncoder,
+    ) -> tuple[dict[str, Any], Optional[dict[str, Any]]]:
+        """Decode PASETO.
+
+        Args:
+            token (str): PASETO
+            serializer (BaseEncoder): Json serializer
+        """
+        if token.startswith(f"{self._VERSION}.local"):
+            return self._decode_local(token, serializer)
+        else:
+            raise NotImplementedError
