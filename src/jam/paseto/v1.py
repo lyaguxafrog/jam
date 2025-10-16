@@ -1,12 +1,19 @@
 # -*- coding: utf-8 -*-
 
-
+import base64
+import hashlib
+import hmac
+import secrets
 from typing import Any, Literal, Optional, Union
+
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
 from jam.__abc_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
+from jam.paseto.__abc_paseto_repo__ import PASETO, BasePASETO
 
-from .__abc_paseto_repo__ import PASETO, BasePASETO
+from .utils import __gen_hash__, __pae__, base64url_encode
 
 
 class PASETOv1(BasePASETO):
@@ -30,9 +37,44 @@ class PASETOv1(BasePASETO):
             PASETO: Paseto instance
         """
         ky = cls()
-        ky._secret = key
+        if isinstance(key, str):
+            ky._secret = base64.urlsafe_b64decode(key + "==")
+        else:
+            ky._secret = key
         ky._purpose = purpose
         return ky
+
+    def _encode_local(
+        self,
+        header: str,
+        payload: bytes,
+        footer: bytes,
+    ) -> bytes:
+        header: bytes = header.encode("ascii")
+        nonce = secrets.token_bytes(32)
+        pl = __gen_hash__(nonce, payload, 32)
+        e = HKDF(
+            algorithm=hashes.SHA384(),
+            length=32,
+            salt=pl[0:16],
+            info=b"paseto-encryption-key",
+        )
+        a = HKDF(
+            algorithm=hashes.SHA384(),
+            length=32,
+            salt=pl[0:16],
+            info=b"paseto-auth-key-for-aead",
+        )
+        ek = e.derive(self._secret)
+        ak = a.derive(self._secret)
+
+        c = self._encrypt(ek, pl[16:], payload)
+        pre_auth = __pae__([header, pl, c, footer])
+        t = hmac.new(ak, pre_auth, hashlib.sha384).digest()
+        token = header + base64url_encode(pl + c + t)
+        if footer:
+            token += b"." + base64url_encode(footer)
+        return token
 
     def encode(
         self,
@@ -41,7 +83,14 @@ class PASETOv1(BasePASETO):
         serializer: BaseEncoder = JsonEncoder,
     ) -> str:
         """Encode PASETO."""
-        ...
+        header = f"{self._VERSION}.{self.purpose}."
+        payload = serializer.dumps(payload)
+        footer = serializer.dumps(footer) if footer else b""
+
+        if self._purpose == "local":
+            return self._encode_local(header, payload, footer).decode("utf-8")
+        else:
+            raise NotImplementedError
 
     @staticmethod
     def decode(
