@@ -37,7 +37,7 @@ class BasePASETO(ABC):
     def load_rsa_key(
         key: Optional[RSAKeyLike], *, private: bool = True
     ) -> Union[RSAPrivateKey, RSAPublicKey, None]:
-        """Load rsa key fron string | bytes.
+        """Load rsa key from string | bytes.
 
         Args:
             key (RSAKeyLike | None): RSA Key
