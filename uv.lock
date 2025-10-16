@@ -609,7 +609,7 @@ wheels = [
 
 [[package]]
 name = "jamlib"
-version = "2.5.2.post0"
+version = "2.5.3a1+encoders"
 source = { editable = "." }
 dependencies = [
     { name = "cryptography" },
@@ -648,6 +648,7 @@ dev = [
     { name = "fakeredis" },
     { name = "icecream" },
     { name = "isort" },
+    { name = "msgspec" },
     { name = "pre-commit" },
     { name = "ruff" },
     { name = "uvicorn" },
@@ -685,6 +686,7 @@ dev = [
     { name = "fakeredis", specifier = ">=2.28.1" },
     { name = "icecream", specifier = ">=2.1.4" },
     { name = "isort", specifier = ">=6.0.1" },
+    { name = "msgspec", specifier = ">=0.19.0" },
     { name = "pre-commit", specifier = ">=4.2.0" },
     { name = "ruff", specifier = ">=0.11.2" },
     { name = "uvicorn", specifier = ">=0.37.0" },
