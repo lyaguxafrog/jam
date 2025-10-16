@@ -20,7 +20,6 @@ class BaseJam(ABC):
             cfg (dict[str, Any]): Config
         """
         module_path = cfg.pop("module", None)
-
         if not module_path:
             module_path = self._JAM_MODULES.get(name)
 
@@ -29,6 +28,11 @@ class BaseJam(ABC):
 
         logger.debug(f"Initializing module '{name}' from {module_path}")
         module_cls = __module_loader__(module_path)
+
+        # FIX: handle oauth2 specially
+        if name == "oauth2":
+            return module_cls(config=cfg)
+
         return module_cls(**cfg)
 
     @abstractmethod
