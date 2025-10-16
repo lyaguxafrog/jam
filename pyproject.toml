@@ -1,6 +1,6 @@
 [project]
 name = "jamlib"
-version = "2.5.2.post0"
+version = "2.5.3a0+encoders"
 description = "Simple and universal library for authorization."
 authors = [
     {name = "Makridenko Adrian",email = "adrianmakridenko@duck.com"},

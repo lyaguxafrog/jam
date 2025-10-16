@@ -11,5 +11,5 @@ from jam.__abc_instances__ import BaseJam
 from jam.instance import Jam
 
 
-__version__ = "2.5.2.post0"
+__version__ = "2.5.3a0+encoders"
 __all__ = ["Jam", "BaseJam"]

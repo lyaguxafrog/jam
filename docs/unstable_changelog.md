@@ -1,7 +1,7 @@
 # Unstable features and etc
 
-Current version: `2.5.2.post0`
+Current version: `2.5.3a0+encoders`
 
 ## What is not yet included in the master
 
-- All in master :D
+- Add `BaseEncoder` instance for encoding JSONs
