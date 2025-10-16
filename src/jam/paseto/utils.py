@@ -3,6 +3,7 @@
 import base64
 import hashlib
 import hmac
+from typing import Union
 
 
 def __b64url_nopad__(b: bytes) -> str:
@@ -38,9 +39,12 @@ def __pae__(pieces: list[bytes]) -> bytes:
     return output
 
 
-def base64url_decode(v: str) -> bytes:
+def base64url_decode(v: Union[str, bytes]) -> bytes:
     """Base64 URL-safe decoding with padding."""
-    bv = v.encode("ascii")
+    if isinstance(v, bytes):
+        bv = v
+    else:
+        bv = v.encode("ascii")
     rem = len(bv) % 4
     if rem > 0:
         bv += b"=" * (4 - rem)
