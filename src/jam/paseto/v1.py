@@ -50,28 +50,27 @@ class PASETOv1(BasePASETO):
         payload: bytes,
         footer: bytes,
     ) -> bytes:
-        header: bytes = header.encode("ascii")
+        header_bytes = header.encode("ascii")
         nonce = secrets.token_bytes(32)
         pl = __gen_hash__(nonce, payload, 32)
-        e = HKDF(
-            algorithm=hashes.SHA384(),
-            length=32,
-            salt=pl[0:16],
-            info=b"paseto-encryption-key",
-        )
-        a = HKDF(
-            algorithm=hashes.SHA384(),
-            length=32,
-            salt=pl[0:16],
-            info=b"paseto-auth-key-for-aead",
-        )
-        ek = e.derive(self._secret)
-        ak = a.derive(self._secret)
 
-        c = self._encrypt(ek, pl[16:], payload)
-        pre_auth = __pae__([header, pl, c, footer])
-        t = hmac.new(ak, pre_auth, hashlib.sha384).digest()
-        token = header + base64url_encode(pl + c + t)
+        hkdf_params = {
+            "algorithm": hashes.SHA384(),
+            "length": 32,
+            "salt": pl[0:16],
+        }
+        ek = HKDF(info=b"paseto-encryption-key", **hkdf_params).derive(
+            self._secret
+        )
+        ak = HKDF(info=b"paseto-auth-key-for-aead", **hkdf_params).derive(
+            self._secret
+        )
+
+        ciphertext = self._encrypt(ek, pl[16:], payload)
+        pre_auth = __pae__([header_bytes, pl, ciphertext, footer])
+        tag = hmac.new(ak, pre_auth, hashlib.sha384).digest()
+
+        token = header_bytes + base64url_encode(pl + ciphertext + tag)
         if footer:
             token += b"." + base64url_encode(footer)
         return token
