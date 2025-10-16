@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import base64
+import secrets
 from typing import Any, Literal, Optional, Union
 
 from cryptography.hazmat.primitives import serialization
@@ -8,6 +9,8 @@ from cryptography.hazmat.primitives.asymmetric import ed25519
 
 from jam import BaseEncoder, JsonEncoder
 from jam.paseto.__abc_paseto_repo__ import PASETO, BasePASETO
+from jam.paseto.utils import __pae__, base64url_encode
+from jam.utils.xchacha20poly1305 import xchacha20poly1305_encrypt
 
 
 class PASETOv2(BasePASETO):
@@ -62,6 +65,27 @@ class PASETOv2(BasePASETO):
         else:
             raise ValueError("Purpose must be 'local' or 'public'")
 
+    def _encode_local(
+        self,
+        header: str,
+        payload: bytes,
+        footer: bytes,  # TODO: Footer checker for specification
+    ) -> bytes:
+        bheader = header.encode("ascii")
+        nonce = secrets.token_bytes(24)
+        aad = __pae__([bheader, footer])
+        ciphertext = xchacha20poly1305_encrypt(
+            self._secret, nonce, payload, aad
+        )
+
+        token = (
+            bheader
+            + base64url_encode(nonce + ciphertext)
+            + b"."
+            + base64url_encode(footer)
+        )
+        return token
+
     def encode(
         self,
         payload: dict[str, Any],
@@ -69,7 +93,13 @@ class PASETOv2(BasePASETO):
         serializer: BaseEncoder = JsonEncoder,
     ) -> str:
         """Encode."""
-        raise NotImplementedError
+        header = f"{self._VERSION}.{self._purpose}."
+        payload = serializer.dumps(payload)
+        footer = serializer.dumps(footer) if footer else b""
+        if self._purpose == "local":
+            return self._encode_local(header, payload, footer).decode("utf-8")
+        else:
+            raise NotImplementedError
 
     def decode(
         self,
