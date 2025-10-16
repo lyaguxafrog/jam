@@ -3,6 +3,11 @@
 from abc import ABC, abstractmethod
 from typing import Any, Literal, Optional, TypeVar, Union
 
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric.rsa import (
+    RSAPrivateKey,
+    RSAPublicKey,
+)
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 from jam.__abc_encoder__ import BaseEncoder
@@ -10,6 +15,7 @@ from jam.encoders import JsonEncoder
 
 
 PASETO = TypeVar("PASETO", bound="BasePASETO")
+RSAKeyLike = Union[str, bytes, RSAPrivateKey, RSAPublicKey]
 
 
 class BasePASETO(ABC):
@@ -19,13 +25,67 @@ class BasePASETO(ABC):
 
     def __init__(self):
         """Constructor."""
-        self._secret: Optional[bytes] = None
+        self._secret: Union[Optional[bytes], RSAKeyLike] = None
         self._purpose: Optional[Literal["local", "public"]] = None
 
     @property
     def purpose(self) -> Optional[Literal["local", "public"]]:
         """Return PASETO purpose."""
         return self._purpose
+
+    @staticmethod
+    def load_rsa_key(
+        key: Optional[RSAKeyLike], *, private: bool = True
+    ) -> Union[RSAPrivateKey, RSAPublicKey, None]:
+        """Load rsa key fron string | bytes.
+
+        Args:
+            key (RSAKeyLike | None): RSA Key
+            private (bool): Private or public
+        """
+        if key is None:
+            return None
+        if isinstance(key, (RSAPublicKey, RSAPrivateKey)):
+            return key
+        if isinstance(key, str):
+            key = key.encode("utf-8")
+        try:
+            if private:
+                return serialization.load_pem_private_key(key, password=None)
+            else:
+                return serialization.load_pem_public_key(key)
+        except ValueError:
+            try:
+                if private:
+                    return serialization.load_der_private_key(
+                        key, password=None
+                    )
+                else:
+                    return serialization.load_der_public_key(key)
+            except Exception as e:
+                raise ValueError(
+                    f"Invalid RSA {'private' if private else 'public'} key format: {e}"
+                )
+
+    @staticmethod
+    def _rsa_pem_check(key: RSAKeyLike) -> bool:
+        if isinstance(key, str):
+            if key.startswith("-----BEGIN PRIVATE"):
+                return True
+            elif key.startswith("-----BEGIN RSA PRIVATE"):
+                return True
+            elif key.startswith("-----BEGIN EC PRIVATE"):
+                return True
+        elif isinstance(key, bytes):
+            if key.startswith(b"-----BEGIN PRIVATE"):
+                return True
+            elif key.startswith(b"-----BEGIN RSA PRIVATE"):
+                return True
+            elif key.startswith(b"-----BEGIN EC PRIVATE"):
+                return True
+        elif isinstance(key, RSAPrivateKey):
+            return True
+        return False
 
     @staticmethod
     def _encrypt(key: bytes, nonce: bytes, data: bytes) -> bytes:

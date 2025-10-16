@@ -7,6 +7,8 @@ import secrets
 from typing import Any, Literal, Optional, Union
 
 from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
 from jam.__abc_encoder__ import BaseEncoder
@@ -29,7 +31,7 @@ class PASETOv1(BasePASETO):
     def key(
         cls: type[PASETO],
         purpose: Literal["local", "public"],
-        key: Union[str, bytes],
+        key: Union[str, bytes, None, RSAPrivateKey],
     ) -> PASETO:
         """Return PASETO instance.
 
@@ -41,10 +43,24 @@ class PASETOv1(BasePASETO):
             PASETO: Paseto instance
         """
         ky = cls()
-        if isinstance(key, str):
-            ky._secret = base64.urlsafe_b64decode(key + "==")
-        else:
+        if cls._rsa_pem_check(key):
+            if purpose == "local":
+                raise ValueError("PASETOv1.local does not support RSA keys")
+            key = cls.load_rsa_key(key, private=True)
+            if not isinstance(key, RSAPrivateKey):
+                raise ValueError("Invalid RSA private key")
             ky._secret = key
+        else:
+            if purpose == "local":
+                if isinstance(key, str):
+                    key = base64.urlsafe_b64decode(key + "==")
+                if not isinstance(key, bytes) or len(key) != 32:
+                    raise ValueError(
+                        "PASETOv1.local requires a 32-byte secret key"
+                    )
+                ky._secret = key
+            else:
+                raise ValueError("PASETOv1.public requires an RSA private key")
         ky._purpose = purpose
         return ky
 
@@ -75,6 +91,29 @@ class PASETOv1(BasePASETO):
         tag = hmac.new(ak, pre_auth, hashlib.sha384).digest()
 
         token = header_bytes + base64url_encode(pl + ciphertext + tag)
+        if footer:
+            token += b"." + base64url_encode(footer)
+        return token
+
+    def _encode_public(
+        self, header: str, payload: bytes, footer: bytes
+    ) -> bytes:
+        header_bytes = header.encode("ascii")
+        pre_auth = __pae__([header_bytes, payload, footer])
+
+        try:
+            signature = self._secret.sign(
+                pre_auth,
+                padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA384()),
+                    salt_length=padding.PSS.MAX_LENGTH,
+                ),
+                hashes.SHA384(),
+            )
+        except Exception as e:
+            raise ValueError(f"Failed to sign PASETO token: {e}")
+
+        token = header_bytes + base64url_encode(payload + signature)
         if footer:
             token += b"." + base64url_encode(footer)
         return token
@@ -149,6 +188,8 @@ class PASETOv1(BasePASETO):
 
         if self._purpose == "local":
             return self._encode_local(header, payload, footer).decode("utf-8")
+        elif self._purpose == "public":
+            return self._encode_public(header, payload, footer).decode("utf-8")
         else:
             raise NotImplementedError
 
