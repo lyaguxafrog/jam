@@ -123,6 +123,7 @@ class PASETOv1(BasePASETO):
         payload_bytes = self._decrypt(ek, pl[16:], ciphertext)
         payload = serializer.loads(payload_bytes)
 
+        # FIXME: Optimize
         footer = None
         if footer_decoded:
             try:
