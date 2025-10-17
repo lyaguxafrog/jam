@@ -9,8 +9,11 @@ from cryptography.hazmat.primitives.asymmetric import ed25519
 
 from jam import BaseEncoder, JsonEncoder
 from jam.paseto.__abc_paseto_repo__ import PASETO, BasePASETO
-from jam.paseto.utils import __pae__, base64url_encode
-from jam.utils.xchacha20poly1305 import xchacha20poly1305_encrypt
+from jam.paseto.utils import __pae__, base64url_decode, base64url_encode
+from jam.utils.xchacha20poly1305 import (
+    xchacha20poly1305_decrypt,
+    xchacha20poly1305_encrypt,
+)
 
 
 class PASETOv2(BasePASETO):
@@ -85,6 +88,45 @@ class PASETOv2(BasePASETO):
             token += b"." + base64url_encode(bfooter)
         return token
 
+    def _decode_local(
+        self, token: str, serializer: Union[type[BaseEncoder], BaseEncoder]
+    ) -> tuple[dict[str, Any], Optional[dict[str, Any]]]:
+        parts = token.encode().split(b".")
+        if len(parts) < 3:
+            raise ValueError("Invalid token format")
+
+        header = b".".join(parts[:2]) + b"."
+        if header != b"v2.local.":
+            raise ValueError("Invalid header")
+
+        body = base64url_decode(parts[2])
+        footer = base64url_decode(parts[3]) if len(parts) > 3 else b""
+
+        nonce = body[:24]
+        ciphertext = body[24:]
+        aad = __pae__([header, footer])
+
+        try:
+            plaintext = xchacha20poly1305_decrypt(
+                self._secret, nonce, ciphertext, aad
+            )
+        except Exception:
+            raise ValueError("Invalid authentication or corrupt ciphertext")
+
+        payload = serializer.loads(plaintext)
+
+        footer_val = None
+        if footer:
+            try:
+                footer_val = serializer.loads(footer)
+            except Exception:
+                try:
+                    footer_val = footer.decode("utf-8")
+                except Exception:
+                    footer_val = footer
+
+        return payload, footer_val
+
     def encode(
         self,
         payload: dict[str, Any],
@@ -106,4 +148,7 @@ class PASETOv2(BasePASETO):
         serializer: BaseEncoder = JsonEncoder,
     ) -> tuple[dict[str, Any], Optional[dict[str, Any]]]:
         """Decode."""
-        raise NotImplementedError
+        if token.startswith(f"{self._VERSION}.local"):
+            return self._decode_local(token, serializer)
+        else:
+            raise NotImplementedError
