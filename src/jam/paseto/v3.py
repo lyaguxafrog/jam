@@ -41,10 +41,7 @@ class PASETOv3(BasePASETO):
 
         Args:
             purpose (str): "local" or "public"
-            key (str | bytes):  may be:
-                * EC private key PEM/text (P-384) -> instance will have private and public
-                * EC public key PEM/text -> instance will have public only
-                * ec.EllipticCurvePrivateKey / ec.EllipticCurvePublicKey objects
+            key (str | bytes):  Private PEM
             public_key (str | bytes | None): Public PEM
         """
         inst = cls()
