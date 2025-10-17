@@ -56,9 +56,10 @@ class Jam(BaseJam):
             self.module = module
             setattr(self, name, module(**config))
         else:
+            _jam_modules = self._JAM_MODULES
             for name, cfg in config.items():
                 try:
-                    module = self.build_module(name, cfg)
+                    module = self.build_module(name, cfg, _jam_modules)
                     if name == "jwt":
                         self.module = module
                     setattr(self, name, module)

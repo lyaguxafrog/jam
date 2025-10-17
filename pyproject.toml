@@ -28,6 +28,7 @@ dependencies = [
 ]
 
 classifiers = [
+    "License :: OSI Approved :: MIT License",
     "Development Status :: 5 - Production/Stable",
     "Operating System :: OS Independent",
     "Intended Audience :: Developers",
@@ -79,7 +80,6 @@ dev = [
     "fakeredis>=2.28.1",
     "icecream>=2.1.4",
     "isort>=6.0.1",
-    "msgspec>=0.19.0",
     "pre-commit>=4.2.0",
     "ruff>=0.11.2",
     "uvicorn>=0.37.0",
