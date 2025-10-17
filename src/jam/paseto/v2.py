@@ -69,21 +69,20 @@ class PASETOv2(BasePASETO):
         self,
         header: str,
         payload: bytes,
-        footer: bytes,  # TODO: Footer checker for specification
+        footer: Optional[bytes],
     ) -> bytes:
         bheader = header.encode("ascii")
+        bfooter = footer or b""
         nonce = secrets.token_bytes(24)
-        aad = __pae__([bheader, footer])
+        aad = __pae__([bheader, bfooter])
+
         ciphertext = xchacha20poly1305_encrypt(
             self._secret, nonce, payload, aad
         )
 
-        token = (
-            bheader
-            + base64url_encode(nonce + ciphertext)
-            + b"."
-            + base64url_encode(footer)
-        )
+        token = bheader + base64url_encode(nonce + ciphertext)
+        if bfooter:
+            token += b"." + base64url_encode(bfooter)
         return token
 
     def encode(
@@ -95,7 +94,7 @@ class PASETOv2(BasePASETO):
         """Encode."""
         header = f"{self._VERSION}.{self._purpose}."
         payload = serializer.dumps(payload)
-        footer = serializer.dumps(footer) if footer else b""
+        footer = serializer.dumps(footer) if footer else None
         if self._purpose == "local":
             return self._encode_local(header, payload, footer).decode("utf-8")
         else:
