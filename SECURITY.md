@@ -6,7 +6,7 @@ Older versions are **not** patched — please update to the latest version.
 
 | Version | Supported          |
 |---------|--------------------|
-| 2.5.4   | ✅ latest release   |
+| 2.5.5   | ✅ latest release   |
 | < 2.5.0 | ❌ not supported    |
 
 ## Reporting a Vulnerability
