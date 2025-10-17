@@ -34,7 +34,6 @@ class PASETOv2(BasePASETO):
         k = cls()
         k._purpose = purpose
 
-        # --- LOCAL MODE (symmetric)
         if purpose == "local":
             if isinstance(key, str):
                 key = base64.urlsafe_b64decode(key + "==")
@@ -43,21 +42,17 @@ class PASETOv2(BasePASETO):
             k._secret = key
             return k
 
-        # --- PUBLIC MODE (asymmetric, Ed25519)
         elif purpose == "public":
-            # ✅ Case 1: Directly provided Ed25519PrivateKey
             if isinstance(key, Ed25519PrivateKey):
                 k._secret = key
                 k._public_key = key.public_key()
                 return k
 
-            # ✅ Case 2: Directly provided Ed25519PublicKey
             if isinstance(key, Ed25519PublicKey):
                 k._secret = None
                 k._public_key = key
                 return k
 
-            # ✅ Case 3: PEM or bytes
             if isinstance(key, str):
                 key = key.encode()
 
@@ -161,6 +156,53 @@ class PASETOv2(BasePASETO):
                     footer_val = footer
 
         return payload, footer_val
+
+    def _decode_public(
+        self,
+        token: str,
+        serializer,
+    ) -> tuple[dict[str, Any], Optional[dict[str, Any]]]:
+        parts = token.encode().split(b".")
+        if len(parts) < 3:
+            raise ValueError("Invalid token format")
+
+        header = b".".join(parts[:2]) + b"."
+        if header != b"v2.public.":
+            raise ValueError("Invalid header")
+
+        body = base64url_decode(parts[2])
+        footer = base64url_decode(parts[3]) if len(parts) > 3 else b""
+
+        if len(body) < 64:
+            raise ValueError(
+                "Invalid token: too short to contain Ed25519 signature"
+            )
+
+        payload = body[:-64]
+        signature = body[-64:]
+        pre_auth = __pae__([header, payload, footer])
+
+        if not isinstance(self._public_key, Ed25519PublicKey):
+            raise TypeError("Public key must be Ed25519PublicKey for v2.public")
+
+        try:
+            self._public_key.verify(signature, pre_auth)
+        except Exception:
+            raise ValueError("Invalid signature")
+
+        payload_data = serializer.loads(payload)
+
+        footer_val = None
+        if footer:
+            try:
+                footer_val = serializer.loads(footer)
+            except Exception:
+                try:
+                    footer_val = footer.decode("utf-8")
+                except Exception:
+                    footer_val = footer
+
+        return payload_data, footer_val
 
     def encode(
         self,
