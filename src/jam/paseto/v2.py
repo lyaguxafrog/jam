@@ -229,5 +229,7 @@ class PASETOv2(BasePASETO):
         """Decode."""
         if token.startswith(f"{self._VERSION}.local"):
             return self._decode_local(token, serializer)
+        elif token.startswith(f"{self._VERSION}.public"):
+            return self._decode_public(token, serializer)
         else:
             raise NotImplementedError
