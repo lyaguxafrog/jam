@@ -51,6 +51,10 @@ def base64url_decode(v: Union[str, bytes]) -> bytes:
     return base64.urlsafe_b64decode(bv)
 
 
-def base64url_encode(data: bytes) -> bytes:
+def base64url_encode(data: Union[bytes, str]) -> bytes:
     """Base64 URL-safe encoding without padding."""
-    return base64.urlsafe_b64encode(data).replace(b"=", b"")
+    if isinstance(data, bytes):
+        bv = data
+    else:
+        bv = data.encode("ascii")
+    return base64.urlsafe_b64encode(bv).replace(b"=", b"")
