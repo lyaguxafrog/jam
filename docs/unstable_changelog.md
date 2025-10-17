@@ -1,6 +1,6 @@
 # Unstable features and etc
 
-Current version: `2.6.0a4`
+Current version: `2.6.0a5`
 
 ## What is not yet included in the master
 
@@ -9,6 +9,7 @@ Current version: `2.6.0a4`
 - PASETO v1 provider
 - PASETO v2 provider
 - PASETO v3 provider
+- PASETO v4 provider
 - New utils:
   - Util for generate symmetric keys
   - Util for generate ED key pairs
