@@ -7,8 +7,6 @@ from cryptography.hazmat.primitives.asymmetric import ec, ed25519
 def generate_ed25519_keypair() -> dict[str, str]:
     """Generate Ed25519 key.
 
-    For example fot v2.public and v4.public PASETO.
-
     Returns:
         dict[str, str]: {'private': KEY, 'public': KEY}
     """
@@ -31,8 +29,6 @@ def generate_ed25519_keypair() -> dict[str, str]:
 
 def generate_ecdsa_p384_keypair() -> dict[str, str]:
     """Generate ECDSA P-384 key pair.
-
-    For example for v3.public PASETO.
 
     Returns:
         dict[str, str]: {'private': KEY, 'public': KEY}

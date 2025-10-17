@@ -14,4 +14,4 @@ def generate_symmetric_key(n: int = 32) -> str:
         str: Key
     """
     key = os.urandom(n)
-    return base64.urlsafe_b64decode(key).decode("utf-8").strip("=")
+    return base64.urlsafe_b64encode(key).decode("utf-8").rstrip("=")
