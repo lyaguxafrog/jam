@@ -5,7 +5,10 @@ import secrets
 from typing import Any, Literal, Optional, Union
 
 from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import ed25519
+from cryptography.hazmat.primitives.asymmetric.ed25519 import (
+    Ed25519PrivateKey,
+    Ed25519PublicKey,
+)
 
 from jam import BaseEncoder, JsonEncoder
 from jam.paseto.__abc_paseto_repo__ import PASETO, BasePASETO
@@ -25,11 +28,13 @@ class PASETOv2(BasePASETO):
     def key(
         cls: type[PASETO],
         purpose: Literal["local", "public"],
-        key: Union[str, bytes],
+        key: Union[str, bytes, Ed25519PrivateKey, Ed25519PublicKey],
     ) -> PASETO:
         """Create PASETOv2 instance from provided key."""
         k = cls()
         k._purpose = purpose
+
+        # --- LOCAL MODE (symmetric)
         if purpose == "local":
             if isinstance(key, str):
                 key = base64.urlsafe_b64decode(key + "==")
@@ -38,32 +43,43 @@ class PASETOv2(BasePASETO):
             k._secret = key
             return k
 
+        # --- PUBLIC MODE (asymmetric, Ed25519)
         elif purpose == "public":
-            if isinstance(key, str) and key.startswith("-----BEGIN"):
-                private_key = serialization.load_pem_private_key(
-                    key.encode(), password=None
-                )
-                k._secret = private_key
+            # ✅ Case 1: Directly provided Ed25519PrivateKey
+            if isinstance(key, Ed25519PrivateKey):
+                k._secret = key
+                k._public_key = key.public_key()
                 return k
 
-            elif isinstance(key, str) and "PUBLIC KEY" in key:
-                public_key = serialization.load_pem_public_key(key.encode())
-                k._public_key = public_key
+            # ✅ Case 2: Directly provided Ed25519PublicKey
+            if isinstance(key, Ed25519PublicKey):
+                k._secret = None
+                k._public_key = key
+                return k
 
-            elif isinstance(key, (bytes, bytearray)):
+            # ✅ Case 3: PEM or bytes
+            if isinstance(key, str):
+                key = key.encode()
+
+            try:
+                private_key = serialization.load_pem_private_key(
+                    key, password=None
+                )
+                if not isinstance(private_key, Ed25519PrivateKey):
+                    raise ValueError("Expected Ed25519 private key")
+                k._secret = private_key
+                k._public_key = private_key.public_key()
+                return k
+            except Exception:
                 try:
-                    public_key = ed25519.Ed25519PublicKey.from_public_bytes(key)
+                    public_key = serialization.load_pem_public_key(key)
+                    if not isinstance(public_key, Ed25519PublicKey):
+                        raise ValueError("Expected Ed25519 public key")
+                    k._secret = None
                     k._public_key = public_key
                     return k
                 except Exception:
-                    private_key = ed25519.Ed25519PrivateKey.from_private_bytes(
-                        key
-                    )
-                    k._private_key = private_key
-                    k._public_key = private_key.public_key()
-                    return k
-
-            raise ValueError("Invalid key for v2.public")
+                    raise ValueError("Invalid Ed25519 key provided")
 
         else:
             raise ValueError("Purpose must be 'local' or 'public'")
@@ -86,6 +102,25 @@ class PASETOv2(BasePASETO):
         token = bheader + base64url_encode(nonce + ciphertext)
         if bfooter:
             token += b"." + base64url_encode(bfooter)
+        return token
+
+    def _encode_public(
+        self, header: str, payload: bytes, footer: Optional[bytes]
+    ) -> bytes:
+        bheader = header.encode("ascii")
+        footer_bytes = footer or b""
+
+        if not isinstance(self._secret, Ed25519PrivateKey):
+            raise TypeError(
+                "Secret key must be Ed25519PrivateKey for v2.public"
+            )
+
+        pre_auth = __pae__([bheader, payload, footer_bytes])
+        signature = self._secret.sign(pre_auth)
+
+        token = bheader + base64url_encode(payload + signature)
+        if footer_bytes:
+            token += b"." + base64url_encode(footer_bytes)
         return token
 
     def _decode_local(
@@ -139,6 +174,8 @@ class PASETOv2(BasePASETO):
         footer = serializer.dumps(footer) if footer else None
         if self._purpose == "local":
             return self._encode_local(header, payload, footer).decode("utf-8")
+        elif self._purpose == "public":
+            return self._encode_public(header, payload, footer).decode("utf-8")
         else:
             raise NotImplementedError
 
