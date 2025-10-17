@@ -12,16 +12,19 @@ class BaseJam(ABC):
 
     _JAM_MODULES: dict[str, str] = {}
 
-    def build_module(self, name: str, cfg: dict[str, Any]):
+    def build_module(
+        self, name: str, cfg: dict[str, Any], _jam_modules: dict[str, str]
+    ):
         """Method for building module from config.
 
         Args:
             name (str): Module name
             cfg (dict[str, Any]): Config
+            _jam_modules (dict[str, str]): Jam modules
         """
         module_path = cfg.pop("module", None)
         if not module_path:
-            module_path = self._JAM_MODULES.get(name)
+            module_path = _jam_modules.get(name)
 
         if not module_path:
             raise NotImplementedError(f"Auth module '{name}' is not supported")
