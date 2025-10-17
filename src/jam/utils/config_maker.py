@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import sys
 from collections.abc import Callable
 from importlib import import_module
@@ -34,7 +35,9 @@ def __yaml_config_parser__(
         )
     try:
         with open(path) as file:
-            config = yaml.safe_load(file)
+            config_text = file.read(path)
+        config_text = os.path.expandvars(config_text)
+        config = yaml.safe_load(config_text)
         return config[pointer] if config else {}
     except FileNotFoundError:
         raise FileNotFoundError(f"YAML config file not found at: {path}")
