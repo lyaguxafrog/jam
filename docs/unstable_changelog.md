@@ -1,9 +1,13 @@
 # Unstable features and etc
 
-Current version: `2.6.0a5`
+Current version: `2.6.0b0.dev0`
 
 ## What is not yet included in the master
 
+
+### `2.6.0b*`
+
+- Updated interface `BaseJam`
 
 ### `2.6.0a*`
 - PASETO v1 provider
