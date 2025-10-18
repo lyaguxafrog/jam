@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+import re
 import sys
 from collections.abc import Callable
 from importlib import import_module
@@ -12,36 +14,56 @@ GENERIC_POINTER = "jam"
 def __yaml_config_parser__(
     path: str, pointer: str = GENERIC_POINTER
 ) -> dict[str, Any]:
-    """Private method for parsing YML config.
+    """Private method for parsing YML config with env substitution.
 
     Args:
         path (str): Path to config.yml
-        pointer (str): Pointer to config read
+        pointer (str): Pointer to config section to read.
 
     Raises:
         ImportError: If pyyaml not installed
         FileNotFoundError: If file not found
-        ValueError: If invalid YML
+        ValueError: If invalid YAML
 
     Returns:
-        (dict[str, Any]): Dict with configs params
+        dict[str, Any]: Parsed YAML section with environment variable substitution.
     """
     try:
         import yaml
     except ImportError:
         raise ImportError(
-            "To generate a configuration file from YAML/YML, you need to install PyYaml: `pip install pyyaml` or `pip install jamlib[yaml]`"
+            "To generate a configuration file from YAML/YML, you need to install PyYaml: "
+            "`pip install pyyaml` or `pip install jamlib[yaml]`"
         )
+
+    pattern = re.compile(r"\$\{([^}^{]+)\}")
+
+    # FIXME: Refactor
+    def _env_constructor(loader, node):
+        value = loader.construct_scalar(node)
+        for var in pattern.findall(value):
+            env_value = os.getenv(var)
+            if env_value is None:
+                raise ValueError(f"Environment variable '{var}' not set")
+            value = value.replace(f"${{{var}}}", env_value)
+        return value
+
+    yaml.SafeLoader.add_implicit_resolver("!env", pattern, None)
+    yaml.SafeLoader.add_constructor("!env", _env_constructor)
+
     try:
         with open(path) as file:
             config = yaml.safe_load(file)
-        return config[pointer] if config else {}
+        if not config:
+            return {}
+        return config[pointer] if pointer in config else config
     except FileNotFoundError:
         raise FileNotFoundError(f"YAML config file not found at: {path}")
     except yaml.YAMLError as e:
         raise ValueError(f"Error parsing YAML file: {e}")
 
 
+# TODO: env
 def __toml_config_parser__(
     path: str = "pyproject.toml", pointer: str = GENERIC_POINTER
 ) -> dict[str, Any]:
