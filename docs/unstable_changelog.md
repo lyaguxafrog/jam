@@ -1,12 +1,13 @@
 # Unstable features and etc
 
-Current version: `2.6.0b0.dev1`
+Current version: `2.6.0b0.dev2`
 
 ## What is not yet included in the master
 
 
 ### `2.6.0b*`
 
+- Add PASETO methods to `jam.Jam`
 - Util for init PASETO instance
 - Util for making payload
 - Updated interface `BaseJam`
