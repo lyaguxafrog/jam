@@ -7,6 +7,7 @@ Current version: `2.6.0b0.dev2`
 
 ### `2.6.0b*`
 
+- Add PASETO methods to `jam.aio.Jam`
 - Add PASETO methods to `jam.Jam`
 - Util for init PASETO instance
 - Util for making payload
