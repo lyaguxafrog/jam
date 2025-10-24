@@ -3,7 +3,9 @@
 import base64
 import hashlib
 import hmac
-from typing import Union
+from typing import Any, Literal, Union
+
+from jam.paseto import PASETO
 
 
 def __b64url_nopad__(b: bytes) -> str:
@@ -58,3 +60,33 @@ def base64url_encode(data: Union[bytes, str]) -> bytes:
     else:
         bv = data.encode("ascii")
     return base64.urlsafe_b64encode(bv).replace(b"=", b"")
+
+
+def init_paseto_instance(
+    version: Literal["v1", "v2", "v3", "v4"],
+    purpose: Literal["public", "local"],
+    key: Union[str, bytes, Any],  # TODO: path to keys
+    **kwargs,
+) -> PASETO:
+    """Init paseto instance.
+
+    Args:
+        version (Literal["v1", "v2", "v3", "v4"]): PASETO Version
+        purpose (Literal["public", "local"]): Token purpose
+        key (str | bytes | Any): Symmetric or asymmetric key
+        kwargs: Any key arguments
+
+    Returns:
+        BasePaseto: PASETO Instance
+    """
+    from jam.utils.config_maker import __module_loader__
+
+    if kwargs.get("module", None):
+        _paseto: type[PASETO] = __module_loader__(kwargs["module"])
+        kwargs.pop("modules")
+    else:
+        _paseto: type[PASETO] = __module_loader__(
+            f"jam.paseto.{version}.PASETO{version}"
+        )
+
+    return _paseto.key(purpose, key)
