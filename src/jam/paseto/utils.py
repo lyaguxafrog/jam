@@ -3,7 +3,9 @@
 import base64
 import hashlib
 import hmac
+from datetime import datetime
 from typing import Any, Literal, Union
+from uuid import uuid4
 
 from jam.paseto import PASETO
 
@@ -81,12 +83,40 @@ def init_paseto_instance(
     """
     from jam.utils.config_maker import __module_loader__
 
+    # FIXME: Fix custom module init
     if kwargs.get("module", None):
         _paseto: type[PASETO] = __module_loader__(kwargs["module"])
-        kwargs.pop("modules")
+        return _paseto.key(purpose, key)
     else:
         _paseto: type[PASETO] = __module_loader__(
             f"jam.paseto.{version}.PASETO{version}"
         )
 
     return _paseto.key(purpose, key)
+
+
+def payload_maker(expire: int, data: dict[str, Any]) -> dict[str, Any]:
+    """Generate PASETO payload.
+
+    ```json
+    {
+        'iat': 1761326685.45693,
+        'exp': 1761328485.45693,
+        'pit': '52aeaf12-0825-4bc1-aa45-5ded41df2463',
+        # custom data
+        'user': 1,
+        'role': 'admin'
+    }
+    ```
+
+    Args:
+        expire (int): Token lifetime
+        data (dict[str, Any]): Custom data
+
+    Returns:
+        dict: Payload
+    """
+    now = datetime.now().timestamp()
+    _payload = {"iat": now, "exp": expire + now, "pit": str(uuid4())}
+
+    return _payload | data
