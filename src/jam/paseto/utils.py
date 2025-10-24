@@ -3,6 +3,7 @@
 import base64
 import hashlib
 import hmac
+import os.path
 from datetime import datetime
 from typing import Any, Literal, Optional, Union
 from uuid import uuid4
@@ -67,7 +68,7 @@ def base64url_encode(data: Union[bytes, str]) -> bytes:
 def init_paseto_instance(
     version: Literal["v1", "v2", "v3", "v4"],
     purpose: Literal["public", "local"],
-    key: Union[str, bytes, Any],  # TODO: path to keys
+    key: Union[str, bytes, Any],
     **kwargs,
 ) -> PASETO:
     """Init paseto instance.
@@ -82,6 +83,11 @@ def init_paseto_instance(
         BasePaseto: PASETO Instance
     """
     from jam.utils.config_maker import __module_loader__
+
+    if os.path.isfile(key):
+        with open(key) as file:
+            key = file.read()
+        key = key
 
     # FIXME: Fix custom module init
     if kwargs.get("module", None):
