@@ -8,6 +8,7 @@ from jam.__abc_instances__ import BaseJam
 from jam.__deprecated__ import deprecated
 from jam.__logger__ import logger
 from jam.modules import JWTModule, OAuth2Module, SessionModule
+from jam.paseto import BasePASETO
 from jam.utils.config_maker import __config_maker__, __module_loader__
 
 
@@ -18,6 +19,7 @@ class Jam(BaseJam):
         "jwt": "jam.modules.JWTModule",
         "session": "jam.modules.SessionModule",
         "oauth2": "jam.modules.OAuth2Module",
+        "paseto": "jam.paseto.utils.init_paseto_instance",
     }
 
     def __init__(
@@ -34,6 +36,7 @@ class Jam(BaseJam):
         self.jwt: Optional[JWTModule] = None
         self.session: Optional[SessionModule] = None
         self.oauth2: Optional[OAuth2Module] = None
+        self.paseto: Optional[BasePASETO] = None
 
         config = __config_maker__(config, pointer)
 
@@ -595,3 +598,51 @@ class Jam(BaseJam):
         return self.oauth2.client_credentials_flow(
             provider, scope, **extra_params
         )
+
+    def paseto_make_payload(
+        self, exp: Optional[int] = None, **data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Generate payload for PASETO.
+
+        Args:
+            exp (int | None): Token expire
+            data (dict[str, Any]): Custom data
+
+        Returns:
+            dict: Payload
+        """
+        from jam.paseto.utils import payload_maker
+
+        return payload_maker(expire=exp, data=data)
+
+    def paseto_create(
+        self,
+        payload: dict[str, Any],
+        footer: Optional[Union[dict[str, Any], str]],
+    ) -> str:
+        """Create new PASETO.
+
+        Args:
+            payload (dict[str, Any]): Payload
+            footer (dict | str  | None): Footer
+
+        Returns:
+            str: New token
+        """
+        return self.paseto.encode(payload=payload, footer=footer)
+
+    def paseto_decode(
+        self, token: str, check_exp: bool = True, check_list: bool = True
+    ) -> dict[str, Union[dict, Union[str, dict, None]]]:
+        """Decode PASETO.
+
+        Args:
+            token (str): Token
+            check_exp (bool): Check exp in payload
+            check_list (bool): Check token in list
+
+        Returns:
+            dict: {'payload' PAYLOAD, 'footer': FOOTER}
+        """
+        payload, footer = self.paseto.decode(token)
+        return {"payload": payload, "footer": footer}
