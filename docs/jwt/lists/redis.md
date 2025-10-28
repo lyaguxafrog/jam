@@ -30,12 +30,11 @@ Token lifetime in seconds.
 
 Example `toml` config:
 ```toml
-[jam]
-auth_type = "jwt"
+[jam.jwt]
 expire = 3600
 secret_key = "SECRET_KEY"
 
-[jam.list]
+[jam.jwt.list]
 type = "white" # or black
 backend = "redis"
 redis_uri = "redis://0.0.0.0:6379/0"

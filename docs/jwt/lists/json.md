@@ -25,12 +25,11 @@ Path to json file.
 
 Example `toml` config:
 ```toml
-[jam]
-auth_type = "jwt"
+[jam.jwt]
 secret_key = "SECRET"
 expire = 3600
 
-[jam.list]
+[jam.jwt.list]
 type="white" # or black
 backend="json"
 json_path="my_whitelist.json"
