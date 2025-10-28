@@ -8,7 +8,7 @@ from jam.__abc_instances__ import BaseJam
 from jam.__logger__ import logger
 from jam.aio.modules import JWTModule, OAuth2Module, SessionModule
 from jam.paseto import BasePASETO
-from jam.utils.config_maker import __config_maker__, __module_loader__
+from jam.utils.config_maker import __config_maker__
 
 
 class Jam(BaseJam):
@@ -48,30 +48,18 @@ class Jam(BaseJam):
             self._otp_module = self._otp_module_setup()
             logger.debug("OTP module initialized")
 
-        # Other modules
-        if config.get("auth_type", None):
-            logger.warning(
-                "This configuration type is deprecated, see: https://jam.makridenko.ru/config"
-            )
-            name = config.pop("auth_type")
-            module = __module_loader__(self._JAM_MODULES[name])
-            self.module = module
-            setattr(self, name, module(**config))
-        else:
-            _jam_modules = self._JAM_MODULES
-            for name, cfg in config.items():
-                try:
-                    module = self.build_module(name, cfg, _jam_modules)
-                    if name == "jwt":
-                        self.module = module
-                    setattr(self, name, module)
-                    logger.debug(
-                        f"Auth module '{name}' successfully initialized"
-                    )
-                except Exception as e:
-                    logger.exception(
-                        f"Failed to initialize auth module '{name}': {e}"
-                    )
+        # config build
+        for name, cfg in config.items():
+            try:
+                module = self.build_module(name, cfg, self._JAM_MODULES)
+                if name == "jwt":
+                    self.module = module
+                setattr(self, name, module)
+                logger.debug(f"Auth module '{name}' successfully initialized")
+            except Exception as e:
+                logger.exception(
+                    f"Failed to initialize auth module '{name}': {e}"
+                )
         gc.collect()
 
     def _otp_module_setup(self) -> Callable:
