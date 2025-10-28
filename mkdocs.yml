@@ -20,6 +20,9 @@ nav:
               - JSONList: jwt/lists/json.md
               - RedisList: jwt/lists/redis.md
               - CustomList: jwt/lists/own_module.md
+      - PASETO:
+          - Config: paseto/config.md
+          - Instance: paseto/instance.md
       - Sessions:
           - Config: sessions/config.md
           - Instance: sessions/instance.md

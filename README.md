@@ -52,13 +52,14 @@ Each integration offers built-in middleware or plugin support for JWT and sessio
 Jam supports many authentication methods out of the box with minimal dependencies.
 Here is a comparison with other libraries:
 
-| Features / Library    | **Jam**                                                                                              | [Authx](https://authx.yezz.me/) | [PyJWT](https://pyjwt.readthedocs.io) | [AuthLib](https://docs.authlib.org) | [OTP Auth](https://otp.authlib.org/) |
-|-----------------------|------------------------------------------------------------------------------------------------------|--------------------------------|---------------------------------------|-------------------------------------|--------------------------------------|
-| JWT                   | ✅                                                                                                    | ✅ | ✅ | ✅ | ❌                                    |
-| JWT black/white lists | ✅                                                                                                    | ❌ | ❌ | ❌ | ❌ |
-| Server side sessions  | ✅                                                                                                    | ✅ | ❌ | ❌ | ❌                                    |
-| OTP                   | ✅                                                                                                    | ❌ | ❌ | ❌ | ✅ |
-| OAuth2                | ✅                                                                                                     | ✅ | ❌ | ✅ | ❌ |
-| Flexible config       | ✅                                                                                                    | ❌ | ❌ | ❌ | ❌ |
-| Modularity            | ✅                                                                                                    | ❌ | ❌ | ❌ | ❌ |
+| Features / Library   | **Jam** | [Authx](https://authx.yezz.me/) | [PyJWT](https://pyjwt.readthedocs.io) | [AuthLib](https://docs.authlib.org) | [OTP Auth](https://otp.authlib.org/) |
+|----------------------|---------|---------------------------------|---------------------------------------|-------------------------------------|--------------------------------------|
+| JWT                  | ✅       | ✅                               | ✅                                     | ✅                                   | ❌                                    |
+| JWT black/white lists | ✅       | ❌                               | ❌                                     | ❌                                   | ❌                                    |
+| Server side sessions | ✅       | ✅                               | ❌                                     | ❌                                   | ❌                                    |
+| OTP                  | ✅       | ❌                               | ❌                                     | ❌                                   | ✅                                    |
+| OAuth2               | ✅       | ✅                               | ❌                                     | ✅                                   | ❌                                    |
+| PASETO               | ✅       | ❌                               | ❌                                     | ❌                                   | ❌                                    |
+| Flexible config      | ✅       | ❌                               | ❌                                     | ❌                                   | ❌                                    |
+| Modularity           | ✅       | ❌                               | ❌                                     | ❌                                   | ❌                                    |
 

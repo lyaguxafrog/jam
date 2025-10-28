@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 
-import base64
 import hashlib
 import hmac
 import secrets
 from typing import Any, Literal, Optional, Union
 
-from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
-from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
+from cryptography.hazmat.primitives.asymmetric.rsa import (
+    RSAPrivateKey,
+    RSAPublicKey,
+)
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
 from jam.__abc_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
-from jam.paseto.__abc_paseto_repo__ import PASETO, BasePASETO, RSAKeyLike
+from jam.paseto.__abc_paseto_repo__ import PASETO, BasePASETO
 from jam.paseto.utils import (
     __gen_hash__,
     __pae__,
@@ -31,41 +33,81 @@ class PASETOv1(BasePASETO):
     def key(
         cls: type[PASETO],
         purpose: Literal["local", "public"],
-        key: Union[str, bytes, None, RSAPrivateKey],
-        public_key: Union[RSAKeyLike] = None,
+        key: Union[str, bytes, None, RSAPrivateKey, RSAPublicKey],
     ) -> PASETO:
         """Return PASETO instance.
 
         Args:
             purpose (Literal["local", "public"]): Paseto purpose
             key (str | bytes): PEM or secret key
-            public_key (str | bytes | RSAPublicKey | None): Public key for RSA
 
         Returns:
             PASETO: Paseto instance
         """
-        ky = cls()
-        if cls._rsa_pem_check(key):
-            if purpose == "local":
-                raise ValueError("PASETOv1.local does not support RSA keys")
-            key = cls.load_rsa_key(key, private=True)
-            if not isinstance(key, RSAPrivateKey):
-                raise ValueError("Invalid RSA private key")
-            ky._secret = key
-            ky._public_key = cls.load_rsa_key(public_key, private=False)
-        else:
-            if purpose == "local":
-                if isinstance(key, str):
-                    key = base64.urlsafe_b64decode(key + "==")
-                if not isinstance(key, bytes) or len(key) != 32:
-                    raise ValueError(
-                        "PASETOv1.local requires a 32-byte secret key"
-                    )
-                ky._secret = key
+        inst = cls()
+        inst._purpose = purpose
+
+        if purpose == "local":
+            if isinstance(key, str):
+                raw = base64url_decode(key.encode("utf-8"))
             else:
-                raise ValueError("PASETOv1.public requires an RSA private key")
-        ky._purpose = purpose
-        return ky
+                raw = key
+            if not isinstance(raw, (bytes, bytearray) or len(raw) != 32):
+                raise ValueError("v1.local requires a 32-byte secret key.")
+            inst._secret = bytes(raw)
+            return inst
+
+        elif purpose == "public":
+            if isinstance(key, RSAPrivateKey):
+                inst._secret = key
+                inst._public_key - key.public_key()
+                return inst
+            if isinstance(key, RSAPublicKey):
+                inst._secret = None
+                inst._public_key = key
+                return inst
+
+            key_bytes = key.encode("utf-8") if isinstance(key, str) else key
+            try:
+                priv = serialization.load_pem_private_key(
+                    key_bytes, password=None
+                )
+                if isinstance(priv, RSAPrivateKey):
+                    inst._secret = priv
+                    inst._public_key = priv.public_key()
+                    return inst
+            except Exception:
+                pass
+            try:
+                priv = serialization.load_der_private_key(
+                    key_bytes, password=None
+                )
+                if isinstance(priv, RSAPrivateKey):
+                    inst._secret = priv
+                    inst._public_key = priv.public_key()
+                    return inst
+            except Exception:
+                pass
+            try:
+                pub = serialization.load_pem_public_key(key_bytes)
+                if isinstance(pub, RSAPublicKey):
+                    inst._secret = None
+                    inst._public_key = pub
+                    return inst
+            except Exception:
+                pass
+            try:
+                pub = serialization.load_der_public_key(key_bytes)
+                if isinstance(pub, RSAPublicKey):
+                    inst._secret = None
+                    inst._public_key = pub
+                    return inst
+            except Exception:
+                pass
+
+            raise ValueError("Invalid RSA key for v1.public")
+        else:
+            raise ValueError("Purpose must be 'local' or 'public'")
 
     def _encode_local(
         self,

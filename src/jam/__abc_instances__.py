@@ -366,3 +366,49 @@ class BaseJam(ABC):
             dict: JSON with access token
         """
         raise NotImplementedError
+
+    @abstractmethod
+    def paseto_make_payload(
+        self, exp: Optional[int] = None, **data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Generate payload for PASETO.
+
+        Args:
+            exp (int | None): Custom expire if needed
+            data (dict[str, Any]): Data in payload
+
+        Returns:
+            dict[str, Any]: New payload
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def paseto_create(
+        self,
+        payload: dict[str, Any],
+        footer: Optional[Union[dict[str, Any], str]],
+    ) -> str:
+        """Create new PASETO.
+
+        Args:
+            payload (dict[str, Any]): Payload
+            footer (dict[str, Any] | str | None): Payload if needed
+
+        Returns:
+            str: PASETO
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def paseto_decode(  # mb refactoring this
+        self, token: str
+    ) -> dict[str, Union[dict, Union[str, dict, None]]]:
+        """Decode PASETO and return payload and footer.
+
+        Args:
+            token (str): PASETO
+
+        Returns:
+            dict: {`payload`: PAYLOAD, `footer`: FOOTER}
+        """
+        raise NotImplementedError
