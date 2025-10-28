@@ -1,6 +1,6 @@
 [project]
 name = "jamlib"
-version = "2.6.0b0.dev3"
+version = "2.6.0b0.dev4"
 description = "Simple and universal library for authorization."
 authors = [
     {name = "Makridenko Adrian",email = "adrianmakridenko@duck.com"},
@@ -81,6 +81,7 @@ dev = [
     "icecream>=2.1.4",
     "isort>=6.0.1",
     "pre-commit>=4.2.0",
+    "pyrefly>=0.39.1",
     "ruff>=0.11.2",
     "uvicorn>=0.37.0",
 ]
