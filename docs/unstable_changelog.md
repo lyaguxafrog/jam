@@ -1,8 +1,13 @@
 # Unstable features and etc
 
-Current version: `2.6.0b0.dev6`
+Current version: `3.0.0a0`
 
 ## What is not yet included in the master
+
+
+### `3.0.0a*`
+
+- Delete deprecated instances methods
 
 
 ### `2.6.0b*`
