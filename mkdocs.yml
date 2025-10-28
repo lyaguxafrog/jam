@@ -49,6 +49,8 @@ nav:
       - Flask: extensions/flask.md
   - API Reference: api.md
   - Breaking changes:
+#      - Deprecated: breaking_changes/deprecated
+      - 2.5.5 -> 3.0.0: breaking_changes/jam255_to_300
       - 1.1.4 -> 2.0.0: breaking_changes/jam114_to_200
   - Contributing: contributing.md
   - Changelog: https://github.com/lyaguxafrog/jam/releases
