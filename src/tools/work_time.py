@@ -4,7 +4,9 @@ import time
 from functools import wraps
 
 
-def _work_time(func):
+def work_time(func):
+    """Decorator for displaying the function execution time."""
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         start_time = time.perf_counter()
