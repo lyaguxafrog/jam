@@ -6,7 +6,8 @@ import os.path
 from typing import Any, Literal, Optional, Union
 
 from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding, rsa
+from cryptography.hazmat.primitives.asymmetric import ec, padding, rsa
+from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature
 
 from jam.encoders import BaseEncoder, JsonEncoder
 from jam.jwt.__base__ import BaseJWT
@@ -32,7 +33,12 @@ class JWT(BaseJWT):
             "PS384",
             "PS512",
         ],
-        secret: Union[str, rsa.RSAPrivateKey, rsa.RSAPublicKey],
+        secret: Union[
+            str,
+            bytes,
+            rsa.RSAPrivateKey,
+            rsa.RSAPublicKey,
+        ],
         password: Optional[str] = None,
         serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
     ) -> None:
@@ -40,7 +46,7 @@ class JWT(BaseJWT):
 
         Args:
             alg (str): Algorithm
-            secret (str | rsa.RSAPrivateKey | rsa.RSAPublicKey): Secret key or path to private/public key file
+            secret (str | bytes | rsa.RSAPrivateKey | rsa.RSAPublicKey): Secret key or path to private/public key file
             password (str | None): Password for asymmetric keys
             serializer (BaseEncoder |type[BaseEncoder]): JSON Serializer
         """
@@ -48,6 +54,14 @@ class JWT(BaseJWT):
         self.__secret = secret
         self.serializer = serializer
         self.__password = password
+
+    @staticmethod
+    def _file_loader(path: str) -> str:
+        if not os.path.isfile(path):
+            return path
+        else:
+            with open(path) as f:
+                return f.read()
 
     def __sign(self, signature_input: bytes) -> str:
         if self.alg.startswith("HS"):
@@ -76,6 +90,41 @@ class JWT(BaseJWT):
                 signature_input, padding.PKCS1v15(), hash_alg
             )
             return base64url_encode(signature)
+
+        elif self.alg.startswith("ES"):
+            curve_map = {
+                "ES256": (ec.SECP256R1(), hashes.SHA256()),
+                "ES384": (ec.SECP384R1(), hashes.SHA384()),
+                "ES512": (ec.SECP521R1(), hashes.SHA512()),
+            }
+            if self.alg not in curve_map:
+                raise ValueError(f"Unsupported ECDSA algorithm: {self.alg}")
+
+            curve, hash_alg = curve_map[self.alg]
+
+            if isinstance(self.__secret, str):
+                key_data = self._file_loader(self.__secret)
+                private_key = serialization.load_pem_private_key(
+                    (
+                        key_data.encode()
+                        if isinstance(key_data, str)
+                        else key_data
+                    ),
+                    password=(
+                        self.__password.encode() if self.__password else None
+                    ),
+                )
+            else:
+                private_key = self.__secret
+
+            der_signature = private_key.sign(
+                signature_input, ec.ECDSA(hash_alg)
+            )
+            r, s = decode_dss_signature(der_signature)
+
+            n = (private_key.curve.key_size + 7) // 8
+            raw_signature = r.to_bytes(n, "big") + s.to_bytes(n, "big")
+            return base64url_encode(raw_signature)
         else:
             raise ValueError("Unsupported algorithm")
 
