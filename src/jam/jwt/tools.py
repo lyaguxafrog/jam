@@ -18,7 +18,7 @@ from jam.exceptions import (
     NotFoundSomeInPayload,
     TokenLifeTimeExpired,
 )
-from jam.jwt.__utils__ import __base64url_decode__, __base64url_encode__
+from jam.jwt.utils import base64url_decode, base64url_encode
 
 
 def __gen_jwt__(
@@ -56,8 +56,8 @@ def __gen_jwt__(
     Returns:
         (str): Access/refresh token
     """
-    header_encoded = __base64url_encode__(json.dumps(header).encode("utf-8"))
-    payload_encoded = __base64url_encode__(json.dumps(payload).encode("utf-8"))
+    header_encoded = base64url_encode(json.dumps(header).encode("utf-8"))
+    payload_encoded = base64url_encode(json.dumps(payload).encode("utf-8"))
 
     signature_input = f"{header_encoded}.{payload_encoded}".encode()
 
@@ -76,7 +76,7 @@ def __gen_jwt__(
     else:
         raise ValueError("Unsupported algorithm")
 
-    signature_encoded = __base64url_encode__(signature)
+    signature_encoded = base64url_encode(signature)
 
     jwt_token = f"{header_encoded}.{payload_encoded}.{signature_encoded}"
     return jwt_token
@@ -111,9 +111,9 @@ def __validate_jwt__(
     except ValueError:
         raise ValueError("Invalid token format")
 
-    header = json.loads(__base64url_decode__(header_encoded).decode("utf-8"))
-    payload = json.loads(__base64url_decode__(payload_encoded).decode("utf-8"))
-    signature = __base64url_decode__(signature_encoded)
+    header = json.loads(base64url_decode(header_encoded).decode("utf-8"))
+    payload = json.loads(base64url_decode(payload_encoded).decode("utf-8"))
+    signature = base64url_decode(signature_encoded)
 
     signature_input = f"{header_encoded}.{payload_encoded}".encode()
 
