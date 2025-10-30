@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
-
+import datetime
 import gc
+import uuid
 from collections.abc import Callable
 from typing import Any, Optional, Union
 
 from jam.__abc_instances__ import BaseJam
 from jam.__logger__ import logger
-from jam.modules import JWTModule, OAuth2Module, SessionModule
+from jam.jwt.module import JWT
+from jam.modules import OAuth2Module, SessionModule
 from jam.paseto import BasePASETO
 from jam.utils.config_maker import __config_maker__
 
@@ -15,7 +17,7 @@ class Jam(BaseJam):
     """Main instance."""
 
     _JAM_MODULES: dict[str, str] = {
-        "jwt": "jam.modules.JWTModule",
+        "jwt": "jam.jwt.module.JWT",
         "session": "jam.modules.SessionModule",
         "oauth2": "jam.modules.OAuth2Module",
         "paseto": "jam.paseto.utils.init_paseto_instance",
@@ -32,7 +34,7 @@ class Jam(BaseJam):
             config (dict[str, Any] | str): dict or path to config file
             pointer (str): Config read point
         """
-        self.jwt: Optional[JWTModule] = None
+        self.jwt: Optional[JWT] = None
         self.session: Optional[SessionModule] = None
         self.oauth2: Optional[OAuth2Module] = None
         self.paseto: Optional[BasePASETO] = None
@@ -92,7 +94,13 @@ class Jam(BaseJam):
         Returns:
             dict[str, Any]: Payload
         """
-        return self.jwt.make_payload(exp=exp, **data)
+        payload = {
+            "iat": datetime.datetime.now().timestamp(),
+            "exp": (datetime.datetime.now().timestamp() + exp) if exp else None,
+            "jti": str(uuid.uuid4()),
+        }
+        payload = payload | data
+        return payload
 
     def jwt_create_token(self, payload: dict[str, Any]) -> str:
         """Create JWT token.
@@ -107,7 +115,7 @@ class Jam(BaseJam):
             EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
             EmtpyPrivateKey: If RSA algorithm is selected, but private key None
         """
-        return self.jwt.gen_token(**payload)
+        return self.jwt.encode(payload)
 
     def jwt_verify_token(
         self, token: str, check_exp: bool = True, check_list: bool = True
@@ -131,7 +139,7 @@ class Jam(BaseJam):
             TokenNotInWhiteList: If the list type is white, but the token is  not there
             TokenInBlackList: If the list type is black and the token is there
         """
-        return self.jwt.validate_payload(token, check_exp, check_list)
+        return self.jwt.decode(token)
 
     def session_create(self, session_key: str, data: dict[str, Any]) -> str:
         """Create new session.
