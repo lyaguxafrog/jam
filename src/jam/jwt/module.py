@@ -125,6 +125,46 @@ class JWT(BaseJWT):
             n = (private_key.curve.key_size + 7) // 8
             raw_signature = r.to_bytes(n, "big") + s.to_bytes(n, "big")
             return base64url_encode(raw_signature)
+        elif self.alg.startswith("PS"):
+            hash_alg = getattr(hashes, f"SHA{self.alg.replace('PS', '')}")()
+
+            if isinstance(self.__secret, str):
+                key_data = self._file_loader(self.__secret)
+                private_key = serialization.load_pem_private_key(
+                    (
+                        key_data.encode()
+                        if isinstance(key_data, str)
+                        else key_data
+                    ),
+                    password=(
+                        self.__password.encode()
+                        if isinstance(self.__password, str)
+                        else self.__password
+                    ),
+                )
+            else:
+                private_key = serialization.load_pem_private_key(
+                    self.__secret,
+                    password=(
+                        self.__password.encode()
+                        if isinstance(self.__password, str)
+                        else self.__password
+                    ),
+                )
+
+            # Ensure it's actually an RSA key
+            if not isinstance(private_key, rsa.RSAPrivateKey):
+                raise TypeError("PS algorithms require an RSA private key")
+
+            signature = private_key.sign(
+                signature_input,
+                padding.PSS(
+                    mgf=padding.MGF1(hash_alg),
+                    salt_length=padding.PSS.MAX_LENGTH,
+                ),
+                hash_alg,
+            )
+            return base64url_encode(signature)
         else:
             raise ValueError("Unsupported algorithm")
 

@@ -11,7 +11,7 @@ from jam.exceptions import (
     EmtpyPrivateKey,
     TokenLifeTimeExpired,
 )
-from jam.jwt.__utils__ import __base64url_decode__, __base64url_encode__
+from jam.jwt.utils import base64url_decode, base64url_encode
 from jam.utils import generate_rsa_key_pair
 
 
