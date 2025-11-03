@@ -172,4 +172,5 @@ cython_debug/
 .pytest_cache/
 debug*
 .idea/
+.zed/
 :memory:
