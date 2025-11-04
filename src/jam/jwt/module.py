@@ -52,7 +52,7 @@ class JWT(BaseJWT):
         """
         self.alg = alg
         self.__secret = secret
-        self.serializer = serializer
+        self._serializer = serializer
         self.__password = password
 
     @staticmethod
@@ -175,8 +175,8 @@ class JWT(BaseJWT):
         """Encode."""
         header = {"typ": "jwt", "alg": self.alg}
 
-        header_encoded = base64url_encode(self.serializer.dumps(header))
-        payload_encoder = base64url_encode(self.serializer.dumps(payload))
+        header_encoded = base64url_encode(self._serializer.dumps(header))
+        payload_encoder = base64url_encode(self._serializer.dumps(payload))
         signature = self.__sign(f"{header_encoded}.{payload_encoder}".encode())
 
         return f"{header_encoded}.{payload_encoder}.{signature}"
