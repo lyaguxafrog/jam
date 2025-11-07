@@ -66,25 +66,43 @@ class JWT(BaseJWT):
     def __sign(self, signature_input: bytes) -> str:
         if self.alg.startswith("HS"):
             hash_alg = getattr(hashlib, f"{self.alg.replace('HS', 'sha')}")
-            signature = hmac.new(
-                self.__secret.encode("utf-8"), signature_input, hash_alg
-            ).digest()
+
+            if isinstance(self.__secret, str):
+                key = self.__secret.encode("utf-8")
+            elif isinstance(self.__secret, bytes):
+                key = self.__secret
+            else:
+                raise TypeError(
+                    "Invalid secret type for HMAC algorithm. Expected str or bytes."
+                )
+
+            signature = hmac.new(key, signature_input, hash_alg).digest()
             return base64url_encode(signature)
+
         elif self.alg.startswith("RS"):
             if isinstance(self.__secret, str):
                 if os.path.isfile(self.__secret):
                     with open(self.__secret, "rb") as key_file:
                         private_key = serialization.load_pem_private_key(
                             key_file.read(),
-                            password=self.__password,
+                            password=(
+                                self.__password.encode()
+                                if isinstance(self.__password, str)
+                                else self.__password
+                            ),
                         )
                 else:
                     private_key = serialization.load_pem_private_key(
                         self.__secret.encode(),
-                        password=self.__password,
+                        password=(
+                            self.__password.encode()
+                            if isinstance(self.__password, str)
+                            else self.__password
+                        ),
                     )
             else:
                 private_key = self.__secret
+
             hash_alg = getattr(hashes, f"SHA{self.alg.replace('RS', '')}")()
             signature = private_key.sign(
                 signature_input, padding.PKCS1v15(), hash_alg
@@ -105,13 +123,13 @@ class JWT(BaseJWT):
             if isinstance(self.__secret, str):
                 key_data = self._file_loader(self.__secret)
                 private_key = serialization.load_pem_private_key(
-                    (
-                        key_data.encode()
-                        if isinstance(key_data, str)
-                        else key_data
-                    ),
+                    key_data.encode()
+                    if isinstance(key_data, str)
+                    else key_data,
                     password=(
-                        self.__password.encode() if self.__password else None
+                        self.__password.encode()
+                        if isinstance(self.__password, str)
+                        else self.__password
                     ),
                 )
             else:
@@ -121,21 +139,19 @@ class JWT(BaseJWT):
                 signature_input, ec.ECDSA(hash_alg)
             )
             r, s = decode_dss_signature(der_signature)
-
             n = (private_key.curve.key_size + 7) // 8
             raw_signature = r.to_bytes(n, "big") + s.to_bytes(n, "big")
             return base64url_encode(raw_signature)
+
         elif self.alg.startswith("PS"):
             hash_alg = getattr(hashes, f"SHA{self.alg.replace('PS', '')}")()
 
             if isinstance(self.__secret, str):
                 key_data = self._file_loader(self.__secret)
                 private_key = serialization.load_pem_private_key(
-                    (
-                        key_data.encode()
-                        if isinstance(key_data, str)
-                        else key_data
-                    ),
+                    key_data.encode()
+                    if isinstance(key_data, str)
+                    else key_data,
                     password=(
                         self.__password.encode()
                         if isinstance(self.__password, str)
@@ -143,16 +159,8 @@ class JWT(BaseJWT):
                     ),
                 )
             else:
-                private_key = serialization.load_pem_private_key(
-                    self.__secret,
-                    password=(
-                        self.__password.encode()
-                        if isinstance(self.__password, str)
-                        else self.__password
-                    ),
-                )
+                private_key = self.__secret
 
-            # Ensure it's actually an RSA key
             if not isinstance(private_key, rsa.RSAPrivateKey):
                 raise TypeError("PS algorithms require an RSA private key")
 
@@ -165,8 +173,9 @@ class JWT(BaseJWT):
                 hash_alg,
             )
             return base64url_encode(signature)
+
         else:
-            raise ValueError("Unsupported algorithm")
+            raise ValueError(f"Unsupported algorithm: {self.alg}")
 
     def encode(
         self,
