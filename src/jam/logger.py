@@ -34,7 +34,9 @@ class JamLogger(BaseLogger):
 
     def __init__(
         self,
-        log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        log_level: Literal[
+            "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
+        ] = "INFO",
     ):
         """Initialize the logger."""
         self.logger = logging.getLogger(__name__)
