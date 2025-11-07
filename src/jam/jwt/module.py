@@ -12,6 +12,7 @@ from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature
 from jam.encoders import BaseEncoder, JsonEncoder
 from jam.jwt.__base__ import BaseJWT
 from jam.jwt.utils import base64url_encode
+from jam.logger import BaseLogger, logger
 
 
 class JWT(BaseJWT):
@@ -41,6 +42,7 @@ class JWT(BaseJWT):
         ],
         password: Optional[str] = None,
         serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
+        logger: BaseLogger = logger,
     ) -> None:
         """Initialize JWT Factory.
 
@@ -49,11 +51,13 @@ class JWT(BaseJWT):
             secret (str | bytes | rsa.RSAPrivateKey | rsa.RSAPublicKey): Secret key or path to private/public key file
             password (str | None): Password for asymmetric keys
             serializer (BaseEncoder |type[BaseEncoder]): JSON Serializer
+            logger (BaseLogger): Logger instance
         """
         self.alg = alg
         self.__secret = secret
         self._serializer = serializer
         self.__password = password
+        self.__logger = logger
 
     @staticmethod
     def _file_loader(path: str) -> str:
@@ -65,6 +69,7 @@ class JWT(BaseJWT):
 
     def __sign(self, signature_input: bytes) -> str:
         if self.alg.startswith("HS"):
+            self.__logger.debug(f"Signing with algorithm: {self.alg}")
             hash_alg = getattr(hashlib, f"{self.alg.replace('HS', 'sha')}")
 
             if isinstance(self.__secret, str):
@@ -77,9 +82,11 @@ class JWT(BaseJWT):
                 )
 
             signature = hmac.new(key, signature_input, hash_alg).digest()
+            self.__logger.debug(f"Generated signature: {signature.hex()}")
             return base64url_encode(signature)
 
         elif self.alg.startswith("RS"):
+            self.__logger.debug(f"Signing with algorithm: {self.alg}")
             if isinstance(self.__secret, str):
                 if os.path.isfile(self.__secret):
                     with open(self.__secret, "rb") as key_file:
@@ -110,6 +117,7 @@ class JWT(BaseJWT):
             return base64url_encode(signature)
 
         elif self.alg.startswith("ES"):
+            self.__logger.debug(f"Signing with algorithm: {self.alg}")
             curve_map = {
                 "ES256": (ec.SECP256R1(), hashes.SHA256()),
                 "ES384": (ec.SECP384R1(), hashes.SHA384()),
@@ -123,9 +131,11 @@ class JWT(BaseJWT):
             if isinstance(self.__secret, str):
                 key_data = self._file_loader(self.__secret)
                 private_key = serialization.load_pem_private_key(
-                    key_data.encode()
-                    if isinstance(key_data, str)
-                    else key_data,
+                    (
+                        key_data.encode()
+                        if isinstance(key_data, str)
+                        else key_data
+                    ),
                     password=(
                         self.__password.encode()
                         if isinstance(self.__password, str)
@@ -149,9 +159,11 @@ class JWT(BaseJWT):
             if isinstance(self.__secret, str):
                 key_data = self._file_loader(self.__secret)
                 private_key = serialization.load_pem_private_key(
-                    key_data.encode()
-                    if isinstance(key_data, str)
-                    else key_data,
+                    (
+                        key_data.encode()
+                        if isinstance(key_data, str)
+                        else key_data
+                    ),
                     password=(
                         self.__password.encode()
                         if isinstance(self.__password, str)
