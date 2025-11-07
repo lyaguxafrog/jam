@@ -3,7 +3,7 @@
 import base64
 
 
-def __base64url_encode__(data: bytes) -> str:
+def base64url_encode(data: bytes) -> str:
     """Encodes data using URL-safe Base64 encoding.
 
     Removes padding characters ('=') typically added in standard Base64 encoding.
@@ -17,7 +17,7 @@ def __base64url_encode__(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).rstrip(b"=").decode("utf-8")
 
 
-def __base64url_decode__(data: str) -> bytes:
+def base64url_decode(data: str) -> bytes:
     """Decodes a URL-safe Base64 encoded string back to bytes.
 
     Automatically adds the necessary padding characters ('=') before decoding.
