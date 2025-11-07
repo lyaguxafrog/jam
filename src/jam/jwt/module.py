@@ -172,7 +172,14 @@ class JWT(BaseJWT):
         self,
         payload: dict[str, Any],
     ) -> str:
-        """Encode."""
+        """Encode token.
+
+        Args:
+            payload (dict[str, Any]): The payload to encode.
+
+        Returns:
+            str: The encoded token.
+        """
         header = {"typ": "jwt", "alg": self.alg}
 
         header_encoded = base64url_encode(self._serializer.dumps(header))
