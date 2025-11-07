@@ -2,30 +2,27 @@
 
 import logging
 from abc import ABC, abstractmethod
+from typing import Literal
 
 
 class BaseLogger(ABC):
     """Interface for logging."""
 
-    @classmethod
     @abstractmethod
     def info(cls, message: str) -> None:
         """Log an informational message."""
         raise NotImplementedError
 
-    @classmethod
     @abstractmethod
     def error(cls, message: str) -> None:
         """Log an error message."""
         raise NotImplementedError
 
-    @classmethod
     @abstractmethod
     def warning(cls, message: str) -> None:
         """Log a warning message."""
         raise NotImplementedError
 
-    @classmethod
     @abstractmethod
     def debug(cls, message: str) -> None:
         """Log a debug message."""
@@ -35,12 +32,15 @@ class BaseLogger(ABC):
 class JamLogger(BaseLogger):
     """Default jam logger, use stdlib logging."""
 
-    def __init__(self):
+    def __init__(
+        self,
+        log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+    ):
         """Initialize the logger."""
         self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.INFO)
+        self.logger.setLevel(log_level)
         handler = logging.StreamHandler()
-        handler.setLevel(logging.INFO)
+        handler.setLevel(log_level)
         self.logger.addHandler(handler)
 
     def info(self, message: str) -> None:
@@ -66,3 +66,6 @@ class JamLogger(BaseLogger):
     def __repr__(self) -> str:
         """Return a string representation of the logger."""
         return f"JamLogger({self.logger.name})"
+
+
+logger = JamLogger("INFO")
