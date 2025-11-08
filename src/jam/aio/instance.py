@@ -15,7 +15,7 @@ class Jam(BaseJam):
     """Main instance for aio."""
 
     _JAM_MODULES: dict[str, str] = {
-        "jwt": "jam.aio.modules.JWTModule",
+        "jwt": "jam.jwt.module.JWT",
         "session": "jam.aio.modules.SessionModule",
         "oauth2": "jam.aio.modules.OAuth2Module",
         "paseto": "jam.paseto.utils.init_paseto_instance",
