@@ -16,7 +16,12 @@ from jam.logger import BaseLogger, logger
 
 
 class JWT(BaseJWT):
-    """JWT Factory."""
+    """JWT Factory.
+
+    Methods:
+        encode: Encode token.
+        decode: Decode token.
+    """
 
     def __init__(
         self,
@@ -233,7 +238,6 @@ class JWT(BaseJWT):
 
         self.__logger.debug("Decoding JWT token...")
 
-        # Decode header & payload
         try:
             header = self._serializer.loads(base64url_decode(header_b64))
             payload = self._serializer.loads(base64url_decode(payload_b64))
@@ -244,7 +248,6 @@ class JWT(BaseJWT):
         signing_input = f"{header_b64}.{payload_b64}".encode()
         signature = base64url_decode(signature_b64)
 
-        # --- Verify signature ---
         alg = header.get("alg")
         if alg != self.alg:
             raise ValueError(
@@ -253,7 +256,6 @@ class JWT(BaseJWT):
 
         self.__logger.debug(f"Verifying signature using algorithm: {alg}")
 
-        # HMAC verification
         if alg.startswith("HS"):
             if isinstance(self.__secret, str):
                 key = self.__secret.encode("utf-8")
@@ -268,7 +270,6 @@ class JWT(BaseJWT):
             if not hmac.compare_digest(signature, expected_signature):
                 raise ValueError("Invalid HMAC signature")
 
-        # RSA verification
         elif alg.startswith("RS"):
             key = public_key or self.__secret
             if isinstance(key, str):
@@ -290,7 +291,6 @@ class JWT(BaseJWT):
             except Exception:
                 raise ValueError("Invalid RSA signature")
 
-        # ECDSA verification
         elif alg.startswith("ES"):
             key = public_key or self.__secret
             if isinstance(key, str):
@@ -308,7 +308,6 @@ class JWT(BaseJWT):
             }
             curve, hash_alg = curve_map[alg]
 
-            # split signature into r/s
             n = (pub_key.curve.key_size + 7) // 8
             r = int.from_bytes(signature[:n], "big")
             s = int.from_bytes(signature[n:], "big")
@@ -319,7 +318,6 @@ class JWT(BaseJWT):
             except Exception:
                 raise ValueError("Invalid ECDSA signature")
 
-        # RSA-PSS verification
         elif alg.startswith("PS"):
             key = public_key or self.__secret
             if isinstance(key, str):

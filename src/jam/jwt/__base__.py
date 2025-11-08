@@ -5,7 +5,12 @@ from typing import Any, Optional
 
 
 class BaseJWT(ABC):
-    """Base JWT module."""
+    """Base JWT module.
+
+    Methods:
+        encode: Encode token.
+        decode: Decode token.
+    """
 
     @abstractmethod
     def encode(
