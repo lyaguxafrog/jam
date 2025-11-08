@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import gc
+import uuid
 from collections.abc import Callable
+from datetime import datetime
 from typing import Any, Optional, Union
 
 from jam.__abc_instances__ import BaseJam
@@ -93,7 +95,13 @@ class Jam(BaseJam):
         Returns:
             dict[str, Any]: Payload
         """
-        return await self.jwt.make_payload(exp=exp, **data)
+        payload = {
+            "iat": datetime.datetime.now().timestamp(),
+            "exp": (datetime.datetime.now().timestamp() + exp) if exp else None,
+            "jti": str(uuid.uuid4()),
+        }
+        payload = payload | data
+        return payload
 
     async def jwt_create_token(self, payload: dict[str, Any]) -> str:
         """Create JWT token.
