@@ -1,12 +1,13 @@
 # Unstable features and etc
 
-Current version: `3.0.0a1`
+Current version: `3.0.0a2`
 
 ## What is not yet included in the master
 
 
 ### `3.0.0a*`
 
+- JWT Module
 - Encode in JWT module
 - Delete deprecated instances methods
 
