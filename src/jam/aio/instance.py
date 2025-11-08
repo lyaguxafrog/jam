@@ -6,7 +6,8 @@ from typing import Any, Optional, Union
 
 from jam.__abc_instances__ import BaseJam
 from jam.__logger__ import logger
-from jam.aio.modules import JWTModule, OAuth2Module, SessionModule
+from jam.aio.modules import OAuth2Module, SessionModule
+from jam.jwt import JWT
 from jam.paseto import BasePASETO
 from jam.utils.config_maker import __config_maker__
 
@@ -32,7 +33,7 @@ class Jam(BaseJam):
             config (dict[str, Any] | str): dict or path to config file
             pointer (str): Config read point
         """
-        self.jwt: Optional[JWTModule] = None
+        self.jwt: Optional[JWT] = None
         self.session: Optional[SessionModule] = None
         self.oauth2: Optional[OAuth2Module] = None
         self.paseto: Optional[BasePASETO] = None
@@ -108,7 +109,7 @@ class Jam(BaseJam):
             EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
             EmtpyPrivateKey: If RSA algorithm is selected, but private key None
         """
-        return await self.jwt.gen_token(**payload)
+        return await self.jwt.encode(payload)
 
     async def jwt_verify_token(
         self, token: str, check_exp: bool = True, check_list: bool = True
