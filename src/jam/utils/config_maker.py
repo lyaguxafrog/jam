@@ -7,6 +7,7 @@ from collections.abc import Callable
 from importlib import import_module
 from typing import Any, Union
 
+
 GENERIC_POINTER = "jam"
 
 
@@ -140,7 +141,7 @@ def __config_maker__(
     """Base config masker.
 
     Args:
-        config (Union[str, dict[str, Any]): Config dict or file path
+        config (str | dict[str, Any): Config dict or file path
         pointer (str): Pointer to config read
 
     Returns:
@@ -148,9 +149,9 @@ def __config_maker__(
     """
     if isinstance(config, str):
         if config.split(".")[1] == ("yml" or "yaml"):
-            return __yaml_config_parser(config, pointer=pointer).copy()
+            return __yaml_config_parser(path=config, pointer=pointer).copy()
         elif config.split(".")[1] == "toml":
-            return __toml_config_parser(config, pointer=pointer).copy()
+            return __toml_config_parser(path=config, pointer=pointer).copy()
         else:
             raise ValueError("YML/YAML or TOML configs only!")
     else:
