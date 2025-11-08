@@ -5,7 +5,6 @@ import re
 import sys
 from collections.abc import Callable
 from importlib import import_module
-from threading import ExceptHookArgs
 from typing import Any, Union
 
 GENERIC_POINTER = "jam"
