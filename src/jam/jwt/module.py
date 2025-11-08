@@ -67,33 +67,56 @@ class JWT(BaseJWT):
 
     def __sign(self, signature_input: bytes) -> str:
         if self.alg.startswith("HS"):
+            self.__logger.debug(f"Signing with HMAC algorithm: {self.alg}")
             hash_alg = getattr(hashlib, f"{self.alg.replace('HS', 'sha')}")
-            signature = hmac.new(
-                self.__secret.encode("utf-8"), signature_input, hash_alg
-            ).digest()
+
+            if isinstance(self.__secret, str):
+                key = self.__secret.encode("utf-8")
+            elif isinstance(self.__secret, bytes):
+                key = self.__secret
+            else:
+                raise TypeError(
+                    "Invalid secret type for HMAC algorithm. Expected str or bytes."
+                )
+
+            signature = hmac.new(key, signature_input, hash_alg).digest()
+            self.__logger.debug(f"Signature generated: {signature.hex()}")
             return base64url_encode(signature)
+
         elif self.alg.startswith("RS"):
+            self.__logger.debug(f"Signing with RSA algorithm: {self.alg}")
             if isinstance(self.__secret, str):
                 if os.path.isfile(self.__secret):
                     with open(self.__secret, "rb") as key_file:
                         private_key = serialization.load_pem_private_key(
                             key_file.read(),
-                            password=self.__password,
+                            password=(
+                                self.__password.encode()
+                                if isinstance(self.__password, str)
+                                else self.__password
+                            ),
                         )
                 else:
                     private_key = serialization.load_pem_private_key(
                         self.__secret.encode(),
-                        password=self.__password,
+                        password=(
+                            self.__password.encode()
+                            if isinstance(self.__password, str)
+                            else self.__password
+                        ),
                     )
             else:
                 private_key = self.__secret
+
             hash_alg = getattr(hashes, f"SHA{self.alg.replace('RS', '')}")()
             signature = private_key.sign(
                 signature_input, padding.PKCS1v15(), hash_alg
             )
+            self.__logger.debug(f"Signature generated: {signature.hex()}")
             return base64url_encode(signature)
 
         elif self.alg.startswith("ES"):
+            self.__logger.debug(f"Signing with ECDSA algorithm: {self.alg}")
             curve_map = {
                 "ES256": (ec.SECP256R1(), hashes.SHA256()),
                 "ES384": (ec.SECP384R1(), hashes.SHA384()),
@@ -113,7 +136,9 @@ class JWT(BaseJWT):
                         else key_data
                     ),
                     password=(
-                        self.__password.encode() if self.__password else None
+                        self.__password.encode()
+                        if isinstance(self.__password, str)
+                        else self.__password
                     ),
                 )
             else:
@@ -123,11 +148,13 @@ class JWT(BaseJWT):
                 signature_input, ec.ECDSA(hash_alg)
             )
             r, s = decode_dss_signature(der_signature)
-
             n = (private_key.curve.key_size + 7) // 8
             raw_signature = r.to_bytes(n, "big") + s.to_bytes(n, "big")
+            self.__logger.debug(f"Signature generated: {raw_signature.hex()}")
             return base64url_encode(raw_signature)
+
         elif self.alg.startswith("PS"):
+            self.__logger.debug(f"Signing with RSA-PSS algorithm: {self.alg}")
             hash_alg = getattr(hashes, f"SHA{self.alg.replace('PS', '')}")()
 
             if isinstance(self.__secret, str):

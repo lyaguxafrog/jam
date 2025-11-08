@@ -8,7 +8,8 @@ from typing import Any, Optional, Union
 
 from jam.__abc_instances__ import BaseJam
 from jam.__logger__ import logger
-from jam.aio.modules import JWTModule, OAuth2Module, SessionModule
+from jam.aio.modules import OAuth2Module, SessionModule
+from jam.jwt import JWT
 from jam.paseto import BasePASETO
 from jam.utils.config_maker import __config_maker__
 
@@ -17,7 +18,7 @@ class Jam(BaseJam):
     """Main instance for aio."""
 
     _JAM_MODULES: dict[str, str] = {
-        "jwt": "jam.aio.modules.JWTModule",
+        "jwt": "jam.jwt.module.JWT",
         "session": "jam.aio.modules.SessionModule",
         "oauth2": "jam.aio.modules.OAuth2Module",
         "paseto": "jam.paseto.utils.init_paseto_instance",
@@ -34,7 +35,7 @@ class Jam(BaseJam):
             config (dict[str, Any] | str): dict or path to config file
             pointer (str): Config read point
         """
-        self.jwt: Optional[JWTModule] = None
+        self.jwt: Optional[JWT] = None
         self.session: Optional[SessionModule] = None
         self.oauth2: Optional[OAuth2Module] = None
         self.paseto: Optional[BasePASETO] = None
