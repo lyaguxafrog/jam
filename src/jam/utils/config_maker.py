@@ -5,13 +5,13 @@ import re
 import sys
 from collections.abc import Callable
 from importlib import import_module
+from threading import ExceptHookArgs
 from typing import Any, Union
-
 
 GENERIC_POINTER = "jam"
 
 
-def __yaml_config_parser__(
+def __yaml_config_parser(
     path: str, pointer: str = GENERIC_POINTER
 ) -> dict[str, Any]:
     """Private method for parsing YML config with env substitution.
@@ -64,7 +64,7 @@ def __yaml_config_parser__(
 
 
 # TODO: env
-def __toml_config_parser__(
+def __toml_config_parser(
     path: str = "pyproject.toml", pointer: str = GENERIC_POINTER
 ) -> dict[str, Any]:
     """Private method for parsing TOML config.
@@ -84,20 +84,55 @@ def __toml_config_parser__(
         import tomllib as toml
     else:
         try:
-            import toml
+            import toml  # type: ignore
         except ImportError:
             raise ImportError(
-                "To generate a configuration file from TOML, you need to install toml: "
-                "`pip install toml` or `pip install jamlib[toml]`"
+                "To parse TOML config files, install toml: "
+                "`pip install toml` or use Python 3.11+ (built-in tomllib)."
             )
+
     try:
-        with open(path, "rb") as file:
+        with open(path) as file:
             config = toml.load(file)
-        return config.get(pointer, {})
     except FileNotFoundError:
         raise FileNotFoundError(f"TOML config file not found at: {path}")
-    except toml.TOMLDecodeError as e:
-        raise ValueError(f"Error parsing TOML file: {e}")
+    except Exception as e:
+        raise ValueError(f"Error parsing TOML file: {e}") from e
+
+    env_pattern = re.compile(r"\$\{([^}^{]+)\}|\$([A-Za-z_][A-Za-z0-9_]*)")
+
+    def _env_constructor(value: Any) -> Any:
+        """Recursively substitute ${VAR} and $VAR in strings."""
+        if isinstance(value, str):
+            for match in env_pattern.findall(value):
+                var_name = match[0] or match[1]
+                env_value = os.getenv(var_name)
+                if env_value is None:
+                    raise ValueError(
+                        f"Environment variable '{var_name}' not set"
+                    )
+                value = re.sub(
+                    rf"\$\{{{var_name}\}}|\${var_name}", env_value, value
+                )
+            return value
+        elif isinstance(value, dict):
+            return {k: _env_constructor(v) for k, v in value.items()}
+        elif isinstance(value, list):
+            return [_env_constructor(v) for v in value]
+        else:
+            return value
+
+    config = _env_constructor(config)
+
+    if pointer:
+        section = config
+        for part in pointer.split("."):
+            if isinstance(section, dict):
+                section = section.get(part, {})
+            else:
+                return {}
+        return section
+    return config
 
 
 def __config_maker__(
@@ -114,9 +149,9 @@ def __config_maker__(
     """
     if isinstance(config, str):
         if config.split(".")[1] == ("yml" or "yaml"):
-            return __yaml_config_parser__(config, pointer).copy()
+            return __yaml_config_parser(config, pointer=pointer).copy()
         elif config.split(".")[1] == "toml":
-            return __toml_config_parser__(config, pointer).copy()
+            return __toml_config_parser(config, pointer=pointer).copy()
         else:
             raise ValueError("YML/YAML or TOML configs only!")
     else:
