@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Literal, Optional, Union
 
 from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import ec, padding, rsa
+from cryptography.hazmat.primitives.asymmetric import ec, padding
 from cryptography.hazmat.primitives.asymmetric.utils import (
     decode_dss_signature,
     encode_dss_signature,
@@ -16,18 +16,9 @@ from cryptography.hazmat.primitives.asymmetric.utils import (
 
 from jam.encoders import BaseEncoder, JsonEncoder
 from jam.jwt.__base__ import BaseJWT
+from jam.jwt.__types__ import KeyLike
 from jam.jwt.utils import base64url_decode, base64url_encode
 from jam.logger import BaseLogger, logger
-
-
-KeyLike = Union[
-    str,
-    bytes,
-    rsa.RSAPrivateKey,
-    rsa.RSAPublicKey,
-    ec.EllipticCurvePrivateKey,
-    ec.EllipticCurvePublicKey,
-]
 
 
 class JWT(BaseJWT):
@@ -64,12 +55,10 @@ class JWT(BaseJWT):
             logger (BaseLogger): Logger instance
         """
         self.alg = alg
-        self._secret = secret
-        self._password = password
+        self.__secret = secret
+        self.__password = password
         self._logger = logger
-        self._serializer = (
-            serializer() if isinstance(serializer, type) else serializer
-        )
+        self._serializer = serializer
 
     def _load_key_data(self, data: Union[str, bytes]) -> bytes:
         if isinstance(data, bytes):
@@ -93,9 +82,9 @@ class JWT(BaseJWT):
             priv = serialization.load_pem_private_key(
                 key_bytes,
                 password=(
-                    self._password.encode()
-                    if isinstance(self._password, str)
-                    else self._password
+                    self.__password.encode()
+                    if isinstance(self.__password, str)
+                    else self.__password
                 ),
             )
             self._logger.debug(
@@ -105,9 +94,9 @@ class JWT(BaseJWT):
 
     def _sign_hs(self, data: bytes) -> str:
         key = (
-            self._secret.encode()
-            if isinstance(self._secret, str)
-            else self._secret
+            self.__secret.encode()
+            if isinstance(self.__secret, str)
+            else self.__secret
         )
         digest = getattr(hashlib, f"sha{self.alg[2:]}")
         sig = hmac.new(key, data, digest).digest()
@@ -115,21 +104,21 @@ class JWT(BaseJWT):
 
     def _sign_rs(self, data: bytes) -> str:
         key_bytes = (
-            self._load_key_data(self._secret)
-            if isinstance(self._secret, (str, bytes))
+            self._load_key_data(self.__secret)
+            if isinstance(self.__secret, (str, bytes))
             else None
         )
         private_key = (
             serialization.load_pem_private_key(
                 key_bytes,
                 password=(
-                    self._password.encode()
-                    if isinstance(self._password, str)
-                    else self._password
+                    self.__password.encode()
+                    if isinstance(self.__password, str)
+                    else self.__password
                 ),
             )
             if key_bytes
-            else self._secret
+            else self.__secret
         )
         hash_alg = getattr(hashes, f"SHA{self.alg[2:]}")()
         sig = private_key.sign(data, padding.PKCS1v15(), hash_alg)
@@ -143,21 +132,21 @@ class JWT(BaseJWT):
         }
         _, hash_alg = curve_map[self.alg]
         key_bytes = (
-            self._load_key_data(self._secret)
-            if isinstance(self._secret, (str, bytes))
+            self._load_key_data(self.__secret)
+            if isinstance(self.__secret, (str, bytes))
             else None
         )
         private_key = (
             serialization.load_pem_private_key(
                 key_bytes,
                 password=(
-                    self._password.encode()
-                    if isinstance(self._password, str)
-                    else self._password
+                    self.__password.encode()
+                    if isinstance(self.__password, str)
+                    else self.__password
                 ),
             )
             if key_bytes
-            else self._secret
+            else self.__secret
         )
         der = private_key.sign(data, ec.ECDSA(hash_alg))
         r, s = decode_dss_signature(der)
@@ -167,21 +156,21 @@ class JWT(BaseJWT):
 
     def _sign_ps(self, data: bytes) -> str:
         key_bytes = (
-            self._load_key_data(self._secret)
-            if isinstance(self._secret, (str, bytes))
+            self._load_key_data(self.__secret)
+            if isinstance(self.__secret, (str, bytes))
             else None
         )
         private_key = (
             serialization.load_pem_private_key(
                 key_bytes,
                 password=(
-                    self._password.encode()
-                    if isinstance(self._password, str)
-                    else self._password
+                    self.__password.encode()
+                    if isinstance(self.__password, str)
+                    else self.__password
                 ),
             )
             if key_bytes
-            else self._secret
+            else self.__secret
         )
         hash_alg = getattr(hashes, f"SHA{self.alg[2:]}")()
         sig = private_key.sign(
@@ -195,12 +184,16 @@ class JWT(BaseJWT):
 
     def __sign(self, data: bytes) -> str:
         if self.alg.startswith("HS"):
+            self._logger.debug("Signing with HS")
             return self._sign_hs(data)
         if self.alg.startswith("RS"):
+            self._logger.debug("Signing with RS")
             return self._sign_rs(data)
         if self.alg.startswith("ES"):
+            self._logger.debug("Signing with ES")
             return self._sign_es(data)
         if self.alg.startswith("PS"):
+            self._logger.debug("Signing with PS")
             return self._sign_ps(data)
         raise ValueError(f"Unsupported algorithm: {self.alg}")
 
@@ -251,7 +244,7 @@ class JWT(BaseJWT):
                 f"Algorithm mismatch: expected {self.alg}, got {header.get('alg')}"
             )
 
-        key = public_key or self._secret
+        key = public_key or self.__secret
         if not self.alg.startswith("HS"):
             key = self._load_public_key_auto(key)
 
