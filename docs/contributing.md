@@ -18,10 +18,10 @@ from jam.jwt.__utils__ import __base64url_decode__
 
 class SomeClass:
     """Long class description."""
-    
+
     def __init__(self, some_value: str) -> None:
         """Class constructor.
-        
+
         Args:
             some_value (str): Some value
         """
@@ -29,13 +29,13 @@ class SomeClass:
 
     def some_method(self, something: int) -> int:
         """Method Description.
-        
+
         Args:
             something (int): Argument description
-        
+
         Raises:
             ValueError: if something < 1
-            
+
         Returns:
             (int)
         """
@@ -58,6 +58,7 @@ The project must have `pre-commit`
 * `[~]` Changes that do not affect the logic, documentation, linters, etc.
 
 The keys in the commit body are also used:
+
 * `R`(reason): Reason for change, deletion, etc
 * `FB`(fix by): How it was made or fixed
 * `N`(note): A note of some kind
@@ -66,14 +67,16 @@ Example of a correct commit
 ```
 [*] Changed JWT decryption logic
 R: Used a third-party heavy dependency that slowed down the code
-FB: Removed the dependency and wrote independently 
+FB: Removed the dependency and wrote independently
 ```
 
 ### Branches
 The project has one main branche:
-* `master` - Stable code of the latest release
 
-All branches are created from `master` and adhere to strict branch naming:
+* `master` - Stable code of the latest release
+* `unstable` - Unstable code of the latest release
+
+All branches are created from `unstable` and adhere to strict branch naming:
 
 * New feature: `feature/<id-issue-if-it-is>-<pair-words-about-feature>`
 * Bug fixes: `fix/<id-issue-if-it-is>-<pair-words-about-bug>`
@@ -93,7 +96,7 @@ The title of the pull request must contain a keyword:
 * `HOTFIX` Urgent bug fix
 * `DOCS` Edits/additions to documentation
 
-There is a template for the poolquest, 
+There is a template for the poolquest,
 in it clearly describe what you did and why.
 
 Example:
