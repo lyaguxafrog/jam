@@ -23,7 +23,7 @@ from jam import Jam
 jam = Jam()
 
 jwt = jam.jwt_create_token({"user": 1})
-decoded_payload = jam.jwt_verify_token(jwt)
+session_id = jam.session_create(session_key="username", data={"user": 1})
 ```
 
 ## Why Jam?
