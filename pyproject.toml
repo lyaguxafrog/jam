@@ -102,32 +102,28 @@ tests = [
 target-version = "py39"
 line-length = 80
 ignore = ["UP009", "D100", "UP007"]
-exclude = ["*__init__.py", "tests/", "*exceptions/"]
+exclude = ["*__init__.py", "tests/", "*exceptions/", "env", ".env", ".env.example", "migrations/", ".venv/"]
 
 [tool.ruff.lint]
-extend-select = ["UP", "D"]
+extend-select = ["UP", "D", "I"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
-[tool.isort]
-profile = "black"
-default_section = "THIRDPARTY"
-balanced_wrapping = true
-known_first_party = "src"
-line_length = 80
-lines_after_imports = 2
-lines_between_sections = 1
-multi_line_output = 3
+[tool.ruff.lint.isort]
+known-first-party = ["jam"]
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
-skip = ["env", ".env", ".env.example", "migrations/", ".venv/"]
+split-on-trailing-comma = true
+force-wrap-aliases = true
+force-sort-within-sections = true
+lines-after-imports = 2
+lines-between-types = 1
 
-[tool.black]
-line-length = 80
-skip-string-normalization = false
+[tool.ruff.format]
+quote-style = "double"
+skip-magic-trailing-comma = false
+line-ending = "auto"
 
-[tool.mypy]
-disable_error_code = ["no-redef", "import-not-found", "import-untyped", "attr-defined"]
 
 [tool.pytest]
 python_files = ["test*.py"]
