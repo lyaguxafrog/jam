@@ -112,7 +112,6 @@ convention = "google"
 
 [tool.ruff.lint.isort]
 known-first-party = ["jam"]
-sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
 split-on-trailing-comma = true
 force-wrap-aliases = true
 force-sort-within-sections = true
