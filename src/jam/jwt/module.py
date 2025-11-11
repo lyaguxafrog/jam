@@ -2,19 +2,10 @@
 
 from __future__ import annotations
 
-import hashlib
-import hmac
-from pathlib import Path
 from typing import Any, Literal, Optional, Union
 
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import ec, padding
-from cryptography.hazmat.primitives.asymmetric.utils import (
-    decode_dss_signature,
-    encode_dss_signature,
-)
-
 from jam.encoders import BaseEncoder, JsonEncoder
+from jam.jwt.__algorithms__ import BaseAlgorithm, create_algorithm
 from jam.jwt.__base__ import BaseJWT
 from jam.jwt.__types__ import KeyLike
 from jam.jwt.utils import base64url_decode, base64url_encode
@@ -22,7 +13,32 @@ from jam.logger import BaseLogger, logger
 
 
 class JWT(BaseJWT):
-    """JWT factory."""
+    """JWT factory.
+
+    This class provides JWT encoding and decoding functionality with support
+    for multiple signing algorithms. It is designed to be easily extensible
+    through inheritance and algorithm customization.
+
+    Example:
+        >>> jwt = JWT(alg="HS256", secret="my-secret-key")
+        >>> token = jwt.encode({"sub": "user123"})
+        >>> payload = jwt.decode(token)
+    """
+
+    _SUPPORTED_ALGORITHMS = (
+        "HS256",
+        "HS384",
+        "HS512",
+        "RS256",
+        "RS384",
+        "RS512",
+        "ES256",
+        "ES384",
+        "ES512",
+        "PS256",
+        "PS384",
+        "PS512",
+    )
 
     def __init__(
         self,
@@ -45,255 +61,164 @@ class JWT(BaseJWT):
         serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
         logger: BaseLogger = logger,
     ) -> None:
-        """Initalization.
+        """Initialize JWT instance.
 
         Args:
-            alg (str): JWT Alg
-            secret (KeyLike): Secret key
-            password (str  | bytes | None): Password for private key
-            serializer (BaseEncoder | type[BaseEncoder]): JSON Encoder
+            alg (str): JWT algorithm name
+            secret (KeyLike): Secret key for signing/verification
+            password (str | bytes | None): Password for encrypted private keys
+            serializer (BaseEncoder | type[BaseEncoder]): JSON encoder/decoder
             logger (BaseLogger): Logger instance
+
+        Raises:
+            ValueError: If algorithm is not supported or secret is invalid
         """
+        self._validate_algorithm(alg)
         self.alg = alg
-        self.__secret = secret
-        self.__password = password
+        self._secret = secret
+        self._password = self._normalize_password(password)
         self._logger = logger
         self._serializer = serializer
+        self._algorithm: BaseAlgorithm | None = None
 
-    def _load_key_data(self, data: Union[str, bytes]) -> bytes:
-        if isinstance(data, bytes):
-            return data
-        path = Path(data)
-        return path.read_bytes() if path.is_file() else data.encode()
+        self._logger.info(f"Initialized JWT with algorithm {alg}")
 
-    def _load_public_key_auto(self, key: KeyLike) -> Any:
-        if hasattr(key, "public_key"):
-            return key.public_key()
+    def _validate_algorithm(self, alg: str) -> None:
+        """Validate algorithm name.
 
-        key_bytes = (
-            self._load_key_data(key) if isinstance(key, (str, bytes)) else None
-        )
-        if not key_bytes:
-            return key
+        Args:
+            alg (str): Algorithm name
 
-        try:
-            return serialization.load_pem_public_key(key_bytes)
-        except ValueError:
-            priv = serialization.load_pem_private_key(
-                key_bytes,
-                password=(
-                    self.__password.encode()
-                    if isinstance(self.__password, str)
-                    else self.__password
-                ),
+        Raises:
+            ValueError: If algorithm is not supported
+        """
+        if alg not in self._SUPPORTED_ALGORITHMS:
+            raise ValueError(
+                f"Unsupported algorithm: {alg}. "
+                f"Supported algorithms: {', '.join(self._SUPPORTED_ALGORITHMS)}"
             )
-            self._logger.debug(
-                "Extracted public key from private PEM automatically."
+
+    def _normalize_password(
+        self, password: Optional[Union[str, bytes]]
+    ) -> bytes | None:
+        """Normalize password to bytes.
+
+        Args:
+            password (str | bytes | None): Password
+
+        Returns:
+            bytes | None: Normalized password
+        """
+        if password is None:
+            return None
+        return password.encode() if isinstance(password, str) else password
+
+    @property
+    def _algo(self) -> BaseAlgorithm:
+        """Get or create algorithm instance.
+
+        Returns:
+            BaseAlgorithm: Algorithm instance
+        """
+        if self._algorithm is None:
+            self._algorithm = create_algorithm(
+                self.alg, self._secret, self._password, self._logger
             )
-            return priv.public_key()
-
-    def _sign_hs(self, data: bytes) -> str:
-        key = (
-            self.__secret.encode()
-            if isinstance(self.__secret, str)
-            else self.__secret
-        )
-        digest = getattr(hashlib, f"sha{self.alg[2:]}")
-        sig = hmac.new(key, data, digest).digest()
-        return base64url_encode(sig)
-
-    def _sign_rs(self, data: bytes) -> str:
-        key_bytes = (
-            self._load_key_data(self.__secret)
-            if isinstance(self.__secret, (str, bytes))
-            else None
-        )
-        private_key = (
-            serialization.load_pem_private_key(
-                key_bytes,
-                password=(
-                    self.__password.encode()
-                    if isinstance(self.__password, str)
-                    else self.__password
-                ),
-            )
-            if key_bytes
-            else self.__secret
-        )
-        hash_alg = getattr(hashes, f"SHA{self.alg[2:]}")()
-        sig = private_key.sign(data, padding.PKCS1v15(), hash_alg)
-        return base64url_encode(sig)
-
-    def _sign_es(self, data: bytes) -> str:
-        curve_map = {
-            "ES256": (ec.SECP256R1(), hashes.SHA256()),
-            "ES384": (ec.SECP384R1(), hashes.SHA384()),
-            "ES512": (ec.SECP521R1(), hashes.SHA512()),
-        }
-        _, hash_alg = curve_map[self.alg]
-        key_bytes = (
-            self._load_key_data(self.__secret)
-            if isinstance(self.__secret, (str, bytes))
-            else None
-        )
-        private_key = (
-            serialization.load_pem_private_key(
-                key_bytes,
-                password=(
-                    self.__password.encode()
-                    if isinstance(self.__password, str)
-                    else self.__password
-                ),
-            )
-            if key_bytes
-            else self.__secret
-        )
-        der = private_key.sign(data, ec.ECDSA(hash_alg))
-        r, s = decode_dss_signature(der)
-        n = (private_key.curve.key_size + 7) // 8
-        raw = r.to_bytes(n, "big") + s.to_bytes(n, "big")
-        return base64url_encode(raw)
-
-    def _sign_ps(self, data: bytes) -> str:
-        key_bytes = (
-            self._load_key_data(self.__secret)
-            if isinstance(self.__secret, (str, bytes))
-            else None
-        )
-        private_key = (
-            serialization.load_pem_private_key(
-                key_bytes,
-                password=(
-                    self.__password.encode()
-                    if isinstance(self.__password, str)
-                    else self.__password
-                ),
-            )
-            if key_bytes
-            else self.__secret
-        )
-        hash_alg = getattr(hashes, f"SHA{self.alg[2:]}")()
-        sig = private_key.sign(
-            data,
-            padding.PSS(
-                mgf=padding.MGF1(hash_alg), salt_length=padding.PSS.MAX_LENGTH
-            ),
-            hash_alg,
-        )
-        return base64url_encode(sig)
-
-    def __sign(self, data: bytes) -> str:
-        if self.alg.startswith("HS"):
-            self._logger.debug("Signing with HS")
-            return self._sign_hs(data)
-        if self.alg.startswith("RS"):
-            self._logger.debug("Signing with RS")
-            return self._sign_rs(data)
-        if self.alg.startswith("ES"):
-            self._logger.debug("Signing with ES")
-            return self._sign_es(data)
-        if self.alg.startswith("PS"):
-            self._logger.debug("Signing with PS")
-            return self._sign_ps(data)
-        raise ValueError(f"Unsupported algorithm: {self.alg}")
+        return self._algorithm
 
     def encode(self, payload: dict[str, Any]) -> str:
         """Encode token.
 
         Args:
-            payload (dict[str, Any]): Payload
+            payload (dict[str, Any]): JWT payload
 
         Returns:
-            str: New token
+            str: Encoded JWT token
+
+        Raises:
+            ValueError: If encoding fails
         """
-        header = {"typ": "jwt", "alg": self.alg}
-        header_b64 = base64url_encode(self._serializer.dumps(header))
-        payload_b64 = base64url_encode(self._serializer.dumps(payload))
-        signature = self.__sign(f"{header_b64}.{payload_b64}".encode())
-        return f"{header_b64}.{payload_b64}.{signature}"
+        self._logger.debug(
+            f"Encoding JWT with payload keys: {list(payload.keys())}"
+        )
+
+        try:
+            header = {"typ": "JWT", "alg": self.alg}
+            header_b64 = base64url_encode(self._serializer.dumps(header))
+            payload_b64 = base64url_encode(self._serializer.dumps(payload))
+            data = f"{header_b64}.{payload_b64}".encode()
+            signature = self._algo.sign(data)
+            token = f"{header_b64}.{payload_b64}.{signature}"
+
+            self._logger.debug("JWT encoded successfully")
+            return token
+        except Exception as e:
+            self._logger.error(
+                f"Failed to encode JWT: {e}",
+                exc_info=True,
+            )
+            raise ValueError(f"JWT encoding failed: {e}") from e
 
     def decode(
         self, token: str, public_key: Optional[KeyLike] = None
     ) -> dict[str, Any]:
-        """Decode token.
+        """Decode and verify token.
 
         Args:
-            token (str): Token
-            public_key (KeyLike | None): Public key
+            token (str): JWT token to decode
+            public_key (KeyLike | None): Optional public key for verification.
+                If not provided, uses the secret from initialization.
 
         Raises:
-            ValueError: If invalid token
+            ValueError: If token is invalid, malformed, or verification fails
 
         Returns:
-            dict: Payload
+            dict[str, Any]: Decoded payload
         """
-        try:
-            h_b64, p_b64, s_b64 = token.split(".")
-        except ValueError:
+        self._logger.debug("Decoding JWT token")
+
+        # Validate token format
+        parts = token.split(".")
+        if len(parts) != 3:
+            self._logger.warning(
+                f"Invalid token format: expected 3 parts, got {len(parts)}"
+            )
             raise ValueError(
                 "Invalid token format. Expected header.payload.signature"
             )
 
-        header = self._serializer.loads(base64url_decode(h_b64))
-        payload = self._serializer.loads(base64url_decode(p_b64))
-        data = f"{h_b64}.{p_b64}".encode()
-        sig = base64url_decode(s_b64)
+        try:
+            h_b64, p_b64, s_b64 = parts
 
-        if header.get("alg") != self.alg:
-            raise ValueError(
-                f"Algorithm mismatch: expected {self.alg}, got {header.get('alg')}"
+            # Decode header and payload
+            header = self._serializer.loads(base64url_decode(h_b64))
+            payload = self._serializer.loads(base64url_decode(p_b64))
+            data = f"{h_b64}.{p_b64}".encode()
+            sig = base64url_decode(s_b64)
+
+            # Validate algorithm
+            token_alg = header.get("alg")
+            if token_alg != self.alg:
+                self._logger.warning(
+                    f"Algorithm mismatch: expected {self.alg}, got {token_alg}"
+                )
+                raise ValueError(
+                    f"Algorithm mismatch: expected {self.alg}, got {token_alg}"
+                )
+
+            # Verify signature
+            key = public_key or self._secret
+            self._algo.verify(sig, data, key)
+
+            self._logger.debug("JWT decoded and verified successfully")
+            return payload
+
+        except ValueError:
+            # Re-raise ValueError as-is (already logged)
+            raise
+        except Exception as e:
+            self._logger.error(
+                f"Failed to decode JWT: {e}",
+                exc_info=True,
             )
-
-        key = public_key or self.__secret
-        if not self.alg.startswith("HS"):
-            key = self._load_public_key_auto(key)
-
-        if self.alg.startswith("HS"):
-            self._verify_hs(sig, data, key)
-        elif self.alg.startswith("RS"):
-            self._verify_rs(sig, data, key)
-        elif self.alg.startswith("ES"):
-            self._verify_es(sig, data, key)
-        elif self.alg.startswith("PS"):
-            self._verify_ps(sig, data, key)
-        else:
-            raise ValueError(f"Unsupported algorithm: {self.alg}")
-
-        return payload
-
-    def _verify_hs(self, sig: bytes, data: bytes, key: KeyLike) -> None:
-        k = key.encode() if isinstance(key, str) else key
-        digest = getattr(hashlib, f"sha{self.alg[2:]}")
-        expected = hmac.new(k, data, digest).digest()
-        if not hmac.compare_digest(sig, expected):
-            raise ValueError("Invalid HMAC signature")
-
-    def _verify_rs(self, sig: bytes, data: bytes, key: KeyLike) -> None:
-        pub_key = self._load_public_key_auto(key)
-        hash_alg = getattr(hashes, f"SHA{self.alg[2:]}")()
-        pub_key.verify(sig, data, padding.PKCS1v15(), hash_alg)
-
-    def _verify_es(self, sig: bytes, data: bytes, key: KeyLike) -> None:
-        pub_key = self._load_public_key_auto(key)
-        curve_map = {
-            "ES256": (ec.SECP256R1(), hashes.SHA256()),
-            "ES384": (ec.SECP384R1(), hashes.SHA384()),
-            "ES512": (ec.SECP521R1(), hashes.SHA512()),
-        }
-        _, hash_alg = curve_map[self.alg]
-        n = (pub_key.curve.key_size + 7) // 8
-        r, s = int.from_bytes(sig[:n], "big"), int.from_bytes(sig[n:], "big")
-        der = encode_dss_signature(r, s)
-        pub_key.verify(der, data, ec.ECDSA(hash_alg))
-
-    def _verify_ps(self, sig: bytes, data: bytes, key: KeyLike) -> None:
-        pub_key = self._load_public_key_auto(key)
-        hash_alg = getattr(hashes, f"SHA{self.alg[2:]}")()
-        pub_key.verify(
-            sig,
-            data,
-            padding.PSS(
-                mgf=padding.MGF1(hash_alg), salt_length=padding.PSS.MAX_LENGTH
-            ),
-            hash_alg,
-        )
+            raise ValueError(f"JWT decoding failed: {e}") from e
