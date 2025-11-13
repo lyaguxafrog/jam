@@ -7,6 +7,7 @@ Current version: `3.0.0a2`
 
 ### `3.0.0a*`
 
+- Refactoring JWT module
 - New JWT Module
 - Encode in JWT module
 - Delete deprecated instances methods
