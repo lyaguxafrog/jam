@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import time
 from functools import wraps
+import time
 
 
 def work_time(func):
