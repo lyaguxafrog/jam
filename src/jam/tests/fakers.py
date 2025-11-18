@@ -3,7 +3,6 @@
 from secrets import token_urlsafe
 from typing import Any, Optional
 
-from jam.jwt.tools import __gen_jwt__
 from jam.utils import xor_my_data
 
 
@@ -13,15 +12,8 @@ def fake_jwt_token(payload: Optional[dict[str, Any]]) -> str:
     Returns:
         str: A fake JWT token.
     """
-    return __gen_jwt__(
-        header={"alg": "HS256", "typ": "fake-JWT"},
-        payload=(
-            payload
-            if payload
-            else {"sub": "1234567890", "name": "JohnDoe", "iat": 1616239022}
-        ),
-        secret="FAKE",
-    )
+    # TODO: Make fake
+    return "TEST"
 
 
 def invalid_token() -> str:
@@ -30,11 +22,7 @@ def invalid_token() -> str:
     Returns:
         str: An invalid JWT token.
     """
-    return __gen_jwt__(
-        header={"alg": "HS256", "typ": "invalid-JWT"},
-        payload={"sub": "0987654321", "name": "Jane Doe", "iat": 1616239022},
-        secret="FAKE",
-    )
+    return "INVALID_TOKEN"
 
 
 def fake_oauth2_token() -> str:

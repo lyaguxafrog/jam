@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import gc
-import uuid
 from collections.abc import Callable
 from datetime import datetime
+import gc
 from typing import Any, Optional, Union
+import uuid
 
 from jam.__abc_instances__ import BaseJam
 from jam.__logger__ import logger
