@@ -1,88 +1,21 @@
 # -*- coding: utf-8 -*-
 
-from collections.abc import Callable
 from datetime import datetime
-import gc
 from typing import Any, Optional, Union
 import uuid
 
 from jam.__abc_instances__ import BaseJam
-from jam.__logger__ import logger
-from jam.aio.modules import OAuth2Module, SessionModule
-from jam.jwt import JWT
-from jam.paseto import BasePASETO
-from jam.utils.config_maker import __config_maker__
 
 
 class Jam(BaseJam):
     """Main instance for aio."""
 
-    _JAM_MODULES: dict[str, str] = {
+    MODULES: dict[str, str] = {
         "jwt": "jam.jwt.module.JWT",
         "session": "jam.aio.modules.SessionModule",
         "oauth2": "jam.aio.modules.OAuth2Module",
         "paseto": "jam.paseto.utils.init_paseto_instance",
     }
-
-    def __init__(
-        self,
-        config: Union[dict[str, Any], str] = "pyproject.toml",
-        pointer: str = "jam",
-    ) -> None:
-        """Class constructor.
-
-        Args:
-            config (dict[str, Any] | str): dict or path to config file
-            pointer (str): Config read point
-        """
-        self.jwt: Optional[JWT] = None
-        self.session: Optional[SessionModule] = None
-        self.oauth2: Optional[OAuth2Module] = None
-        self.paseto: Optional[BasePASETO] = None
-
-        config = __config_maker__(config, pointer)
-
-        # OTP
-        otp_config = config.pop("otp", None)
-        if otp_config:
-            from jam.otp.__abc_module__ import OTPConfig
-
-            self._otp = OTPConfig(**otp_config)
-            self._otp_module = self._otp_module_setup()
-            logger.debug("OTP module initialized")
-
-        # config build
-        for name, cfg in config.items():
-            try:
-                module = self.build_module(name, cfg, self._JAM_MODULES)
-                if name == "jwt":
-                    self.module = module
-                setattr(self, name, module)
-                logger.debug(f"Auth module '{name}' successfully initialized")
-            except Exception as e:
-                logger.exception(
-                    f"Failed to initialize auth module '{name}': {e}"
-                )
-        gc.collect()
-
-    def _otp_module_setup(self) -> Callable:
-        otp_type = self._otp.type
-        if otp_type == "hotp":
-            from jam.otp import HOTP
-
-            return HOTP
-        elif otp_type == "totp":
-            from jam.otp import TOTP
-
-            return TOTP
-        else:
-            raise ValueError("OTP type can only be totp or hotp.")
-
-    def _otp_checker(self) -> None:
-        if not hasattr(self, "_otp"):
-            raise NotImplementedError(
-                "OTP not configure. Check documentation: "
-            )
 
     async def jwt_make_payload(
         self, exp: Optional[int], data: dict[str, Any]
@@ -97,8 +30,8 @@ class Jam(BaseJam):
             dict[str, Any]: Payload
         """
         payload = {
-            "iat": datetime.datetime.now().timestamp(),
-            "exp": (datetime.datetime.now().timestamp() + exp) if exp else None,
+            "iat": datetime.now().timestamp(),
+            "exp": (datetime.now().timestamp() + exp) if exp else None,
             "jti": str(uuid.uuid4()),
         }
         payload = payload | data

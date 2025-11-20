@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from collections.abc import Callable
+from importlib import import_module
 import os
 import re
 import sys
-from collections.abc import Callable
-from importlib import import_module
 from typing import Any, Union
 
 

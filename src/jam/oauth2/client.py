@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import json
-import urllib.parse
 from contextlib import contextmanager
 from http.client import HTTPSConnection
+import json
 from typing import Any, Optional
+import urllib.parse
 
 from .__abc_oauth2_repo__ import BaseOAuth2Client
 

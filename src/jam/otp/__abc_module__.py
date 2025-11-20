@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import base64
+from dataclasses import dataclass
 import hashlib
 import hmac
 import struct
-import urllib.parse
-from dataclasses import dataclass
 from typing import Literal, Optional, Union
+import urllib.parse
 
 
 class BaseOTP:
