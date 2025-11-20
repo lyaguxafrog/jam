@@ -6,7 +6,7 @@ from litestar.middleware import (
     AuthenticationResult,
 )
 
-from jam.__abc_instances__ import BaseJam
+from jam.__base__ import BaseJam
 from jam.utils.await_maybe import await_maybe
 
 

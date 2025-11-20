@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Any, Optional, Union
 import uuid
 
-from jam.__abc_instances__ import BaseJam
+from jam.__base__ import BaseJam
 
 
 class Jam(BaseJam):

@@ -8,7 +8,7 @@ Documentation: https://jam.makridenko.ru
 """
 
 from jam.__base_encoder__ import BaseEncoder
-from jam.__abc_instances__ import BaseJam
+from jam.__base__ import BaseJam
 from jam.encoders import JsonEncoder
 from jam.instance import Jam
 

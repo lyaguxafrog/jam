@@ -6,7 +6,7 @@ from litestar.config.app import AppConfig
 from litestar.di import Provide
 from litestar.plugins import InitPlugin
 
-from jam.__abc_instances__ import BaseJam
+from jam.__base__ import BaseJam
 
 from .value import Auth, AuthMiddlewareSettings, User
 
