@@ -9,7 +9,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PublicKey,
 )
 
-from jam.__abc_encoder__ import BaseEncoder
+from jam.__base_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
 from jam.paseto.__abc_paseto_repo__ import PASETO, BasePASETO
 from jam.paseto.utils import __pae__, base64url_decode, base64url_encode

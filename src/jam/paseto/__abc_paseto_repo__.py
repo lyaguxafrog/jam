@@ -10,7 +10,7 @@ from cryptography.hazmat.primitives.asymmetric.rsa import (
 )
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
-from jam.__abc_encoder__ import BaseEncoder
+from jam.__base_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
 
 

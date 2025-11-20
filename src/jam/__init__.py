@@ -7,7 +7,7 @@ Source code: https://github.com/lyaguxafrog/jam
 Documentation: https://jam.makridenko.ru
 """
 
-from jam.__abc_encoder__ import BaseEncoder
+from jam.__base_encoder__ import BaseEncoder
 from jam.__abc_instances__ import BaseJam
 from jam.encoders import JsonEncoder
 from jam.instance import Jam

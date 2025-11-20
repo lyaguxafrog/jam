@@ -9,7 +9,7 @@ try:
 except ImportError:
     pass
 
-from jam.__abc_encoder__ import BaseEncoder
+from jam.__base_encoder__ import BaseEncoder
 
 
 class JsonEncoder(BaseEncoder):
