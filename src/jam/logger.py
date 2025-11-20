@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import logging
 from abc import ABC, abstractmethod
+import logging
+import os
 from typing import Literal
 
 
@@ -70,4 +71,4 @@ class JamLogger(BaseLogger):
         return f"JamLogger({self.logger.name})"
 
 
-logger = JamLogger("INFO")
+logger = JamLogger(os.getenv("JAM_LOG_LEVEL", "INFO").upper())
