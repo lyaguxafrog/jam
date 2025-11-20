@@ -10,7 +10,7 @@ from starlette.authentication import (
 )
 from starlette.requests import HTTPConnection
 
-from jam.__abc_instances__ import BaseJam
+from jam.__base__ import BaseJam
 from jam.__logger__ import logger
 from jam.utils.await_maybe import await_maybe
 

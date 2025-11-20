@@ -5,7 +5,7 @@ from typing import Any, Optional, Union
 
 from jam.aio import Jam as AioJam
 from jam.instance import Jam
-from jam.jwt.tools import __base64url_decode__
+from jam.jwt.utils import base64url_decode
 from jam.tests.fakers import fake_jwt_token, fake_oauth2_token
 
 
@@ -101,8 +101,8 @@ class TestJam(Jam):
             ValueError: If the token format is invalid.
         """
         headers, payload, _ = token.split(".")
-        headers = json.loads(__base64url_decode__(headers).decode("utf-8"))
-        payload = __base64url_decode__(payload).decode("utf-8")
+        headers = json.loads(base64url_decode(headers).decode("utf-8"))
+        payload = base64url_decode(payload).decode("utf-8")
 
         if headers["typ"] == "fake-JWT":
             return json.loads(payload)
@@ -139,8 +139,8 @@ class TestJam(Jam):
             ValueError: If the token format is invalid.
         """
         headers, payload, _ = token.split(".")
-        headers = json.loads(__base64url_decode__(headers).decode("utf-8"))
-        payload = __base64url_decode__(payload).decode("utf-8")
+        headers = json.loads(base64url_decode(headers).decode("utf-8"))
+        payload = base64url_decode(payload).decode("utf-8")
 
         if headers["typ"] == "fake-JWT":
             return json.loads(payload)
@@ -548,8 +548,8 @@ class TestAsyncJam(AioJam):
             ValueError: If the token format is invalid.
         """
         headers, payload, _ = token.split(".")
-        headers = json.loads(__base64url_decode__(headers).decode("utf-8"))
-        payload = __base64url_decode__(payload).decode("utf-8")
+        headers = json.loads(base64url_decode(headers).decode("utf-8"))
+        payload = base64url_decode(payload).decode("utf-8")
 
         if headers["typ"] == "fake-JWT":
             return json.loads(payload)
@@ -573,8 +573,8 @@ class TestAsyncJam(AioJam):
             ValueError: If the token format is invalid.
         """
         headers, payload, _ = token.split(".")
-        headers = json.loads(__base64url_decode__(headers).decode("utf-8"))
-        payload = __base64url_decode__(payload).decode("utf-8")
+        headers = json.loads(base64url_decode(headers).decode("utf-8"))
+        payload = base64url_decode(payload).decode("utf-8")
 
         if headers["typ"] == "fake-JWT":
             return json.loads(payload)

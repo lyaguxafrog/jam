@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import functools
-import warnings
 from typing import Optional
+import warnings
 
 
 def deprecated(replacement: Optional[str] = None):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import inspect
 from collections.abc import AsyncIterator, Awaitable, Iterator
+import inspect
 from typing import TypeVar, Union
 
 

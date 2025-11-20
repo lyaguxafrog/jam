@@ -1,84 +1,21 @@
 # -*- coding: utf-8 -*-
 
-import gc
-from collections.abc import Callable
+import datetime
 from typing import Any, Optional, Union
+import uuid
 
-from jam.__abc_instances__ import BaseJam
-from jam.__logger__ import logger
-from jam.modules import JWTModule, OAuth2Module, SessionModule
-from jam.paseto import BasePASETO
-from jam.utils.config_maker import __config_maker__
+from jam.__base__ import BaseJam
 
 
 class Jam(BaseJam):
     """Main instance."""
 
-    _JAM_MODULES: dict[str, str] = {
-        "jwt": "jam.modules.JWTModule",
+    MODULES: dict[str, str] = {
+        "jwt": "jam.jwt.module.JWT",
         "session": "jam.modules.SessionModule",
         "oauth2": "jam.modules.OAuth2Module",
         "paseto": "jam.paseto.utils.init_paseto_instance",
     }
-
-    def __init__(
-        self,
-        config: Union[dict[str, Any], str] = "pyproject.toml",
-        pointer: str = "jam",
-    ) -> None:
-        """Class constructor.
-
-        Args:
-            config (dict[str, Any] | str): dict or path to config file
-            pointer (str): Config read point
-        """
-        self.jwt: Optional[JWTModule] = None
-        self.session: Optional[SessionModule] = None
-        self.oauth2: Optional[OAuth2Module] = None
-        self.paseto: Optional[BasePASETO] = None
-
-        config = __config_maker__(config, pointer)
-
-        # OTP
-        otp_config = config.pop("otp", None)
-        if otp_config:
-            from jam.otp.__abc_module__ import OTPConfig
-
-            self._otp = OTPConfig(**otp_config)
-            self._otp_module = self._otp_module_setup()
-            logger.debug("OTP module initialized")
-
-        # build config
-        for name, cfg in config.items():
-            try:
-                module = self.build_module(name, cfg, self._JAM_MODULES)
-                setattr(self, name, module)
-                logger.debug(f"Auth module '{name}' successfully initialized")
-            except Exception as e:
-                logger.exception(
-                    f"Failed to initialize auth module '{name}': {e}"
-                )
-        gc.collect()
-
-    # TODO: Refactor this too
-    def _otp_module_setup(self) -> Callable:
-        otp_type = self._otp.type
-        if otp_type == "hotp":
-            from jam.otp import HOTP
-
-            return HOTP
-        elif otp_type == "totp":
-            from jam.otp import TOTP
-
-            return TOTP
-        else:
-            raise ValueError("OTP type can only be totp or hotp.")
-
-    def _otp_checker(self) -> None:
-        if not hasattr(self, "_otp"):
-            raise NotImplementedError(
-                "OTP not configure. Check documentation: "
-            )
 
     def jwt_make_payload(
         self, exp: Optional[int], data: dict[str, Any]
@@ -92,7 +29,13 @@ class Jam(BaseJam):
         Returns:
             dict[str, Any]: Payload
         """
-        return self.jwt.make_payload(exp=exp, **data)
+        payload = {
+            "iat": datetime.datetime.now().timestamp(),
+            "exp": (datetime.datetime.now().timestamp() + exp) if exp else None,
+            "jti": str(uuid.uuid4()),
+        }
+        payload = payload | data
+        return payload
 
     def jwt_create_token(self, payload: dict[str, Any]) -> str:
         """Create JWT token.
@@ -107,7 +50,7 @@ class Jam(BaseJam):
             EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
             EmtpyPrivateKey: If RSA algorithm is selected, but private key None
         """
-        return self.jwt.gen_token(**payload)
+        return self.jwt.encode(payload=payload)
 
     def jwt_verify_token(
         self, token: str, check_exp: bool = True, check_list: bool = True
@@ -131,7 +74,7 @@ class Jam(BaseJam):
             TokenNotInWhiteList: If the list type is white, but the token is  not there
             TokenInBlackList: If the list type is black and the token is there
         """
-        return self.jwt.validate_payload(token, check_exp, check_list)
+        return self.jwt.decode(token)
 
     def session_create(self, session_key: str, data: dict[str, Any]) -> str:
         """Create new session.

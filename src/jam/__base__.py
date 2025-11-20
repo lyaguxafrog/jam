@@ -1,42 +1,74 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABC, abstractmethod
+import gc
 from typing import Any, Optional, Union
 
-from jam.__logger__ import logger
-from jam.utils.config_maker import __module_loader__
+from jam.encoders import BaseEncoder, JsonEncoder
+from jam.jwt.__base__ import BaseJWT
+from jam.logger import BaseLogger, logger
+from jam.oauth2.__abc_oauth2_repo__ import BaseOAuth2Client
+from jam.sessions.__abc_session_repo__ import BaseSessionModule
+from jam.utils.config_maker import __config_maker__, __module_loader__
 
 
 class BaseJam(ABC):
-    """Abstract Instance object."""
+    """Base jam instance."""
 
-    _JAM_MODULES: dict[str, str] = {}
+    MODULES: dict[str, str] = {}
 
-    def build_module(
-        self, name: str, cfg: dict[str, Any], _jam_modules: dict[str, str]
-    ):
-        """Method for building module from config.
+    def __init__(
+        self,
+        config: Union[str, dict[str, Any]],
+        pointer: str = "jam",
+        logger: BaseLogger = logger,
+        serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
+    ) -> None:
+        """Initialize instance.
 
         Args:
-            name (str): Module name
-            cfg (dict[str, Any]): Config
-            _jam_modules (dict[str, str]): Jam modules
+                config (Union[str, dict[str, Any]]): Configuration
+                pointer (str): Pointer
+                logger (BaseLogger): Logger
+                serializer (Union[BaseEncoder, type[BaseBrowser]]): Serializer
+
+        Returns:
+                None
         """
-        module_path = cfg.pop("module", None)
-        if not module_path:
-            module_path = _jam_modules.get(name)
+        self.__logger = logger
+        self.jwt: Optional[BaseJWT] = None
+        self.session: Optional[BaseSessionModule] = None
+        self.oauth2: Optional[BaseOAuth2Client] = None
 
-        if not module_path:
-            raise NotImplementedError(f"Auth module '{name}' is not supported")
+        config = __config_maker__(config, pointer)
+        self._build_instance(config)
+        gc.collect()
 
-        logger.debug(f"Initializing module '{name}' from {module_path}")
-        module_cls = __module_loader__(module_path)
+    def _build_instance(self, config: dict[str, Any]) -> None:
+        """Build instance.
 
-        # FIX: handle oauth2 specially
-        if name == "oauth2":
-            return module_cls(config=cfg)
+        Load modules from configuration and initialize them.
 
-        return module_cls(**cfg)
+        Args:
+            config (dict[str, Any]): Configuration
+
+        Returns:
+            None
+        """
+        for name, path in self.MODULES.items():
+            if name not in config:
+                logger.debug(f"Missing configuration for module {name}")
+                continue
+
+            try:
+                module_cls = __module_loader__(path)
+                self.__logger.debug(f"Loading module {name} from {path}")
+                params = config.get(name, {})
+                params["logger"] = self.__logger
+                self.__setattr__(name, module_cls(**params))
+
+            except Exception as e:
+                logger.error(f"Failed to load module {name} from {path}: {e}")
 
     @abstractmethod
     def jwt_make_payload(

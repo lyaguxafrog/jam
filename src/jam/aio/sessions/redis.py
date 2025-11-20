@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import json
 from collections.abc import Callable
+import json
 from typing import Optional, Union
 from uuid import uuid4
 

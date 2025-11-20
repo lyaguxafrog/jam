@@ -2,7 +2,7 @@
 
 ![logo](https://github.com/lyaguxafrog/jam/blob/master/docs/assets/h_logo_n_title.png?raw=true)
 
-![Static Badge](https://img.shields.io/badge/Python-3.9%2B-blue?logo=python&logoColor=white)
+![Python Version](https://img.shields.io/badge/Python-3.9.*%20--%203.14.*-blue?logo=python&logoColor=white)
 [![PyPI - Version](https://img.shields.io/pypi/v/jamlib)](https://pypi.org/project/jamlib/)
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/jamlib?period=total&units=INTERNATIONAL_SYSTEM&left_color=GRAY&right_color=RED&left_text=Downloads)](https://pypi.org/project/jamlib/)
 ![tests](https://github.com/lyaguxafrog/jam/actions/workflows/run-tests.yml/badge.svg)
@@ -23,7 +23,7 @@ from jam import Jam
 jam = Jam()
 
 jwt = jam.jwt_create_token({"user": 1})
-decoded_payload = jam.jwt_verify_token(jwt)
+session_id = jam.session_create(session_key="username", data={"user": 1})
 ```
 
 ## Why Jam?
@@ -62,4 +62,3 @@ Here is a comparison with other libraries:
 | PASETO               | ✅       | ❌                               | ❌                                     | ❌                                   | ❌                                    |
 | Flexible config      | ✅       | ❌                               | ❌                                     | ❌                                   | ❌                                    |
 | Modularity           | ✅       | ❌                               | ❌                                     | ❌                                   | ❌                                    |
-
