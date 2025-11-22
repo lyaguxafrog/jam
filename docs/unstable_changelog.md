@@ -1,12 +1,13 @@
 # Unstable features and etc
 
-Current version: `3.0.0a5`
+Current version: `3.0.0a6`
 
 ## What is not yet included in the master
 
 
 ### `3.0.0a*`
 
+- Swap license: MIT -> Apache 2.0
 - Tests for new JWT module
 - Refactoring JWT module
 - New JWT Module

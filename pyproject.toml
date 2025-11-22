@@ -1,12 +1,12 @@
 [project]
 name = "jamlib"
-version = "3.0.0a5"
+version = "3.0.0a6"
 description = "Simple and universal library for authorization."
 authors = [
     {name = "Makridenko Adrian",email = "adrianmakridenko@duck.com"},
     {name = "Ksenia Travnikova",email = "kseniatravnikova@duck.com"}
 ]
-license = {text = "MIT License"}
+license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 keywords = [
     "Authentication",
@@ -28,7 +28,7 @@ dependencies = [
 ]
 
 classifiers = [
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
     "Development Status :: 5 - Production/Stable",
     "Operating System :: OS Independent",
     "Intended Audience :: Developers",
