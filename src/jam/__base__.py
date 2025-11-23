@@ -41,10 +41,10 @@ class BaseJam(ABC):
         self.oauth2: Optional[BaseOAuth2Client] = None
 
         config = __config_maker__(config, pointer)
-        self._build_instance(config)
+        self.__build_instance(config)
         gc.collect()
 
-    def _build_instance(self, config: dict[str, Any]) -> None:
+    def __build_instance(self, config: dict[str, Any]) -> None:
         """Build instance.
 
         Load modules from configuration and initialize them.
