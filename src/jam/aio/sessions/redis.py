@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 from collections.abc import Callable
 import json
 from typing import Optional, Union
@@ -25,7 +26,9 @@ class RedisSessions(SyncRedisSessions):
         redis_sessions_key: str = "sessions",
         default_ttl: Optional[int] = 3600,
         is_session_crypt: bool = False,
-        session_aes_secret: Optional[bytes] = None,
+        session_aes_secret: Optional[bytes] = os.getenv(
+            "JAM_SESSION_AES_SECRET", None
+        ),
         id_factory: Callable[[], str] = lambda: str(uuid4()),
     ) -> None:
         """Initialize the Redis session management module.
