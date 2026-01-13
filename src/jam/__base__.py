@@ -36,6 +36,7 @@ class BaseJam(ABC):
                 None
         """
         self.__logger = logger
+        self._serializer = serializer
         self.jwt: Optional[BaseJWT] = None
         self.session: Optional[BaseSessionModule] = None
         self.oauth2: Optional[BaseOAuth2Client] = None
@@ -57,7 +58,7 @@ class BaseJam(ABC):
         """
         for name, path in self.MODULES.items():
             if name not in config:
-                logger.debug(f"Missing configuration for module {name}")
+                self.__logger.debug(f"Missing configuration for module {name}")
                 continue
 
             try:
@@ -68,7 +69,9 @@ class BaseJam(ABC):
                 self.__setattr__(name, module_cls(**params))
 
             except Exception as e:
-                logger.error(f"Failed to load module {name} from {path}: {e}")
+                self.__logger.error(
+                    f"Failed to load module {name} from {path}: {e}"
+                )
 
     @abstractmethod
     def jwt_make_payload(
