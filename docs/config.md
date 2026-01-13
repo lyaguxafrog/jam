@@ -13,9 +13,12 @@ There are several ways to configure Jam:
 The configuration follows this pattern:
 `<auth_type>: <config>`
 
-## YML/YAML Example
-To configure via yml, you need to install the [`pyyaml`](https://pypi.org/project/PyYAML/) module: `pip install jamlib[yaml]`
-and describe all configuration parameters in the `jam` block, for example:
+## YAML Configuration
+
+To configure via YAML, you need to install the [`pyyaml`](https://pypi.org/project/PyYAML/) module: `pip install jamlib[yaml]`
+
+All configuration parameters must be described in the `jam` block:
+
 ```yaml
 jam:
   jwt:
@@ -26,17 +29,20 @@ jam:
     redis_uri: redis://0.0.0.0:6379/0
 ```
 
-And specify the path to the file in the instance:
+Specify the path to the file in the instance:
 ```python
 from jam import Jam
 
 jam = Jam(config="my_config.yml")
 ```
 
-## TOML Example
-To configure via toml, you need to describe all parameters in the config in the `jam` block, for example:
+## TOML Configuration
+
+To configure via TOML, describe all parameters in the config in the `jam` block:
+
 !!! tip
-    For `python < 3.11` you need to install the [`toml`](https://pypi.org/project/toml/) module: `pip intall jamlib[toml]`
+    For `python < 3.11` you need to install the [`toml`](https://pypi.org/project/toml/) module: `pip install jamlib[toml]`
+
 ```toml
 [jam.jwt]
 alg = "HS256"
@@ -47,15 +53,17 @@ session_type = "redis"
 redis_uri = "redis://0.0.0.0:6379/0"
 ```
 
-And specify the path to the file in the instance:
+Specify the path to the file in the instance:
 ```python
 from jam import Jam
 
-jam = Jam(config="my_config.toml") # By default config=pyproject.toml
+jam = Jam(config="my_config.toml")  # By default config=pyproject.toml
 ```
 
-## Dict Example
-To configure via dict, you need to describe all parameters in dict and pass it to the instance:
+## Dict Configuration
+
+You can also pass configuration as a Python dictionary:
+
 ```python
 from jam import Jam
 
@@ -71,4 +79,51 @@ config = {
 }
 
 jam = Jam(config=config)
+```
+
+## Environment Variables
+
+Both YAML and TOML configuration formats support environment variable substitution.
+
+### Syntax
+
+Jam supports three formats for environment variables:
+
+| Format | Description | Example |
+|--------|-------------|---------|
+| `${VAR}` | Required variable - raises error if not set | `${JWT_SECRET}` |
+| `${VAR:-default}` | Variable with default value | `${JWT_ALG:-HS256}` |
+| `$VAR` | Short form - raises error if not set | `$JWT_SECRET` |
+
+### Example with Environment Variables
+
+**YAML:**
+```yaml
+jam:
+  jwt:
+    alg: ${JWT_ALGORITHM:-HS256}  # Default to HS256 if not set
+    secret_key: ${JWT_SECRET}     # Required, will fail if not set
+  session:
+    sessions_type: redis
+    redis_uri: redis://${REDIS_HOST:-localhost}:${REDIS_PORT:-6379}/0
+  oauth2:
+    providers:
+      google:
+        client_id: ${GOOGLE_CLIENT_ID}
+        client_secret: ${GOOGLE_CLIENT_SECRET}
+```
+
+**TOML:**
+```toml
+[jam.jwt]
+alg = "${JWT_ALGORITHM:-HS256}"
+secret_key = "${JWT_SECRET}"
+
+[jam.session]
+session_type = "redis"
+redis_uri = "redis://${REDIS_HOST:-localhost}:${REDIS_PORT:-6379}/0"
+
+[jam.oauth2.providers.google]
+client_id = "${GOOGLE_CLIENT_ID}"
+client_secret = "${GOOGLE_CLIENT_SECRET}"
 ```
