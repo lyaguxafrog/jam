@@ -4,11 +4,8 @@ import base64
 from datetime import datetime
 import hashlib
 import hmac
-import os.path
-from typing import Any, Literal, Optional, Union
+from typing import Any, Optional, Union
 from uuid import uuid4
-
-from jam.paseto import PASETO
 
 
 def __b64url_nopad__(b: bytes) -> str:
@@ -65,40 +62,8 @@ def base64url_encode(data: Union[bytes, str]) -> bytes:
     return base64.urlsafe_b64encode(bv).replace(b"=", b"")
 
 
-def init_paseto_instance(
-    version: Literal["v1", "v2", "v3", "v4"],
-    purpose: Literal["public", "local"],
-    key: Union[str, bytes, Any],
-    **kwargs,
-) -> PASETO:
-    """Init paseto instance.
-
-    Args:
-        version (Literal["v1", "v2", "v3", "v4"]): PASETO Version
-        purpose (Literal["public", "local"]): Token purpose
-        key (str | bytes | Any): Symmetric or asymmetric key
-        kwargs: Any key arguments
-
-    Returns:
-        BasePaseto: PASETO Instance
-    """
-    from jam.utils.config_maker import __module_loader__
-
-    if os.path.isfile(key):
-        with open(key) as file:
-            key = file.read()
-        key = key
-
-    # FIXME: Fix custom module init
-    if kwargs.get("module", None):
-        _paseto: type[PASETO] = __module_loader__(kwargs["module"])
-        return _paseto.key(purpose, key)
-    else:
-        _paseto: type[PASETO] = __module_loader__(
-            f"jam.paseto.{version}.PASETO{version}"
-        )
-
-    return _paseto.key(purpose, key)
+# init_paseto_instance has been removed and replaced with jam.paseto.create_instance
+# Use: from jam.paseto import create_instance
 
 
 def payload_maker(
