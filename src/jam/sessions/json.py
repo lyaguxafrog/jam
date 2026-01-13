@@ -3,8 +3,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
-import json
-from typing import Optional
+from typing import Optional, Union
 from uuid import uuid4
 
 
@@ -16,6 +15,7 @@ except ImportError:
     )
 
 from jam.__logger__ import logger
+from jam.encoders import BaseEncoder, JsonEncoder
 from jam.exceptions.sessions import SessionNotFoundError
 from jam.sessions.__abc_session_repo__ import BaseSessionModule
 
@@ -29,6 +29,7 @@ class JSONSessions(BaseSessionModule):
         is_session_crypt: bool = False,
         session_aes_secret: Optional[bytes] = None,
         id_factory: Callable[[], str] = lambda: str(uuid4()),
+        serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
     ) -> None:
         """Initialize the JSON session management module.
 
@@ -37,11 +38,13 @@ class JSONSessions(BaseSessionModule):
             is_session_crypt (bool): If True, session keys will be encoded.
             session_aes_secret (Optional[bytes]): AES secret for encoding session keys. Required if `is_session_crypt` is True.
             id_factory (Callable[[], str], optional): A callable that generates unique IDs. Defaults to a UUID factory.
+            serializer (Union[BaseEncoder, type[BaseEncoder]], optional): JSON encoder/decoder. Defaults to JsonEncoder.
         """
         super().__init__(
             is_session_crypt=is_session_crypt,
             session_aes_secret=session_aes_secret,
             id_factory=id_factory,
+            serializer=serializer,
         )
         self._db = tinydb.TinyDB(json_path)
         self._qs = tinydb.Query()
@@ -69,7 +72,7 @@ class JSONSessions(BaseSessionModule):
         try:
             dumps_data = self.__encode_session_data__(data)
         except AttributeError:
-            dumps_data = json.dumps(data)
+            dumps_data = self._serializer.dumps(data).decode("utf-8")
         del data
 
         doc = self._SessionDoc(
@@ -97,7 +100,7 @@ class JSONSessions(BaseSessionModule):
             try:
                 loads_data = self.__decode_session_data__(result[0]["data"])
             except AttributeError:
-                loads_data = json.loads(result[0]["data"])
+                loads_data = self._serializer.loads(result[0]["data"])
             del result
             return loads_data
         return None
@@ -127,7 +130,7 @@ class JSONSessions(BaseSessionModule):
         try:
             dumps_data = self.__encode_session_data__(data)
         except AttributeError:
-            dumps_data = json.dumps(data)
+            dumps_data = self._serializer.dumps(data).decode("utf-8")
         del data
 
         self._db.update({"data": dumps_data}, self._qs.session_id == session_id)

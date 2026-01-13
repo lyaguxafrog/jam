@@ -66,6 +66,7 @@ class BaseJam(ABC):
                 self.__logger.debug(f"Loading module {name} from {path}")
                 params = config.get(name, {})
                 params["logger"] = self.__logger
+                params["serializer"] = self._serializer
                 self.__setattr__(name, module_cls(**params))
 
             except Exception as e:

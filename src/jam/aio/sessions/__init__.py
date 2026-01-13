@@ -3,9 +3,10 @@
 """Async sessions methods."""
 
 import os
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Union
 from uuid import uuid4
 
+from jam.encoders import BaseEncoder, JsonEncoder
 from jam.sessions.__abc_session_repo__ import BaseSessionModule
 from jam.logger import BaseLogger, logger
 
@@ -14,6 +15,7 @@ def create_instance(
     session_type: Optional[str] = None,
     sessions_type: Optional[str] = None,  # Backward compatibility
     logger: BaseLogger = logger,
+    serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
     **kwargs: Any
 ) -> BaseSessionModule:
     """Create async session module instance.
@@ -22,6 +24,7 @@ def create_instance(
         session_type: "redis" | "json" | "custom"
         sessions_type: Alias for session_type (deprecated, use 'session_type')
         logger: Logger instance
+        serializer: JSON encoder/decoder
         **kwargs: Config params specific to session type
 
     Returns:
@@ -51,7 +54,8 @@ def create_instance(
             default_ttl=kwargs.get("default_ttl"),
             is_session_crypt=is_session_crypt,
             session_aes_secret=session_aes_secret,
-            id_factory=id_factory
+            id_factory=id_factory,
+            serializer=serializer
         )
     elif session_type == "json":
         from jam.aio.sessions.json import JSONSessions
@@ -59,7 +63,8 @@ def create_instance(
             json_path=kwargs.get("json_path", "sessions.json"),
             is_session_crypt=is_session_crypt,
             session_aes_secret=session_aes_secret,
-            id_factory=id_factory
+            id_factory=id_factory,
+            serializer=serializer
         )
     elif session_type == "custom":
         from jam.utils.config_maker import __module_loader__
@@ -71,7 +76,12 @@ def create_instance(
             is_session_crypt=is_session_crypt,
             session_aes_secret=session_aes_secret,
             id_factory=id_factory,
-            **{k: v for k, v in kwargs.items() if k not in ["session_type", "custom_module", "logger"]}
+            serializer=serializer,
+            **{
+                k: v
+                for k, v in kwargs.items()
+                if k not in ["session_type", "custom_module", "logger", "serializer"]
+            },
         )
     else:
         raise ValueError(f"Unknown session_type: {session_type}")

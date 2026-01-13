@@ -174,3 +174,4 @@ debug*
 .idea/
 .zed/
 :memory:
+.ruff_cache/

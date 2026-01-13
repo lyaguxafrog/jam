@@ -3,7 +3,9 @@
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from secrets import token_urlsafe
-from typing import Any, Optional
+from typing import Any, Optional, Union
+
+from jam.encoders import BaseEncoder, JsonEncoder
 
 
 class BaseOAuth2Client(ABC):
@@ -16,6 +18,7 @@ class BaseOAuth2Client(ABC):
         auth_url: str,
         token_url: str,
         redirect_url: str,
+        serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
     ) -> None:
         """Constructor.
 
@@ -25,12 +28,14 @@ class BaseOAuth2Client(ABC):
             auth_url (str): App auth url
             token_url (str): App token url
             redirect_url (str): Your app url
+            serializer (Union[BaseEncoder, type[BaseEncoder]], optional): JSON encoder/decoder. Defaults to JsonEncoder.
         """
         self.client_id = client_id
         self._client_secret = client_secret
         self.auth_url = auth_url
         self.token_url = token_url
         self.redirect_url = redirect_url
+        self._serializer = serializer
 
     @abstractmethod
     def get_authorization_url(self, scope: list[str]) -> str:
