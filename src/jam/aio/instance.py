@@ -11,10 +11,10 @@ class Jam(BaseJam):
     """Main instance for aio."""
 
     MODULES: dict[str, str] = {
-        "jwt": "jam.jwt.module.JWT",
-        "session": "jam.aio.modules.SessionModule",
-        "oauth2": "jam.aio.modules.OAuth2Module",
-        "paseto": "jam.paseto.utils.init_paseto_instance",
+        "jwt": "jam.jwt.create_instance",
+        "session": "jam.aio.sessions.create_instance",
+        "oauth2": "jam.aio.oauth2.create_instance",
+        "paseto": "jam.paseto.create_instance",
     }
 
     async def jwt_make_payload(
@@ -50,7 +50,7 @@ class Jam(BaseJam):
             EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
             EmtpyPrivateKey: If RSA algorithm is selected, but private key None
         """
-        return await self.jwt.gen_token(**payload)
+        return self.jwt.encode(payload=payload)
 
     async def jwt_verify_token(
         self, token: str, check_exp: bool = True, check_list: bool = True
@@ -74,7 +74,7 @@ class Jam(BaseJam):
             TokenNotInWhiteList: If the list type is white, but the token is  not there
             TokenInBlackList: If the list type is black and the token is there
         """
-        return await self.jwt.validate_payload(token, check_exp, check_list)
+        return self.jwt.decode(token)
 
     async def session_create(
         self, session_key: str, data: dict[str, Any]
@@ -217,8 +217,14 @@ class Jam(BaseJam):
         Returns:
             str: Authorization url
         """
-        return await self.oauth2.get_authorization_url(
-            provider, scope, **extra_params
+        from jam.exceptions import ProviderNotConfigurError
+
+        if provider not in self.oauth2:
+            raise ProviderNotConfigurError(
+                f"Provider {provider} not configured"
+            )
+        return await self.oauth2[provider].get_authorization_url(
+            scope, **extra_params
         )
 
     async def oauth2_fetch_token(
@@ -239,8 +245,14 @@ class Jam(BaseJam):
         Returns:
             dict: OAuth2 token
         """
-        return await self.oauth2.fetch_token(
-            provider, code, grant_type, **extra_params
+        from jam.exceptions import ProviderNotConfigurError
+
+        if provider not in self.oauth2:
+            raise ProviderNotConfigurError(
+                f"Provider {provider} not configured"
+            )
+        return await self.oauth2[provider].fetch_token(
+            code, grant_type, **extra_params
         )
 
     async def oauth2_refresh_token(
@@ -261,8 +273,14 @@ class Jam(BaseJam):
         Returns:
             dict: Refresh token
         """
-        return await self.oauth2.refresh_token(
-            provider, refresh_token, grant_type, **extra_params
+        from jam.exceptions import ProviderNotConfigurError
+
+        if provider not in self.oauth2:
+            raise ProviderNotConfigurError(
+                f"Provider {provider} not configured"
+            )
+        return await self.oauth2[provider].refresh_token(
+            refresh_token, grant_type, **extra_params
         )
 
     async def oauth2_client_credentials_flow(
@@ -281,8 +299,14 @@ class Jam(BaseJam):
         Returns:
             dict: JSON with access token
         """
-        return await self.oauth2.client_credentials_flow(
-            provider, scope, **extra_params
+        from jam.exceptions import ProviderNotConfigurError
+
+        if provider not in self.oauth2:
+            raise ProviderNotConfigurError(
+                f"Provider {provider} not configured"
+            )
+        return await self.oauth2[provider].client_credentials_flow(
+            scope, **extra_params
         )
 
     async def paseto_make_payload(
