@@ -11,10 +11,11 @@ class Jam(BaseJam):
     """Main instance."""
 
     MODULES: dict[str, str] = {
-        "jwt": "jam.jwt.module.JWT",
-        "session": "jam.modules.SessionModule",
-        "oauth2": "jam.modules.OAuth2Module",
-        "paseto": "jam.paseto.utils.init_paseto_instance",
+        "jwt": "jam.jwt.create_instance",
+        "session": "jam.sessions.create_instance",
+        "oauth2": "jam.oauth2.create_instance",
+        "paseto": "jam.paseto.create_instance",
+        "otp": "jam.otp.create_instance",
     }
 
     def jwt_make_payload(
@@ -147,10 +148,7 @@ class Jam(BaseJam):
         Returns:
             str: OTP code (fixed-length string).
         """
-        self._otp_checker()
-        return self._otp_module(
-            secret=secret, digits=self._otp.digits, digest=self._otp.digest
-        ).at(factor)
+        return self.otp(secret=secret).at(factor)
 
     def otp_uri(
         self,
@@ -213,8 +211,14 @@ class Jam(BaseJam):
         Returns:
             str: Authorization url
         """
-        return self.oauth2.get_authorization_url(
-            provider, scope, **extra_params
+        from jam.exceptions import ProviderNotConfigurError
+
+        if provider not in self.oauth2:
+            raise ProviderNotConfigurError(
+                f"Provider {provider} not configured"
+            )
+        return self.oauth2[provider].get_authorization_url(
+            scope, **extra_params
         )
 
     def oauth2_fetch_token(
@@ -235,8 +239,14 @@ class Jam(BaseJam):
         Returns:
             dict: OAuth2 token
         """
-        return self.oauth2.fetch_token(
-            provider, code, grant_type, **extra_params
+        from jam.exceptions import ProviderNotConfigurError
+
+        if provider not in self.oauth2:
+            raise ProviderNotConfigurError(
+                f"Provider {provider} not configured"
+            )
+        return self.oauth2[provider].fetch_token(
+            code, grant_type, **extra_params
         )
 
     def oauth2_refresh_token(
@@ -257,8 +267,14 @@ class Jam(BaseJam):
         Returns:
             dict: Refresh token
         """
-        return self.oauth2.refresh_token(
-            provider, refresh_token, grant_type, **extra_params
+        from jam.exceptions import ProviderNotConfigurError
+
+        if provider not in self.oauth2:
+            raise ProviderNotConfigurError(
+                f"Provider {provider} not configured"
+            )
+        return self.oauth2[provider].refresh_token(
+            refresh_token, grant_type, **extra_params
         )
 
     def oauth2_client_credentials_flow(
@@ -277,8 +293,14 @@ class Jam(BaseJam):
         Returns:
             dict: JSON with access token
         """
-        return self.oauth2.client_credentials_flow(
-            provider, scope, **extra_params
+        from jam.exceptions import ProviderNotConfigurError
+
+        if provider not in self.oauth2:
+            raise ProviderNotConfigurError(
+                f"Provider {provider} not configured"
+            )
+        return self.oauth2[provider].client_credentials_flow(
+            scope, **extra_params
         )
 
     def paseto_make_payload(
