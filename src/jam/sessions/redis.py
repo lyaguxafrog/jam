@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import json
 import os
 from typing import Callable, Optional, Union
 from uuid import uuid4
@@ -14,6 +13,7 @@ except ImportError:
     )
 
 from jam.__logger__ import logger
+from jam.encoders import BaseEncoder, JsonEncoder
 from jam.exceptions import SessionNotFoundError
 from jam.sessions.__abc_session_repo__ import BaseSessionModule
 
@@ -31,6 +31,7 @@ class RedisSessions(BaseSessionModule):
             "JAM_SESSION_AES_SECRET", None
         ),
         id_factory: Callable[[], str] = lambda: str(uuid4()),
+        serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
     ) -> None:
         """Initialize the Redis session management module.
 
@@ -41,11 +42,13 @@ class RedisSessions(BaseSessionModule):
             is_session_crypt (bool): If True, session keys will be encoded.
             session_aes_secret (Optional[bytes]): AES secret for encoding session keys. Required if `is_session_key_crypt` is True.
             id_factory (Callable[[], str], optional): A callable that generates unique IDs. Defaults to a UUID factory.
+            serializer (Union[BaseEncoder, type[BaseEncoder]], optional): JSON encoder/decoder. Defaults to JsonEncoder.
         """
         super().__init__(
             id_factory=id_factory,
             is_session_crypt=is_session_crypt,
             session_aes_secret=session_aes_secret,
+            serializer=serializer,
         )
         if isinstance(redis_uri, str):
             self._redis = Redis.from_url(redis_uri, decode_responses=True)
@@ -83,7 +86,7 @@ class RedisSessions(BaseSessionModule):
         try:
             dumps_data = self.__encode_session_data__(data)
         except AttributeError:
-            dumps_data = json.dumps(data)
+            dumps_data = self._serializer.dumps(data).decode("utf-8")
         del data
 
         self._redis.hset(
@@ -125,7 +128,7 @@ class RedisSessions(BaseSessionModule):
         try:
             loads_data = self.__decode_session_data__(session)
         except AttributeError:
-            loads_data = json.loads(session)
+            loads_data = self._serializer.loads(session)
         del session
 
         return loads_data
@@ -173,7 +176,7 @@ class RedisSessions(BaseSessionModule):
         try:
             dumps_data = self.__encode_session_data__(data)
         except AttributeError:
-            dumps_data = json.dumps(data)
+            dumps_data = self._serializer.dumps(data).decode("utf-8")
         del data
 
         self._redis.hset(

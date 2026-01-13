@@ -2,13 +2,13 @@
 
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Coroutine
-import json
 from typing import Any, Optional, Union
 from uuid import uuid4
 
 from cryptography.fernet import Fernet
 
 from jam.__logger__ import logger
+from jam.encoders import BaseEncoder, JsonEncoder
 
 
 class BaseSessionModule(ABC):
@@ -52,6 +52,7 @@ class BaseSessionModule(ABC):
         id_factory: Callable[[], str] = lambda: str(uuid4()),
         is_session_crypt: bool = False,
         session_aes_secret: Optional[bytes] = None,
+        serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
     ) -> None:
         """Class constructor.
 
@@ -59,9 +60,11 @@ class BaseSessionModule(ABC):
             id_factory (Callable[str], optional): A callable that generates unique IDs. Defaults to a UUID factory.
             is_session_crypt (bool, optional): If True, session keys will be encoded. Defaults to False.
             session_aes_secret (Optional[bytes], optional): AES secret for encoding session keys.
+            serializer (Union[BaseEncoder, type[BaseEncoder]], optional): JSON encoder/decoder. Defaults to JsonEncoder.
         """
         self._id = id_factory
         self._sk_mark_symbol = "J$_"
+        self._serializer = serializer
         if is_session_crypt and not session_aes_secret:
             raise ValueError(
                 "If 'code_session_key' is True, 'session_key_aes_secret' must be provided."
@@ -112,7 +115,7 @@ class BaseSessionModule(ABC):
         if not hasattr(self, "_code_session_key"):
             raise AttributeError("Session data encoding is not enabled.")
 
-        data_json = json.dumps(data)
+        data_json = self._serializer.dumps(data).decode("utf-8")
         return self.__encode_session_id__(data_json)
 
     def __decode_session_data__(self, data: str) -> dict:
@@ -120,7 +123,7 @@ class BaseSessionModule(ABC):
         if not hasattr(self, "_code_session_key"):
             raise AttributeError("Session key encoding is not enabled.")
         data = self.__decode_session_id__(data)
-        return json.loads(data)
+        return self._serializer.loads(data)
 
     @property
     def id(self) -> str:

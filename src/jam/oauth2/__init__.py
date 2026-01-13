@@ -2,13 +2,14 @@
 
 """OAuth2 module."""
 
-from typing import Any
+from typing import Any, Union
 
 from .__abc_oauth2_repo__ import BaseOAuth2Client
 from .builtin.github import GitHubOAuth2Client
 from .builtin.gitlab import GitLabOAuth2Client
 from .builtin.google import GoogleOAuth2Client
 from .builtin.yandex import YandexOAuth2Client
+from jam.encoders import BaseEncoder, JsonEncoder
 from jam.logger import BaseLogger, logger
 
 
@@ -23,6 +24,7 @@ BUILTIN_PROVIDERS = {
 def create_instance(
     providers: dict[str, dict],
     logger: BaseLogger = logger,
+    serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
     **kwargs: Any
 ) -> dict[str, BaseOAuth2Client]:
     """Create OAuth2 clients for configured providers.
@@ -30,6 +32,7 @@ def create_instance(
     Args:
         providers: {provider_name: {client_id, client_secret, redirect_uri, ...}}
         logger: Logger instance
+        serializer: JSON encoder/decoder
         **kwargs: Additional params
 
     Returns:
@@ -46,6 +49,10 @@ def create_instance(
         else:
             module_path = BUILTIN_PROVIDERS.get(name, "jam.oauth2.client.OAuth2Client")
             module_cls = __module_loader__(module_path)
+        
+        # Add serializer to config if not already present
+        if "serializer" not in cfg:
+            cfg["serializer"] = serializer
         
         result[name] = module_cls(**cfg)
     
