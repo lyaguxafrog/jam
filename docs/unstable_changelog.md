@@ -1,6 +1,6 @@
 # Unstable features and etc
 
-Current version: `3.0.0a6`
+Current version: `3.0.0a7`
 
 ## What is not yet included in the master
 
@@ -13,6 +13,8 @@ Current version: `3.0.0a6`
 - New JWT Module
 - Encode in JWT module
 - Delete deprecated instances methods
+- Environment variables support in config
+- Update config maker
 
 
 ### `2.6.0b*`
