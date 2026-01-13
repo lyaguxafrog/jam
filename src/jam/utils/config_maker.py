@@ -16,6 +16,11 @@ def __yaml_config_parser(
 ) -> dict[str, Any]:
     """Private method for parsing YML config with env substitution.
 
+    Supports:
+    - ${VAR} - environment variable (required)
+    - ${VAR:-default} - environment variable with default value
+    - $VAR - short form (required)
+
     Args:
         path (str): Path to config.yml
         pointer (str): Pointer to config section to read.
@@ -23,7 +28,7 @@ def __yaml_config_parser(
     Raises:
         ImportError: If pyyaml not installed
         FileNotFoundError: If file not found
-        ValueError: If invalid YAML
+        ValueError: If invalid YAML or required env var not set
 
     Returns:
         dict[str, Any]: Parsed YAML section with environment variable substitution.
@@ -36,24 +41,51 @@ def __yaml_config_parser(
             "`pip install pyyaml` or `pip install jamlib[yaml]`"
         )
 
-    pattern = re.compile(r"\$\{([^}^{]+)\}")
+    # Pattern to match ${VAR:-default} or ${VAR} or $VAR
+    pattern = re.compile(
+        r"\$\{([^}^{]+?)(:-([^}]+))?\}|\$([A-Za-z_][A-Za-z0-9_]*)"
+    )
 
-    # FIXME: Refactor
-    def _env_constructor(loader, node):
-        value = loader.construct_scalar(node)
-        for var in pattern.findall(value):
-            env_value = os.getenv(var)
+    def replace_env(match):
+        if match.group(1):
+            var_name = match.group(1)
+            default_value = (
+                match.group(3) if match.group(3) is not None else None
+            )
+            env_value = os.getenv(var_name)
+
             if env_value is None:
-                raise ValueError(f"Environment variable '{var}' not set")
-            value = value.replace(f"${{{var}}}", env_value)
+                if default_value is not None:
+                    return default_value
+                raise ValueError(
+                    f"Environment variable '{var_name}' not set and no default provided"
+                )
+            return env_value
+        elif match.group(4):
+            var_name = match.group(4)
+            env_value = os.getenv(var_name)
+            if env_value is None:
+                raise ValueError(f"Environment variable '{var_name}' not set")
+            return env_value
+        return match.group(0)
+
+    class EnvVarLoader(yaml.SafeLoader):
+        pass
+
+    def construct_scalar_with_env(loader, node):
+        value = loader.construct_scalar(node)
+        # Only process strings that contain variable patterns
+        if isinstance(value, str) and pattern.search(value):
+            return pattern.sub(replace_env, value)
         return value
 
-    yaml.SafeLoader.add_implicit_resolver("!env", pattern, None)
-    yaml.SafeLoader.add_constructor("!env", _env_constructor)
+    EnvVarLoader.add_constructor(
+        "tag:yaml.org,2002:str", construct_scalar_with_env
+    )
 
     try:
         with open(path) as file:
-            config = yaml.safe_load(file)
+            config = yaml.load(file, Loader=EnvVarLoader)
         if not config:
             return {}
         return config[pointer] if pointer in config else config
@@ -63,11 +95,15 @@ def __yaml_config_parser(
         raise ValueError(f"Error parsing YAML file: {e}")
 
 
-# TODO: env
 def __toml_config_parser(
     path: str = "pyproject.toml", pointer: str = GENERIC_POINTER
 ) -> dict[str, Any]:
-    """Private method for parsing TOML config.
+    """Private method for parsing TOML config with env substitution.
+
+    Supports:
+    - ${VAR} - environment variable (required)
+    - ${VAR:-default} - environment variable with default value
+    - $VAR - short form (required)
 
     Args:
         path (str): Path to config.toml
@@ -75,7 +111,7 @@ def __toml_config_parser(
 
     Raises:
         FileNotFoundError: If file not found
-        ValueError: If invalid TOML file
+        ValueError: If invalid TOML file or required env var not set
 
     Returns:
         (dict[str, Any]): Dict with config param
@@ -92,29 +128,51 @@ def __toml_config_parser(
             )
 
     try:
-        with open(path) as file:
-            config = toml.load(file)
+        if sys.version_info >= (3, 11):
+            with open(path, "rb") as file:
+                config = toml.load(file)
+        else:
+            with open(path) as file:
+                config = toml.load(file)
     except FileNotFoundError:
         raise FileNotFoundError(f"TOML config file not found at: {path}")
     except Exception as e:
         raise ValueError(f"Error parsing TOML file: {e}") from e
 
-    env_pattern = re.compile(r"\$\{([^}^{]+)\}|\$([A-Za-z_][A-Za-z0-9_]*)")
+    env_pattern = re.compile(
+        r"\$\{([^}^{]+?)(:-([^}]+))?\}|\$([A-Za-z_][A-Za-z0-9_]*)"
+    )
 
     def _env_constructor(value: Any) -> Any:
-        """Recursively substitute ${VAR} and $VAR in strings."""
+        """Recursively substitute ${VAR:-default}, ${VAR} and $VAR in strings."""
         if isinstance(value, str):
-            for match in env_pattern.findall(value):
-                var_name = match[0] or match[1]
-                env_value = os.getenv(var_name)
-                if env_value is None:
-                    raise ValueError(
-                        f"Environment variable '{var_name}' not set"
+
+            def replace_env(match):
+                if match.group(1):
+                    var_name = match.group(1)
+                    default_value = (
+                        match.group(3) if match.group(3) is not None else None
                     )
-                value = re.sub(
-                    rf"\$\{{{var_name}\}}|\${var_name}", env_value, value
-                )
-            return value
+                    env_value = os.getenv(var_name)
+
+                    if env_value is None:
+                        if default_value is not None:
+                            return default_value
+                        raise ValueError(
+                            f"Environment variable '{var_name}' not set and no default provided"
+                        )
+                    return env_value
+                elif match.group(4):
+                    var_name = match.group(4)
+                    env_value = os.getenv(var_name)
+                    if env_value is None:
+                        raise ValueError(
+                            f"Environment variable '{var_name}' not set"
+                        )
+                    return env_value
+                return match.group(0)
+
+            return env_pattern.sub(replace_env, value)
         elif isinstance(value, dict):
             return {k: _env_constructor(v) for k, v in value.items()}
         elif isinstance(value, list):
@@ -148,9 +206,10 @@ def __config_maker__(
         dict[str, Any]: Parsed config
     """
     if isinstance(config, str):
-        if config.split(".")[1] == ("yml" or "yaml"):
+        ext = config.split(".")[-1].lower()
+        if ext in ("yml", "yaml"):
             return __yaml_config_parser(path=config, pointer=pointer).copy()
-        elif config.split(".")[1] == "toml":
+        elif ext == "toml":
             return __toml_config_parser(path=config, pointer=pointer).copy()
         else:
             raise ValueError("YML/YAML or TOML configs only!")
