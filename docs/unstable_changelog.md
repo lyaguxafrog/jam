@@ -1,6 +1,6 @@
 # Unstable features and etc
 
-Current version: `3.0.0a9`
+Current version: `3.0.0a10`
 
 ## What is not yet included in the master
 
@@ -17,7 +17,7 @@ Current version: `3.0.0a9`
 - Update config maker
 - Update main config
 - Rename all `__abc_*_module__` -> `__base__`
-
+- Warning on AIO version
 
 ### `2.6.0b*`
 
