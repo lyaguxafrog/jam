@@ -9,6 +9,8 @@ from typing import Literal
 class BaseLogger(ABC):
     """Interface for logging."""
 
+    log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
+
     @abstractmethod
     def info(self, message: str) -> None:
         """Log an informational message."""

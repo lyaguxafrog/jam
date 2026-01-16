@@ -127,3 +127,43 @@ redis_uri = "redis://${REDIS_HOST:-localhost}:${REDIS_PORT:-6379}/0"
 client_id = "${GOOGLE_CLIENT_ID}"
 client_secret = "${GOOGLE_CLIENT_SECRET}"
 ```
+
+## Main Jam configuration
+
+* `logger`: `str` = `jam.logger.JamLogger`
+
+Path to logger module.
+
+* `log_level`: `str` = `INFO`
+
+Log level.
+
+
+* `serializer`: `str` = `jam.encoders.JsonEncoder`
+
+Path to json encoder/decoder. 
+
+
+## Example
+
+### TOML
+```toml
+[jam]
+log_level = "DEBUG"
+serializer = "jam.encoders.MsgspecJsonEncoder"
+
+[jam.jwt]
+alg = "HS256"
+secret = $JWT_SECRET
+```
+
+### YAML
+
+```yaml
+jam:
+  logger: myapp.customlogger.SomeCustomLogger
+  log_level: INFO
+  jwt:
+    alg: HS512
+    expire: 1200
+```
