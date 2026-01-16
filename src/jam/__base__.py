@@ -7,8 +7,8 @@ from typing import Any, Literal, Optional, Union
 from jam.encoders import BaseEncoder, JsonEncoder
 from jam.jwt.__base__ import BaseJWT
 from jam.logger import BaseLogger, JamLogger
-from jam.oauth2.__abc_oauth2_repo__ import BaseOAuth2Client
-from jam.sessions.__abc_session_repo__ import BaseSessionModule
+from jam.oauth2.__base__ import BaseOAuth2Client
+from jam.sessions.__base__ import BaseSessionModule
 from jam.utils.config_maker import __config_maker__, __module_loader__
 
 
