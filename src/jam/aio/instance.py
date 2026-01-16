@@ -1,21 +1,34 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from typing import Any, Optional, Union
+from this import d
+from typing import Any, Optional, Union, Literal
 import uuid
 
 from jam.__base__ import BaseJam
+from jam.logger import BaseLogger, JamLogger
+from jam.encoders import BaseEncoder, JsonEncoder
 
 
 class Jam(BaseJam):
     """Main instance for aio."""
 
-    MODULES: dict[str, str] = {
-        "jwt": "jam.jwt.create_instance",
-        "session": "jam.aio.sessions.create_instance",
-        "oauth2": "jam.aio.oauth2.create_instance",
-        "paseto": "jam.paseto.create_instance",
-    }
+    MODULES: dict[str, str] = {}
+
+    def __init__(
+        self,
+        config: Union[str, dict[str, Any]] = "pyproject.toml",
+        pointer: str = "jam",
+        *,
+        logger: type(BaseLogger) = JamLogger,
+        log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO",
+        serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
+    ) -> None:
+        super().__init__(config, pointer, logger, log_level, serializer)
+        self.__logger.warn("AIO VERSION NOT WORKING IN unstable VERSION")
+
+
+
 
     async def jwt_make_payload(
         self, exp: Optional[int], data: dict[str, Any]
