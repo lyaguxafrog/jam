@@ -38,6 +38,11 @@ class BaseJam(ABC):
                 None
         """
         config = __config_maker__(config, pointer)
+        main_config = self.__build_main_config(config, logger, log_level, serializer)
+
+        logger = main_config["logger"]
+        log_level = main_config["log_level"]
+        serializer = main_config["serializer"]
 
         self.__logger = logger(log_level)
         self._serializer = serializer
@@ -49,8 +54,65 @@ class BaseJam(ABC):
         gc.collect()
 
 
-    def __build_main_config__(self, config) -> None:
-        ...
+    def __build_main_config(
+        self,
+        config: dict[str, Any],
+        default_logger: type[BaseLogger],
+        default_log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        default_serializer: Union[BaseEncoder, type[BaseEncoder]],
+    ) -> dict[str, Any]:
+        """Build main params from config like logger, loglevel, etc.
+
+        Args:
+            config (dict[str, Any]): Configuration dictionary
+            default_logger (type[BaseLogger]): Default logger class
+            default_log_level (Literal): Default log level
+            default_serializer (Union[BaseEncoder, type[BaseEncoder]]): Default serializer
+
+        Returns:
+            dict[str, Any]: Dictionary with logger, log_level, and serializer
+        """
+        logger = default_logger
+        log_level = default_log_level
+        serializer = default_serializer
+
+        # Read logger from config
+        if "logger" in config:
+            logger_cfg = config["logger"]
+            if isinstance(logger_cfg, str):
+                logger = __module_loader__(logger_cfg)
+            elif isinstance(logger_cfg, type) and issubclass(logger_cfg, BaseLogger):
+                logger = logger_cfg
+
+        if "log_level" in config:
+            log_level_cfg = config["log_level"]
+            if isinstance(log_level_cfg, str) and log_level_cfg.upper() in (
+                "DEBUG",
+                "INFO",
+                "WARNING",
+                "ERROR",
+                "CRITICAL",
+            ):
+                log_level = log_level_cfg.upper()
+
+        if "serializer" in config:
+            serializer_cfg = config["serializer"]
+            if isinstance(serializer_cfg, str):
+                serializer = __module_loader__(serializer_cfg)
+            elif isinstance(serializer_cfg, type) and issubclass(
+                serializer_cfg, BaseEncoder
+            ):
+                serializer = serializer_cfg
+            elif isinstance(serializer_cfg, BaseEncoder):
+                serializer = serializer_cfg
+
+        return {
+            "logger": logger,
+            "log_level": log_level,
+            "serializer": serializer,
+        }
+
+        
 
     def __build_instance(self, config: dict[str, Any]) -> None:
         """Build instance.
