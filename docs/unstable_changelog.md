@@ -1,6 +1,6 @@
 # Unstable features and etc
 
-Current version: `3.0.0a8`
+Current version: `3.0.0a9`
 
 ## What is not yet included in the master
 
@@ -16,6 +16,7 @@ Current version: `3.0.0a8`
 - Environment variables support in config
 - Update config maker
 - Update main config
+- Rename all `__abc_*_module__` -> `__base__`
 
 
 ### `2.6.0b*`
