@@ -16,7 +16,7 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
 from jam.__base_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
-from jam.paseto.__abc_paseto_repo__ import PASETO, BasePASETO
+from jam.paseto.__base__ import PASETO, BasePASETO
 from jam.paseto.utils import (
     __gen_hash__,
     __pae__,

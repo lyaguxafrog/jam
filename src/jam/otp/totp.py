@@ -3,7 +3,7 @@
 import time
 from typing import Literal, Optional, Union
 
-from jam.otp.__abc_module__ import BaseOTP
+from jam.otp.__base__ import BaseOTP
 
 
 class TOTP(BaseOTP):

@@ -7,8 +7,8 @@ from uuid import uuid4
 
 from cryptography.fernet import Fernet
 
-from jam.__logger__ import logger
 from jam.encoders import BaseEncoder, JsonEncoder
+from jam.logger import BaseLogger
 
 
 class BaseSessionModule(ABC):
@@ -53,6 +53,7 @@ class BaseSessionModule(ABC):
         is_session_crypt: bool = False,
         session_aes_secret: Optional[bytes] = None,
         serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
+        logger: Optional[BaseLogger] = None,
     ) -> None:
         """Class constructor.
 
@@ -61,10 +62,12 @@ class BaseSessionModule(ABC):
             is_session_crypt (bool, optional): If True, session keys will be encoded. Defaults to False.
             session_aes_secret (Optional[bytes], optional): AES secret for encoding session keys.
             serializer (Union[BaseEncoder, type[BaseEncoder]], optional): JSON encoder/decoder. Defaults to JsonEncoder.
+            logger (Optional[BaseLogger], optional): Logger instance. Defaults to None.
         """
         self._id = id_factory
         self._sk_mark_symbol = "J$_"
         self._serializer = serializer
+        self._logger = logger
         if is_session_crypt and not session_aes_secret:
             raise ValueError(
                 "If 'code_session_key' is True, 'session_key_aes_secret' must be provided."
@@ -94,7 +97,8 @@ class BaseSessionModule(ABC):
             try:
                 data = self.__encode_session_id__(data)
             except ValueError as e:
-                logger.error("Failed to encode session ID: %s", e)
+                if self._logger:
+                    self._logger.error("Failed to encode session ID: %s", e)
             return data
         else:
             return data
@@ -105,7 +109,8 @@ class BaseSessionModule(ABC):
             try:
                 data = self.__decode_session_id__(data)
             except ValueError as e:
-                logger.error("Failed to decode session ID: %s", e)
+                if self._logger:
+                    self._logger.error("Failed to decode session ID: %s", e)
             return data
         else:
             return data

@@ -5,7 +5,6 @@ from typing import Any, Optional
 from flask import Flask, g, request
 
 from jam import Jam
-from jam.__logger__ import logger
 
 
 class JamExtension:
@@ -60,22 +59,32 @@ class JWTExtension(JamExtension):
     def _get_payload(self) -> Optional[dict[str, Any]]:
         token = None
         g.payload = None
+        logger = self._jam._BaseJam__logger
+        
+        logger.debug("JWTExtension: Attempting to extract token from request")
         if self.cookie:
             token = request.cookies.get(self.cookie)
+            if token:
+                logger.debug(f"Token found in cookie '{self.cookie}'")
 
         if not token and self.header:
             header = request.headers.get(self.header)
             if header and header.startswith("Bearer "):
                 token = header.split("Bearer ")[1]
+                logger.debug(f"Token found in header '{self.header}'")
 
         if not token:
+            logger.debug("No token found in request")
             return None
+        
+        logger.debug(f"Verifying JWT token (length: {len(token)} chars), check_list={self.__use_list}")
         try:
             payload: dict[str, Any] = self._jam.jwt_verify_token(
                 token=token, check_exp=True, check_list=self.__use_list
             )
+            logger.debug(f"JWT token verified successfully, payload keys: {list(payload.keys())}")
         except Exception as e:
-            logger.warning(str(e))
+            logger.warning(f"JWT token verification failed: {e}")
             return None
 
         g.payload = payload
@@ -112,22 +121,35 @@ class SessionExtension(JamExtension):
     def _get_payload(self) -> Optional[dict[str, Any]]:
         session_id = None
         g.payload = None
+        logger = self._jam._BaseJam__logger
+        
+        logger.debug("SessionExtension: Attempting to extract session ID from request")
         if self.cookie:
             session_id = request.cookies.get(self.cookie)
+            if session_id:
+                logger.debug(f"Session ID found in cookie '{self.cookie}'")
 
         if not session_id and self.header:
             header = request.headers.get(self.header)
             if header and header.startswith("Bearer "):
                 session_id = header.split("Bearer ")[1]
+                logger.debug(f"Session ID found in header '{self.header}'")
 
         if not session_id:
+            logger.debug("No session ID found in request")
             return None
+        
+        logger.debug(f"Getting session data for session ID: {session_id}")
         try:
             payload: Optional[dict[str, Any]] = self._jam.session_get(
                 session_id
             )
+            if payload:
+                logger.debug(f"Session data retrieved successfully, keys: {list(payload.keys())}")
+            else:
+                logger.debug(f"Session {session_id} not found")
         except Exception as e:
-            logger.warning(str(e))
+            logger.warning(f"Session retrieval failed: {e}")
             return None
 
         g.payload = payload

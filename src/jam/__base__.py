@@ -50,7 +50,9 @@ class BaseJam(ABC):
         self.session: Optional[BaseSessionModule] = None
         self.oauth2: Optional[BaseOAuth2Client] = None
 
+        self.__logger.debug(f"Initializing BaseJam with log_level={log_level}, serializer={serializer}")
         self.__build_instance(config)
+        self.__logger.debug(f"BaseJam initialization complete. Modules loaded: jwt={self.jwt is not None}, session={self.session is not None}, oauth2={self.oauth2 is not None}")
         gc.collect()
 
 
@@ -134,13 +136,17 @@ class BaseJam(ABC):
                 module_cls = __module_loader__(path)
                 self.__logger.debug(f"Loading module {name} from {path}")
                 params = config.get(name, {})
+                self.__logger.debug(f"Module {name} config params: {list(params.keys())}")
                 params["logger"] = self.__logger
                 params["serializer"] = self._serializer
-                self.__setattr__(name, module_cls(**params))
+                module_instance = module_cls(**params)
+                self.__setattr__(name, module_instance)
+                self.__logger.debug(f"Module {name} initialized successfully")
 
             except Exception as e:
                 self.__logger.error(
-                    f"Failed to load module {name} from {path}: {e}"
+                    f"Failed to load module {name} from {path}: {e}",
+                    exc_info=True
                 )
 
     @abstractmethod

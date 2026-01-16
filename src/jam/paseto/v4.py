@@ -11,7 +11,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
 
 from jam.__base_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
-from jam.paseto.__abc_paseto_repo__ import PASETO, BasePASETO
+from jam.paseto.__base__ import PASETO, BasePASETO
 from jam.paseto.utils import __pae__, base64url_decode, base64url_encode
 from jam.utils.xchacha20poly1305 import (
     xchacha20poly1305_decrypt,

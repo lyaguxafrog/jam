@@ -14,10 +14,10 @@ except ImportError:
         "JSON module is not installed. Please install it with 'pip install jamlib[json]'."
     )
 
-from jam.__logger__ import logger
 from jam.encoders import BaseEncoder, JsonEncoder
 from jam.exceptions.sessions import SessionNotFoundError
-from jam.sessions.__abc_session_repo__ import BaseSessionModule
+from jam.logger import BaseLogger
+from jam.sessions.__base__ import BaseSessionModule
 
 
 class JSONSessions(BaseSessionModule):
@@ -30,6 +30,7 @@ class JSONSessions(BaseSessionModule):
         session_aes_secret: Optional[bytes] = None,
         id_factory: Callable[[], str] = lambda: str(uuid4()),
         serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
+        logger: Optional[BaseLogger] = None,
     ) -> None:
         """Initialize the JSON session management module.
 
@@ -39,16 +40,19 @@ class JSONSessions(BaseSessionModule):
             session_aes_secret (Optional[bytes]): AES secret for encoding session keys. Required if `is_session_crypt` is True.
             id_factory (Callable[[], str], optional): A callable that generates unique IDs. Defaults to a UUID factory.
             serializer (Union[BaseEncoder, type[BaseEncoder]], optional): JSON encoder/decoder. Defaults to JsonEncoder.
+            logger (Optional[BaseLogger], optional): Logger instance. Defaults to None.
         """
         super().__init__(
             is_session_crypt=is_session_crypt,
             session_aes_secret=session_aes_secret,
             id_factory=id_factory,
             serializer=serializer,
+            logger=logger,
         )
         self._db = tinydb.TinyDB(json_path)
         self._qs = tinydb.Query()
-        logger.debug("JSON database initialized at %s", json_path)
+        if self._logger:
+            self._logger.debug("JSON database initialized at %s", json_path)
 
     @dataclass
     class _SessionDoc:
@@ -82,7 +86,8 @@ class JSONSessions(BaseSessionModule):
         )
 
         self._db.insert(doc.__dict__)
-        logger.debug("Session created with ID %s", session_id)
+        if self._logger:
+            self._logger.debug("Session created with ID %s", session_id)
         return session_id
 
     def get(self, session_id) -> Optional[dict]:
@@ -94,6 +99,8 @@ class JSONSessions(BaseSessionModule):
         Returns:
             dict | None: The session data if found, otherwise None.
         """
+        if self._logger:
+            self._logger.debug(f"Getting session with ID: {session_id}")
         # session_id = self.__decode_session_id_if_needed__(session_id)
         result = self._db.search(self._qs.session_id == session_id)
         if result:
@@ -101,8 +108,12 @@ class JSONSessions(BaseSessionModule):
                 loads_data = self.__decode_session_data__(result[0]["data"])
             except AttributeError:
                 loads_data = self._serializer.loads(result[0]["data"])
+            if self._logger:
+                self._logger.debug(f"Session {session_id} found, data keys: {list(loads_data.keys()) if isinstance(loads_data, dict) else 'N/A'}")
             del result
             return loads_data
+        if self._logger:
+            self._logger.debug(f"Session {session_id} not found")
         return None
 
     def delete(self, session_id: str) -> None:
@@ -114,8 +125,11 @@ class JSONSessions(BaseSessionModule):
         Returns:
             None
         """
-        self._db.remove(self._qs.session_id == session_id)
-        logger.debug("Session with ID %s deleted", session_id)
+        if self._logger:
+            self._logger.debug(f"Deleting session with ID: {session_id}")
+        removed_count = self._db.remove(self._qs.session_id == session_id)
+        if self._logger:
+            self._logger.debug(f"Session with ID {session_id} deleted, removed {len(removed_count)} document(s)")
 
     def update(self, session_id: str, data: dict) -> None:
         """Update session data by its ID.
@@ -127,14 +141,17 @@ class JSONSessions(BaseSessionModule):
         Returns:
             None
         """
+        if self._logger:
+            self._logger.debug(f"Updating session {session_id} with data keys: {list(data.keys())}")
         try:
             dumps_data = self.__encode_session_data__(data)
         except AttributeError:
             dumps_data = self._serializer.dumps(data).decode("utf-8")
         del data
 
-        self._db.update({"data": dumps_data}, self._qs.session_id == session_id)
-        logger.debug("Session with ID %s updated", session_id)
+        updated_count = self._db.update({"data": dumps_data}, self._qs.session_id == session_id)
+        if self._logger:
+            self._logger.debug(f"Session with ID {session_id} updated, modified {len(updated_count)} document(s)")
 
     def clear(self, session_key: str) -> None:
         """Clear all sessions for a given session key.
@@ -170,5 +187,6 @@ class JSONSessions(BaseSessionModule):
             {"session_id": new_session_id},
             self._qs.session_id == session_id,
         )
-        logger.debug("Session ID %s reworked to %s", session_id, new_session_id)
+        if self._logger:
+            self._logger.debug("Session ID %s reworked to %s", session_id, new_session_id)
         return new_session_id

@@ -6,7 +6,7 @@ import json
 from typing import Any, Optional
 import urllib.parse
 
-from .__abc_oauth2_repo__ import BaseOAuth2Client
+from .__base__ import BaseOAuth2Client
 
 
 class OAuth2Client(BaseOAuth2Client):

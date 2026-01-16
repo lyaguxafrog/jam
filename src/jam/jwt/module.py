@@ -139,7 +139,7 @@ class JWT(BaseJWT):
             ValueError: If encoding fails
         """
         self._logger.debug(
-            f"Encoding JWT with payload keys: {list(payload.keys())}"
+            f"Encoding JWT with algorithm {self.alg}, payload keys: {list(payload.keys())}"
         )
 
         try:
@@ -147,10 +147,11 @@ class JWT(BaseJWT):
             header_b64 = base64url_encode(self._serializer.dumps(header))
             payload_b64 = base64url_encode(self._serializer.dumps(payload))
             data = f"{header_b64}.{payload_b64}".encode()
+            self._logger.debug(f"JWT header and payload encoded, data length: {len(data)} bytes")
             signature = self._algo.sign(data)
             token = f"{header_b64}.{payload_b64}.{signature}"
 
-            self._logger.debug("JWT encoded successfully")
+            self._logger.debug(f"JWT encoded successfully, token length: {len(token)} characters")
             return token
         except Exception as e:
             self._logger.error(
@@ -175,7 +176,7 @@ class JWT(BaseJWT):
         Returns:
             dict[str, Any]: Decoded payload
         """
-        self._logger.debug("Decoding JWT token")
+        self._logger.debug(f"Decoding JWT token (length: {len(token)} characters)")
 
         # Validate token format
         parts = token.split(".")
@@ -189,10 +190,12 @@ class JWT(BaseJWT):
 
         try:
             h_b64, p_b64, s_b64 = parts
+            self._logger.debug(f"Token split into parts: header={len(h_b64)} chars, payload={len(p_b64)} chars, signature={len(s_b64)} chars")
 
             # Decode header and payload
             header = self._serializer.loads(base64url_decode(h_b64))
             payload = self._serializer.loads(base64url_decode(p_b64))
+            self._logger.debug(f"Decoded header: {header}, payload keys: {list(payload.keys())}")
             data = f"{h_b64}.{p_b64}".encode()
             sig = base64url_decode(s_b64)
 
@@ -208,9 +211,10 @@ class JWT(BaseJWT):
 
             # Verify signature
             key = public_key or self._secret
+            self._logger.debug(f"Verifying signature with algorithm {self.alg}")
             self._algo.verify(sig, data, key)
 
-            self._logger.debug("JWT decoded and verified successfully")
+            self._logger.debug(f"JWT decoded and verified successfully, payload contains {len(payload)} keys")
             return payload
 
         except ValueError:

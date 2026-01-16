@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-from typing import Literal
+from typing import Literal, Optional
 
-from jam.__logger__ import logger
+from jam.logger import BaseLogger
 
 
 try:
@@ -35,17 +35,23 @@ class JSONList(BaseJWTList):
     """
 
     def __init__(
-        self, type: Literal["white", "black"], json_path: str = "whitelist.json"
+        self,
+        type: Literal["white", "black"],
+        json_path: str = "whitelist.json",
+        logger: Optional[BaseLogger] = None,
     ) -> None:
         """Class constructor.
 
         Args:
             type (Literal["white", "black"]): Type of list
             json_path (str): Path to .json file
+            logger (Optional[BaseLogger], optional): Logger instance. Defaults to None.
         """
         super().__init__(list_type=type)
         self.__list__ = TinyDB(json_path)
-        logger.info(f"Save JSON to: {json_path}")
+        self._logger = logger
+        if self._logger:
+            self._logger.info(f"Save JSON to: {json_path}")
 
     def add(self, token: str) -> None:
         """Method for adding token to list.
@@ -63,9 +69,10 @@ class JSONList(BaseJWTList):
 
         self.__list__.insert(_doc)
 
-        logger.info("Set token in list.")
-        logger.debug(f"Set {token} in list")
-        logger.debug(f"JSON document: {_doc}")
+        if self._logger:
+            self._logger.info("Set token in list.")
+            self._logger.debug(f"Set {token} in list")
+            self._logger.debug(f"JSON document: {_doc}")
         return None
 
     def check(self, token: str) -> bool:
@@ -77,12 +84,14 @@ class JSONList(BaseJWTList):
         Returns:
             (bool)
         """
+        if self._logger:
+            self._logger.debug(f"Checking token in {self.__list_type__} list (token length: {len(token)} chars)")
         cond = Query()
         _token = self.__list__.search(cond.token == token)
-        if _token:
-            return True
-        else:
-            return False
+        result = bool(_token)
+        if self._logger:
+            self._logger.debug(f"Token {'found' if result else 'not found'} in {self.__list_type__} list")
+        return result
 
     def delete(self, token: str) -> None:
         """Method for removing token from list.
@@ -93,5 +102,9 @@ class JSONList(BaseJWTList):
         Returns:
             (None)
         """
+        if self._logger:
+            self._logger.debug(f"Deleting token from {self.__list_type__} list (token length: {len(token)} chars)")
         cond = Query()
-        self.__list__.remove(cond.token == token)
+        removed_count = self.__list__.remove(cond.token == token)
+        if self._logger:
+            self._logger.debug(f"Token removed from {self.__list_type__} list, deleted {len(removed_count)} document(s)")

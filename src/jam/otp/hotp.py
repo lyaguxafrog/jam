@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from jam.otp.__abc_module__ import BaseOTP
+from jam.otp.__base__ import BaseOTP
 
 
 class HOTP(BaseOTP):

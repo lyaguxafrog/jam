@@ -8,7 +8,7 @@ import os
 from typing import Any, Callable, Optional, Union
 from uuid import uuid4
 
-from .__abc_session_repo__ import BaseSessionModule
+from .__base__ import BaseSessionModule
 from jam.encoders import BaseEncoder, JsonEncoder
 from jam.logger import BaseLogger, logger
 

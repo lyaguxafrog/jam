@@ -6,7 +6,7 @@
 
 from typing import Any, Literal
 
-from .__abc_module__ import BaseOTP
+from .__base__ import BaseOTP
 from .hotp import HOTP
 from .totp import TOTP
 from jam.logger import BaseLogger, logger
