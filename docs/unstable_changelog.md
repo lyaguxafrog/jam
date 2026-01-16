@@ -1,6 +1,6 @@
 # Unstable features and etc
 
-Current version: `3.0.0a7`
+Current version: `3.0.0a8`
 
 ## What is not yet included in the master
 
@@ -15,6 +15,7 @@ Current version: `3.0.0a7`
 - Delete deprecated instances methods
 - Environment variables support in config
 - Update config maker
+- Update main config
 
 
 ### `2.6.0b*`
