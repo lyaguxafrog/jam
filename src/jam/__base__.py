@@ -2,11 +2,11 @@
 
 from abc import ABC, abstractmethod
 import gc
-from typing import Any, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 from jam.encoders import BaseEncoder, JsonEncoder
 from jam.jwt.__base__ import BaseJWT
-from jam.logger import BaseLogger, logger
+from jam.logger import BaseLogger, JamLogger
 from jam.oauth2.__abc_oauth2_repo__ import BaseOAuth2Client
 from jam.sessions.__abc_session_repo__ import BaseSessionModule
 from jam.utils.config_maker import __config_maker__, __module_loader__
@@ -19,9 +19,11 @@ class BaseJam(ABC):
 
     def __init__(
         self,
-        config: Union[str, dict[str, Any]],
+        config: Union[str, dict[str, Any]] = "pyproject.toml",
         pointer: str = "jam",
-        logger: BaseLogger = logger,
+        *,
+        logger: type(BaseLogger) = JamLogger,
+        log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO",
         serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
     ) -> None:
         """Initialize instance.
@@ -35,15 +37,20 @@ class BaseJam(ABC):
         Returns:
                 None
         """
-        self.__logger = logger
+        config = __config_maker__(config, pointer)
+
+        self.__logger = logger(log_level)
         self._serializer = serializer
         self.jwt: Optional[BaseJWT] = None
         self.session: Optional[BaseSessionModule] = None
         self.oauth2: Optional[BaseOAuth2Client] = None
 
-        config = __config_maker__(config, pointer)
         self.__build_instance(config)
         gc.collect()
+
+
+    def __build_main_config__(self, config) -> None:
+        ...
 
     def __build_instance(self, config: dict[str, Any]) -> None:
         """Build instance.
