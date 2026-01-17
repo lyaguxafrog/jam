@@ -27,15 +27,10 @@ How to install dev version: -> [Jam Unstable](install_unstable.md)
 ```python
 from jam.aio import Jam
 
-config = {
-    "auth_type": "jwt",
-    "alg": "HS256",
-    "secret_key": "secret",
-    "expire": 2600
-}
-jam = Jam(config=config)
-payload = await jam.make_payload(**{"user_id": 1})
-token = await jam.gen_jwt_token(payload)
+
+jam = Jam()
+payload = await jam.jwt_make_payload(**{"user_id": 1})
+token = await jam.jwt_create_token(payload)
 ```
 
 

@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 
-"""Async sessions methods."""
+"""
+Async module for making server auth sessions.
+"""
 
 import os
 from typing import Any, Callable, Optional, Union
 from uuid import uuid4
 
+from jam.sessions.__base__ import BaseSessionModule
 from jam.encoders import BaseEncoder, JsonEncoder
-from jam.sessions.__abc_session_repo__ import BaseSessionModule
 from jam.logger import BaseLogger, logger
 
 
 def create_instance(
     session_type: Optional[str] = None,
-    sessions_type: Optional[str] = None,  # Backward compatibility
+    sessions_type: Optional[str] = None,
     logger: BaseLogger = logger,
     serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
     **kwargs: Any
@@ -28,7 +30,7 @@ def create_instance(
         **kwargs: Config params specific to session type
 
     Returns:
-        BaseSessionModule instance
+        BaseSessionModule instance (async-compatible)
     """
     # Handle backward compatibility: sessions_type -> session_type
     if session_type is None and sessions_type is not None:
@@ -85,3 +87,6 @@ def create_instance(
         )
     else:
         raise ValueError(f"Unknown session_type: {session_type}")
+
+
+__all__ = ["create_instance", "RedisSessions", "JSONSessions"]

@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 
-"""Async OAuth2 modules."""
+"""Async OAuth2 module."""
 
-from typing import Any
+from typing import Any, Union
 
-from .builtin.github import GitHubOAuth2Client
-from .builtin.gitlab import GitLabOAuth2Client
-from .builtin.google import GoogleOAuth2Client
-from .builtin.yandex import YandexOAuth2Client
-from jam.oauth2.__abc_oauth2_repo__ import BaseOAuth2Client
+from jam.oauth2.__base__ import BaseOAuth2Client
+from jam.aio.oauth2.client import OAuth2Client
+from jam.aio.oauth2.builtin.github import GitHubOAuth2Client
+from jam.aio.oauth2.builtin.gitlab import GitLabOAuth2Client
+from jam.aio.oauth2.builtin.google import GoogleOAuth2Client
+from jam.aio.oauth2.builtin.yandex import YandexOAuth2Client
+from jam.encoders import BaseEncoder, JsonEncoder
 from jam.logger import BaseLogger, logger
 
 
@@ -23,6 +25,7 @@ BUILTIN_PROVIDERS = {
 def create_instance(
     providers: dict[str, dict],
     logger: BaseLogger = logger,
+    serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
     **kwargs: Any
 ) -> dict[str, BaseOAuth2Client]:
     """Create async OAuth2 clients for configured providers.
@@ -30,10 +33,11 @@ def create_instance(
     Args:
         providers: {provider_name: {client_id, client_secret, redirect_uri, ...}}
         logger: Logger instance
+        serializer: JSON encoder/decoder
         **kwargs: Additional params
 
     Returns:
-        dict: {provider_name: OAuth2Client instance}
+        dict: {provider_name: OAuth2Client instance (async)}
     """
     from jam.utils.config_maker import __module_loader__
 
@@ -47,14 +51,20 @@ def create_instance(
             module_path = BUILTIN_PROVIDERS.get(name, "jam.aio.oauth2.client.OAuth2Client")
             module_cls = __module_loader__(module_path)
         
+        # Add serializer to config if not already present
+        if "serializer" not in cfg:
+            cfg["serializer"] = serializer
+        
         result[name] = module_cls(**cfg)
     
     return result
 
 
 __all__ = [
-    "GitLabOAuth2Client",
+    "BaseOAuth2Client",
+    "OAuth2Client",
     "GitHubOAuth2Client",
+    "GitLabOAuth2Client",
     "GoogleOAuth2Client",
     "YandexOAuth2Client",
     "create_instance",

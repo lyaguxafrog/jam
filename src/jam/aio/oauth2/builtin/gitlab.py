@@ -4,7 +4,7 @@ from jam.aio.oauth2.client import OAuth2Client
 
 
 class GitLabOAuth2Client(OAuth2Client):
-    """Ready to use GitLab OAuth2 provider.
+    """Async ready to use GitLab OAuth2 provider.
 
     See: https://docs.gitlab.com/api/oauth2/
     """

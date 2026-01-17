@@ -4,7 +4,7 @@ from jam.aio.oauth2.client import OAuth2Client
 
 
 class GoogleOAuth2Client(OAuth2Client):
-    """Ready to use Google OAuth2 provider.
+    """Async ready to use Google OAuth2 provider.
 
     See: https://developers.google.com/identity/protocols/oauth2
     """

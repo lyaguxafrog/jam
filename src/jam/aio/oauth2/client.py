@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
 
-from contextlib import asynccontextmanager
+import asyncio
+from contextlib import contextmanager
 from http.client import HTTPSConnection
 import json
 from typing import Any, Optional
 import urllib.parse
 
-from jam.oauth2.__abc_oauth2_repo__ import BaseOAuth2Client
+from jam.oauth2.__base__ import BaseOAuth2Client
 
 
 class OAuth2Client(BaseOAuth2Client):
-    """Async OAuth2 client."""
+    """Async universal OAuth2 client implementation."""
 
-    @asynccontextmanager
-    async def __http(self, url: str):
+    @contextmanager
+    def __http(self, url: str):
         """Create HTTPS connection context manager."""
         parsed = urllib.parse.urlparse(url)
         connection = HTTPSConnection(parsed.netloc)
@@ -22,43 +23,14 @@ class OAuth2Client(BaseOAuth2Client):
         finally:
             connection.close()
 
-    async def __post_form(
-        self, url: str, params: dict[str, Any]
-    ) -> dict[str, Any]:
-        """Send POST form and parse JSON response."""
-        encoded = urllib.parse.urlencode(params)
-
-        async with self.__http(url) as (conn, parsed):
-            conn.request(
-                "POST",
-                parsed.path,
-                body=encoded,
-                headers={"Content-Type": "application/x-www-form-urlencoded"},
-            )
-            response = conn.getresponse()
-            raw = response.read().decode("utf-8")
-
-        if not raw:
-            raise ValueError("Empty response from token endpoint")
-
-        try:
-            data = self._serializer.loads(raw)
-        except (json.JSONDecodeError, AttributeError):
-            data = {k: v[0] for k, v in urllib.parse.parse_qs(raw).items()}
-
-        if response.status >= 400:
-            raise RuntimeError(f"OAuth2 error ({response.status}): {data}")
-
-        return data
-
-    async def get_authorization_url(
+    def get_authorization_url(
         self, scope: list[str], **extra_params: Any
     ) -> str:
         """Generate full OAuth2 authorization URL.
 
         Args:
             scope (list[str]): Auth scope
-            extra_params (Any): Extra ath params
+            extra_params (Any): Extra auth params
 
         Returns:
             str: Authorization url
@@ -149,3 +121,34 @@ class OAuth2Client(BaseOAuth2Client):
         body.update(extra_params)
 
         return await self.__post_form(self.token_url, body)
+
+    async def __post_form(self, url: str, params: dict[str, Any]) -> dict[str, Any]:
+        """Send POST form and parse JSON response (async version)."""
+        encoded = urllib.parse.urlencode(params)
+
+        def _sync_post():
+            """Synchronous POST operation wrapped for async execution."""
+            with self.__http(url) as (conn, parsed):
+                conn.request(
+                    "POST",
+                    parsed.path,
+                    body=encoded,
+                    headers={"Content-Type": "application/x-www-form-urlencoded"},
+                )
+                response = conn.getresponse()
+                raw = response.read().decode("utf-8")
+
+            if not raw:
+                raise ValueError("Empty response from token endpoint")
+
+            try:
+                data = self._serializer.loads(raw)
+            except (json.JSONDecodeError, AttributeError):
+                data = {k: v[0] for k, v in urllib.parse.parse_qs(raw).items()}
+
+            if response.status >= 400:
+                raise RuntimeError(f"OAuth2 error ({response.status}): {data}")
+
+            return data
+
+        return await asyncio.to_thread(_sync_post)

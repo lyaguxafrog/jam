@@ -1,24 +1,31 @@
 # -*- coding: utf-8 -*-
 
-from collections.abc import Callable
 import os
-from typing import Optional, Union
+from typing import Callable, Optional, Union
 from uuid import uuid4
 
-from redis.asyncio import Redis
+
+try:
+    from redis.asyncio import Redis
+except ImportError:
+    try:
+        from redis import Redis
+        raise ImportError(
+            "Redis async module is not installed. Please install it with 'pip install jamlib[redis]' (redis>=4.0.0 required for async support)."
+        )
+    except ImportError:
+        raise ImportError(
+            "Redis module is not installed. Please install it with 'pip install jamlib[redis]'."
+        )
 
 from jam.encoders import BaseEncoder, JsonEncoder
 from jam.exceptions import SessionNotFoundError
 from jam.logger import BaseLogger
-from jam.sessions.redis import RedisSessions as SyncRedisSessions
+from jam.sessions.__base__ import BaseSessionModule
 
 
-class RedisSessions(SyncRedisSessions):
-    """Async redis sessions module.
-
-    Dependency required:
-    `pip install jamlib[redis]`
-    """
+class RedisSessions(BaseSessionModule):
+    """Async Redis session management module."""
 
     def __init__(
         self,
@@ -33,10 +40,10 @@ class RedisSessions(SyncRedisSessions):
         serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
         logger: Optional[BaseLogger] = None,
     ) -> None:
-        """Initialize the Redis session management module.
+        """Initialize the async Redis session management module.
 
         Args:
-            redis_uri (str | Redis): The URI for the Redis server.
+            redis_uri (str | Redis): The URI for the Redis server or Redis instance.
             redis_sessions_key (str): The key under which sessions are stored in Redis.
             default_ttl (Optional[int]): Default time-to-live for sessions in seconds. Defaults to 3600 seconds (1 hour).
             is_session_crypt (bool): If True, session keys will be encoded.
@@ -57,17 +64,18 @@ class RedisSessions(SyncRedisSessions):
         else:
             self._redis = redis_uri
         if self._logger:
-            self._logger.debug("Redis connection established at %s", redis_uri)
+            self._logger.debug("Redis async connection established at %s", redis_uri)
 
         self.ttl = default_ttl
         self.session_path = redis_sessions_key
 
     async def _ping(self) -> bool:
+        """Check if the Redis connection is alive."""
         try:
             return await self._redis.ping()
         except Exception as e:
             if self._logger:
-                self._logger.error("Redis ping failed %s", e)
+                self._logger.error("Redis ping failed: %s", e)
             return False
 
     async def create(self, session_key: str, data: dict) -> str:
@@ -86,6 +94,7 @@ class RedisSessions(SyncRedisSessions):
         if self._logger:
             self._logger.debug("Gen session: %s", session_id)
 
+        # trying to encode data
         try:
             dumps_data = self.__encode_session_data__(data)
         except AttributeError:
@@ -121,13 +130,14 @@ class RedisSessions(SyncRedisSessions):
         """
         if self._logger:
             self._logger.debug(f"Getting session with ID: {session_id}")
-        decode_session_key = self.__decode_session_id_if_needed__(
+        decoded_session_key = self.__decode_session_id_if_needed__(
             session_id
         ).split(":", 1)
         if self._logger:
-            self._logger.debug(f"Decoded session key: {decode_session_key[0]}, looking in Redis key: {self.session_path}:{decode_session_key[0]}")
+            self._logger.debug(f"Decoded session key: {decoded_session_key[0]}, looking in Redis key: {self.session_path}:{decoded_session_key[0]}")
         session = await self._redis.hget(
-            name=f"{self.session_path}:{decode_session_key[0]}", key=session_id
+            name=f"{self.session_path}:{decoded_session_key[0]}",
+            key=session_id,
         )
         if not session:
             if self._logger:
@@ -218,7 +228,6 @@ class RedisSessions(SyncRedisSessions):
                     "TTL for session %s reset to %d seconds.", session_id, self.ttl
                 )
 
-    # TODO: Optimize this method
     async def rework(self, session_id: str) -> str:
         """Rework a session and return its new ID.
 

@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 
-"""
-Async jam version.
-"""
+"""Async Jam package."""
 
-from jam.aio.instance import Jam
-
+from .instance import Jam
 
 __all__ = ["Jam"]
