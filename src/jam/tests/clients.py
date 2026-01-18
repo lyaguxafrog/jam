@@ -54,6 +54,7 @@ class TestJam(Jam):
             config (str | dict[str, Any] | None): Jam configuration.
             pointer (str): Pointer for the client instance.
         """
+        super().__init__(config=config or {}, pointer=pointer)
         self.module = self
         self._fake_session: dict[str, Any] = {}
 
@@ -502,6 +503,7 @@ class TestAsyncJam(AioJam):
             config (str | dict[str, Any] | None): Jam configuration.
             pointer (str): Pointer for the client instance.
         """
+        super().__init__(config=config or {}, pointer=pointer)
         self.module = self
         self._fake_session: dict[str, Any] = {}
 
