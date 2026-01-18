@@ -17,8 +17,13 @@ class BaseLogger(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def error(self, message: str) -> None:
-        """Log an error message."""
+    def error(self, message: str, exc_info: bool = False) -> None:
+        """Log an error message.
+
+        Args:
+            message (str): Error message
+            exc_info (bool): Whether to include exception info
+        """
         raise NotImplementedError
 
     @abstractmethod
@@ -52,9 +57,14 @@ class JamLogger(BaseLogger):
         """Log an informational message."""
         self.logger.info(message)
 
-    def error(self, message: str) -> None:
-        """Log an error message."""
-        self.logger.error(message)
+    def error(self, message: str, exc_info: bool = False) -> None:
+        """Log an error message.
+
+        Args:
+            message (str): Error message
+            exc_info (bool): Whether to include exception info
+        """
+        self.logger.error(message, exc_info=exc_info)
 
     def warning(self, message: str) -> None:
         """Log a warning message."""
