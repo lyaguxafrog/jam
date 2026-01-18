@@ -18,7 +18,7 @@ class JsonEncoder(BaseEncoder):
     @classmethod
     def dumps(cls, var: dict[str, Any]) -> bytes:
         """Dump dict."""
-        return json.dumps(var, sort_keys=True, separators=(",", ":")).encode(
+        return json.dumps(var, sort_keys=True, separators=(",", ": ")).encode(
             "utf8"
         )
 
