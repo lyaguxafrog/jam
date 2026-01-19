@@ -23,7 +23,9 @@ class BaseJam(ABC):
         pointer: str = "jam",
         *,
         logger: type(BaseLogger) = JamLogger,
-        log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO",
+        log_level: Literal[
+            "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
+        ] = "INFO",
         serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
     ) -> None:
         """Initialize instance.
@@ -32,13 +34,16 @@ class BaseJam(ABC):
                 config (Union[str, dict[str, Any]]): Configuration
                 pointer (str): Pointer
                 logger (BaseLogger): Logger
+                log_level (Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]): Log level
                 serializer (Union[BaseEncoder, type[BaseBrowser]]): Serializer
 
         Returns:
                 None
         """
         config = __config_maker__(config, pointer)
-        main_config = self.__build_main_config(config, logger, log_level, serializer)
+        main_config = self.__build_main_config(
+            config, logger, log_level, serializer
+        )
 
         logger = main_config["logger"]
         log_level = main_config["log_level"]
@@ -50,17 +55,22 @@ class BaseJam(ABC):
         self.session: Optional[BaseSessionModule] = None
         self.oauth2: Optional[BaseOAuth2Client] = None
 
-        self.__logger.debug(f"Initializing BaseJam with log_level={log_level}, serializer={serializer}")
+        self.__logger.debug(
+            f"Initializing BaseJam with log_level={log_level}, serializer={serializer}"
+        )
         self.__build_instance(config)
-        self.__logger.debug(f"BaseJam initialization complete. Modules loaded: jwt={self.jwt is not None}, session={self.session is not None}, oauth2={self.oauth2 is not None}")
+        self.__logger.debug(
+            f"BaseJam initialization complete. Modules loaded: jwt={self.jwt is not None}, session={self.session is not None}, oauth2={self.oauth2 is not None}"
+        )
         gc.collect()
-
 
     def __build_main_config(
         self,
         config: dict[str, Any],
         default_logger: type[BaseLogger],
-        default_log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        default_log_level: Literal[
+            "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
+        ],
         default_serializer: Union[BaseEncoder, type[BaseEncoder]],
     ) -> dict[str, Any]:
         """Build main params from config like logger, loglevel, etc.
@@ -83,7 +93,9 @@ class BaseJam(ABC):
             logger_cfg = config["logger"]
             if isinstance(logger_cfg, str):
                 logger = __module_loader__(logger_cfg)
-            elif isinstance(logger_cfg, type) and issubclass(logger_cfg, BaseLogger):
+            elif isinstance(logger_cfg, type) and issubclass(
+                logger_cfg, BaseLogger
+            ):
                 logger = logger_cfg
 
         if "log_level" in config:
@@ -114,8 +126,6 @@ class BaseJam(ABC):
             "serializer": serializer,
         }
 
-        
-
     def __build_instance(self, config: dict[str, Any]) -> None:
         """Build instance.
 
@@ -136,7 +146,9 @@ class BaseJam(ABC):
                 module_cls = __module_loader__(path)
                 self.__logger.debug(f"Loading module {name} from {path}")
                 params = config.get(name, {})
-                self.__logger.debug(f"Module {name} config params: {list(params.keys())}")
+                self.__logger.debug(
+                    f"Module {name} config params: {list(params.keys())}"
+                )
                 params["logger"] = self.__logger
                 params["serializer"] = self._serializer
                 module_instance = module_cls(**params)
@@ -146,7 +158,7 @@ class BaseJam(ABC):
             except Exception as e:
                 self.__logger.error(
                     f"Failed to load module {name} from {path}: {e}",
-                    exc_info=True
+                    exc_info=True,
                 )
 
     @abstractmethod
