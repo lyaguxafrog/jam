@@ -7,6 +7,7 @@ Current version: `3.0.0b0`
 ### `3.0.0b*`
 
 - Delete useless dependencies
+- Update typing
 
 ### `3.0.0a*`
 
