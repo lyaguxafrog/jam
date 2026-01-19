@@ -226,7 +226,7 @@ class PASETOv2(BasePASETO):
     def decode(
         self,
         token: str,
-        serializer: BaseEncoder = JsonEncoder,
+        serializer: type[BaseEncoder] | BaseEncoder = JsonEncoder,
     ) -> tuple[dict[str, Any], dict[str, Any] | None]:
         """Decode."""
         if token.startswith(f"{self._VERSION}.local"):
