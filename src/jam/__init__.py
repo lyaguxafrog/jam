@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 
-"""
-JAM - Universal auth* library
+"""JAM - Universal auth* library
 
 Source code: https://github.com/lyaguxafrog/jam
 Documentation: https://jam.makridenko.ru
 """
 
-from jam.__base_encoder__ import BaseEncoder
 from jam.__base__ import BaseJam
+from jam.__base_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
 from jam.instance import Jam
 
