@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-from typing import Literal, Optional, Union
+from typing import Literal
 
 from jam.logger import BaseLogger
 
@@ -32,9 +32,9 @@ class RedisList(BaseJWTList):
     def __init__(
         self,
         type: Literal["white", "black"],
-        redis_uri: Union[str, "Redis"],
-        in_list_life_time: Optional[int] = None,
-        logger: Optional[BaseLogger] = None,
+        redis_uri: str | Redis,
+        in_list_life_time: int | None = None,
+        logger: BaseLogger | None = None,
     ) -> None:
         """Class constructor.
 
@@ -79,11 +79,15 @@ class RedisList(BaseJWTList):
             (bool)
         """
         if self._logger:
-            self._logger.debug(f"Checking token in {self.__list_type__} list (token length: {len(token)} chars)")
+            self._logger.debug(
+                f"Checking token in {self.__list_type__} list (token length: {len(token)} chars)"
+            )
         _token = self.__list__.get(name=token)
         result = bool(_token)
         if self._logger:
-            self._logger.debug(f"Token {'found' if result else 'not found'} in {self.__list_type__} list")
+            self._logger.debug(
+                f"Token {'found' if result else 'not found'} in {self.__list_type__} list"
+            )
         return result
 
     def delete(self, token: str) -> None:
@@ -96,8 +100,12 @@ class RedisList(BaseJWTList):
             None
         """
         if self._logger:
-            self._logger.debug(f"Deleting token from {self.__list_type__} list (token length: {len(token)} chars)")
+            self._logger.debug(
+                f"Deleting token from {self.__list_type__} list (token length: {len(token)} chars)"
+            )
         deleted_count = self.__list__.delete(token)
         if self._logger:
-            self._logger.debug(f"Token removed from {self.__list_type__} list, deleted {deleted_count} key(s)")
+            self._logger.debug(
+                f"Token removed from {self.__list_type__} list, deleted {deleted_count} key(s)"
+            )
         return None

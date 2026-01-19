@@ -2,7 +2,7 @@
 
 import base64
 import secrets
-from typing import Any, Literal, Optional, Union
+from typing import Any, Literal
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import (
@@ -28,7 +28,7 @@ class PASETOv2(BasePASETO):
     def key(
         cls: type[PASETO],
         purpose: Literal["local", "public"],
-        key: Union[str, bytes, Ed25519PrivateKey, Ed25519PublicKey],
+        key: str | bytes | Ed25519PrivateKey | Ed25519PublicKey,
     ) -> PASETO:
         """Create PASETOv2 instance from provided key."""
         k = cls()
@@ -83,7 +83,7 @@ class PASETOv2(BasePASETO):
         self,
         header: str,
         payload: bytes,
-        footer: Optional[bytes],
+        footer: bytes | None,
     ) -> bytes:
         bheader = header.encode("ascii")
         bfooter = footer or b""
@@ -100,7 +100,7 @@ class PASETOv2(BasePASETO):
         return token
 
     def _encode_public(
-        self, header: str, payload: bytes, footer: Optional[bytes]
+        self, header: str, payload: bytes, footer: bytes | None
     ) -> bytes:
         bheader = header.encode("ascii")
         footer_bytes = footer or b""
@@ -119,8 +119,10 @@ class PASETOv2(BasePASETO):
         return token
 
     def _decode_local(
-        self, token: str, serializer: Union[type[BaseEncoder], BaseEncoder]
-    ) -> tuple[dict[str, Any], Optional[dict[str, Any]]]:
+        self,
+        token: str,
+        serializer: type[BaseEncoder] | BaseEncoder = JsonEncoder,
+    ) -> tuple[dict[str, Any], dict[str, Any] | None]:
         parts = token.encode().split(b".")
         if len(parts) < 3:
             raise ValueError("Invalid token format")
@@ -161,7 +163,7 @@ class PASETOv2(BasePASETO):
         self,
         token: str,
         serializer,
-    ) -> tuple[dict[str, Any], Optional[dict[str, Any]]]:
+    ) -> tuple[dict[str, Any], dict[str, Any] | None]:
         parts = token.encode().split(b".")
         if len(parts) < 3:
             raise ValueError("Invalid token format")
@@ -207,8 +209,8 @@ class PASETOv2(BasePASETO):
     def encode(
         self,
         payload: dict[str, Any],
-        footer: Optional[Union[dict[str, Any], str]] = None,
-        serializer: BaseEncoder = JsonEncoder,
+        footer: dict[str, Any] | str | None = None,
+        serializer: type[BaseEncoder] | BaseEncoder = JsonEncoder,
     ) -> str:
         """Encode."""
         header = f"{self._VERSION}.{self._purpose}."
@@ -225,7 +227,7 @@ class PASETOv2(BasePASETO):
         self,
         token: str,
         serializer: BaseEncoder = JsonEncoder,
-    ) -> tuple[dict[str, Any], Optional[dict[str, Any]]]:
+    ) -> tuple[dict[str, Any], dict[str, Any] | None]:
         """Decode."""
         if token.startswith(f"{self._VERSION}.local"):
             return self._decode_local(token, serializer)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABC, abstractmethod
-from typing import Any, Union
+from typing import Any
 
 
 class BaseEncoder(ABC):
@@ -15,6 +15,6 @@ class BaseEncoder(ABC):
 
     @classmethod
     @abstractmethod
-    def loads(cls, var: Union[str, bytes]) -> dict[str, Any]:
+    def loads(cls, var: str | bytes) -> dict[str, Any]:
         """Load json."""
         raise NotImplementedError

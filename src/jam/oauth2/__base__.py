@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from secrets import token_urlsafe
-from typing import Any, Optional, Union
+from typing import Any
 
 from jam.encoders import BaseEncoder, JsonEncoder
 
@@ -18,7 +18,7 @@ class BaseOAuth2Client(ABC):
         auth_url: str,
         token_url: str,
         redirect_url: str,
-        serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
+        serializer: BaseEncoder | type[BaseEncoder] = JsonEncoder,
     ) -> None:
         """Constructor.
 
@@ -75,7 +75,7 @@ class BaseOAuth2Client(ABC):
 
     @abstractmethod
     def client_credentials_flow(
-        self, scope: Optional[list[str]] = None
+        self, scope: list[str] | None = None
     ) -> dict[str, Any]:
         """Obtain access token using client credentials flow (no user interaction).
 

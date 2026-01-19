@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABC, abstractmethod
-from typing import Any, Literal, Optional, TypeVar, Union
+from typing import Any, Literal, TypeVar
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.rsa import (
@@ -15,7 +15,7 @@ from jam.encoders import JsonEncoder
 
 
 PASETO = TypeVar("PASETO", bound="BasePASETO")
-RSAKeyLike = Union[str, bytes, RSAPrivateKey, RSAPublicKey]
+RSAKeyLike = str | bytes | RSAPrivateKey | RSAPublicKey
 
 
 class BasePASETO(ABC):
@@ -25,19 +25,19 @@ class BasePASETO(ABC):
 
     def __init__(self):
         """Constructor."""
-        self._secret: Optional[Any] = None
-        self._public_key: Optional[RSAPublicKey] = None
-        self._purpose: Optional[Literal["local", "public"]] = None
+        self._secret: Any | None = None
+        self._public_key: RSAPublicKey | None = None
+        self._purpose: Literal["local", "public"] | None = None
 
     @property
-    def purpose(self) -> Optional[Literal["local", "public"]]:
+    def purpose(self) -> Literal["local", "public"] | None:
         """Return PASETO purpose."""
         return self._purpose
 
     @staticmethod
     def load_rsa_key(
-        key: Optional[RSAKeyLike], *, private: bool = True
-    ) -> Union[RSAPrivateKey, RSAPublicKey, None]:
+        key: RSAKeyLike | None, *, private: bool = True
+    ) -> RSAPrivateKey | RSAPublicKey | None:
         """Load rsa key from string | bytes.
 
         Args:
@@ -46,7 +46,7 @@ class BasePASETO(ABC):
         """
         if key is None:
             return None
-        if isinstance(key, (RSAPublicKey, RSAPrivateKey)):
+        if isinstance(key, (RSAPublicKey | RSAPrivateKey)):
             return key
         if isinstance(key, str):
             key = key.encode("utf-8")
@@ -115,7 +115,7 @@ class BasePASETO(ABC):
     def key(
         cls: type[PASETO],
         purpose: Literal["local", "public"],
-        key: Union[str, bytes],
+        key: str | bytes,
     ) -> PASETO:
         """Create a PASETO instance with the given key.
 
@@ -132,8 +132,8 @@ class BasePASETO(ABC):
     def encode(
         self,
         payload: dict[str, Any],
-        footer: Optional[Union[dict[str, Any], str]] = None,
-        serializer: BaseEncoder = JsonEncoder,
+        footer: dict[str, Any] | str | None = None,
+        serializer: type[BaseEncoder] | BaseEncoder = JsonEncoder,
     ) -> str:
         """Generate token from key instance.
 
@@ -148,8 +148,8 @@ class BasePASETO(ABC):
     def decode(
         self,
         token: str,
-        serializer: BaseEncoder = JsonEncoder,
-    ) -> tuple[dict[str, Any], Optional[dict[str, Any]]]:
+        serializer: type[BaseEncoder] | BaseEncoder = JsonEncoder,
+    ) -> tuple[dict[str, Any], dict[str, Any] | None]:
         """Decode PASETO.
 
         Args:

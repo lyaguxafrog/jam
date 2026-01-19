@@ -3,7 +3,7 @@
 import hashlib
 import hmac
 import secrets
-from typing import Any, Literal, Optional, Union
+from typing import Any, Literal
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes, serialization
@@ -34,8 +34,8 @@ class PASETOv3(BasePASETO):
     def key(
         cls: type[PASETO],
         purpose: Literal["local", "public"],
-        key: Union[str, bytes],
-        public_key: Union[str, bytes, None] = None,
+        key: str | bytes,
+        public_key: str | bytes | None = None,
     ) -> PASETO:
         """Create PASETOv3 instance.
 
@@ -57,7 +57,7 @@ class PASETOv3(BasePASETO):
                     )
             else:
                 raw = key
-            if not isinstance(raw, (bytes, bytearray)) or len(raw) != 32:
+            if not isinstance(raw, (bytes | bytearray)) or len(raw) != 32:
                 raise ValueError("v3.local requires a 32-byte secret key")
             inst._secret = bytes(raw)
             return inst
@@ -151,8 +151,8 @@ class PASETOv3(BasePASETO):
     def encode(
         self,
         payload: dict[str, Any],
-        footer: Optional[Union[dict[str, Any], str, bytes]] = None,
-        serializer: Union[type[BaseEncoder], BaseEncoder] = JsonEncoder,
+        footer: dict[str, Any] | str | bytes | None = None,
+        serializer: type[BaseEncoder] | BaseEncoder = JsonEncoder,
     ) -> str:
         """Encode PASETO.
 
@@ -167,11 +167,11 @@ class PASETOv3(BasePASETO):
         header = f"{self._VERSION}.{self._purpose}."
         payload_bytes = serializer.dumps(payload)
         # normalize footer: if dict or list -> dumps, if str -> encode, if bytes -> as is, if None -> b""
-        if isinstance(footer, (dict, list)):
+        if isinstance(footer, (dict | list)):
             footer_bytes = serializer.dumps(footer)
         elif isinstance(footer, str):
             footer_bytes = footer.encode("utf-8")
-        elif isinstance(footer, (bytes, bytearray)):
+        elif isinstance(footer, (bytes | bytearray)):
             footer_bytes = bytes(footer)
         else:
             footer_bytes = b""
@@ -190,8 +190,8 @@ class PASETOv3(BasePASETO):
     def decode(
         self,
         token: str,
-        serializer: Union[type[BaseEncoder], BaseEncoder] = JsonEncoder,
-    ) -> tuple[dict[str, Any], Optional[Union[dict[str, Any], str, bytes]]]:
+        serializer: type[BaseEncoder] | BaseEncoder = JsonEncoder,
+    ) -> tuple[dict[str, Any], dict[str, Any] | str | bytes | None]:
         """Decode PASETO.
 
         Args:

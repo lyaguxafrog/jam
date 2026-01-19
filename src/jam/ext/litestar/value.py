@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 
 @dataclass
@@ -22,7 +22,7 @@ class Auth:
 class AuthMiddlewareSettings:
     """Setting for jam middleware."""
 
-    cookie_name: Optional[str]
-    header_name: Optional[str]
+    cookie_name: str | None
+    header_name: str | None
     user_dataclass: Any
     auth_dataclass: Any

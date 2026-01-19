@@ -4,7 +4,7 @@ import asyncio
 from contextlib import contextmanager
 from http.client import HTTPSConnection
 import json
-from typing import Any, Optional
+from typing import Any
 import urllib.parse
 
 from jam.oauth2.__base__ import BaseOAuth2Client
@@ -100,7 +100,7 @@ class OAuth2Client(BaseOAuth2Client):
         return await self.__post_form(self.token_url, body)
 
     async def client_credentials_flow(
-        self, scope: Optional[list[str]] = None, **extra_params: Any
+        self, scope: list[str] | None = None, **extra_params: Any
     ) -> dict[str, Any]:
         """Obtain access token using client credentials flow (no user interaction).
 
@@ -122,7 +122,9 @@ class OAuth2Client(BaseOAuth2Client):
 
         return await self.__post_form(self.token_url, body)
 
-    async def __post_form(self, url: str, params: dict[str, Any]) -> dict[str, Any]:
+    async def __post_form(
+        self, url: str, params: dict[str, Any]
+    ) -> dict[str, Any]:
         """Send POST form and parse JSON response (async version)."""
         encoded = urllib.parse.urlencode(params)
 
@@ -133,7 +135,9 @@ class OAuth2Client(BaseOAuth2Client):
                     "POST",
                     parsed.path,
                     body=encoded,
-                    headers={"Content-Type": "application/x-www-form-urlencoded"},
+                    headers={
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
                 )
                 response = conn.getresponse()
                 raw = response.read().decode("utf-8")

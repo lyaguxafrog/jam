@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any, Optional
+from typing import Any
 
 from litestar.config.app import AppConfig
 from litestar.di import Provide
@@ -55,8 +55,8 @@ class JWTPlugin(InitPlugin):
     def __init__(
         self,
         jam: BaseJam,
-        cookie_name: Optional[str] = None,
-        header_name: Optional[str] = "Authorization",
+        cookie_name: str | None = None,
+        header_name: str | None = "Authorization",
         user_dataclass: Any = User,
         auth_dataclass: Any = Auth,
     ) -> None:
@@ -92,8 +92,8 @@ class SessionsPlugin(InitPlugin):
     def __init__(
         self,
         jam: BaseJam,
-        cookie_name: Optional[str] = None,
-        header_name: Optional[str] = "Authorization",
+        cookie_name: str | None = None,
+        header_name: str | None = "Authorization",
         user_dataclass: Any = User,
         auth_dataclass: Any = Auth,
     ) -> None:

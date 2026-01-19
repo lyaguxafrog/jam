@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from collections.abc import AsyncIterator, Awaitable, Iterator
+from collections.abc import Awaitable
 import inspect
-from typing import TypeVar, Union
+from typing import TypeVar
 
 
 T = TypeVar("T")
 
-AwaitableOrValue = Union[Awaitable[T], T]
-AsyncIteratorOrIterator = Union[AsyncIterator[T], Iterator[T]]
+AwaitableOrValue = Awaitable[T] | T
+AsyncIteratorOrIterator = Awaitable[T] | T
 
 
 async def await_maybe(value: AwaitableOrValue[T]) -> T:

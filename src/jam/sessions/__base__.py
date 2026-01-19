@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Coroutine
-from typing import Any, Optional, Union
+from typing import Any
 from uuid import uuid4
 
 from cryptography.fernet import Fernet
@@ -51,9 +51,9 @@ class BaseSessionModule(ABC):
         self,
         id_factory: Callable[[], str] = lambda: str(uuid4()),
         is_session_crypt: bool = False,
-        session_aes_secret: Optional[bytes] = None,
-        serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
-        logger: Optional[BaseLogger] = None,
+        session_aes_secret: bytes | None = None,
+        serializer: type[BaseEncoder] | BaseEncoder = JsonEncoder,
+        logger: BaseLogger | None = None,
     ) -> None:
         """Class constructor.
 
@@ -138,7 +138,7 @@ class BaseSessionModule(ABC):
     @abstractmethod
     def create(
         self, session_key: str, data: dict
-    ) -> Union[str, Coroutine[Any, Any, str]]:
+    ) -> str | Coroutine[Any, Any, str]:
         """Create a new session with the given session key and data.
 
         Args:
@@ -160,7 +160,7 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def delete(self, session_id: str) -> Optional[Coroutine[Any, Any, None]]:
+    def delete(self, session_id: str) -> Coroutine[Any, Any, None]:
         """Delete a session by its key or ID.
 
         Args:
@@ -169,9 +169,7 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def update(
-        self, session_id: str, data: dict
-    ) -> Union[None, Coroutine[Any, Any, None]]:
+    def update(self, session_id: str, data: dict) -> Coroutine[Any, Any, None]:
         """Update an existing session with new data.
 
         Args:
@@ -181,7 +179,7 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def rework(self, session_id: str) -> Union[str, Coroutine[Any, Any, str]]:
+    def rework(self, session_id: str) -> Coroutine[Any, Any, str]:
         """Rework a session and return its new ID.
 
         Args:
@@ -193,7 +191,7 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def clear(self, session_key: str) -> Union[None, Coroutine[Any, Any, None]]:
+    def clear(self, session_key: str) -> Coroutine[Any, Any, None]:
         """Clear all sessions by key.
 
         Args:

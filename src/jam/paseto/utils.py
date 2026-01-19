@@ -4,7 +4,7 @@ import base64
 from datetime import datetime
 import hashlib
 import hmac
-from typing import Any, Optional, Union
+from typing import Any
 from uuid import uuid4
 
 
@@ -41,7 +41,7 @@ def __pae__(pieces: list[bytes]) -> bytes:
     return output
 
 
-def base64url_decode(v: Union[str, bytes]) -> bytes:
+def base64url_decode(v: str | bytes) -> bytes:
     """Base64 URL-safe decoding with padding."""
     if isinstance(v, bytes):
         bv = v
@@ -53,7 +53,7 @@ def base64url_decode(v: Union[str, bytes]) -> bytes:
     return base64.urlsafe_b64decode(bv)
 
 
-def base64url_encode(data: Union[bytes, str]) -> bytes:
+def base64url_encode(data: bytes | str) -> bytes:
     """Base64 URL-safe encoding without padding."""
     if isinstance(data, bytes):
         bv = data
@@ -66,9 +66,7 @@ def base64url_encode(data: Union[bytes, str]) -> bytes:
 # Use: from jam.paseto import create_instance
 
 
-def payload_maker(
-    expire: Optional[int], data: dict[str, Any]
-) -> dict[str, Any]:
+def payload_maker(expire: int | None, data: dict[str, Any]) -> dict[str, Any]:
     """Generate PASETO payload.
 
     ```json

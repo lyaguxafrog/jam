@@ -3,7 +3,7 @@
 import hashlib
 import hmac
 import secrets
-from typing import Any, Literal, Optional, Union
+from typing import Any, Literal
 
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
@@ -33,7 +33,7 @@ class PASETOv1(BasePASETO):
     def key(
         cls: type[PASETO],
         purpose: Literal["local", "public"],
-        key: Union[str, bytes, None, RSAPrivateKey, RSAPublicKey],
+        key: str | bytes | None | RSAPrivateKey | RSAPublicKey,
     ) -> PASETO:
         """Return PASETO instance.
 
@@ -223,7 +223,7 @@ class PASETOv1(BasePASETO):
     def _decode_public(
         self,
         token: str,
-        serializer: Union[type[BaseEncoder], BaseEncoder] = JsonEncoder,
+        serializer: type[BaseEncoder] | BaseEncoder = JsonEncoder,
     ):
         parts = token.encode("utf-8").split(b".")
         if len(parts) < 3:
@@ -280,8 +280,8 @@ class PASETOv1(BasePASETO):
     def encode(
         self,
         payload: dict[str, Any],
-        footer: Optional[Union[dict[str, Any], str]] = None,
-        serializer: Union[type[BaseEncoder], BaseEncoder] = JsonEncoder,
+        footer: dict[str, Any] | str | None = None,
+        serializer: type[BaseEncoder] | BaseEncoder = JsonEncoder,
     ) -> str:
         """Encode PASETO."""
         header = f"{self._VERSION}.{self.purpose}."
@@ -298,8 +298,8 @@ class PASETOv1(BasePASETO):
     def decode(
         self,
         token: str,
-        serializer: Union[type[BaseEncoder], BaseEncoder] = JsonEncoder,
-    ) -> tuple[dict[str, Any], Optional[dict[str, Any]]]:
+        serializer: type[BaseEncoder] | BaseEncoder = JsonEncoder,
+    ) -> tuple[dict[str, Any], dict[str, Any] | None]:
         """Decode PASETO.
 
         Args:

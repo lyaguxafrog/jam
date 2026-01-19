@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import hashlib
 import hmac
 import struct
-from typing import Literal, Optional, Union
+from typing import Literal
 import urllib.parse
 
 
@@ -14,7 +14,7 @@ class BaseOTP:
 
     def __init__(
         self,
-        secret: Union[bytes, str],
+        secret: bytes | str,
         digits: int = 6,
         digest: Literal["sha1", "sha256", "sha512"] = "sha1",
     ) -> None:
@@ -72,7 +72,7 @@ class BaseOTP:
         name: str,
         issuer: str,
         type_: str = "totp",
-        counter: Optional[int] = None,
+        counter: int | None = None,
     ) -> str:
         """Generates an otpauth:// URI for Google Authenticator.
 

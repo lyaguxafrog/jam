@@ -3,7 +3,7 @@
 """PASETO auth* tokens."""
 
 import os
-from typing import Any, Literal, Union
+from typing import Any, Literal
 
 from .__base__ import PASETO, BasePASETO
 from .v1 import PASETOv1
@@ -16,7 +16,7 @@ from jam.logger import BaseLogger, logger
 def create_instance(
     version: Literal["v1", "v2", "v3", "v4"],
     purpose: Literal["local", "public"],
-    key: Union[str, bytes, Any],
+    key: str | bytes | Any,
     logger: BaseLogger = logger,
     **kwargs: Any
 ) -> PASETO:

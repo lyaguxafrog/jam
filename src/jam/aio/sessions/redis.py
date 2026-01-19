@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from collections.abc import Callable
 import os
-from typing import Callable, Optional, Union
 from uuid import uuid4
 
 
@@ -10,6 +10,7 @@ try:
 except ImportError:
     try:
         from redis import Redis
+
         raise ImportError(
             "Redis async module is not installed. Please install it with 'pip install jamlib[redis]' (redis>=4.0.0 required for async support)."
         )
@@ -29,16 +30,16 @@ class RedisSessions(BaseSessionModule):
 
     def __init__(
         self,
-        redis_uri: Union[str, Redis] = "redis://localhost:6379/0",
+        redis_uri: str | Redis = "redis://localhost:6379/0",
         redis_sessions_key: str = "sessions",
-        default_ttl: Optional[int] = 3600,
+        default_ttl: int | None = 3600,
         is_session_crypt: bool = False,
-        session_aes_secret: Optional[bytes] = os.getenv(
+        session_aes_secret: bytes | None = os.getenv(
             "JAM_SESSION_AES_SECRET", None
         ),
         id_factory: Callable[[], str] = lambda: str(uuid4()),
-        serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
-        logger: Optional[BaseLogger] = None,
+        serializer: BaseEncoder | type[BaseEncoder] = JsonEncoder,
+        logger: BaseLogger | None = None,
     ) -> None:
         """Initialize the async Redis session management module.
 
@@ -64,7 +65,9 @@ class RedisSessions(BaseSessionModule):
         else:
             self._redis = redis_uri
         if self._logger:
-            self._logger.debug("Redis async connection established at %s", redis_uri)
+            self._logger.debug(
+                "Redis async connection established at %s", redis_uri
+            )
 
         self.ttl = default_ttl
         self.session_path = redis_sessions_key
@@ -114,12 +117,14 @@ class RedisSessions(BaseSessionModule):
             )
             if self._logger:
                 self._logger.debug(
-                    "Set TTL for session %s to %d seconds.", session_id, self.ttl
+                    "Set TTL for session %s to %d seconds.",
+                    session_id,
+                    self.ttl,
                 )
 
         return session_id
 
-    async def get(self, session_id: str) -> Optional[dict]:
+    async def get(self, session_id: str) -> dict | None:
         """Retrieve a session by its key or ID.
 
         Args:
@@ -134,7 +139,9 @@ class RedisSessions(BaseSessionModule):
             session_id
         ).split(":", 1)
         if self._logger:
-            self._logger.debug(f"Decoded session key: {decoded_session_key[0]}, looking in Redis key: {self.session_path}:{decoded_session_key[0]}")
+            self._logger.debug(
+                f"Decoded session key: {decoded_session_key[0]}, looking in Redis key: {self.session_path}:{decoded_session_key[0]}"
+            )
         session = await self._redis.hget(
             name=f"{self.session_path}:{decoded_session_key[0]}",
             key=session_id,
@@ -149,7 +156,9 @@ class RedisSessions(BaseSessionModule):
         except AttributeError:
             loads_data = self._serializer.loads(session)
         if self._logger:
-            self._logger.debug(f"Session {session_id} found, data keys: {list(loads_data.keys()) if isinstance(loads_data, dict) else 'N/A'}")
+            self._logger.debug(
+                f"Session {session_id} found, data keys: {list(loads_data.keys()) if isinstance(loads_data, dict) else 'N/A'}"
+            )
         del session
 
         return loads_data
@@ -170,7 +179,9 @@ class RedisSessions(BaseSessionModule):
             session_id,
         )
         if self._logger:
-            self._logger.debug(f"Session {session_id} deleted from Redis, removed {deleted_count} field(s)")
+            self._logger.debug(
+                f"Session {session_id} deleted from Redis, removed {deleted_count} field(s)"
+            )
 
     async def clear(self, session_key: str) -> None:
         """Clear all sessions for a given session key.
@@ -192,13 +203,17 @@ class RedisSessions(BaseSessionModule):
             data (dict): The new data to be stored in the session.
         """
         if self._logger:
-            self._logger.debug(f"Updating session {session_id} with data keys: {list(data.keys())}")
+            self._logger.debug(
+                f"Updating session {session_id} with data keys: {list(data.keys())}"
+            )
         decoded_session_key = self.__decode_session_id_if_needed__(
             session_id
         ).split(":", 1)
         if not await self.get(session_id):
             if self._logger:
-                self._logger.warning(f"Attempted to update non-existent session {session_id}")
+                self._logger.warning(
+                    f"Attempted to update non-existent session {session_id}"
+                )
             raise SessionNotFoundError(
                 f"Session with ID {session_id} not found."
             )
@@ -215,7 +230,9 @@ class RedisSessions(BaseSessionModule):
             value=dumps_data,
         )
         if self._logger:
-            self._logger.debug(f"Session {session_id} updated successfully in Redis")
+            self._logger.debug(
+                f"Session {session_id} updated successfully in Redis"
+            )
 
         if self.ttl:
             await self._redis.hexpire(
@@ -225,7 +242,9 @@ class RedisSessions(BaseSessionModule):
             )
             if self._logger:
                 self._logger.debug(
-                    "TTL for session %s reset to %d seconds.", session_id, self.ttl
+                    "TTL for session %s reset to %d seconds.",
+                    session_id,
+                    self.ttl,
                 )
 
     async def rework(self, session_id: str) -> str:

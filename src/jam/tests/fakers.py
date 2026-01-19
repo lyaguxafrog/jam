@@ -2,13 +2,13 @@
 
 import json
 from secrets import token_urlsafe
-from typing import Any, Optional
+from typing import Any
 
 from jam.jwt.utils import base64url_encode
 from jam.utils import xor_my_data
 
 
-def fake_jwt_token(payload: Optional[dict[str, Any]]) -> str:
+def fake_jwt_token(payload: dict[str, Any] | None) -> str:
     """Generate a fake JWT token for testing purposes.
 
     Returns:
@@ -16,11 +16,15 @@ def fake_jwt_token(payload: Optional[dict[str, Any]]) -> str:
     """
     header = {"typ": "fake-JWT", "alg": "none"}
     payload_data = payload or {}
-    
-    header_b64 = base64url_encode(json.dumps(header, separators=(",", ": ")).encode("utf-8"))
-    payload_b64 = base64url_encode(json.dumps(payload_data, separators=(",", ": ")).encode("utf-8"))
+
+    header_b64 = base64url_encode(
+        json.dumps(header, separators=(",", ": ")).encode("utf-8")
+    )
+    payload_b64 = base64url_encode(
+        json.dumps(payload_data, separators=(",", ": ")).encode("utf-8")
+    )
     signature = "fake_signature"
-    
+
     return f"{header_b64}.{payload_b64}.{signature}"
 
 

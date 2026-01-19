@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import functools
-from typing import Optional
 import warnings
 
 
-def deprecated(replacement: Optional[str] = None):
+def deprecated(replacement: str | None = None):
     """Mark funcs are deprecated."""
 
     def decorator(func):

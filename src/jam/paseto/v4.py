@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import secrets
-from typing import Any, Literal, Optional, Union
+from typing import Any, Literal
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import (
@@ -28,7 +28,7 @@ class PASETOv4(BasePASETO):
     def key(
         cls: type[PASETO],
         purpose: Literal["local", "public"],
-        key: Union[str, bytes, Ed25519PrivateKey],
+        key: str | bytes | Ed25519PrivateKey,
     ) -> PASETO:
         """Create PASETO Factory.
 
@@ -44,7 +44,7 @@ class PASETOv4(BasePASETO):
                 raw = base64url_decode(key.encode("utf-8"))
             else:
                 raw = key
-            if not isinstance(raw, (bytes, bytearray)) or len(raw) != 32:
+            if not isinstance(raw, (bytes | bytearray)) or len(raw) != 32:
                 raise ValueError("v4.local requires a 32-byte secret key")
             inst._secret = bytes(raw)
             return inst
@@ -105,8 +105,8 @@ class PASETOv4(BasePASETO):
     def encode(
         self,
         payload: dict[str, Any],
-        footer: Optional[Union[dict[str, Any], str, bytes]] = None,
-        serializer: Union[type[BaseEncoder], BaseEncoder] = JsonEncoder,
+        footer: dict[str, Any] | str | bytes | None = None,
+        serializer: type[BaseEncoder] | BaseEncoder = JsonEncoder,
     ) -> str:
         """Encode PASETO.
 
@@ -121,11 +121,11 @@ class PASETOv4(BasePASETO):
         header = f"{self._VERSION}.{self._purpose}."
         payload_bytes = serializer.dumps(payload)
 
-        if isinstance(footer, (dict, list)):
+        if isinstance(footer, (dict | list)):
             footer_bytes = serializer.dumps(footer)
         elif isinstance(footer, str):
             footer_bytes = footer.encode("utf-8")
-        elif isinstance(footer, (bytes, bytearray)):
+        elif isinstance(footer, (bytes | bytearray)):
             footer_bytes = bytes(footer)
         else:
             footer_bytes = b""
@@ -144,8 +144,8 @@ class PASETOv4(BasePASETO):
     def decode(
         self,
         token: str,
-        serializer: Union[type[BaseEncoder], BaseEncoder] = JsonEncoder,
-    ) -> tuple[dict[str, Any], Optional[Union[dict[str, Any], str, bytes]]]:
+        serializer: type[BaseEncoder] | BaseEncoder = JsonEncoder,
+    ) -> tuple[dict[str, Any], dict[str, Any] | str | bytes | None]:
         """Decode PASETO.
 
         Args:
@@ -175,7 +175,7 @@ class PASETOv4(BasePASETO):
         return token
 
     def _decode_local(
-        self, token: str, serializer: Union[type[BaseEncoder], BaseEncoder]
+        self, token: str, serializer: BaseEncoder | type[BaseEncoder]
     ):
         parts = token.encode("utf-8").split(b".")
         if len(parts) < 3:

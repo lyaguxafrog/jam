@@ -4,7 +4,6 @@ import asyncio
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Optional, Union
 from uuid import uuid4
 
 
@@ -28,10 +27,10 @@ class JSONSessions(BaseSessionModule):
         self,
         json_path: str = "sessions.json",
         is_session_crypt: bool = False,
-        session_aes_secret: Optional[bytes] = None,
+        session_aes_secret: bytes | None = None,
         id_factory: Callable[[], str] = lambda: str(uuid4()),
-        serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
-        logger: Optional[BaseLogger] = None,
+        serializer: BaseEncoder | type[BaseEncoder] = JsonEncoder,
+        logger: BaseLogger | None = None,
     ) -> None:
         """Initialize the async JSON session management module.
 
@@ -91,7 +90,7 @@ class JSONSessions(BaseSessionModule):
             self._logger.debug("Session created with ID %s", session_id)
         return session_id
 
-    async def get(self, session_id) -> Optional[dict]:
+    async def get(self, session_id) -> dict | None:
         """Retrieve session data by session ID.
 
         Args:
@@ -112,7 +111,9 @@ class JSONSessions(BaseSessionModule):
             except AttributeError:
                 loads_data = self._serializer.loads(result[0]["data"])
             if self._logger:
-                self._logger.debug(f"Session {session_id} found, data keys: {list(loads_data.keys()) if isinstance(loads_data, dict) else 'N/A'}")
+                self._logger.debug(
+                    f"Session {session_id} found, data keys: {list(loads_data.keys()) if isinstance(loads_data, dict) else 'N/A'}"
+                )
             del result
             return loads_data
         if self._logger:
@@ -134,7 +135,9 @@ class JSONSessions(BaseSessionModule):
             self._db.remove, self._qs.session_id == session_id
         )
         if self._logger:
-            self._logger.debug(f"Session with ID {session_id} deleted, removed {len(removed_count)} document(s)")
+            self._logger.debug(
+                f"Session with ID {session_id} deleted, removed {len(removed_count)} document(s)"
+            )
 
     async def update(self, session_id: str, data: dict) -> None:
         """Update session data by its ID.
@@ -147,7 +150,9 @@ class JSONSessions(BaseSessionModule):
             None
         """
         if self._logger:
-            self._logger.debug(f"Updating session {session_id} with data keys: {list(data.keys())}")
+            self._logger.debug(
+                f"Updating session {session_id} with data keys: {list(data.keys())}"
+            )
         try:
             dumps_data = self.__encode_session_data__(data)
         except AttributeError:
@@ -160,7 +165,9 @@ class JSONSessions(BaseSessionModule):
             self._qs.session_id == session_id,
         )
         if self._logger:
-            self._logger.debug(f"Session with ID {session_id} updated, modified {len(updated_count)} document(s)")
+            self._logger.debug(
+                f"Session with ID {session_id} updated, modified {len(updated_count)} document(s)"
+            )
 
     async def clear(self, session_key: str) -> None:
         """Clear all sessions for a given session key.
@@ -204,5 +211,7 @@ class JSONSessions(BaseSessionModule):
             self._qs.session_id == session_id,
         )
         if self._logger:
-            self._logger.debug("Session ID %s reworked to %s", session_id, new_session_id)
+            self._logger.debug(
+                "Session ID %s reworked to %s", session_id, new_session_id
+            )
         return new_session_id

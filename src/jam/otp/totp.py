@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import time
-from typing import Literal, Optional, Union
+from typing import Literal
 
 from jam.otp.__base__ import BaseOTP
 
@@ -11,7 +11,7 @@ class TOTP(BaseOTP):
 
     def __init__(
         self,
-        secret: Union[bytes, str],
+        secret: bytes | str,
         digits: int = 6,
         digest: Literal["sha1", "sha256", "sha512"] = "sha1",
         interval: int = 30,
@@ -27,7 +27,7 @@ class TOTP(BaseOTP):
         super().__init__(secret, digits, digest)
         self.interval = interval
 
-    def at(self, factor: Optional[int] = None) -> str:
+    def at(self, factor: int | None = None) -> str:
         """Generates a TOTP code for a specified time.
 
         Args:
@@ -53,7 +53,7 @@ class TOTP(BaseOTP):
         return self.at()
 
     def verify(
-        self, code: str, factor: Optional[int] = None, look_ahead: int = 1
+        self, code: str, factor: int | None = None, look_ahead: int = 1
     ) -> bool:
         """Checks the TOTP code, taking into account the acceptable window.
 

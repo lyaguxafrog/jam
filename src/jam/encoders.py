@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
-from typing import Any, Union
+from typing import Any
 
 
 try:
@@ -23,7 +23,7 @@ class JsonEncoder(BaseEncoder):
         )
 
     @classmethod
-    def loads(cls, var: Union[str, bytes]) -> dict[str, Any]:
+    def loads(cls, var: str | bytes) -> dict[str, Any]:
         """Load json."""
         return json.loads(var)
 
@@ -40,7 +40,7 @@ class MsgspecJsonEncoder(BaseEncoder):
         return msgspec.json.encode(var)
 
     @classmethod
-    def loads(cls, var: Union[str, bytes]) -> dict[str, Any]:
+    def loads(cls, var: str | bytes) -> dict[str, Any]:
         """Load JSON to dict."""
         return msgspec.json.decode(
             var if isinstance(var, bytes) else var.encode("utf-8")

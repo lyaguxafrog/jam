@@ -5,7 +5,7 @@ from importlib import import_module
 import os
 import re
 import sys
-from typing import Any, Union
+from typing import Any
 
 
 GENERIC_POINTER = "jam"
@@ -194,7 +194,7 @@ def __toml_config_parser(
 
 
 def __config_maker__(
-    config: Union[str, dict[str, Any]], pointer: str = GENERIC_POINTER
+    config: str | dict[str, Any], pointer: str = GENERIC_POINTER
 ) -> dict[str, Any]:
     """Base config masker.
 

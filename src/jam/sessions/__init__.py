@@ -5,7 +5,7 @@ Module for making server auth sessions.
 """
 
 import os
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable
 from uuid import uuid4
 
 from .__base__ import BaseSessionModule
@@ -14,10 +14,10 @@ from jam.logger import BaseLogger, logger
 
 
 def create_instance(
-    session_type: Optional[str] = None,
-    sessions_type: Optional[str] = None,
+    session_type: str | None = None,
+    sessions_type: str | None = None,
     logger: BaseLogger = logger,
-    serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
+    serializer: BaseEncoder | type[BaseEncoder] = JsonEncoder,
     **kwargs: Any
 ) -> BaseSessionModule:
     """Create session module instance.
@@ -40,8 +40,8 @@ def create_instance(
     # Get optional params
     id_factory: Callable[[], str] = kwargs.get("id_factory", lambda: str(uuid4()))
     is_session_crypt: bool = kwargs.get("is_session_crypt", False)
-    session_aes_secret: Optional[bytes] = kwargs.get("session_aes_secret")
-    
+    session_aes_secret: bytes | None = kwargs.get("session_aes_secret")
+
     # Handle env variable for AES secret
     if session_aes_secret is None:
         env_secret = os.getenv("JAM_SESSION_AES_SECRET")

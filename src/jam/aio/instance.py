@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-from typing import Any, Optional, Union
+from typing import Any
 import uuid
 
 from jam.__base__ import BaseJam
@@ -15,11 +15,11 @@ class Jam(BaseJam):
         "session": "jam.aio.sessions.create_instance",
         "oauth2": "jam.aio.oauth2.create_instance",
         "paseto": "jam.paseto.create_instance",
-        "otp": "jam.otp.create_instance"
+        "otp": "jam.otp.create_instance",
     }
 
     async def jwt_make_payload(
-        self, exp: Optional[int], data: dict[str, Any]
+        self, exp: int | None, data: dict[str, Any]
     ) -> dict[str, Any]:
         """Make JWT-specific payload.
 
@@ -51,9 +51,13 @@ class Jam(BaseJam):
             EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
             EmtpyPrivateKey: If RSA algorithm is selected, but private key None
         """
-        self._BaseJam__logger.debug(f"Creating JWT token with payload keys: {list(payload.keys())}")
+        self._BaseJam__logger.debug(
+            f"Creating JWT token with payload keys: {list(payload.keys())}"
+        )
         token = self.jwt.encode(payload=payload)
-        self._BaseJam__logger.debug(f"JWT token created successfully, length: {len(token)} characters")
+        self._BaseJam__logger.debug(
+            f"JWT token created successfully, length: {len(token)} characters"
+        )
         return token
 
     async def jwt_verify_token(
@@ -78,12 +82,18 @@ class Jam(BaseJam):
             TokenNotInWhiteList: If the list type is white, but the token is  not there
             TokenInBlackList: If the list type is black and the token is there
         """
-        self._BaseJam__logger.debug(f"Verifying JWT token (length: {len(token)} chars), check_exp={check_exp}, check_list={check_list}")
+        self._BaseJam__logger.debug(
+            f"Verifying JWT token (length: {len(token)} chars), check_exp={check_exp}, check_list={check_list}"
+        )
         payload = self.jwt.decode(token)
-        self._BaseJam__logger.debug(f"JWT token verified successfully, payload keys: {list(payload.keys())}")
+        self._BaseJam__logger.debug(
+            f"JWT token verified successfully, payload keys: {list(payload.keys())}"
+        )
         return payload
 
-    async def session_create(self, session_key: str, data: dict[str, Any]) -> str:
+    async def session_create(
+        self, session_key: str, data: dict[str, Any]
+    ) -> str:
         """Create new session.
 
         Args:
@@ -93,12 +103,16 @@ class Jam(BaseJam):
         Returns:
             str: New session ID
         """
-        self._BaseJam__logger.debug(f"Creating session with key: {session_key}, data keys: {list(data.keys())}")
+        self._BaseJam__logger.debug(
+            f"Creating session with key: {session_key}, data keys: {list(data.keys())}"
+        )
         session_id = await self.session.create(session_key, data)
-        self._BaseJam__logger.debug(f"Session created successfully, session_id: {session_id}")
+        self._BaseJam__logger.debug(
+            f"Session created successfully, session_id: {session_id}"
+        )
         return session_id
 
-    async def session_get(self, session_id: str) -> Optional[dict[str, Any]]:
+    async def session_get(self, session_id: str) -> dict[str, Any] | None:
         """Get data from session.
 
         Args:
@@ -107,10 +121,14 @@ class Jam(BaseJam):
         Returns:
             dict[str, Any] | None: Session data if exist
         """
-        self._BaseJam__logger.debug(f"Getting session data for session_id: {session_id}")
+        self._BaseJam__logger.debug(
+            f"Getting session data for session_id: {session_id}"
+        )
         data = await self.session.get(session_id)
         if data:
-            self._BaseJam__logger.debug(f"Session data retrieved, keys: {list(data.keys())}")
+            self._BaseJam__logger.debug(
+                f"Session data retrieved, keys: {list(data.keys())}"
+            )
         else:
             self._BaseJam__logger.debug(f"Session {session_id} not found")
         return data
@@ -123,7 +141,9 @@ class Jam(BaseJam):
         """
         await self.session.delete(session_id)
 
-    async def session_update(self, session_id: str, data: dict[str, Any]) -> None:
+    async def session_update(
+        self, session_id: str, data: dict[str, Any]
+    ) -> None:
         """Update session data.
 
         Args:
@@ -152,7 +172,7 @@ class Jam(BaseJam):
         return await self.session.rework(old_session_id)
 
     async def otp_code(
-        self, secret: Union[str, bytes], factor: Optional[int] = None
+        self, secret: str | bytes, factor: int | None = None
     ) -> str:
         """Generates an OTP.
 
@@ -168,9 +188,9 @@ class Jam(BaseJam):
     async def otp_uri(
         self,
         secret: str,
-        name: Optional[str] = None,
-        issuer: Optional[str] = None,
-        counter: Optional[int] = None,
+        name: str | None = None,
+        issuer: str | None = None,
+        counter: int | None = None,
     ) -> str:
         """Generates an otpauth:// URI for Google Authenticator.
 
@@ -192,10 +212,10 @@ class Jam(BaseJam):
 
     async def otp_verify_code(
         self,
-        secret: Union[str, bytes],
+        secret: str | bytes,
         code: str,
-        factor: Optional[int] = None,
-        look_ahead: Optional[int] = 1,
+        factor: int | None = None,
+        look_ahead: int | None = 1,
     ) -> bool:
         """Checks the OTP code, taking into account the acceptable window.
 
@@ -295,7 +315,7 @@ class Jam(BaseJam):
     async def oauth2_client_credentials_flow(
         self,
         provider: str,
-        scope: Optional[list[str]] = None,
+        scope: list[str] | None = None,
         **extra_params: Any,
     ) -> dict[str, Any]:
         """Obtain access token using client credentials flow (no user interaction).
@@ -319,7 +339,7 @@ class Jam(BaseJam):
         )
 
     async def paseto_make_payload(
-        self, exp: Optional[int] = None, **data: dict[str, Any]
+        self, exp: int | None = None, **data: dict[str, Any]
     ) -> dict[str, Any]:
         """Generate payload for PASETO.
 
@@ -337,7 +357,7 @@ class Jam(BaseJam):
     async def paseto_create(
         self,
         payload: dict[str, Any],
-        footer: Optional[Union[dict[str, Any], str]],
+        footer: dict[str, Any] | str | None,
     ) -> str:
         """Create new PASETO.
 
@@ -352,7 +372,7 @@ class Jam(BaseJam):
 
     async def paseto_decode(
         self, token: str, check_exp: bool = True, check_list: bool = True
-    ) -> dict[str, Union[dict, Union[str, dict, None]]]:
+    ) -> dict[str, str | dict | None]:
         """Decode PASETO.
 
         Args:

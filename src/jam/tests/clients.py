@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 from jam.aio import Jam as AioJam
 from jam.instance import Jam
@@ -45,7 +45,7 @@ class TestJam(Jam):
 
     def __init__(
         self,
-        config: Optional[Union[str, dict[str, Any]]] = None,
+        config: Union[str, dict[str, Any]] | None = None,
         pointer: str = "jam",
     ) -> None:
         """Class constructor.
@@ -72,7 +72,7 @@ class TestJam(Jam):
         return fake_jwt_token(payload)
 
     def jwt_make_payload(
-        self, exp: Optional[int], data: dict[str, Any]
+        self, exp: int | None, data: dict[str, Any]
     ) -> dict[str, Any]:
         """Payload maker tool.
 
@@ -185,7 +185,7 @@ class TestJam(Jam):
         self._fake_session = data
         return "fake-session-id"
 
-    def session_get(self, session_id: str) -> Optional[dict[str, Any]]:
+    def session_get(self, session_id: str) -> dict[str, Any] | None:
         """Retrieve session data by session ID.
 
         Args:
@@ -198,7 +198,7 @@ class TestJam(Jam):
             return self._fake_session
         return None
 
-    def get_session(self, session_id: str) -> Optional[dict[str, Any]]:
+    def get_session(self, session_id: str) -> dict[str, Any] | None:
         """Retrieve session data by session ID.
 
         Args:
@@ -290,7 +290,7 @@ class TestJam(Jam):
         return "fake-session-id"
 
     def otp_code(
-        self, secret: Union[str, bytes], factor: Optional[int] = None
+        self, secret: Union[str, bytes], factor: int | None = None
     ) -> str:
         """Generates a OTP code.
 
@@ -303,7 +303,7 @@ class TestJam(Jam):
         """
         return "123456"
 
-    def get_otp_code(self, secret: str, factor: Optional[int] = None) -> str:
+    def get_otp_code(self, secret: str, factor: int | None = None) -> str:
         """Generates a OTP code.
 
         Args:
@@ -319,8 +319,8 @@ class TestJam(Jam):
         self,
         secret: Union[str, bytes],
         code: str,
-        factor: Optional[int] = None,
-        look_ahead: Optional[int] = 1,
+        factor: int | None = None,
+        look_ahead: int | None = 1,
     ) -> bool:
         """Verifies a given OTP code.
 
@@ -339,8 +339,8 @@ class TestJam(Jam):
         self,
         secret: str,
         code: str,
-        factor: Optional[int] = None,
-        look_ahead: Optional[int] = None,
+        factor: int | None = None,
+        look_ahead: int | None = None,
     ) -> bool:
         """Verifies a given OTP code.
 
@@ -358,9 +358,9 @@ class TestJam(Jam):
     def otp_uri(
         self,
         secret: str,
-        name: Optional[str] = None,
-        issuer: Optional[str] = None,
-        counter: Optional[int] = None,
+        name: str | None = None,
+        issuer: str | None = None,
+        counter: int | None = None,
     ) -> str:
         """Generates an otpauth:// URI for Google Authenticator.
 
@@ -383,9 +383,9 @@ class TestJam(Jam):
     def get_otp_uri(
         self,
         secret: str,
-        name: Optional[str] = None,
-        issuer: Optional[str] = None,
-        counter: Optional[int] = None,
+        name: str | None = None,
+        issuer: str | None = None,
+        counter: int | None = None,
     ) -> str:
         """Generates an otpauth:// URI for Google Authenticator.
 
@@ -447,7 +447,7 @@ class TestJam(Jam):
         }
 
     def oauth2_client_credentials_flow(
-        self, scope: Optional[list[str]] = None, **extra_params: Any
+        self, scope: list[str] | None = None, **extra_params: Any
     ) -> dict[str, Any]:
         """Fake client MtM flow."""
         return {
@@ -494,7 +494,7 @@ class TestAsyncJam(AioJam):
 
     def __init__(
         self,
-        config: Optional[Union[str, dict[str, Any]]] = None,
+        config: Union[str, dict[str, Any]] | None = None,
         pointer: str = "jam",
     ) -> None:
         """Class constructor.
@@ -584,7 +584,7 @@ class TestAsyncJam(AioJam):
             raise ValueError("Invalid token format.")
 
     async def jwt_make_payload(
-        self, exp: Optional[int], data: dict[str, Any]
+        self, exp: int | None, data: dict[str, Any]
     ) -> dict[str, Any]:
         """Payload maker tool.
 
@@ -638,7 +638,7 @@ class TestAsyncJam(AioJam):
         self._fake_session = data
         return "fake-session-id"
 
-    async def session_get(self, session_id: str) -> Optional[dict[str, Any]]:
+    async def session_get(self, session_id: str) -> dict[str, Any] | None:
         """Retrieve session data by session ID.
 
         Args:
@@ -651,7 +651,7 @@ class TestAsyncJam(AioJam):
             return self._fake_session
         return None
 
-    async def get_session(self, session_id: str) -> Optional[dict[str, Any]]:
+    async def get_session(self, session_id: str) -> dict[str, Any] | None:
         """Retrieve session data by session ID.
 
         Args:
@@ -745,7 +745,7 @@ class TestAsyncJam(AioJam):
         return "fake-session-id"
 
     async def otp_code(
-        self, secret: Union[str, bytes], factor: Optional[int] = None
+        self, secret: Union[str, bytes], factor: int | None = None
     ) -> str:
         """Generates a OTP code.
 
@@ -758,9 +758,7 @@ class TestAsyncJam(AioJam):
         """
         return "123456"
 
-    async def get_otp_code(
-        self, secret: str, factor: Optional[int] = None
-    ) -> str:
+    async def get_otp_code(self, secret: str, factor: int | None = None) -> str:
         """Generates a OTP code.
 
         Args:
@@ -776,8 +774,8 @@ class TestAsyncJam(AioJam):
         self,
         secret: Union[str, bytes],
         code: str,
-        factor: Optional[int] = None,
-        look_ahead: Optional[int] = 1,
+        factor: int | None = None,
+        look_ahead: int | None = 1,
     ) -> bool:
         """Verifies a given OTP code.
 
@@ -796,8 +794,8 @@ class TestAsyncJam(AioJam):
         self,
         secret: str,
         code: str,
-        factor: Optional[int] = None,
-        look_ahead: Optional[int] = None,
+        factor: int | None = None,
+        look_ahead: int | None = None,
     ) -> bool:
         """Verifies a given OTP code.
 
@@ -815,9 +813,9 @@ class TestAsyncJam(AioJam):
     async def otp_uri(
         self,
         secret: str,
-        name: Optional[str] = None,
-        issuer: Optional[str] = None,
-        counter: Optional[int] = None,
+        name: str | None = None,
+        issuer: str | None = None,
+        counter: int | None = None,
     ) -> str:
         """Generates an otpauth:// URI for Google Authenticator.
 
@@ -840,9 +838,9 @@ class TestAsyncJam(AioJam):
     async def get_otp_uri(
         self,
         secret: str,
-        name: Optional[str] = None,
-        issuer: Optional[str] = None,
-        counter: Optional[int] = None,
+        name: str | None = None,
+        issuer: str | None = None,
+        counter: int | None = None,
     ) -> str:
         """Generates an otpauth:// URI for Google Authenticator.
 
@@ -904,7 +902,7 @@ class TestAsyncJam(AioJam):
         }
 
     async def oauth2_client_credentials_flow(
-        self, scope: Optional[list[str]] = None, **extra_params: Any
+        self, scope: list[str] | None = None, **extra_params: Any
     ) -> dict[str, Any]:
         """Fake client MtM flow."""
         return {

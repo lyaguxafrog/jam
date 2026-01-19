@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 
 class BaseJWT(ABC):
@@ -24,7 +24,7 @@ class BaseJWT(ABC):
 
     @abstractmethod
     def decode(
-        self, token: str, public_key: Optional[Any] = None
+        self, token: str, public_key: Any | None = None
     ) -> dict[str, Any]:
         """Decode token.
 

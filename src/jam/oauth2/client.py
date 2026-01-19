@@ -3,7 +3,7 @@
 from contextlib import contextmanager
 from http.client import HTTPSConnection
 import json
-from typing import Any, Optional
+from typing import Any
 import urllib.parse
 
 from .__base__ import BaseOAuth2Client
@@ -99,7 +99,7 @@ class OAuth2Client(BaseOAuth2Client):
         return self.__post_form(self.token_url, body)
 
     def client_credentials_flow(
-        self, scope: Optional[list[str]] = None, **extra_params: Any
+        self, scope: list[str] | None = None, **extra_params: Any
     ) -> dict[str, Any]:
         """Obtain access token using client credentials flow (no user interaction).
 

@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 import gc
-from typing import Any, Literal, Optional, Union
+from typing import Any, Literal
 
 from jam.encoders import BaseEncoder, JsonEncoder
 from jam.jwt.__base__ import BaseJWT
@@ -19,14 +19,14 @@ class BaseJam(ABC):
 
     def __init__(
         self,
-        config: Union[str, dict[str, Any]] = "pyproject.toml",
+        config: str | dict[str, Any] = "pyproject.toml",
         pointer: str = "jam",
         *,
         logger: type(BaseLogger) = JamLogger,
         log_level: Literal[
             "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
         ] = "INFO",
-        serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
+        serializer: BaseEncoder | type[BaseEncoder] = JsonEncoder,
     ) -> None:
         """Initialize instance.
 
@@ -51,9 +51,9 @@ class BaseJam(ABC):
 
         self.__logger = logger(log_level)
         self._serializer = serializer
-        self.jwt: Optional[BaseJWT] = None
-        self.session: Optional[BaseSessionModule] = None
-        self.oauth2: Optional[BaseOAuth2Client] = None
+        self.jwt: BaseJWT | None = None
+        self.session: BaseSessionModule | None = None
+        self.oauth2: BaseOAuth2Client | None = None
 
         self.__logger.debug(
             f"Initializing BaseJam with log_level={log_level}, serializer={serializer}"
@@ -71,7 +71,7 @@ class BaseJam(ABC):
         default_log_level: Literal[
             "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
         ],
-        default_serializer: Union[BaseEncoder, type[BaseEncoder]],
+        default_serializer: BaseEncoder | type[BaseEncoder],
     ) -> dict[str, Any]:
         """Build main params from config like logger, loglevel, etc.
 
@@ -79,7 +79,7 @@ class BaseJam(ABC):
             config (dict[str, Any]): Configuration dictionary
             default_logger (type[BaseLogger]): Default logger class
             default_log_level (Literal): Default log level
-            default_serializer (Union[BaseEncoder, type[BaseEncoder]]): Default serializer
+            default_serializer (BaseEncoder | type[BaseEncoder]): Default serializer
 
         Returns:
             dict[str, Any]: Dictionary with logger, log_level, and serializer
@@ -163,7 +163,7 @@ class BaseJam(ABC):
 
     @abstractmethod
     def jwt_make_payload(
-        self, exp: Optional[int], data: dict[str, Any]
+        self, exp: int | None, data: dict[str, Any]
     ) -> dict[str, Any]:
         """Make JWT-specific payload.
 
@@ -231,7 +231,7 @@ class BaseJam(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def session_get(self, session_id: str) -> Optional[dict[str, Any]]:
+    def session_get(self, session_id: str) -> dict[str, Any] | None:
         """Get data from session.
 
         Args:
@@ -283,9 +283,7 @@ class BaseJam(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def otp_code(
-        self, secret: Union[str, bytes], factor: Optional[int] = None
-    ) -> str:
+    def otp_code(self, secret: str | bytes, factor: int | None = None) -> str:
         """Generates an OTP.
 
         Args:
@@ -301,9 +299,9 @@ class BaseJam(ABC):
     def otp_uri(
         self,
         secret: str,
-        name: Optional[str] = None,
-        issuer: Optional[str] = None,
-        counter: Optional[int] = None,
+        name: str | None = None,
+        issuer: str | None = None,
+        counter: int | None = None,
     ) -> str:
         """Generates an otpauth:// URI for Google Authenticator.
 
@@ -321,10 +319,10 @@ class BaseJam(ABC):
     @abstractmethod
     def otp_verify_code(
         self,
-        secret: Union[str, bytes],
+        secret: str | bytes,
         code: str,
-        factor: Optional[int] = None,
-        look_ahead: Optional[int] = 1,
+        factor: int | None = None,
+        look_ahead: int | None = 1,
     ) -> bool:
         """Checks the OTP code, taking into account the acceptable window.
 
@@ -401,7 +399,7 @@ class BaseJam(ABC):
     def oauth2_client_credentials_flow(
         self,
         provider: str,
-        scope: Optional[list[str]] = None,
+        scope: list[str] | None = None,
         **extra_params: Any,
     ) -> dict[str, Any]:
         """Obtain access token using client credentials flow (no user interaction).
@@ -418,7 +416,7 @@ class BaseJam(ABC):
 
     @abstractmethod
     def paseto_make_payload(
-        self, exp: Optional[int] = None, **data: dict[str, Any]
+        self, exp: int | None = None, **data: dict[str, Any]
     ) -> dict[str, Any]:
         """Generate payload for PASETO.
 
@@ -435,7 +433,7 @@ class BaseJam(ABC):
     def paseto_create(
         self,
         payload: dict[str, Any],
-        footer: Optional[Union[dict[str, Any], str]],
+        footer: dict[str, Any] | str | None,
     ) -> str:
         """Create new PASETO.
 
@@ -451,7 +449,7 @@ class BaseJam(ABC):
     @abstractmethod
     def paseto_decode(  # mb refactoring this
         self, token: str
-    ) -> dict[str, Union[dict, Union[str, dict, None]]]:
+    ) -> dict[str, dict | str | dict | None]:
         """Decode PASETO and return payload and footer.
 
         Args:

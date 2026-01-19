@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any, Optional
+from typing import Any
 
 from flask import Flask, g, request
 
@@ -16,7 +16,7 @@ class JamExtension:
     def __init__(
         self,
         jam: Jam,
-        app: Optional[Flask] = None,
+        app: Flask | None = None,
     ) -> None:
         """Constructor.
 
@@ -39,9 +39,9 @@ class JWTExtension(JamExtension):
     def __init__(
         self,
         jam: Jam,
-        app: Optional[Flask] = None,
-        header_name: Optional[str] = "Authorization",
-        cookie_name: Optional[str] = None,
+        app: Flask | None = None,
+        header_name: str | None = "Authorization",
+        cookie_name: str | None = None,
     ) -> None:
         """Constructor.
 
@@ -56,11 +56,11 @@ class JWTExtension(JamExtension):
         self.header = header_name
         self.cookie = cookie_name
 
-    def _get_payload(self) -> Optional[dict[str, Any]]:
+    def _get_payload(self) -> dict[str, Any] | None:
         token = None
         g.payload = None
         logger = self._jam._BaseJam__logger
-        
+
         logger.debug("JWTExtension: Attempting to extract token from request")
         if self.cookie:
             token = request.cookies.get(self.cookie)
@@ -76,13 +76,17 @@ class JWTExtension(JamExtension):
         if not token:
             logger.debug("No token found in request")
             return None
-        
-        logger.debug(f"Verifying JWT token (length: {len(token)} chars), check_list={self.__use_list}")
+
+        logger.debug(
+            f"Verifying JWT token (length: {len(token)} chars), check_list={self.__use_list}"
+        )
         try:
             payload: dict[str, Any] = self._jam.jwt_verify_token(
                 token=token, check_exp=True, check_list=self.__use_list
             )
-            logger.debug(f"JWT token verified successfully, payload keys: {list(payload.keys())}")
+            logger.debug(
+                f"JWT token verified successfully, payload keys: {list(payload.keys())}"
+            )
         except Exception as e:
             logger.warning(f"JWT token verification failed: {e}")
             return None
@@ -102,9 +106,9 @@ class SessionExtension(JamExtension):
     def __init__(
         self,
         jam: Jam,
-        app: Optional[Flask] = None,
-        header_name: Optional[str] = None,
-        cookie_name: Optional[str] = "sessionId",
+        app: Flask | None = None,
+        header_name: str | None = None,
+        cookie_name: str | None = "sessionId",
     ) -> None:
         """Constructor.
 
@@ -118,12 +122,14 @@ class SessionExtension(JamExtension):
         self.header = header_name
         self.cookie = cookie_name
 
-    def _get_payload(self) -> Optional[dict[str, Any]]:
+    def _get_payload(self) -> dict[str, Any] | None:
         session_id = None
         g.payload = None
         logger = self._jam._BaseJam__logger
-        
-        logger.debug("SessionExtension: Attempting to extract session ID from request")
+
+        logger.debug(
+            "SessionExtension: Attempting to extract session ID from request"
+        )
         if self.cookie:
             session_id = request.cookies.get(self.cookie)
             if session_id:
@@ -138,14 +144,14 @@ class SessionExtension(JamExtension):
         if not session_id:
             logger.debug("No session ID found in request")
             return None
-        
+
         logger.debug(f"Getting session data for session ID: {session_id}")
         try:
-            payload: Optional[dict[str, Any]] = self._jam.session_get(
-                session_id
-            )
+            payload: dict[str, Any] | None = self._jam.session_get(session_id)
             if payload:
-                logger.debug(f"Session data retrieved successfully, keys: {list(payload.keys())}")
+                logger.debug(
+                    f"Session data retrieved successfully, keys: {list(payload.keys())}"
+                )
             else:
                 logger.debug(f"Session {session_id} not found")
         except Exception as e:

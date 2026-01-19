@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any, Optional, Union
+from typing import Any
 
 from .__base__ import BaseJWT
 from .module import JWT
@@ -11,11 +11,11 @@ from jam.encoders import BaseEncoder, JsonEncoder
 
 def create_instance(
     alg: str,
-    secret: Optional[KeyLike] = None,
-    secret_key: Optional[KeyLike] = None,  # Backward compatibility
-    password: Optional[Union[str, bytes]] = None,
+    secret: KeyLike | None = None,
+    secret_key: KeyLike | None = None,  # Backward compatibility
+    password: str | bytes | None = None,
     logger: BaseLogger = logger,
-    serializer: Union[BaseEncoder, type[BaseEncoder]] = JsonEncoder,
+    serializer: BaseEncoder | type[BaseEncoder] = JsonEncoder,
     **kwargs: Any
 ) -> JWT:
     """Create JWT instance.

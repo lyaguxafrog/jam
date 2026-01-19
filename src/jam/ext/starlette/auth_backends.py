@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any, Optional
+from typing import Any
 
 from starlette.authentication import (
     AuthCredentials,
@@ -22,8 +22,8 @@ class JWTBackend(AuthenticationBackend):
     def __init__(
         self,
         jam: BaseJam,
-        cookie_name: Optional[str] = None,
-        header_name: Optional[str] = "Authorization",
+        cookie_name: str | None = None,
+        header_name: str | None = "Authorization",
     ) -> None:
         """Constructor.
 
@@ -39,7 +39,7 @@ class JWTBackend(AuthenticationBackend):
 
     async def authenticate(
         self, conn: HTTPConnection
-    ) -> Optional[tuple[AuthCredentials, BaseUser]]:
+    ) -> tuple[AuthCredentials, BaseUser] | None:
         """Starlette authentication handler."""
         logger = self._jam._BaseJam__logger
         token = None
@@ -60,14 +60,18 @@ class JWTBackend(AuthenticationBackend):
             logger.debug("No token found in request")
             return None
 
-        logger.debug(f"Verifying JWT token (length: {len(token)} chars), check_list={self.__use_list}")
+        logger.debug(
+            f"Verifying JWT token (length: {len(token)} chars), check_list={self.__use_list}"
+        )
         try:
             payload: dict[str, Any] = await await_maybe(
                 self._jam.jwt_verify_token(
                     token=token, check_exp=True, check_list=self.__use_list
                 )
             )
-            logger.debug(f"JWT token verified successfully, payload keys: {list(payload.keys())}")
+            logger.debug(
+                f"JWT token verified successfully, payload keys: {list(payload.keys())}"
+            )
         except Exception as e:
             logger.warning(f"Token verify error: {e}")
             raise AuthenticationError("Token verification failed.")
@@ -81,8 +85,8 @@ class SessionBackend(AuthenticationBackend):
     def __init__(
         self,
         jam: BaseJam,
-        cookie_name: Optional[str] = "sessionId",
-        header_name: Optional[str] = None,
+        cookie_name: str | None = "sessionId",
+        header_name: str | None = None,
     ) -> None:
         """Constructor.
 
@@ -97,12 +101,14 @@ class SessionBackend(AuthenticationBackend):
 
     async def authenticate(
         self, conn: HTTPConnection
-    ) -> Optional[tuple[AuthCredentials, BaseUser]]:
+    ) -> tuple[AuthCredentials, BaseUser] | None:
         """Starlette authentication handler."""
         logger = self._jam._BaseJam__logger
         session_id = None
 
-        logger.debug("SessionBackend: Attempting to extract session ID from request")
+        logger.debug(
+            "SessionBackend: Attempting to extract session ID from request"
+        )
         if self.cookie_name:
             session_id = conn.cookies.get(self.cookie_name)
             if session_id:
@@ -124,7 +130,9 @@ class SessionBackend(AuthenticationBackend):
                 self._jam.session_get(session_id)
             )
             if payload:
-                logger.debug(f"Session data retrieved successfully, keys: {list(payload.keys())}")
+                logger.debug(
+                    f"Session data retrieved successfully, keys: {list(payload.keys())}"
+                )
             else:
                 logger.debug(f"Session {session_id} not found")
         except Exception as e:
