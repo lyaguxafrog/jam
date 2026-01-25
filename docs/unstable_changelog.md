@@ -1,6 +1,6 @@
 # Unstable features and etc
 
-Current version: `3.0.0b0`
+Current version: `3.0.0b2`
 
 ## What is not yet included in the master
 
@@ -8,6 +8,7 @@ Current version: `3.0.0b0`
 
 - Delete useless dependencies
 - Update typing
+- Delete modules.py
 
 ### `3.0.0a*`
 
