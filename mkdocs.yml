@@ -48,9 +48,9 @@ nav:
       - Starlette: extensions/starlette.md
       - FastAPI: extensions/fastapi.md
       - Flask: extensions/flask.md
-  # - API Reference: api.md
+  - API Reference: api/SUMMARY
   - Breaking changes:
-#      - Deprecated: breaking_changes/deprecated
+      #      - Deprecated: breaking_changes/deprecated
       - 2.5.5 -> 3.0.0: breaking_changes/jam255_to_300
       - 1.1.4 -> 2.0.0: breaking_changes/jam114_to_200
   - Contributing: contributing.md
@@ -58,7 +58,6 @@ nav:
   - Security Policy: https://github.com/lyaguxafrog/jam/blob/master/SECURITY.md
   - Philosophy: philosophy.md
   - License: https://github.com/lyaguxafrog/jam/blob/master/LICENSE.md
-
 
 theme:
   name: material
@@ -111,11 +110,10 @@ markdown_extensions:
   - pymdownx.magiclink
   - pymdownx.superfences:
       custom_fences:
-      - name: mermaid
-        class: mermaid
+        - name: mermaid
+          class: mermaid
   - pymdownx.tasklist:
       custom_checkbox: true
-
 
 plugins:
   - search
@@ -128,7 +126,7 @@ plugins:
         python:
           options:
             docstring_style: google
-            show_doctring_examples: true
+            # show_doctring_examples: true
             merge_init_into_class: true
             show_source: false
             docstring_options:
@@ -141,3 +139,7 @@ plugins:
             show_symbol_type_toc: true
             signature_crossrefs: true
             summary: true
+  - gen-files:
+      scripts:
+        - docs/gen_api.py
+  - literate-nav
