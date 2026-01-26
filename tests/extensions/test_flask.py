@@ -53,7 +53,7 @@ def test_sessions_get_payload_from_header():
     app = Flask(__name__)
     jam = TestJam()
     jwt_ext = SessionExtension(jam, app, header_name="Authorization")
-    session_id = jam.create_session("test", {"user_id": 123})
+    session_id = jam.session_create("test", {"user_id": 123})
 
     with app.test_request_context(
         headers={"Authorization": f"Bearer {session_id}"}
@@ -67,7 +67,7 @@ def test_sessions_get_payload_from_cookie():
     jam = TestJam()
     jwt_ext = SessionExtension(jam, app, cookie_name="sessionId")
     jwt_ext.init_app(app)
-    session_id = jam.create_session("test", {"user_id": 123})
+    session_id = jam.session_create("test", {"user_id": 123})
 
     with app.test_client() as client:
         client.set_cookie("sessionId", session_id)

@@ -73,7 +73,7 @@ async def test_jwt_backend_invalid_token(async_jam):
     async def raise_error(*args, **kwargs):
         raise ValueError("Invalid token")
 
-    async_jam.verify_jwt_token = raise_error
+    async_jam.jwt_verify_token = raise_error
 
     with pytest.raises(AuthenticationError):
         await backend.authenticate(conn)
