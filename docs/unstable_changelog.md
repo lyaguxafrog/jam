@@ -1,6 +1,6 @@
 # Unstable features and etc
 
-Current version: `3.0.0b3`
+Current version: `3.0.0b4`
 
 ## What is not yet included in the master
 
