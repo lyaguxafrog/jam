@@ -198,17 +198,116 @@ def __toml_config_parser(
 def __json_config_parser(
     path: str, encoder: BaseEncoder | type[BaseEncoder] = JsonEncoder
 ) -> dict[str, Any]:
-    """JSON config parser.
+    """JSON config parser with env substitution.
+
+    Supports:
+    - ${VAR} - environment variable (required)
+    - ${VAR:-default} - environment variable with default value
+    - $VAR - short form (required)
 
     Args:
         path (str): Path to JSON file
         encoder (BaseEncoder | type[BaseEncoder]): Encoder to use for parsing
 
+    Raises:
+        FileNotFoundError: If file not found
+        ValueError: If invalid JSON or required env var not set
+
     Returns:
-        dict[str, Any]: Parsed config
+        dict[str, Any]: Parsed config with environment variable substitution
     """
-    with open(path) as f:
-        config = encoder.loads(f.read())
+    try:
+        with open(path) as f:
+            content = f.read()
+    except FileNotFoundError:
+        raise FileNotFoundError(f"JSON config file not found at: {path}")
+
+    env_pattern = re.compile(
+        r"\$\{([^}^{]+?)(:-([^}]+))?\}|\$([A-Za-z_][A-Za-z0-9_]*)"
+    )
+
+    def get_env_value(var_name: str, default_value: str | None) -> str:
+        env_value = os.getenv(var_name)
+        if env_value is None:
+            if default_value is not None:
+                return default_value
+            raise ValueError(
+                f"Environment variable '{var_name}' not set and no default provided"
+            )
+        return env_value
+
+    def find_string_boundaries(content: str) -> list[tuple[int, int]]:
+        boundaries = []
+        in_string = False
+        escaped = False
+        start = -1
+
+        for i, char in enumerate(content):
+            if escaped:
+                escaped = False
+                continue
+            if char == "\\":
+                escaped = True
+                continue
+            if char == '"':
+                if not in_string:
+                    start = i
+                    in_string = True
+                else:
+                    boundaries.append((start, i))
+                    in_string = False
+                    start = -1
+
+        return boundaries
+
+    string_boundaries = find_string_boundaries(content)
+
+    def is_in_string(pos: int) -> bool:
+        for start, end in string_boundaries:
+            if start < pos < end:
+                return True
+        return False
+
+    def replace_env_in_content(match):
+        var_name = match.group(1) or match.group(4)
+        default_value = match.group(3) if match.group(3) is not None else None
+        start_pos = match.start()
+
+        in_string = is_in_string(start_pos)
+        env_value = get_env_value(var_name, default_value)
+
+        if in_string:
+            return env_value.replace("\\", "\\\\").replace('"', '\\"')
+        else:
+            escaped_value = env_value.replace("\\", "\\\\").replace('"', '\\"')
+            return f'"{escaped_value}"'
+
+    content = env_pattern.sub(replace_env_in_content, content)
+
+    try:
+        config = encoder.loads(content)
+    except Exception as e:
+        raise ValueError(f"Error parsing JSON file: {e}") from e
+
+    def _env_constructor(value: Any) -> Any:
+        if isinstance(value, str):
+
+            def replace_env_after(match):
+                var_name = match.group(1) or match.group(4)
+                default_value = (
+                    match.group(3) if match.group(3) is not None else None
+                )
+                return get_env_value(var_name, default_value)
+
+            if env_pattern.search(value):
+                return env_pattern.sub(replace_env_after, value)
+        elif isinstance(value, dict):
+            return {k: _env_constructor(v) for k, v in value.items()}
+        elif isinstance(value, list):
+            return [_env_constructor(v) for v in value]
+        return value
+
+    config = _env_constructor(config)
     return config
 
 
