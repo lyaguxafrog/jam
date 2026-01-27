@@ -30,7 +30,7 @@ session_id = jam.session_create(session_key="username", data={"user": 1})
 Jam is a library that provides the most popular AUTH* mechanisms right out of the box.
 
 * [JWT](https://jam.makridenko.ru/jwt/instance/)
-* PASETO
+* [PASETO](https://jam.makridenko.ru/paseto/instance/)
 * [Server side sessions](https://jam.makridenko.ru/sessions/instance/)
 * OTP
   * [TOTP](https://jam.makridenko.ru/otp/totp/)

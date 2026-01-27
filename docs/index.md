@@ -38,8 +38,8 @@ token = await jam.jwt_create_token(payload)
 Jam is a library that provides the most popular AUTH* mechanisms right out of the box.
 
 * [JWT](jwt/instance.md)
-* PASETO
-* [Server side sessions](instance.md)
+* [PASETO](paseto/instance.md)
+* [Server side sessions](sessions/instance.md)
 * OTP
     * [TOTP](otp/totp.md)
     * [HOTP](otp/hotp.md)
@@ -70,4 +70,3 @@ Here is a comparison with other libraries:
 | OAuth2                | ✅                                                                                                     | ✅ | ❌ | ✅ | ❌ |
 | Flexible config       | ✅                                                                                                    | ❌ | ❌ | ❌ | ❌ |
 | Modularity            | ✅                                                                                                    | ❌ | ❌ | ❌ | ❌ |
-
