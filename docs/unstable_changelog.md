@@ -1,6 +1,6 @@
 # Unstable features and etc
 
-Current version: `3.0.0b4`
+Current version: `3.0.0b5`
 
 ## What is not yet included in the master
 
@@ -10,6 +10,7 @@ Current version: `3.0.0b4`
 - Update typing
 - Delete modules.py
 - Update test clients
+- JSON Configuration
 
 ### `3.0.0a*`
 
