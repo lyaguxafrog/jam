@@ -7,6 +7,8 @@ import re
 import sys
 from typing import Any
 
+from jam.encoders import BaseEncoder, JsonEncoder
+
 
 GENERIC_POINTER = "jam"
 
@@ -190,6 +192,23 @@ def __toml_config_parser(
             else:
                 return {}
         return section
+    return config
+
+
+def __json_config_parser(
+    path: str, encoder: BaseEncoder | type[BaseEncoder] = JsonEncoder
+) -> dict[str, Any]:
+    """JSON config parser.
+
+    Args:
+        path (str): Path to JSON file
+        encoder (BaseEncoder | type[BaseEncoder]): Encoder to use for parsing
+
+    Returns:
+        dict[str, Any]: Parsed config
+    """
+    with open(path) as f:
+        config = encoder.loads(f.read())
     return config
 
 
