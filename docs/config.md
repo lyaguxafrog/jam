@@ -8,6 +8,7 @@ There are several ways to configure Jam:
 
 * yaml file
 * toml file (recommended)
+* json file
 * python-dict
 
 The configuration follows this pattern:
@@ -58,6 +59,23 @@ Specify the path to the file in the instance:
 from jam import Jam
 
 jam = Jam(config="my_config.toml")  # By default config=pyproject.toml
+```
+
+## JSON Configuration
+
+To configure via JSON, describe all parameters in json file:
+
+```json
+{
+    "jwt": {
+        "alg": "HS256",
+        "secret_key": "SECRET"
+    },
+    "session": {
+        "sessions_type": "redis",
+        "redis_uri": "redis://0.0.0.0:6379/0"
+    }
+}
 ```
 
 ## Dict Configuration
