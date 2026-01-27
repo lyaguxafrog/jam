@@ -226,12 +226,15 @@ def __config_maker__(
     """
     if isinstance(config, str):
         ext = config.split(".")[-1].lower()
-        if ext in ("yml", "yaml"):
-            return __yaml_config_parser(path=config, pointer=pointer).copy()
-        elif ext == "toml":
-            return __toml_config_parser(path=config, pointer=pointer).copy()
-        else:
-            raise ValueError("YML/YAML or TOML configs only!")
+        match ext:
+            case "yml" | "yaml":
+                return __yaml_config_parser(path=config, pointer=pointer).copy()
+            case "toml":
+                return __toml_config_parser(path=config, pointer=pointer).copy()
+            case "json":
+                return __json_config_parser(path=config).copy()
+            case _:
+                raise ValueError("YML/YAML, TOML or JSON configs only!")
     else:
         return config.copy()
 
