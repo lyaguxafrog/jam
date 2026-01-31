@@ -14,6 +14,7 @@ def create_instance(
     secret: KeyLike | None = None,
     secret_key: KeyLike | None = None,  # Backward compatibility
     password: str | bytes | None = None,
+    list: dict[str, Any] | None = None,
     logger: BaseLogger = logger,
     serializer: BaseEncoder | type[BaseEncoder] = JsonEncoder,
     **kwargs: Any
@@ -25,6 +26,7 @@ def create_instance(
         secret: Secret key (or use secret_key for backward compatibility)
         secret_key: Alias for secret (deprecated, use 'secret')
         password: Password for encrypted keys
+        list: List config
         logger: Logger instance
         serializer: JSON encoder/decoder
         **kwargs: Additional params (e.g., custom_module)
@@ -45,6 +47,7 @@ def create_instance(
             alg=alg,
             secret=secret,
             password=password,
+            list=list,
             logger=logger,
             serializer=serializer
         )
@@ -53,6 +56,7 @@ def create_instance(
         alg=alg,
         secret=secret,
         password=password,
+        list=list,
         logger=logger,
         serializer=serializer
     )

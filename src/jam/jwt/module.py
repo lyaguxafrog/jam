@@ -58,6 +58,7 @@ class JWT(BaseJWT):
         ],
         secret: KeyLike,
         password: str | bytes | None = None,
+        list: dict[str, Any] | None = None,
         serializer: BaseEncoder | type[BaseEncoder] = JsonEncoder,
         logger: BaseLogger = logger,
     ) -> None:
@@ -67,6 +68,7 @@ class JWT(BaseJWT):
             alg (str): JWT algorithm name
             secret (KeyLike): Secret key for signing/verification
             password (str | bytes | None): Password for encrypted private keys
+            list (dict[str, Any] | None): List config
             serializer (BaseEncoder | type[BaseEncoder]): JSON encoder/decoder
             logger (BaseLogger): Logger instance
 
@@ -80,6 +82,7 @@ class JWT(BaseJWT):
         self._logger = logger
         self._serializer = serializer
         self._algorithm: BaseAlgorithm | None = None
+        self.list = self._list_built(list) if list else None
 
         self._logger.info(f"Initialized JWT with algorithm {alg}")
 
