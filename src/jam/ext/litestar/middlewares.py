@@ -55,7 +55,7 @@ class JamJWTMiddleware(AbstractAuthenticationMiddleware):
             try:
                 payload = await await_maybe(
                     instance.jwt_verify_token(
-                        token=cookie,
+                        token=header,
                         check_exp=True,
                         check_list=connection.app.state.use_list,
                     )
