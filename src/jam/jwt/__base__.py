@@ -3,9 +3,29 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
+from jam.jwt.lists import BaseJWTList
+
 
 class BaseJWT(ABC):
     """Base JWT module."""
+
+    list: BaseJWTList | None = None
+
+    def _list_built(self, list_config: dict[str, Any]) -> BaseJWTList:
+        """Builder list."""
+        match list_config["backend"]:
+            case "redis":
+                from jam.jwt.lists.redis import RedisList
+
+                list_config.pop("backend")
+                return RedisList(**list_config)
+            case "json":
+                from jam.jwt.lists.json import JSONList
+
+                list_config.pop("backend")
+                return JSONList(**list_config)
+            case _:
+                raise ValueError(f"Unknown list type: {list_config['type']}")
 
     @abstractmethod
     def encode(
