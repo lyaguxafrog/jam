@@ -60,7 +60,8 @@ class BaseJam(ABC):
         )
         self.__build_instance(config)
         self.__logger.debug(
-            f"BaseJam initialization complete. Modules loaded: jwt={self.jwt is not None}, session={self.session is not None}, oauth2={self.oauth2 is not None}"
+            "BaseJam initialization complete. Modules loaded:\n"
+            f" jwt={self.jwt is not None}, session={self.session is not None}, oauth2={self.oauth2 is not None}"
         )
         gc.collect()
 
