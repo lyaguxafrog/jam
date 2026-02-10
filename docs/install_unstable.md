@@ -14,4 +14,4 @@ pip install git+https://github.com/lyaguxafrog/jam.git@unstable
     By installing Jam in this way, you agree that everything can break,
     explode, you can be kidnapped by aliens, everything is at your own risk :D
 
-What is currently happening in the unstable version -> [unstable_changelog.md](https://github.com/lyaguxafrog/jam/blob/unstable/docs/unstable_changelog.md)
+What is currently happening in the unstable version -> [unstable_changelog.md](https://github.com/lyaguxafrog/jam/blob/unstable/CHANGELOG.md)
