@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+from logging import raiseExceptions
 from typing import Any
 import uuid
 
 from jam.__base__ import BaseJam
+from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
 
 
 class Jam(BaseJam):
@@ -58,6 +60,11 @@ class Jam(BaseJam):
         self._logger.debug(
             f"JWT token created successfully, length: {len(token)} characters"
         )
+
+        # white list checker
+        if self.jwt.list and self.jwt.list.__list_type__ == "white":
+            self.jwt.list.add(token)
+
         return token
 
     def jwt_verify_token(
@@ -89,6 +96,19 @@ class Jam(BaseJam):
         self._logger.debug(
             f"JWT token verified successfully, payload keys: {list(payload.keys())}"
         )
+        if check_list:
+            if not self.jwt.list:
+                raise ValueError("JWT list is not connected.")
+            else:
+                match self.jwt.list.__list_type__:
+                    case "white":
+                        if not(self.jwt.list.check(token)):
+                            raise TokenNotInWhiteList
+                    case "black":
+                        if self.jwt.list.check(token):
+                            raise TokenInBlackList
+                    case _:
+                        raise ValueError("Invalid JWT list type")
         return payload
 
     def session_create(self, session_key: str, data: dict[str, Any]) -> str:
