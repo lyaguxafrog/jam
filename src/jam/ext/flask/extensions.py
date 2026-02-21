@@ -52,14 +52,14 @@ class JWTExtension(JamExtension):
             cookie_name (str | None): Cookie with access token
         """
         super().__init__(jam, app)
-        self.__use_list = getattr(self._jam.module, "list", False)
+        self.__use_list = getattr(self._jam.jwt, "list", False)
         self.header = header_name
         self.cookie = cookie_name
 
     def _get_payload(self) -> dict[str, Any] | None:
         token = None
         g.payload = None
-        logger = self._jam._BaseJam__logger
+        logger = self._jam._logger
 
         logger.debug("JWTExtension: Attempting to extract token from request")
         if self.cookie:
@@ -125,7 +125,7 @@ class SessionExtension(JamExtension):
     def _get_payload(self) -> dict[str, Any] | None:
         session_id = None
         g.payload = None
-        logger = self._jam._BaseJam__logger
+        logger = self._jam._logger
 
         logger.debug(
             "SessionExtension: Attempting to extract session ID from request"
