@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-from logging import raiseExceptions
 from typing import Any
 import uuid
 
 from jam.__base__ import BaseJam
-from jam.exceptions import TokenInBlackList, TokenNotInWhiteList
+from jam.exceptions import (
+    TokenInBlackList,
+    TokenLifeTimeExpired,
+    TokenNotInWhiteList,
+)
 
 
 class Jam(BaseJam):
@@ -26,7 +29,7 @@ class Jam(BaseJam):
         """Make JWT-specific payload.
 
         Args:
-            exp (int | None): Token expire, if None -> use default
+            exp (int | None): Token expire
             data (dict[str, Any]): Data to payload
 
         Returns:
@@ -96,6 +99,11 @@ class Jam(BaseJam):
         self._logger.debug(
             f"JWT token verified successfully, payload keys: {list(payload.keys())}"
         )
+
+        if check_exp:
+            if payload["exp"] < datetime.datetime.now().timestamp():
+                raise TokenLifeTimeExpired
+
         if check_list:
             if not self.jwt.list:
                 raise ValueError("JWT list is not connected.")
