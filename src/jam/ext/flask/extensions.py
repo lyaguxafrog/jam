@@ -52,7 +52,7 @@ class JWTExtension(JamExtension):
             cookie_name (str | None): Cookie with access token
         """
         super().__init__(jam, app)
-        self.__use_list = getattr(self._jam.jwt, "list", False)
+        self.__use_list = bool(getattr(self._jam.jwt, "list", False))
         self.header = header_name
         self.cookie = cookie_name
 

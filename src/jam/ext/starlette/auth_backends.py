@@ -35,7 +35,7 @@ class JWTBackend(AuthenticationBackend):
         self._jam = jam
         self.cookie_name = cookie_name
         self.header_name = header_name
-        self.__use_list = getattr(self._jam.jwt, "list", False)
+        self.__use_list = bool(getattr(self._jam.jwt, "list", False))
 
     async def authenticate(
         self, conn: HTTPConnection

@@ -73,7 +73,7 @@ class JWTPlugin(InitPlugin):
         self._settings = AuthMiddlewareSettings(
             cookie_name, header_name, user_dataclass, auth_dataclass
         )
-        self.__use_list = getattr(self._jam.jwt, "list", False)
+        self.__use_list = bool(getattr(self._jam.jwt, "list", False))
 
     def on_app_init(self, app_config: AppConfig) -> AppConfig:
         """Init app config."""
