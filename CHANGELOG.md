@@ -30,5 +30,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - YAML Config builder.
+- Fixed JWT lists in starlette/fastapi ext.
 
 ### Security
