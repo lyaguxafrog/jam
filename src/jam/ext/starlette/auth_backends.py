@@ -135,6 +135,7 @@ class SessionBackend(AuthenticationBackend):
                 )
             else:
                 logger.debug(f"Session {session_id} not found")
+                # TODO: Return unauthized user
         except Exception as e:
             logger.warning(f"Session retrieval error: {e}")
             raise AuthenticationError("Token verification failed.")
