@@ -35,13 +35,13 @@ class JWTBackend(AuthenticationBackend):
         self._jam = jam
         self.cookie_name = cookie_name
         self.header_name = header_name
-        self.__use_list = getattr(self._jam.module, "list", False)
+        self.__use_list = getattr(self._jam.jwt, "list", False)
 
     async def authenticate(
         self, conn: HTTPConnection
     ) -> tuple[AuthCredentials, BaseUser] | None:
         """Starlette authentication handler."""
-        logger = self._jam._BaseJam__logger
+        logger = self._jam._logger
         token = None
 
         logger.debug("JWTBackend: Attempting to extract token from request")
@@ -103,7 +103,7 @@ class SessionBackend(AuthenticationBackend):
         self, conn: HTTPConnection
     ) -> tuple[AuthCredentials, BaseUser] | None:
         """Starlette authentication handler."""
-        logger = self._jam._BaseJam__logger
+        logger = self._jam._logger
         session_id = None
 
         logger.debug(
@@ -126,7 +126,7 @@ class SessionBackend(AuthenticationBackend):
 
         logger.debug(f"Getting session data for session ID: {session_id}")
         try:
-            payload: dict[str, Any] = await await_maybe(
+            payload: dict[str, Any] | None = await await_maybe(
                 self._jam.session_get(session_id)
             )
             if payload:
