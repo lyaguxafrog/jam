@@ -49,17 +49,17 @@ class BaseJam(ABC):
         log_level = main_config["log_level"]
         serializer = main_config["serializer"]
 
-        self.__logger = logger(log_level)
+        self._logger = logger(log_level)
         self._serializer = serializer
         self.jwt: BaseJWT | None = None
         self.session: BaseSessionModule | None = None
         self.oauth2: BaseOAuth2Client | None = None
 
-        self.__logger.debug(
+        self._logger.debug(
             f"Initializing BaseJam with log_level={log_level}, serializer={serializer}"
         )
         self.__build_instance(config)
-        self.__logger.debug(
+        self._logger.debug(
             "BaseJam initialization complete. Modules loaded:\n"
             f" jwt={self.jwt is not None}, session={self.session is not None}, oauth2={self.oauth2 is not None}"
         )
@@ -140,24 +140,24 @@ class BaseJam(ABC):
         """
         for name, path in self.MODULES.items():
             if name not in config:
-                self.__logger.debug(f"Missing configuration for module {name}")
+                self._logger.debug(f"Missing configuration for module {name}")
                 continue
 
             try:
                 module_cls = __module_loader__(path)
-                self.__logger.debug(f"Loading module {name} from {path}")
+                self._logger.debug(f"Loading module {name} from {path}")
                 params = config.get(name, {})
-                self.__logger.debug(
+                self._logger.debug(
                     f"Module {name} config params: {list(params.keys())}"
                 )
-                params["logger"] = self.__logger
+                params["logger"] = self._logger
                 params["serializer"] = self._serializer
                 module_instance = module_cls(**params)
                 self.__setattr__(name, module_instance)
-                self.__logger.debug(f"Module {name} initialized successfully")
+                self._logger.debug(f"Module {name} initialized successfully")
 
             except Exception as e:
-                self.__logger.error(
+                self._logger.error(
                     f"Failed to load module {name} from {path}: {e}",
                     exc_info=True,
                 )

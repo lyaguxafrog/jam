@@ -51,11 +51,11 @@ class Jam(BaseJam):
             EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
             EmtpyPrivateKey: If RSA algorithm is selected, but private key None
         """
-        self._BaseJam__logger.debug(
+        self._logger.debug(
             f"Creating JWT token with payload keys: {list(payload.keys())}"
         )
         token = self.jwt.encode(payload=payload)
-        self._BaseJam__logger.debug(
+        self._logger.debug(
             f"JWT token created successfully, length: {len(token)} characters"
         )
         return token
@@ -82,11 +82,11 @@ class Jam(BaseJam):
             TokenNotInWhiteList: If the list type is white, but the token is  not there
             TokenInBlackList: If the list type is black and the token is there
         """
-        self._BaseJam__logger.debug(
+        self._logger.debug(
             f"Verifying JWT token (length: {len(token)} chars), check_exp={check_exp}, check_list={check_list}"
         )
         payload = self.jwt.decode(token)
-        self._BaseJam__logger.debug(
+        self._logger.debug(
             f"JWT token verified successfully, payload keys: {list(payload.keys())}"
         )
         return payload
@@ -101,11 +101,11 @@ class Jam(BaseJam):
         Returns:
             str: New session ID
         """
-        self._BaseJam__logger.debug(
+        self._logger.debug(
             f"Creating session with key: {session_key}, data keys: {list(data.keys())}"
         )
         session_id = self.session.create(session_key, data)
-        self._BaseJam__logger.debug(
+        self._logger.debug(
             f"Session created successfully, session_id: {session_id}"
         )
         return session_id
@@ -119,16 +119,16 @@ class Jam(BaseJam):
         Returns:
             dict[str, Any] | None: Session data if exist
         """
-        self._BaseJam__logger.debug(
+        self._logger.debug(
             f"Getting session data for session_id: {session_id}"
         )
         data = self.session.get(session_id)
         if data:
-            self._BaseJam__logger.debug(
+            self._logger.debug(
                 f"Session data retrieved, keys: {list(data.keys())}"
             )
         else:
-            self._BaseJam__logger.debug(f"Session {session_id} not found")
+            self._logger.debug(f"Session {session_id} not found")
         return data
 
     def session_delete(self, session_id: str) -> None:
