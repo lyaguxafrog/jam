@@ -6,9 +6,10 @@ import uuid
 
 from jam.__base__ import BaseJam
 from jam.exceptions import (
-    TokenInBlackList,
-    TokenLifeTimeExpired,
-    TokenNotInWhiteList,
+    JamConfigurationError,
+    JamJWTExpired,
+    JamJWTInBlackList,
+    JamJWTNotInWhiteList,
 )
 
 
@@ -53,8 +54,7 @@ class Jam(BaseJam):
             str: New token
 
         Raises:
-            EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
-            EmtpyPrivateKey: If RSA algorithm is selected, but private key None
+            JamJWTValidationError: If encodinf fails
         """
         self._logger.debug(
             f"Creating JWT token with payload keys: {list(payload.keys())}"
@@ -84,13 +84,12 @@ class Jam(BaseJam):
             dict[str, Any]: Decoded payload
 
         Raises:
-            ValueError: If the token is invalid.
-            EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None.
-            EmtpyPublicKey: If RSA algorithm is selected, but public key None.
-            NotFoundSomeInPayload: If 'exp' not found in payload.
-            TokenLifeTimeExpired: If token has expired.
-            TokenNotInWhiteList: If the list type is white, but the token is  not there
-            TokenInBlackList: If the list type is black and the token is there
+            JamJWTExpired: If token is expired
+            JamJWTValidationError: If token is invalid, malformed, or verification fails
+            JamJWTUnsupportedAlgorithm: If the token's algorithm is not supported
+            JamConfigurationError: If JWT list is not connected
+            JamJWTNotInWhiteList: If token is not in white list
+            JamJWTInBlackList: If token is in black list
         """
         self._logger.debug(
             f"Verifying JWT token (length: {len(token)} chars), check_exp={check_exp}, check_list={check_list}"
@@ -102,21 +101,27 @@ class Jam(BaseJam):
 
         if check_exp:
             if payload["exp"] < datetime.datetime.now().timestamp():
-                raise TokenLifeTimeExpired
+                raise JamJWTExpired
 
         if check_list:
             if not self.jwt.list:
-                raise ValueError("JWT list is not connected.")
+                raise JamConfigurationError(
+                    message="JWT list is not connected.",
+                    error_code="configuration.jwt.list_not_connected",
+                )
             else:
                 match self.jwt.list.__list_type__:
                     case "white":
-                        if not(self.jwt.list.check(token)):
-                            raise TokenNotInWhiteList
+                        if not (self.jwt.list.check(token)):
+                            raise JamJWTNotInWhiteList
                     case "black":
                         if self.jwt.list.check(token):
-                            raise TokenInBlackList
+                            raise JamJWTInBlackList
                     case _:
-                        raise ValueError("Invalid JWT list type")
+                        raise JamConfigurationError(
+                            message="Invalid JWT list type",
+                            error_code="configuration.jwt.unknown_list_type",
+                        )
         return payload
 
     def session_create(self, session_key: str, data: dict[str, Any]) -> str:
@@ -147,9 +152,7 @@ class Jam(BaseJam):
         Returns:
             dict[str, Any] | None: Session data if exist
         """
-        self._logger.debug(
-            f"Getting session data for session_id: {session_id}"
-        )
+        self._logger.debug(f"Getting session data for session_id: {session_id}")
         data = self.session.get(session_id)
         if data:
             self._logger.debug(
@@ -173,6 +176,9 @@ class Jam(BaseJam):
         Args:
             session_id (str): Session ID
             data (dict[str, Any]): New data
+
+        Raises:
+            JamSessionNotFound: If session with given ID does not exist.
         """
         return self.session.update(session_id, data)
 
@@ -189,6 +195,9 @@ class Jam(BaseJam):
 
         Args:
             old_session_id (str): Old session id
+
+        Raises:
+            JamSessionNotFound: If session with given ID does not exist.
 
         Returns:
             str: New session id
@@ -268,11 +277,12 @@ class Jam(BaseJam):
         Returns:
             str: Authorization url
         """
-        from jam.exceptions import ProviderNotConfigurError
+        from jam.exceptions import JamConfigurationError
 
         if provider not in self.oauth2:
-            raise ProviderNotConfigurError(
-                f"Provider {provider} not configured"
+            raise JamConfigurationError(
+                message=f"Provider {provider} not configured",
+                error_code="oauth2.configuration.provider_not_configured",
             )
         return self.oauth2[provider].get_authorization_url(
             scope, **extra_params
@@ -296,12 +306,10 @@ class Jam(BaseJam):
         Returns:
             dict: OAuth2 token
         """
-        from jam.exceptions import ProviderNotConfigurError
+        from jam.exceptions import JamOAuth2ProviderNotConfigured
 
         if provider not in self.oauth2:
-            raise ProviderNotConfigurError(
-                f"Provider {provider} not configured"
-            )
+            raise JamOAuth2ProviderNotConfigured(details={"provider": provider})
         return self.oauth2[provider].fetch_token(
             code, grant_type, **extra_params
         )
@@ -324,12 +332,10 @@ class Jam(BaseJam):
         Returns:
             dict: Refresh token
         """
-        from jam.exceptions import ProviderNotConfigurError
+        from jam.exceptions import JamOAuth2ProviderNotConfigured
 
         if provider not in self.oauth2:
-            raise ProviderNotConfigurError(
-                f"Provider {provider} not configured"
-            )
+            raise JamOAuth2ProviderNotConfigured(details={"provider": provider})
         return self.oauth2[provider].refresh_token(
             refresh_token, grant_type, **extra_params
         )
@@ -347,15 +353,17 @@ class Jam(BaseJam):
             scope (list[str] | None): Auth scope
             extra_params (Any): Extra auth params if needed
 
+        Raises:
+            JamOAuth2EmptyRaw: If response is empty
+            JamOAuth2Error: HTTP error
+
         Returns:
             dict: JSON with access token
         """
-        from jam.exceptions import ProviderNotConfigurError
+        from jam.exceptions import JamOAuth2ProviderNotConfigured
 
         if provider not in self.oauth2:
-            raise ProviderNotConfigurError(
-                f"Provider {provider} not configured"
-            )
+            raise JamOAuth2ProviderNotConfigured(details={"provider": provider})
         return self.oauth2[provider].client_credentials_flow(
             scope, **extra_params
         )

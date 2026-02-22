@@ -5,6 +5,12 @@ from typing import Any
 import uuid
 
 from jam.__base__ import BaseJam
+from jam.exceptions import (
+    JamConfigurationError,
+    JamJWTExpired,
+    JamJWTInBlackList,
+    JamJWTNotInWhiteList,
+)
 
 
 class Jam(BaseJam):
@@ -24,7 +30,7 @@ class Jam(BaseJam):
         """Make JWT-specific payload.
 
         Args:
-            exp (int | None): Token expire, if None -> use default
+            exp (int | None): Token expire
             data (dict[str, Any]): Data to payload
 
         Returns:
@@ -48,16 +54,20 @@ class Jam(BaseJam):
             str: New token
 
         Raises:
-            EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
-            EmtpyPrivateKey: If RSA algorithm is selected, but private key None
+            JamJWTValidationError: If encodinf fails
         """
-        self._BaseJam__logger.debug(
+        self._logger.debug(
             f"Creating JWT token with payload keys: {list(payload.keys())}"
         )
         token = self.jwt.encode(payload=payload)
-        self._BaseJam__logger.debug(
+        self._logger.debug(
             f"JWT token created successfully, length: {len(token)} characters"
         )
+
+        # white list checker
+        if self.jwt.list and self.jwt.list.__list_type__ == "white":
+            self.jwt.list.add(token)
+
         return token
 
     async def jwt_verify_token(
@@ -74,21 +84,44 @@ class Jam(BaseJam):
             dict[str, Any]: Decoded payload
 
         Raises:
-            ValueError: If the token is invalid.
-            EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None.
-            EmtpyPublicKey: If RSA algorithm is selected, but public key None.
-            NotFoundSomeInPayload: If 'exp' not found in payload.
-            TokenLifeTimeExpired: If token has expired.
-            TokenNotInWhiteList: If the list type is white, but the token is  not there
-            TokenInBlackList: If the list type is black and the token is there
+            JamJWTExpired: If token is expired
+            JamJWTValidationError: If token is invalid, malformed, or verification fails
+            JamJWTUnsupportedAlgorithm: If the token's algorithm is not supported
+            JamConfigurationError: If JWT list is not connected
+            JamJWTNotInWhiteList: If token is not in white list
+            JamJWTInBlackList: If token is in black list
         """
-        self._BaseJam__logger.debug(
+        self._logger.debug(
             f"Verifying JWT token (length: {len(token)} chars), check_exp={check_exp}, check_list={check_list}"
         )
         payload = self.jwt.decode(token)
-        self._BaseJam__logger.debug(
+        self._logger.debug(
             f"JWT token verified successfully, payload keys: {list(payload.keys())}"
         )
+
+        if check_exp:
+            if payload["exp"] < datetime.datetime.now().timestamp():
+                raise JamJWTExpired
+
+        if check_list:
+            if not self.jwt.list:
+                raise JamConfigurationError(
+                    message="JWT list is not connected.",
+                    error_code="configuration.jwt.list_not_connected",
+                )
+            else:
+                match self.jwt.list.__list_type__:
+                    case "white":
+                        if not (self.jwt.list.check(token)):
+                            raise JamJWTNotInWhiteList
+                    case "black":
+                        if self.jwt.list.check(token):
+                            raise JamJWTInBlackList
+                    case _:
+                        raise JamConfigurationError(
+                            message="Invalid JWT list type",
+                            error_code="configuration.jwt.unknown_list_type",
+                        )
         return payload
 
     async def session_create(
@@ -103,11 +136,11 @@ class Jam(BaseJam):
         Returns:
             str: New session ID
         """
-        self._BaseJam__logger.debug(
+        self._logger.debug(
             f"Creating session with key: {session_key}, data keys: {list(data.keys())}"
         )
         session_id = await self.session.create(session_key, data)
-        self._BaseJam__logger.debug(
+        self._logger.debug(
             f"Session created successfully, session_id: {session_id}"
         )
         return session_id
@@ -121,16 +154,14 @@ class Jam(BaseJam):
         Returns:
             dict[str, Any] | None: Session data if exist
         """
-        self._BaseJam__logger.debug(
-            f"Getting session data for session_id: {session_id}"
-        )
+        self._logger.debug(f"Getting session data for session_id: {session_id}")
         data = await self.session.get(session_id)
         if data:
-            self._BaseJam__logger.debug(
+            self._logger.debug(
                 f"Session data retrieved, keys: {list(data.keys())}"
             )
         else:
-            self._BaseJam__logger.debug(f"Session {session_id} not found")
+            self._logger.debug(f"Session {session_id} not found")
         return data
 
     async def session_delete(self, session_id: str) -> None:
@@ -139,7 +170,7 @@ class Jam(BaseJam):
         Args:
             session_id (str): Session ID
         """
-        await self.session.delete(session_id)
+        return await self.session.delete(session_id)
 
     async def session_update(
         self, session_id: str, data: dict[str, Any]
@@ -149,8 +180,11 @@ class Jam(BaseJam):
         Args:
             session_id (str): Session ID
             data (dict[str, Any]): New data
+
+        Raises:
+            JamSessionNotFound: If session with given ID does not exist.
         """
-        await self.session.update(session_id, data)
+        return await self.session.update(session_id, data)
 
     async def session_clear(self, session_key: str) -> None:
         """Delete all sessions by key.
@@ -158,13 +192,16 @@ class Jam(BaseJam):
         Args:
             session_key (str): Key of session
         """
-        await self.session.clear(session_key)
+        return await self.session.clear(session_key)
 
     async def session_rework(self, old_session_id: str) -> str:
         """Rework session.
 
         Args:
             old_session_id (str): Old session id
+
+        Raises:
+            JamSessionNotFound: If session with given ID does not exist.
 
         Returns:
             str: New session id
@@ -246,13 +283,14 @@ class Jam(BaseJam):
         Returns:
             str: Authorization url
         """
-        from jam.exceptions import ProviderNotConfigurError
+        from jam.exceptions import JamConfigurationError
 
         if provider not in self.oauth2:
-            raise ProviderNotConfigurError(
-                f"Provider {provider} not configured"
+            raise JamConfigurationError(
+                message=f"Provider {provider} not configured",
+                error_code="oauth2.configuration.provider_not_configured",
             )
-        return self.oauth2[provider].get_authorization_url(
+        return await self.oauth2[provider].get_authorization_url(
             scope, **extra_params
         )
 
@@ -274,12 +312,10 @@ class Jam(BaseJam):
         Returns:
             dict: OAuth2 token
         """
-        from jam.exceptions import ProviderNotConfigurError
+        from jam.exceptions import JamOAuth2ProviderNotConfigured
 
         if provider not in self.oauth2:
-            raise ProviderNotConfigurError(
-                f"Provider {provider} not configured"
-            )
+            raise JamOAuth2ProviderNotConfigured(details={"provider": provider})
         return await self.oauth2[provider].fetch_token(
             code, grant_type, **extra_params
         )
@@ -302,12 +338,10 @@ class Jam(BaseJam):
         Returns:
             dict: Refresh token
         """
-        from jam.exceptions import ProviderNotConfigurError
+        from jam.exceptions import JamOAuth2ProviderNotConfigured
 
         if provider not in self.oauth2:
-            raise ProviderNotConfigurError(
-                f"Provider {provider} not configured"
-            )
+            raise JamOAuth2ProviderNotConfigured(details={"provider": provider})
         return await self.oauth2[provider].refresh_token(
             refresh_token, grant_type, **extra_params
         )
@@ -325,15 +359,17 @@ class Jam(BaseJam):
             scope (list[str] | None): Auth scope
             extra_params (Any): Extra auth params if needed
 
+        Raises:
+            JamOAuth2EmptyRaw: If response is empty
+            JamOAuth2Error: HTTP error
+
         Returns:
             dict: JSON with access token
         """
-        from jam.exceptions import ProviderNotConfigurError
+        from jam.exceptions import JamOAuth2ProviderNotConfigured
 
         if provider not in self.oauth2:
-            raise ProviderNotConfigurError(
-                f"Provider {provider} not configured"
-            )
+            raise JamOAuth2ProviderNotConfigured(details={"provider": provider})
         return await self.oauth2[provider].client_credentials_flow(
             scope, **extra_params
         )
@@ -372,7 +408,7 @@ class Jam(BaseJam):
 
     async def paseto_decode(
         self, token: str, check_exp: bool = True, check_list: bool = True
-    ) -> dict[str, str | dict | None]:
+    ) -> dict[str, dict[str, Any] | str | None]:
         """Decode PASETO.
 
         Args:
