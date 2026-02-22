@@ -8,6 +8,11 @@ class JamPASETOInvalidRSAKey(JamConfigurationError):
     default_code = "paseto.configuration.invalid_rsa_key"
 
 
+class JamPASETOInvalidED25519Key(JamConfigurationError):
+    default_message = "Invalid ED25519 key."
+    default_code = "paseto.configuration.invalid_ed25519_key"
+
+
 class JamPASETOInvalidPurpose(JamValidationError):
     default_message = "Invalid purpose."
     default_code = "paseto.configuration.invalid_purpose"
