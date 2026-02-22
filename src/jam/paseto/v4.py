@@ -11,6 +11,13 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
 
 from jam.__base_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
+from jam.exceptions import (
+    JamPASETOInvalidED25519Key,
+    JamPASETOInvalidPurpose,
+    JamPASETOInvalidSymmetricKey,
+    JamPASETOInvalidTokenFormat,
+    JamPASTOKeyVerificationError,
+)
 from jam.paseto.__base__ import PASETO, BasePASETO
 from jam.paseto.utils import __pae__, base64url_decode, base64url_encode
 from jam.utils.xchacha20poly1305 import (
@@ -45,7 +52,9 @@ class PASETOv4(BasePASETO):
             else:
                 raw = key
             if not isinstance(raw, (bytes | bytearray)) or len(raw) != 32:
-                raise ValueError("v4.local requires a 32-byte secret key")
+                raise JamPASETOInvalidSymmetricKey(
+                    message="v4.local requires a 32-byte secret key."
+                )
             inst._secret = bytes(raw)
             return inst
 
@@ -98,7 +107,9 @@ class PASETOv4(BasePASETO):
             except Exception:
                 pass
 
-            raise ValueError("Invalid Ed25519 key for v4.public")
+            raise JamPASETOInvalidED25519Key(
+                message="Invalid Ed25519 key for v4.public."
+            )
         else:
             raise ValueError("Purpose must be 'local' or 'public'")
 
@@ -139,7 +150,7 @@ class PASETOv4(BasePASETO):
                 header, payload_bytes, footer_bytes
             ).decode("utf-8")
         else:
-            raise NotImplementedError
+            raise JamPASETOInvalidPurpose
 
     def decode(
         self,
@@ -157,7 +168,7 @@ class PASETOv4(BasePASETO):
         elif token.startswith(f"{self._VERSION}.public."):
             return self._decode_public(token, serializer)
         else:
-            raise NotImplementedError
+            raise JamPASETOInvalidPurpose
 
     def _encode_local(
         self, header: str, payload: bytes, footer: bytes
@@ -179,14 +190,20 @@ class PASETOv4(BasePASETO):
     ):
         parts = token.encode("utf-8").split(b".")
         if len(parts) < 3:
-            raise ValueError("Invalid token format")
+            raise JamPASETOInvalidTokenFormat(
+                message="Invalid token format"
+            )
         header = b".".join(parts[:2]) + b"."
         if header != b"v4.local.":
-            raise ValueError("Invalid header")
+            raise JamPASETOInvalidTokenFormat(
+                message="Invalid header"
+            )
 
         body = base64url_decode(parts[2])
         if len(body) < 24 + 16:
-            raise ValueError("Invalid token body")
+            raise JamPASETOInvalidTokenFormat(
+                message="Invalid token body"
+            )
 
         nonce = body[:24]
         ciphertext = body[24:]
@@ -199,7 +216,9 @@ class PASETOv4(BasePASETO):
                 self._secret, nonce, ciphertext, aad
             )
         except Exception:
-            raise ValueError("Invalid authentication or corrupt ciphertext")
+            raise JamPASTOKeyVerificationError(
+                message="Invalid authentication or corrupt ciphertext"
+            )
 
         payload = serializer.loads(plaintext)
 
@@ -221,8 +240,8 @@ class PASETOv4(BasePASETO):
         if not hasattr(self._secret, "sign") or not isinstance(
             self._secret, Ed25519PrivateKey
         ):
-            raise ValueError(
-                "Private Ed25519 key required for v4.public signing"
+            raise JamPASETOInvalidED25519Key(
+                message="Private Ed25519 key required for v4.public signing"
             )
         header_b = header.encode("ascii")
         pre_auth = __pae__([header_b, payload, footer or b""])
@@ -236,15 +255,19 @@ class PASETOv4(BasePASETO):
     def _decode_public(self, token: str, serializer: BaseEncoder):
         parts = token.encode("utf-8").split(b".")
         if len(parts) < 3:
-            raise ValueError("Invalid token format")
+            raise JamPASETOInvalidTokenFormat(
+                message="Invalid token format."
+            )
         header = b".".join(parts[:2]) + b"."
         if header != b"v4.public.":
-            raise ValueError("Invalid header")
+            raise JamPASETOInvalidTokenFormat(
+                message="Invalid header."
+            )
 
         body = base64url_decode(parts[2])
         if len(body) < 64:
-            raise ValueError(
-                "Invalid token body (too short for Ed25519 signature)"
+            raise JamPASETOInvalidTokenFormat(
+                message="Invalid token body (too short for Ed25519 signature)"
             )
         payload = body[:-64]
         signature = body[-64:]
@@ -254,12 +277,16 @@ class PASETOv4(BasePASETO):
         pre_auth = __pae__([header, payload, footer_decoded])
 
         if not self._public_key:
-            raise ValueError("Public key required for v4.public verification")
+            raise JamPASETOInvalidED25519Key(
+                message="Public key required for v4.public verification"
+            )
         try:
             # raises InvalidSignature on failure
             self._public_key.verify(signature, pre_auth)
         except Exception:
-            raise ValueError("Invalid signature")
+            raise JamPASTOKeyVerificationError(
+                message="Invalid signature"
+            )
 
         payload_data = serializer.loads(payload)
 
