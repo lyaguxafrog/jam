@@ -12,6 +12,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 from jam.__base_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
+from jam.exceptions import JamPASETOInvalidRSAKey
 
 
 PASETO = TypeVar("PASETO", bound="BasePASETO")
@@ -43,6 +44,9 @@ class BasePASETO(ABC):
         Args:
             key (RSAKeyLike | None): RSA Key
             private (bool): Private or public
+
+        Raises:
+            JamPASETOInvalidRSAKey: Invalid RSA key format.
         """
         if key is None:
             return None
@@ -64,8 +68,9 @@ class BasePASETO(ABC):
                 else:
                     return serialization.load_der_public_key(key)
             except Exception as e:
-                raise ValueError(
-                    f"Invalid RSA {'private' if private else 'public'} key format: {e}"
+                raise JamPASETOInvalidRSAKey(
+                    message=f"Invalid RSA {'private' if private else 'public'} key format.",
+                    details={"error": str(e)}
                 )
 
     @staticmethod

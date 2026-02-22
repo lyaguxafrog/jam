@@ -20,6 +20,13 @@ from .jwt import (
     JamJWTValidationError,
 )
 
+from .paseto import (
+    JamPASETOInvalidRSAKey,
+    JamPASTOKeyVerificationError,
+    JamPASETOInvalidPurpose,
+    JamPASETOInvalidTokenFormat
+)
+
 from .sessions import (
     JamSessionNotFound,
     JamSessionEmptyAESKey,
@@ -37,6 +44,10 @@ __all__ = [
     "JamJWTEmptySecretKey",
     "JamJWTUnsupportedAlgorithm",
     "JamJWTValidationError",
+    "JamPASETOInvalidRSAKey",
+    "JamPASETOInvalidPurpose",
+    "JamPASETOInvalidTokenFormat",
+    "JamPASTOKeyVerificationError",
     "JamSessionNotFound",
     "JamSessionEmptyAESKey",
 ]

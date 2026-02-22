@@ -15,6 +15,12 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
 from jam.__base_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
+from jam.exceptions import (
+    JamPASETOInvalidRSAKey,
+    JamPASETOInvalidTokenFormat,
+    JamPASTOKeyVerificationError,
+)
+from jam.exceptions.paseto import JamPASETOInvalidPurpose
 from jam.paseto.__base__ import PASETO, BasePASETO
 from jam.paseto.utils import (
     __gen_hash__,
@@ -41,6 +47,9 @@ class PASETOv1(BasePASETO):
             purpose (Literal["local", "public"]): Paseto purpose
             key (str | bytes): PEM or secret key
 
+        Raises:
+            JamPASETOInvalidRSAKey: If the key is invalid.
+
         Returns:
             PASETO: Paseto instance
         """
@@ -53,7 +62,14 @@ class PASETOv1(BasePASETO):
             else:
                 raw = key
             if not isinstance(raw, (bytes, bytearray) or len(raw) != 32):
-                raise ValueError("v1.local requires a 32-byte secret key.")
+                raise JamPASETOInvalidRSAKey(
+                    message="v1.local requires a 32-byte secret key.",
+                    details={
+                        "version": "v1",
+                        "purpose": "local",
+                        "key": key
+                    }
+                )
             inst._secret = bytes(raw)
             return inst
 
@@ -105,7 +121,7 @@ class PASETOv1(BasePASETO):
             except Exception:
                 pass
 
-            raise ValueError("Invalid RSA key for v1.public")
+            raise JamPASETOInvalidRSAKey(message="Invalid RSA key for v1.public")
         else:
             raise ValueError("Purpose must be 'local' or 'public'")
 
@@ -156,7 +172,9 @@ class PASETOv1(BasePASETO):
                 hashes.SHA384(),
             )
         except Exception as e:
-            raise ValueError(f"Failed to sign PASETO token: {e}")
+            raise JamPASTOKeyVerificationError(
+                details={"version": "v1", "error": str(e)}
+            )
 
         token = header_bytes + base64url_encode(payload + signature)
         if footer:
@@ -167,18 +185,24 @@ class PASETOv1(BasePASETO):
         """Decode local PASETO."""
         parts = token.encode("utf-8").split(b".")
         if len(parts) < 3:
-            raise ValueError("Invalid token format")
+            raise JamPASETOInvalidTokenFormat
 
         header = b".".join(parts[:2]) + b"."
         if header != b"v1.local.":
-            raise ValueError("Invalid PASETO header")
+            raise JamPASETOInvalidTokenFormat(
+                message="Invalid PASETO header",
+                error_code="paseto.validation.invalid_header"
+            )
 
         payload_part = parts[2]
         footer_part = parts[3] if len(parts) > 3 else b""
 
         decoded = base64url_decode(payload_part)
         if len(decoded) < 80:
-            raise ValueError("Invalid payload size")
+            raise JamPASETOInvalidTokenFormat(
+                message="Invalid payload size.",
+                error_code="paseto.validation.invalid_payload_size"
+            )
 
         pl = decoded[:32]
         ciphertext_tag = decoded[32:]
@@ -202,7 +226,10 @@ class PASETOv1(BasePASETO):
         pre_auth = __pae__([header, pl, ciphertext, footer_decoded])
         expected_tag = hmac.new(ak, pre_auth, hashlib.sha384).digest()
         if not hmac.compare_digest(tag, expected_tag):
-            raise ValueError("Invalid authentication tag")
+            raise JamPASETOInvalidTokenFormat(
+                message="Invalid authentication tag",
+                error_code="paseto.validation.invalid_authentication_tag"
+            )
 
         payload_bytes = self._decrypt(ek, pl[16:], ciphertext)
         payload = serializer.loads(payload_bytes)
@@ -227,22 +254,31 @@ class PASETOv1(BasePASETO):
     ):
         parts = token.encode("utf-8").split(b".")
         if len(parts) < 3:
-            raise ValueError("Invalid token format")
+            raise JamPASETOInvalidTokenFormat
 
         header = b".".join(parts[:2]) + b"."
         if header != b"v1.public.":
-            raise ValueError("Invalid PASETO header")
+            raise JamPASETOInvalidTokenFormat(
+                message="Invalid PASETO header",
+                error_code="paseto.validation.invalid_header"
+            )
 
         payload_part = parts[2]
         footer_part = parts[3] if len(parts) > 3 else b""
 
         decoded = base64url_decode(payload_part)
         if len(decoded) < 256:
-            raise ValueError("Invalid token body")
+            raise JamPASETOInvalidTokenFormat(
+                message="Invalid token body,",
+                error_code="paseto.validation.invalid_body"
+            )
 
         key_size = self._public_key.key_size // 8
         if len(decoded) < key_size:
-            raise ValueError("Invalid payload/signature size")
+            raise JamPASETOInvalidTokenFormat(
+                message="Invalid payload/signature size",
+                error_code="paseto.validation.invalid_payload_signature_size"
+            )
 
         payload = decoded[:-key_size]
         signature = decoded[-key_size:]
@@ -261,7 +297,7 @@ class PASETOv1(BasePASETO):
                 hashes.SHA384(),
             )
         except Exception:
-            raise ValueError("Invalid signature")
+            raise JamPASTOKeyVerificationError
 
         payload_data = serializer.loads(payload)
 
@@ -293,7 +329,7 @@ class PASETOv1(BasePASETO):
         elif self._purpose == "public":
             return self._encode_public(header, payload, footer).decode("utf-8")
         else:
-            raise NotImplementedError
+            raise JamPASETOInvalidPurpose
 
     def decode(
         self,
@@ -311,4 +347,4 @@ class PASETOv1(BasePASETO):
         elif token.startswith(f"{self._VERSION}.public"):
             return self._decode_public(token, serializer)
         else:
-            raise NotImplementedError
+            raise JamPASETOInvalidPurpose
