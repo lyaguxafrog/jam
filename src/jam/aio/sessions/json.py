@@ -6,8 +6,6 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from uuid import uuid4
 
-from jam.exceptions.sessions import JamSessionEmptyAESKey, JamSessionNotFound
-
 
 try:
     import tinydb
@@ -17,7 +15,7 @@ except ImportError:
     )
 
 from jam.encoders import BaseEncoder, JsonEncoder
-from jam.exceptions JamSessionNotFound
+from jam.exceptions import JamSessionNotFound
 from jam.logger import BaseLogger
 from jam.sessions.__base__ import BaseSessionModule
 
@@ -165,9 +163,7 @@ class JSONSessions(BaseSessionModule):
         del data
 
         if not self._db.search(self._qs.session_id == session_id):
-            raise JamSessionNotFound(
-                details={"session_id": session_id}
-            )
+            raise JamSessionNotFound(details={"session_id": session_id})
 
         updated_count = await asyncio.to_thread(
             self._db.update,
@@ -210,9 +206,7 @@ class JSONSessions(BaseSessionModule):
             self._db.search, self._qs.session_id == session_id
         )
         if not result:
-            raise JamSessionNotFound(
-                details={"session_id": session_id}
-            )
+            raise JamSessionNotFound(details={"session_id": session_id})
 
         new_session_id = self.__encode_session_id_if_needed__(self.id)
         await asyncio.to_thread(
