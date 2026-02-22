@@ -21,8 +21,10 @@ from .jwt import (
 )
 
 from .paseto import (
+    JamPASETOInvalidSymmetricKey,
     JamPASETOInvalidRSAKey,
     JamPASETOInvalidED25519Key,
+    JamPASETOInvalidSecp384r1Key,
     JamPASTOKeyVerificationError,
     JamPASETOInvalidPurpose,
     JamPASETOInvalidTokenFormat
@@ -45,8 +47,10 @@ __all__ = [
     "JamJWTEmptySecretKey",
     "JamJWTUnsupportedAlgorithm",
     "JamJWTValidationError",
+    "JamPASETOInvalidSymmetricKey",
     "JamPASETOInvalidRSAKey",
     "JamPASETOInvalidED25519Key",
+    "JamPASETOInvalidSecp384r1Key",
     "JamPASETOInvalidPurpose",
     "JamPASETOInvalidTokenFormat",
     "JamPASTOKeyVerificationError",

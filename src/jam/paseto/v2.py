@@ -12,11 +12,9 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
 
 from jam import BaseEncoder, JsonEncoder
 from jam.exceptions import (
-    JamPASETOInvalidPurpose,
     JamPASETOInvalidED25519Key,
-    JamPASETOInvalidRSAKey,
+    JamPASETOInvalidPurpose,
     JamPASETOInvalidTokenFormat,
-    JamPASTOKeyVerificationError,
 )
 from jam.paseto.__base__ import PASETO, BasePASETO
 from jam.paseto.utils import __pae__, base64url_decode, base64url_encode

@@ -16,6 +16,12 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
 from jam.__base_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
+from jam.exceptions import (
+    JamPASETOInvalidPurpose,
+    JamPASETOInvalidSecp384r1Key,
+    JamPASETOInvalidSymmetricKey,
+    JamPASETOInvalidTokenFormat,
+)
 from jam.paseto.__base__ import PASETO, BasePASETO
 from jam.paseto.utils import (
     __gen_hash__,
@@ -52,13 +58,13 @@ class PASETOv3(BasePASETO):
                 try:
                     raw = base64url_decode(key.encode("utf-8"))
                 except Exception:
-                    raise ValueError(
-                        "v3.local key string must be base64-url encoded 32 bytes"
+                    raise JamPASETOInvalidSymmetricKey(
+                        message="v3.local key string must be base64-url encoded 32 bytes",
                     )
             else:
                 raw = key
             if not isinstance(raw, (bytes | bytearray)) or len(raw) != 32:
-                raise ValueError("v3.local requires a 32-byte secret key")
+                raise JamPASETOInvalidSymmetricKey("v3.local requires a 32-byte secret key")
             inst._secret = bytes(raw)
             return inst
 
@@ -67,7 +73,7 @@ class PASETOv3(BasePASETO):
                 key, ec.EllipticCurvePrivateKey
             ):
                 if key.curve.name != "secp384r1":
-                    raise ValueError(
+                    raise JamPASETOInvalidSecp384r1Key(
                         "PASETOv3.public requires P-384 (secp384r1) keys"
                     )
                 inst._secret = key
@@ -78,7 +84,7 @@ class PASETOv3(BasePASETO):
                 key, ec.EllipticCurvePublicKey
             ):
                 if key.curve.name != "secp384r1":
-                    raise ValueError(
+                    raise JamPASETOInvalidSecp384r1Key(
                         "PASETOv3.public requires P-384 (secp384r1) keys"
                     )
                 inst._secret = None
@@ -100,7 +106,9 @@ class PASETOv3(BasePASETO):
                     not isinstance(priv, ec.EllipticCurvePrivateKey)
                     or priv.curve.name != "secp384r1"
                 ):
-                    raise ValueError("Invalid ECDSA key type")
+                    raise JamPASETOInvalidSecp384r1Key(
+                        message="Invalid ECDSA key type"
+                    )
                 inst._secret = priv
                 inst._public_key = priv.public_key()
                 return inst
@@ -125,7 +133,9 @@ class PASETOv3(BasePASETO):
                     not isinstance(pub, ec.EllipticCurvePublicKey)
                     or pub.curve.name != "secp384r1"
                 ):
-                    raise ValueError("Invalid ECDSA public key type")
+                    raise JamPASETOInvalidSecp384r1Key(
+                        message="Invalid ECDSA public key type"
+                    )
                 inst._secret = None
                 inst._public_key = pub
                 return inst
@@ -142,8 +152,8 @@ class PASETOv3(BasePASETO):
                 except Exception:
                     pass
 
-            raise ValueError(
-                "Invalid EC key for v3.public (expect P-384 PEM/DER or key object)"
+            raise JamPASETOInvalidSecp384r1Key(
+                message="Invalid EC key for v3.public (expect P-384 PEM/DER or key object)"
             )
         else:
             raise ValueError("Purpose must be 'local' or 'public'")
@@ -185,7 +195,7 @@ class PASETOv3(BasePASETO):
                 header, payload_bytes, footer_bytes
             ).decode("utf-8")
         else:
-            raise NotImplementedError
+            raise JamPASETOInvalidPurpose
 
     def decode(
         self,
@@ -206,7 +216,7 @@ class PASETOv3(BasePASETO):
         elif token.startswith(f"{self._VERSION}.public."):
             return self._decode_public(token, serializer)
         else:
-            raise NotImplementedError
+            raise JamPASETOInvalidPurpose
 
     def _encode_local(
         self, header: str, payload: bytes, footer: bytes
@@ -248,7 +258,9 @@ class PASETOv3(BasePASETO):
         footer_part = parts[3] if len(parts) > 3 else b""
         decoded = base64url_decode(payload_part)
         if len(decoded) < 80:
-            raise ValueError("Invalid payload size")
+            raise JamPASETOInvalidTokenFormat(
+                message="Invalid payload size"
+            )
 
         pl = decoded[:32]
         ciphertext_tag = decoded[32:]
@@ -272,7 +284,9 @@ class PASETOv3(BasePASETO):
         pre_auth = __pae__([header, pl, ciphertext, footer_decoded])
         expected_tag = hmac.new(ak, pre_auth, hashlib.sha384).digest()
         if not hmac.compare_digest(tag, expected_tag):
-            raise ValueError("Invalid authentication tag")
+            raise JamPASETOInvalidTokenFormat(
+                message="Invalid authentication tag"
+            )
 
         payload_bytes = self._decrypt(ek, pl[16:], ciphertext)
         payload = serializer.loads(payload_bytes)
@@ -295,8 +309,8 @@ class PASETOv3(BasePASETO):
         if not hasattr(self._secret, "sign") or not isinstance(
             self._secret, ec.EllipticCurvePrivateKey
         ):
-            raise ValueError(
-                "Private EC P-384 key required for v3.public signing"
+            raise JamPASETOInvalidSecp384r1Key(
+                message="Private EC P-384 key required for v3.public signing"
             )
         header_b = header.encode("ascii")
         pre_auth = __pae__([header_b, payload, footer or b""])
@@ -315,17 +329,23 @@ class PASETOv3(BasePASETO):
     def _decode_public(self, token: str, serializer: BaseEncoder):
         parts = token.encode("utf-8").split(b".")
         if len(parts) < 3:
-            raise ValueError("Invalid token format")
+            raise JamPASETOInvalidTokenFormat(
+                message="Invalid token format"
+            )
         header = b".".join(parts[:2]) + b"."
         if header != b"v3.public.":
-            raise ValueError("Invalid header")
+            raise JamPASETOInvalidTokenFormat(
+                message="Invalid header"
+            )
 
         payload_part = parts[2]
         footer_part = parts[3] if len(parts) > 3 else b""
         decoded = base64url_decode(payload_part)
 
         if len(decoded) < 96:
-            raise ValueError("Invalid token body (too short for signature)")
+            raise JamPASETOInvalidTokenFormat(
+                message="Invalid token body (too short for signature)"
+            )
 
         payload = decoded[:-96]
         raw_sig = decoded[-96:]
@@ -337,14 +357,18 @@ class PASETOv3(BasePASETO):
         pre_auth = __pae__([header, payload, footer_decoded])
 
         if not self._public_key:
-            raise ValueError("Public key required for v3.public verification")
+            raise JamPASETOInvalidSecp384r1Key(
+                message="Public key required for v3.public verification"
+            )
 
         try:
             self._public_key.verify(
                 der_sig, pre_auth, ec.ECDSA(hashes.SHA384())
             )
         except InvalidSignature:
-            raise ValueError("Invalid signature")
+            raise JamPASETOInvalidTokenFormat(
+                message="Invalid signature"
+            )
 
         payload_data = serializer.loads(payload)
 
