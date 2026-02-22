@@ -20,6 +20,10 @@ from .jwt import (
     JamJWTValidationError
 )
 
+from .sessions import (
+    JamSessionNotFound
+)
+
 
 __all__ = [
     "JamError",
@@ -31,5 +35,6 @@ __all__ = [
     "JamJWTEmptyPrivateKey",
     "JamJWTEmptySecretKey",
     "JamJWTUnsupportedAlgorithm",
-    "JamJWTValidationError"
+    "JamJWTValidationError",
+    "JamSessionNotFound",
 ]

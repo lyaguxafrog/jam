@@ -13,7 +13,7 @@ except ImportError:
     )
 
 from jam.encoders import BaseEncoder, JsonEncoder
-from jam.exceptions import SessionNotFoundError
+from jam.exceptions import JamSessionNotFound
 from jam.logger import BaseLogger
 from jam.sessions.__base__ import BaseSessionModule
 
@@ -192,6 +192,9 @@ class RedisSessions(BaseSessionModule):
         Args:
             session_id (str): The ID of the session to update.
             data (dict): The new data to be stored in the session.
+
+        Raises:
+            JamSessionNotFound: If the session with the given ID does not exist.
         """
         if self._logger:
             self._logger.debug(
@@ -205,8 +208,8 @@ class RedisSessions(BaseSessionModule):
                 self._logger.warning(
                     f"Attempted to update non-existent session {session_id}"
                 )
-            raise SessionNotFoundError(
-                f"Session with ID {session_id} not found."
+            raise JamSessionNotFound(
+                details={"session_id": session_id}
             )
 
         try:
@@ -245,6 +248,9 @@ class RedisSessions(BaseSessionModule):
         Args:
             session_id (str): The ID of the session to rework.
 
+        Raises:
+            JamSessionNotFound: If the session with the given ID does not exist.
+
         Returns:
             str: The new session ID.
         """
@@ -253,8 +259,8 @@ class RedisSessions(BaseSessionModule):
         ).split(":", 1)
         session_data = self.get(session_id)
         if not session_data:
-            raise SessionNotFoundError(
-                f"Session with ID {session_id} not found."
+            raise JamSessionNotFound(
+                details={"session_id": session_id}
             )
 
         new_session_id = self.create(decoded_session_key[0], session_data)
