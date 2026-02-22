@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABC, abstractmethod
-from collections.abc import Callable, Coroutine
-from typing import Any
+from collections.abc import Callable
 from uuid import uuid4
 
 from cryptography.fernet import Fernet
 
 from jam.encoders import BaseEncoder, JsonEncoder
+from jam.exceptions import JamSessionEmptyAESKey
 from jam.logger import BaseLogger
 
 
@@ -51,7 +51,7 @@ class BaseSessionModule(ABC):
         self,
         id_factory: Callable[[], str] = lambda: str(uuid4()),
         is_session_crypt: bool = False,
-        session_aes_secret: bytes | None = None,
+        session_aes_secret: bytes | str | None = None,
         serializer: type[BaseEncoder] | BaseEncoder = JsonEncoder,
         logger: BaseLogger | None = None,
     ) -> None:
@@ -60,18 +60,19 @@ class BaseSessionModule(ABC):
         Args:
             id_factory (Callable[str], optional): A callable that generates unique IDs. Defaults to a UUID factory.
             is_session_crypt (bool, optional): If True, session keys will be encoded. Defaults to False.
-            session_aes_secret (Optional[bytes], optional): AES secret for encoding session keys.
+            session_aes_secret (Optional[bytes, str], optional): AES secret for encoding session keys.
             serializer (Union[BaseEncoder, type[BaseEncoder]], optional): JSON encoder/decoder. Defaults to JsonEncoder.
             logger (Optional[BaseLogger], optional): Logger instance. Defaults to None.
+
+        Raises:
+            JamSessionEmptyAESKey: If 'is_session_crypt' is True and 'session_aes_secret' is not provided.
         """
         self._id = id_factory
         self._sk_mark_symbol = "J$_"
         self._serializer = serializer
         self._logger = logger
         if is_session_crypt and not session_aes_secret:
-            raise ValueError(
-                "If 'code_session_key' is True, 'session_key_aes_secret' must be provided."
-            )
+            raise JamSessionEmptyAESKey
         if is_session_crypt:
             self._code_session_key = Fernet(session_aes_secret)
 

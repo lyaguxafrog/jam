@@ -17,11 +17,12 @@ from .jwt import (
     JamJWTEmptyPrivateKey,
     JamJWTEmptySecretKey,
     JamJWTUnsupportedAlgorithm,
-    JamJWTValidationError
+    JamJWTValidationError,
 )
 
 from .sessions import (
-    JamSessionNotFound
+    JamSessionNotFound,
+    JamSessionEmptyAESKey,
 )
 
 
@@ -37,4 +38,5 @@ __all__ = [
     "JamJWTUnsupportedAlgorithm",
     "JamJWTValidationError",
     "JamSessionNotFound",
+    "JamSessionEmptyAESKey",
 ]

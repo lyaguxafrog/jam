@@ -27,7 +27,7 @@ class RedisSessions(BaseSessionModule):
         redis_sessions_key: str = "sessions",
         default_ttl: int | None = 3600,
         is_session_crypt: bool = False,
-        session_aes_secret: bytes | None = os.getenv(
+        session_aes_secret: bytes | str | None = os.getenv(
             "JAM_SESSION_AES_SECRET", None
         ),
         id_factory: Callable[[], str] = lambda: str(uuid4()),
@@ -41,10 +41,13 @@ class RedisSessions(BaseSessionModule):
             redis_sessions_key (str): The key under which sessions are stored in Redis.
             default_ttl (Optional[int]): Default time-to-live for sessions in seconds. Defaults to 3600 seconds (1 hour).
             is_session_crypt (bool): If True, session keys will be encoded.
-            session_aes_secret (Optional[bytes]): AES secret for encoding session keys. Required if `is_session_key_crypt` is True.
+            session_aes_secret (Optional[bytes, str]): AES secret for encoding session keys. Required if `is_session_key_crypt` is True.
             id_factory (Callable[[], str], optional): A callable that generates unique IDs. Defaults to a UUID factory.
             serializer (Union[BaseEncoder, type[BaseEncoder]], optional): JSON encoder/decoder. Defaults to JsonEncoder.
             logger (Optional[BaseLogger], optional): Logger instance. Defaults to None.
+
+        Raises:
+            JamSessionEmptyAESKey: If 'is_session_crypt' is True and 'session_aes_secret' is not provided.
         """
         super().__init__(
             id_factory=id_factory,

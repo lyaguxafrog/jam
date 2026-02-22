@@ -26,7 +26,9 @@ class JSONSessions(BaseSessionModule):
         self,
         json_path: str = "sessions.json",
         is_session_crypt: bool = False,
-        session_aes_secret: bytes | None = None,
+        session_aes_secret: bytes | str | None = os.getenv(
+            "JAM_SESSION_AES_SECRET", None
+        ),
         id_factory: Callable[[], str] = lambda: str(uuid4()),
         serializer: BaseEncoder | type[BaseEncoder] = JsonEncoder,
         logger: BaseLogger | None = None,
@@ -40,6 +42,9 @@ class JSONSessions(BaseSessionModule):
             id_factory (Callable[[], str], optional): A callable that generates unique IDs. Defaults to a UUID factory.
             serializer (Union[BaseEncoder, type[BaseEncoder]], optional): JSON encoder/decoder. Defaults to JsonEncoder.
             logger (Optional[BaseLogger], optional): Logger instance. Defaults to None.
+
+        Raises:
+            JamSessionEmptyAESKey: If 'is_session_crypt' is True and 'session_aes_secret' is not provided.
         """
         super().__init__(
             is_session_crypt=is_session_crypt,
