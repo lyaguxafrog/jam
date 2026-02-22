@@ -138,7 +138,7 @@ class BaseSessionModule(ABC):
     @abstractmethod
     def create(
         self, session_key: str, data: dict
-    ) -> str | Coroutine[Any, Any, str]:
+    ) -> str:
         """Create a new session with the given session key and data.
 
         Args:
@@ -148,19 +148,19 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get(self, session_id: str) -> Any:
+    def get(self, session_id: str) -> dict | None:
         """Retrieve a session by its key or ID.
 
         Args:
             session_id (str): The ID of the session.
 
         Returns:
-            Any: The session data if found, otherwise None.
+            dict | None: The session data if found, otherwise None.
         """
         raise NotImplementedError
 
     @abstractmethod
-    def delete(self, session_id: str) -> Coroutine[Any, Any, None]:
+    def delete(self, session_id: str) -> None:
         """Delete a session by its key or ID.
 
         Args:
@@ -169,21 +169,27 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def update(self, session_id: str, data: dict) -> Coroutine[Any, Any, None]:
+    def update(self, session_id: str, data: dict) -> None:
         """Update an existing session with new data.
 
         Args:
             session_id (str): The ID of the session to update.
             data (dict): The new data to be stored in the session.
+
+        Raises:
+            JamSessionNotFound: If the session with the given ID does not exist.
         """
         raise NotImplementedError
 
     @abstractmethod
-    def rework(self, session_id: str) -> Coroutine[Any, Any, str]:
+    def rework(self, session_id: str) -> str:
         """Rework a session and return its new ID.
 
         Args:
             session_id (str): The ID of the session to rework.
+
+        Raises:
+            JamSessionNotFound: If the session with the given ID does not exist.
 
         Returns:
             str: The new session ID.
@@ -191,7 +197,7 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def clear(self, session_key: str) -> Coroutine[Any, Any, None]:
+    def clear(self, session_key: str) -> None:
         """Clear all sessions by key.
 
         Args:
