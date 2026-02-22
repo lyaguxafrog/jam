@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Change license to Apache-2.0.
 - Rename all `__abc_*_module__` to `__base__`.
+- Exception format.
 
 ### Deprecated
 
