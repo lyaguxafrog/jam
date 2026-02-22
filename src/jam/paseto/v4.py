@@ -42,6 +42,10 @@ class PASETOv4(BasePASETO):
         Args:
             purpose (Literal["local", "public"]): PASETO type
             key (str | bytes | Ed25519PrivateKey): Secret or ED Private key
+
+        Raises:
+            JamPASETOInvalidED25519Key: If the key is not a valid ED25519 key.
+            JamPASETOInvalidPurpose: If the purpose is not "local" or "public".
         """
         inst = cls()
         inst._purpose = purpose
@@ -128,6 +132,10 @@ class PASETOv4(BasePASETO):
 
         Returns:
             str: PASETO
+
+        Raises:
+            JamPASETOInvalidED25519Key: If the key is not a valid ED25519 key.
+            JamPASETOInvalidPurpose: If the purpose is not "local" or "public".
         """
         header = f"{self._VERSION}.{self._purpose}."
         payload_bytes = serializer.dumps(payload)
@@ -162,6 +170,12 @@ class PASETOv4(BasePASETO):
         Args:
             token (str): PASETO
             serializer (type[BaseEncoder] | BaseEncoder]): JSON Serializer
+
+        Raises:
+            JamPASETOInvalidTokenFormat: If the token format is invalid.
+            JamPASETOInvalidED25519Key: If the key is not a valid ED25519 key.
+            JamPASETOKeyVerificationError: If the token signature is invalid.
+            JamPASETOInvalidPurpose: If the purpose is not "local" or "public".
         """
         if token.startswith(f"{self._VERSION}.local."):
             return self._decode_local(token, serializer)

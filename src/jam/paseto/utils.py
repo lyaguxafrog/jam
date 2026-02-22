@@ -7,6 +7,8 @@ import hmac
 from typing import Any
 from uuid import uuid4
 
+from jam.exceptions import JamPASETOInvalidSymmetricKey
+
 
 def __b64url_nopad__(b: bytes) -> str:
     """Return B64 nopad."""
@@ -43,14 +45,19 @@ def __pae__(pieces: list[bytes]) -> bytes:
 
 def base64url_decode(v: str | bytes) -> bytes:
     """Base64 URL-safe decoding with padding."""
-    if isinstance(v, bytes):
-        bv = v
-    else:
-        bv = v.encode("ascii")
-    rem = len(bv) % 4
-    if rem > 0:
-        bv += b"=" * (4 - rem)
-    return base64.urlsafe_b64decode(bv)
+    try:
+        if isinstance(v, bytes):
+            bv = v
+        else:
+            bv = v.encode("ascii")
+        rem = len(bv) % 4
+        if rem > 0:
+            bv += b"=" * (4 - rem)
+        return base64.urlsafe_b64decode(bv)
+    except Exception as e:
+        raise JamPASETOInvalidSymmetricKey(
+            message=f"Failed to decode base64url: {e}"
+        )
 
 
 def base64url_encode(data: bytes | str) -> bytes:
