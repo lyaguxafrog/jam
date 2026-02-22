@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Literal
 
 from jam.encoders import BaseEncoder, JsonEncoder
+from jam.exceptions import JamJWTUnsupportedAlgorithm, JamJWTValidationError
 from jam.jwt.__algorithms__ import BaseAlgorithm, create_algorithm
 from jam.jwt.__base__ import BaseJWT
 from jam.jwt.__types__ import KeyLike
@@ -73,7 +74,7 @@ class JWT(BaseJWT):
             logger (BaseLogger): Logger instance
 
         Raises:
-            ValueError: If algorithm is not supported or secret is invalid
+            JamJWTUnsupportedAlgorithm: If algorithm is not supported or secret is invalid
         """
         self._validate_algorithm(alg)
         self.alg = alg
@@ -93,12 +94,14 @@ class JWT(BaseJWT):
             alg (str): Algorithm name
 
         Raises:
-            ValueError: If algorithm is not supported
+            JamJWTUnsupportedAlgorithm: If algorithm is not supported
         """
         if alg not in self._SUPPORTED_ALGORITHMS:
-            raise ValueError(
-                f"Unsupported algorithm: {alg}. "
-                f"Supported algorithms: {', '.join(self._SUPPORTED_ALGORITHMS)}"
+            raise JamJWTUnsupportedAlgorithm(
+                details={
+                    "algorithm": alg,
+                    "supported_algorithms": self._SUPPORTED_ALGORITHMS
+                }
             )
 
     def _normalize_password(self, password: str | bytes | None) -> bytes | None:
@@ -137,7 +140,7 @@ class JWT(BaseJWT):
             str: Encoded JWT token
 
         Raises:
-            ValueError: If encoding fails
+            JamJWTValidationError: If encoding fails
         """
         self._logger.debug(
             f"Encoding JWT with algorithm {self.alg}, payload keys: {list(payload.keys())}"
@@ -161,9 +164,10 @@ class JWT(BaseJWT):
         except Exception as e:
             self._logger.error(
                 f"Failed to encode JWT: {e}",
-                exc_info=True,
             )
-            raise ValueError(f"JWT encoding failed: {e}") from e
+            raise JamJWTValidationError(
+                details={"error": e}
+            )
 
     def decode(
         self, token: str, public_key: KeyLike | None = None
@@ -176,7 +180,8 @@ class JWT(BaseJWT):
                 If not provided, uses the secret from initialization.
 
         Raises:
-            ValueError: If token is invalid, malformed, or verification fails
+            JamJWTValidationError: If token is invalid, malformed, or verification fails
+            JamJWTUnsupportedAlgorithm: If the token's algorithm is not supported
 
         Returns:
             dict[str, Any]: Decoded payload
@@ -191,8 +196,9 @@ class JWT(BaseJWT):
             self._logger.warning(
                 f"Invalid token format: expected 3 parts, got {len(parts)}"
             )
-            raise ValueError(
-                "Invalid token format. Expected header.payload.signature"
+            raise JamJWTValidationError(
+                message="Invalid token format. Expected header.payload.signature",
+                error_code="jwt.validation.invalid_token_format"
             )
 
         try:
@@ -216,8 +222,9 @@ class JWT(BaseJWT):
                 self._logger.warning(
                     f"Algorithm mismatch: expected {self.alg}, got {token_alg}"
                 )
-                raise ValueError(
-                    f"Algorithm mismatch: expected {self.alg}, got {token_alg}"
+                raise JamJWTUnsupportedAlgorithm(
+                    message="Algorithm mismatch.",
+                    details={"expected": self.alg, "got": token_alg}
                 )
 
             # Verify signature
@@ -230,12 +237,13 @@ class JWT(BaseJWT):
             )
             return payload
 
-        except ValueError:
-            # Re-raise ValueError as-is (already logged)
-            raise
         except Exception as e:
             self._logger.error(
                 f"Failed to decode JWT: {e}",
                 exc_info=True,
             )
-            raise ValueError(f"JWT decoding failed: {e}") from e
+            raise JamJWTValidationError(
+                message="JWT decoding failed.",
+                error_code="jwt.validation.decoding_failed",
+                details={"error": str(e)}
+            )
