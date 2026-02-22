@@ -8,6 +8,7 @@ import sys
 from typing import Any
 
 from jam.encoders import BaseEncoder, JsonEncoder
+from jam.exceptions import JamConfigurationError
 
 
 GENERIC_POINTER = "jam"
@@ -28,9 +29,7 @@ def __yaml_config_parser(
         pointer (str): Pointer to config section to read.
 
     Raises:
-        ImportError: If pyyaml not installed
-        FileNotFoundError: If file not found
-        ValueError: If invalid YAML or required env var not set
+        JamConfigurationError: If pyyaml not installed, file not found, or invalid YAML
 
     Returns:
         dict[str, Any]: Parsed YAML section with environment variable substitution.
@@ -38,9 +37,10 @@ def __yaml_config_parser(
     try:
         import yaml
     except ImportError:
-        raise ImportError(
-            "To generate a configuration file from YAML/YML, you need to install PyYaml: "
-            "`pip install pyyaml` or `pip install jamlib[yaml]`"
+        raise JamConfigurationError(
+            message="To generate a configuration file from YAML/YML, you need to install PyYaml: "
+            "`pip install pyyaml` or `pip install jamlib[yaml]`",
+            error_code="configuration.import_error"
         )
 
     # Pattern to match ${VAR:-default} or ${VAR} or $VAR
@@ -59,15 +59,19 @@ def __yaml_config_parser(
             if env_value is None:
                 if default_value is not None:
                     return default_value
-                raise ValueError(
-                    f"Environment variable '{var_name}' not set and no default provided"
+                raise JamConfigurationError(
+                    message=f"Environment variable '{var_name}' not set and no default provided",
+                    error_code="configuration.env_var_not_set"
                 )
             return env_value
         elif match.group(4):
             var_name = match.group(4)
             env_value = os.getenv(var_name)
             if env_value is None:
-                raise ValueError(f"Environment variable '{var_name}' not set")
+                raise JamConfigurationError(
+                    message=f"Environment variable '{var_name}' not set",
+                    error_code="configuration.env_var_not_set"
+                )
             return env_value
         return match.group(0)
 
@@ -92,9 +96,15 @@ def __yaml_config_parser(
             return {}
         return config[pointer] if pointer in config else config
     except FileNotFoundError:
-        raise FileNotFoundError(f"YAML config file not found at: {path}")
+        raise JamConfigurationError(
+            message=f"YAML config file not found at: {path}",
+            error_code="configuration.file_not_found"
+        )
     except yaml.YAMLError as e:
-        raise ValueError(f"Error parsing YAML file: {e}")
+        raise JamConfigurationError(
+            message=f"Error parsing YAML file: {e}",
+            error_code="configuration.yaml_error"
+        )
 
 
 def __toml_config_parser(
@@ -112,8 +122,7 @@ def __toml_config_parser(
         pointer (str): Pointer to config read
 
     Raises:
-        FileNotFoundError: If file not found
-        ValueError: If invalid TOML file or required env var not set
+       JamConfigurationError: If file not found or invalid TOML file or required env var not set
 
     Returns:
         (dict[str, Any]): Dict with config param
@@ -124,9 +133,10 @@ def __toml_config_parser(
         try:
             import toml  # type: ignore
         except ImportError:
-            raise ImportError(
-                "To parse TOML config files, install toml: "
-                "`pip install toml` or use Python 3.11+ (built-in tomllib)."
+            raise JamConfigurationError(
+                message="To parse TOML config files, install toml: "
+                "`pip install toml` or use Python 3.11+ (built-in tomllib).",
+                error_code="configuration.toml_not_installed"
             )
 
     try:
@@ -137,9 +147,15 @@ def __toml_config_parser(
             with open(path) as file:
                 config = toml.load(file)
     except FileNotFoundError:
-        raise FileNotFoundError(f"TOML config file not found at: {path}")
+        raise JamConfigurationError(
+            message=f"TOML config file not found at: {path}",
+            error_code="configuration.file_not_found"
+        )
     except Exception as e:
-        raise ValueError(f"Error parsing TOML file: {e}") from e
+        raise JamConfigurationError(
+            message=f"Error parsing TOML file: {e}",
+            error_code="configuration.toml_error"
+        )
 
     env_pattern = re.compile(
         r"\$\{([^}^{]+?)(:-([^}]+))?\}|\$([A-Za-z_][A-Za-z0-9_]*)"
@@ -160,16 +176,18 @@ def __toml_config_parser(
                     if env_value is None:
                         if default_value is not None:
                             return default_value
-                        raise ValueError(
-                            f"Environment variable '{var_name}' not set and no default provided"
+                        raise JamConfigurationError(
+                            message=f"Environment variable '{var_name}' not set and no default provided",
+                            error_code="configuration.env_var_not_set"
                         )
                     return env_value
                 elif match.group(4):
                     var_name = match.group(4)
                     env_value = os.getenv(var_name)
                     if env_value is None:
-                        raise ValueError(
-                            f"Environment variable '{var_name}' not set"
+                        raise JamConfigurationError(
+                            message=f"Environment variable '{var_name}' not set",
+                            error_code="configuration.env_vat_not_set"
                         )
                     return env_value
                 return match.group(0)
@@ -210,8 +228,7 @@ def __json_config_parser(
         encoder (BaseEncoder | type[BaseEncoder]): Encoder to use for parsing
 
     Raises:
-        FileNotFoundError: If file not found
-        ValueError: If invalid JSON or required env var not set
+        JamConfigurationError: If file not found or invalid JSON or required env var not set
 
     Returns:
         dict[str, Any]: Parsed config with environment variable substitution
@@ -220,7 +237,10 @@ def __json_config_parser(
         with open(path) as f:
             content = f.read()
     except FileNotFoundError:
-        raise FileNotFoundError(f"JSON config file not found at: {path}")
+        raise JamConfigurationError(
+            message=f"JSON config file not found at: {path}",
+            error_code="configuration.file_not_found"
+        )
 
     env_pattern = re.compile(
         r"\$\{([^}^{]+?)(:-([^}]+))?\}|\$([A-Za-z_][A-Za-z0-9_]*)"
@@ -231,8 +251,9 @@ def __json_config_parser(
         if env_value is None:
             if default_value is not None:
                 return default_value
-            raise ValueError(
-                f"Environment variable '{var_name}' not set and no default provided"
+            raise JamConfigurationError(
+                message=f"Environment variable '{var_name}' not set and no default provided",
+                error_code="configuration.env_var_not_set"
             )
         return env_value
 
@@ -287,7 +308,10 @@ def __json_config_parser(
     try:
         config = encoder.loads(content)
     except Exception as e:
-        raise ValueError(f"Error parsing JSON file: {e}") from e
+        raise JamConfigurationError(
+            message=f"Error parsing JSON file: {e}",
+            error_code="configuration.json_parse_error"
+        ) from e
 
     def _env_constructor(value: Any) -> Any:
         if isinstance(value, str):
@@ -333,7 +357,10 @@ def __config_maker__(
             case "json":
                 return __json_config_parser(path=config).copy()
             case _:
-                raise ValueError("YML/YAML, TOML or JSON configs only!")
+                raise JamConfigurationError(
+                    message="YML/YAML, TOML or JSON configs only!",
+                    error_code="configuration.invalid_config_type"
+                )
     else:
         return config.copy()
 
