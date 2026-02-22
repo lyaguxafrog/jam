@@ -14,7 +14,7 @@ except ImportError:
     )
 
 from jam.encoders import BaseEncoder, JsonEncoder
-from jam.exceptions.sessions import SessionNotFoundError
+from jam.exceptions import JamSessionNotFound
 from jam.logger import BaseLogger
 from jam.sessions.__base__ import BaseSessionModule
 
@@ -141,8 +141,8 @@ class JSONSessions(BaseSessionModule):
             session_id (str): The ID of the session to update.
             data (dict): The new data to store in the session.
 
-        Returns:
-            None
+        Raises:
+            JamSessionNotFound: If session not found
         """
         if self._logger:
             self._logger.debug(
@@ -153,6 +153,11 @@ class JSONSessions(BaseSessionModule):
         except AttributeError:
             dumps_data = self._serializer.dumps(data).decode("utf-8")
         del data
+
+        if not self._db.search(self._qs.session_id == session_id):
+            raise JamSessionNotFound(
+                details={"session_id": session_id}
+            )
 
         updated_count = self._db.update(
             {"data": dumps_data}, self._qs.session_id == session_id
@@ -180,15 +185,15 @@ class JSONSessions(BaseSessionModule):
             session_id (str): The current session ID to be reworked.
 
         Raises:
-            SessionNotFoundError: If session not found
+            JamSessionNotFound: If session not found
 
         Returns:
             str: The new session ID.
         """
         result = self._db.search(self._qs.session_id == session_id)
         if not result:
-            raise SessionNotFoundError(
-                f"Session with ID {session_id} not found."
+            raise JamSessionNotFound(
+                details={"session_id": session_id}
             )
 
         new_session_id = self.__encode_session_id_if_needed__(self.id)
