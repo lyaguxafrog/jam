@@ -10,6 +10,11 @@ from .base import (
     JamValidationError
 )
 
+from .oauth2 import (
+    JamOAuth2Error,
+    JamOAuth2EmptyRaw
+)
+
 from .jwt import (
     JamJWTExpired,
     JamJWTInBlackList,
@@ -40,6 +45,8 @@ __all__ = [
     "JamError",
     "JamConfigurationError",
     "JamValidationError",
+    "JamOAuth2Error",
+    "JamOAuth2EmptyRaw",
     "JamJWTExpired",
     "JamJWTInBlackList",
     "JamJWTNotInWhiteList",

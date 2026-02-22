@@ -6,6 +6,8 @@ import json
 from typing import Any
 import urllib.parse
 
+from jam.exceptions import JamOAuth2Error, JamOAuth2EmptyRaw
+
 from .__base__ import BaseOAuth2Client
 
 
@@ -107,6 +109,10 @@ class OAuth2Client(BaseOAuth2Client):
             scope (list[str] | None): Auth scope
             extra_params (Any): Extra auth params if needed
 
+        Raises:
+            JamOAuth2EmptyRaw: If response is empty
+            JamOAuth2Error: HTTP error
+
         Returns:
             dict: JSON with access token
         """
@@ -136,7 +142,13 @@ class OAuth2Client(BaseOAuth2Client):
             raw = response.read().decode("utf-8")
 
         if not raw:
-            raise ValueError("Empty response from token endpoint")
+            raise JamOAuth2EmptyRaw(
+                details={
+                    "endpoint": url,
+                    "methid": "POST",
+                    "params": params
+                }
+            )
 
         try:
             data = self._serializer.loads(raw)
@@ -144,6 +156,12 @@ class OAuth2Client(BaseOAuth2Client):
             data = {k: v[0] for k, v in urllib.parse.parse_qs(raw).items()}
 
         if response.status >= 400:
-            raise RuntimeError(f"OAuth2 error ({response.status}): {data}")
+            raise JamOAuth2Error(
+                details={
+                    "status": response.status,
+                    "reason": response.reason,
+                    "data": data
+                }
+            )
 
         return data
