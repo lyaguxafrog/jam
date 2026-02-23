@@ -5,9 +5,11 @@ import gc
 from typing import Any, Literal
 
 from jam.encoders import BaseEncoder, JsonEncoder
+from jam.exceptions import JamConfigurationError
 from jam.jwt.__base__ import BaseJWT
 from jam.logger import BaseLogger, JamLogger
 from jam.oauth2.__base__ import BaseOAuth2Client
+from jam.otp.__base__ import BaseOTP, OTPConfig
 from jam.sessions.__base__ import BaseSessionModule
 from jam.utils.config_maker import __config_maker__, __module_loader__
 
@@ -22,7 +24,7 @@ class BaseJam(ABC):
         config: str | dict[str, Any] = "pyproject.toml",
         pointer: str = "jam",
         *,
-        logger: type(BaseLogger) = JamLogger,
+        logger: type[BaseLogger] = JamLogger,
         log_level: Literal[
             "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
         ] = "INFO",
@@ -54,11 +56,15 @@ class BaseJam(ABC):
         self.jwt: BaseJWT | None = None
         self.session: BaseSessionModule | None = None
         self.oauth2: BaseOAuth2Client | None = None
+        self.otp: OTPConfig | None = None
 
         self._logger.debug(
             f"Initializing BaseJam with log_level={log_level}, serializer={serializer}"
         )
         self.__build_instance(config)
+        self._otp: type[BaseOTP] | None = self.__otp(
+            self.otp.type if self.otp else None
+        )
         self._logger.debug(
             "BaseJam initialization complete. Modules loaded:\n"
             f" jwt={self.jwt is not None}, session={self.session is not None}, oauth2={self.oauth2 is not None}"
@@ -150,8 +156,8 @@ class BaseJam(ABC):
                 self._logger.debug(
                     f"Module {name} config params: {list(params.keys())}"
                 )
-                params["logger"] = self._logger
-                params["serializer"] = self._serializer
+                # params["logger"] = self._logger
+                # params["serializer"] = self._serializer
                 module_instance = module_cls(**params)
                 self.__setattr__(name, module_instance)
                 self._logger.debug(f"Module {name} initialized successfully")
@@ -161,6 +167,24 @@ class BaseJam(ABC):
                     f"Failed to load module {name} from {path}: {e}",
                     exc_info=True,
                 )
+
+    def __otp(
+        self, type: Literal["totp", "hotp"] | None = None
+    ) -> type[BaseOTP] | None:
+        """Get OTP type."""
+        match type:
+            case "hotp":
+                from jam.otp.hotp import HOTP
+
+                return HOTP
+            case "totp":
+                from jam.otp.totp import TOTP
+
+                return TOTP
+            case None:
+                return None
+            case _:
+                raise JamConfigurationError(message="Unknown OTP type.")
 
     @abstractmethod
     def jwt_make_payload(
@@ -300,8 +324,8 @@ class BaseJam(ABC):
     def otp_uri(
         self,
         secret: str,
-        name: str | None = None,
-        issuer: str | None = None,
+        name: str,
+        issuer: str,
         counter: int | None = None,
     ) -> str:
         """Generates an otpauth:// URI for Google Authenticator.

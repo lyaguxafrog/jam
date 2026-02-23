@@ -21,7 +21,7 @@ class Jam(BaseJam):
         "session": "jam.sessions.create_instance",
         "oauth2": "jam.oauth2.create_instance",
         "paseto": "jam.paseto.create_instance",
-        "otp": "jam.otp.create_instance",
+        "otp": "jam.otp.__base__.OTPConfig",
     }
 
     def jwt_make_payload(
@@ -214,13 +214,15 @@ class Jam(BaseJam):
         Returns:
             str: OTP code (fixed-length string).
         """
-        return self.otp(secret=secret).at(factor)
+        return self._otp(  # type: ignore
+            secret=secret, digits=self.otp.digits, digest=self.otp.digest
+        ).at(factor)
 
     def otp_uri(
         self,
         secret: str,
-        name: str | None = None,
-        issuer: str | None = None,
+        name: str,
+        issuer: str,
         counter: int | None = None,
     ) -> str:
         """Generates an otpauth:// URI for Google Authenticator.
@@ -234,12 +236,9 @@ class Jam(BaseJam):
         Returns:
             str: A string of the form "otpauth://..."
         """
-        self._otp_checker()
-        return self._otp_module(
-            secret=secret, digits=self._otp.digits, digest=self._otp.digest
-        ).provisioning_uri(
-            name=name, issuer=issuer, type_=self._otp.type, counter=counter
-        )
+        return self._otp(
+            secret=secret, digits=self.otp.digits, digest=self.otp.digest
+        ).provisioning_uri(name=name, issuer=issuer, counter=counter)
 
     def otp_verify_code(
         self,
@@ -259,9 +258,8 @@ class Jam(BaseJam):
         Returns:
             bool: True if the code matches, otherwise False.
         """
-        self._otp_checker()
-        return self._otp_module(
-            secret=secret, digits=self._otp.digits, digest=self._otp.digest
+        return self._otp(  # type: ignore
+            secret=secret, digits=self.otp.digits, digest=self.otp.digest
         ).verify(code=code, factor=factor, look_ahead=look_ahead)
 
     def oauth2_get_authorized_url(
