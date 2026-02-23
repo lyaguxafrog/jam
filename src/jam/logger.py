@@ -9,6 +9,7 @@ from typing import Literal
 class BaseLogger(ABC):
     """Interface for logging."""
 
+    _LOG_NAME: str = "jam"
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
 
     @abstractmethod
@@ -47,11 +48,10 @@ class JamLogger(BaseLogger):
         ] = "INFO",
     ):
         """Initialize the logger."""
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(self._LOG_NAME)
         self.logger.setLevel(log_level)
-        handler = logging.StreamHandler()
-        handler.setLevel(log_level)
-        self.logger.addHandler(handler)
+        if not self.logger.handlers:
+            self.logger.addHandler(logging.NullHandler())
 
     def info(self, message: str) -> None:
         """Log an informational message."""
