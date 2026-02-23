@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from jam.exceptions import JamSessionNotFound
 import pytest
 from cryptography.fernet import Fernet
 from pytest_asyncio import fixture
@@ -99,11 +100,10 @@ async def test_update_session(json_sessions_no_crypt):
 
 @pytest.mark.asyncio
 async def test_update_nonexistent_session(json_sessions_no_crypt):
-    await json_sessions_no_crypt.update(
-        "nonexistent:session", {"user": "updated_user"}
-    )
-    retrieved_data = await json_sessions_no_crypt.get("nonexistent:session")
-    assert retrieved_data is None
+    with pytest.raises(JamSessionNotFound):
+        await json_sessions_no_crypt.update(
+            "nonexistent:session", {"user": "updated_user"}
+        )
 
     t.truncate()
 

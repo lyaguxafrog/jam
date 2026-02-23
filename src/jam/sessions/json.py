@@ -3,6 +3,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
+import os
 from uuid import uuid4
 
 
@@ -160,9 +161,7 @@ class JSONSessions(BaseSessionModule):
         del data
 
         if not self._db.search(self._qs.session_id == session_id):
-            raise JamSessionNotFound(
-                details={"session_id": session_id}
-            )
+            raise JamSessionNotFound(details={"session_id": session_id})
 
         updated_count = self._db.update(
             {"data": dumps_data}, self._qs.session_id == session_id
@@ -197,9 +196,7 @@ class JSONSessions(BaseSessionModule):
         """
         result = self._db.search(self._qs.session_id == session_id)
         if not result:
-            raise JamSessionNotFound(
-                details={"session_id": session_id}
-            )
+            raise JamSessionNotFound(details={"session_id": session_id})
 
         new_session_id = self.__encode_session_id_if_needed__(self.id)
         self._db.update(

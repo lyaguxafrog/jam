@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from jam.exceptions import JamSessionNotFound
 import pytest
 from cryptography.fernet import Fernet
 from tinydb import Query, TinyDB
@@ -92,12 +93,10 @@ def test_update_session(json_sessions_no_crypt):
 
 
 def test_update_nonexistent_session(json_sessions_no_crypt):
-    json_sessions_no_crypt.update(
-        "nonexistent:session", {"user": "updated_user"}
-    )
-    retrieved_data = json_sessions_no_crypt.get("nonexistent:session")
-    assert retrieved_data is None
-
+    with pytest.raises(JamSessionNotFound):
+        json_sessions_no_crypt.update(
+            "nonexistent:session", {"user": "updated_user"}
+        )
     t.truncate()
 
 

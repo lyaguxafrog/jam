@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from jam.exceptions import JamPASETOInvalidSecp384r1Key
 from pytest import fixture, raises
 
 from jam.paseto.v3 import PASETOv3
@@ -56,5 +57,5 @@ def test_decode_token_by_public_key(public_paseto, public_paseto_no_private):
     decoded_payload, _ = public_paseto_no_private.decode(token)
     assert decoded_payload == payload
 
-    with raises(ValueError):
+    with raises(JamPASETOInvalidSecp384r1Key):
         public_paseto_no_private.encode({"user": "error"})

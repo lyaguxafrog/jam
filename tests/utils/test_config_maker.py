@@ -5,6 +5,7 @@ import tempfile
 from pathlib import Path
 from textwrap import dedent
 
+from jam.exceptions import JamConfigurationError
 import pytest
 
 from jam.utils.config_maker import (
@@ -140,7 +141,7 @@ class TestYAMLConfigParser:
         for var in ["JWT_ALG", "JWT_SECRET", "REDIS_HOST", "REDIS_PORT"]:
             os.environ.pop(var, None)
 
-        with pytest.raises(ValueError, match="Environment variable .* not set"):
+        with pytest.raises(JamConfigurationError):
             _yaml_parser(yaml_config_with_env)
 
     def test_yaml_short_form(self, yaml_config_with_short_form):
@@ -155,7 +156,7 @@ class TestYAMLConfigParser:
 
     def test_yaml_file_not_found(self):
         """Test that missing file raises FileNotFoundError."""
-        with pytest.raises(FileNotFoundError, match="YAML config file not found"):
+        with pytest.raises(JamConfigurationError):
             _yaml_parser("nonexistent.yml")
 
 
@@ -298,7 +299,7 @@ class TestTOMLConfigParser:
         for var in ["JWT_ALG", "JWT_SECRET", "REDIS_HOST", "REDIS_PORT"]:
             os.environ.pop(var, None)
 
-        with pytest.raises(ValueError, match="Environment variable .* not set"):
+        with pytest.raises(JamConfigurationError):
             _toml_parser(toml_config_with_env)
 
     def test_toml_short_form(self, toml_config_with_short_form):
@@ -336,7 +337,7 @@ class TestTOMLConfigParser:
 
     def test_toml_file_not_found(self):
         """Test that missing file raises FileNotFoundError."""
-        with pytest.raises(FileNotFoundError, match="TOML config file not found"):
+        with pytest.raises(JamConfigurationError):
             _toml_parser("nonexistent.toml")
 
 
@@ -410,6 +411,5 @@ class TestConfigMaker:
 
     def test_config_maker_unsupported_format(self):
         """Test that unsupported config format raises error."""
-        with pytest.raises(ValueError, match="YML/YAML or TOML configs only"):
+        with pytest.raises(JamConfigurationError):
             _config_maker("config.json")
-

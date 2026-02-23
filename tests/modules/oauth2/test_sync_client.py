@@ -1,6 +1,7 @@
 import json
 from unittest.mock import MagicMock, patch
 
+from jam.exceptions import JamOAuth2EmptyRaw, JamOAuth2Error
 import pytest
 
 from jam.oauth2.client import OAuth2Client
@@ -66,7 +67,7 @@ def test_fetch_token_http_error(client):
         conn = MockConn.return_value
         conn.getresponse.return_value = mock_response
 
-        with pytest.raises(RuntimeError) as e:
+        with pytest.raises(JamOAuth2Error) as e:
             client.fetch_token("bad_code")
 
         assert "invalid_grant" in str(e.value)
@@ -81,7 +82,7 @@ def test_fetch_token_empty_response(client):
         conn = MockConn.return_value
         conn.getresponse.return_value = mock_response
 
-        with pytest.raises(ValueError, match="Empty response"):
+        with pytest.raises(JamOAuth2EmptyRaw):
             client.fetch_token("auth_code")
 
 

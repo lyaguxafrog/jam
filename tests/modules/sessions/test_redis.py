@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from jam.exceptions import JamSessionNotFound
 import pytest
 from cryptography.fernet import Fernet
 from fakeredis import FakeRedis
@@ -102,9 +103,7 @@ def test_update_session(redis_session_instance_no_crypt):
 
 
 def test_update_nonexistent_session(redis_session_instance_no_crypt):
-    from jam.exceptions.sessions import SessionNotFoundError
-
-    with pytest.raises(SessionNotFoundError):
+    with pytest.raises(JamSessionNotFound):
         redis_session_instance_no_crypt.update(
             "nonexistent:session", {"user_id": 2}
         )
