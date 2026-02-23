@@ -100,7 +100,7 @@ class BaseOTP:
         return f"otpauth://{type_}/{label}?{query}"
 
 
-@dataclass
+@dataclass(slots=True)
 class OTPConfig:
     """Config for Jam instance."""
 

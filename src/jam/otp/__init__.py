@@ -14,7 +14,7 @@ from jam.logger import BaseLogger, logger
 
 def create_instance(
     type: Literal["hotp", "totp"],
-    logger: BaseLogger = logger,
+    # logger: BaseLogger = logger,
     **kwargs: Any
 ) -> type[BaseOTP]:
     """Create OTP class (not instance, since secret is provided per-call).
