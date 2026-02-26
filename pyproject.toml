@@ -82,6 +82,7 @@ dev = [
     "pre-commit>=4.2.0",
     "pyrefly>=0.39.1",
     "ruff>=0.11.2",
+    "unicecream>=0.2.1",
     "uvicorn>=0.37.0",
 ]
 docs = [
@@ -96,6 +97,7 @@ docs = [
 tests = [
     "pytest>=8.4.2",
     "pytest-asyncio>=1.1.0",
+    "coverage>=7.13.4"
 ]
 
 
@@ -128,3 +130,6 @@ line-ending = "auto"
 python_files = ["test*.py"]
 addopts = ["--capture=no"]
 asyncio_default_fixture_loop_scope = "function"
+
+[tool.unicecream]
+exclude = ["__devtools/"]
