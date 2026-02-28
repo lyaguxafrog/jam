@@ -1,6 +1,6 @@
 [project]
 name = "jamlib"
-version = "3.0.0b8"
+version = "3.0.0b9"
 description = "Simple and universal library for authorization."
 authors = [
     {name = "Makridenko Adrian",email = "adrianmakridenko@duck.com"},
@@ -23,7 +23,7 @@ keywords = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "cryptography (>=44.0.2,<45.0.0)",
+    "cryptography>=46.0.5",
 ]
 
 classifiers = [
