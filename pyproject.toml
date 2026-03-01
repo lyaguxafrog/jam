@@ -52,7 +52,7 @@ classifiers = [
 Homepage = "https://jam.makridenko.ru"
 Repository = "https://github.com/lyaguxafrog/jam"
 Issues = "https://github.com/lyaguxafrog/jam/issues"
-Changelog = "https://github.com/lyaguxafrog/jam/releases"
+Changelog = "https://github.com/lyaguxafrog/jam/blob/master/CHANGELOG.md"
 
 
 [project.optional-dependencies]

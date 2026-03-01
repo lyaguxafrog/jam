@@ -19,6 +19,21 @@ Installed!
 ```
 How to install dev version: -> [Jam Unstable](install_unstable.md)
 
+## Quick example
+```python
+from jam import Jam
+
+jam = Jam(config="config.toml")
+payload = {
+    "user": 1
+}
+
+jwt = jam.jwt_create(payload)
+paseto = jam.paseto_create(payload)
+session_id = jam.session_create(payload)
+otp_code = jam.otp_code(secret="7K2HVNA3IQCYFFDX76IXKNCZHQ")
+```
+
 ## Asynchronous support
 !!! note
     You can use `jam.aio` module to work with async functions. **The methods are the same**, but you need to use `await` keyword.

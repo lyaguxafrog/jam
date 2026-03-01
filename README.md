@@ -8,7 +8,8 @@
 ![tests](https://github.com/lyaguxafrog/jam/actions/workflows/run-tests.yml/badge.svg)
 [![GitHub License](https://img.shields.io/github/license/lyaguxafrog/jam)](https://github.com/lyaguxafrog/jam/blob/master/LICENSE.md)
 
-Documentation: [jam.makridenko.ru](https://jam.makridenko.ru)
+* Documentation: [jam.makridenko.ru](https://jam.makridenko.ru)
+* Changelog: [CHANGELOG.md](https://github.com/lyaguxafrog/jam/blob/master/CHANGELOG.md)
 
 
 ## Install
