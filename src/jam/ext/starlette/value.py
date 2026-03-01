@@ -8,7 +8,7 @@ from starlette.authentication import BaseUser
 class Payload(BaseUser):
     """Auth payload."""
 
-    def __init__(self, payload: dict[str, Any]):
+    def __init__(self, payload: dict[str, Any] | None):
         """Auth payload."""
         self.payload = payload
 

@@ -10,6 +10,7 @@ from jam.jwt.__base__ import BaseJWT
 from jam.logger import BaseLogger, JamLogger
 from jam.oauth2.__base__ import BaseOAuth2Client
 from jam.otp.__base__ import BaseOTP, OTPConfig
+from jam.paseto.__base__ import BasePASETO
 from jam.sessions.__base__ import BaseSessionModule
 from jam.utils.config_maker import __config_maker__, __module_loader__
 
@@ -55,8 +56,9 @@ class BaseJam(ABC):
         self._serializer = serializer
         self.jwt: BaseJWT | None = None
         self.session: BaseSessionModule | None = None
-        self.oauth2: BaseOAuth2Client | None = None
+        self.oauth2: dict[str, BaseOAuth2Client] | None = None
         self.otp: OTPConfig | None = None
+        self.paseto: BasePASETO | None = None
 
         self._logger.debug(
             f"Initializing BaseJam with log_level={log_level}, serializer={serializer}"
@@ -211,9 +213,6 @@ class BaseJam(ABC):
         Returns:
             str: New token
 
-        Raises:
-            EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
-            EmtpyPrivateKey: If RSA algorithm is selected, but private key None
         """
         raise NotImplementedError
 
@@ -231,14 +230,6 @@ class BaseJam(ABC):
         Returns:
             dict[str, Any]: Decoded payload
 
-        Raises:
-            ValueError: If the token is invalid.
-            EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None.
-            EmtpyPublicKey: If RSA algorithm is selected, but public key None.
-            NotFoundSomeInPayload: If 'exp' not found in payload.
-            TokenLifeTimeExpired: If token has expired.
-            TokenNotInWhiteList: If the list type is white, but the token is  not there
-            TokenInBlackList: If the list type is black and the token is there
         """
         raise NotImplementedError
 

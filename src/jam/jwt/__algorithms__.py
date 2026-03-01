@@ -147,7 +147,7 @@ class BaseAlgorithm(ABC):
             return key.public_key()
 
         key_bytes = (
-            self._load_key_data(key) if isinstance(key, (str, bytes)) else None
+            self._load_key_data(key) if isinstance(key, str | bytes) else None
         )
         if not key_bytes:
             return key
@@ -237,7 +237,7 @@ class RSAlgorithm(BaseAlgorithm):
         """
         key_bytes = (
             self._load_key_data(self._secret)
-            if isinstance(self._secret, (str, bytes))
+            if isinstance(self._secret, str | bytes)
             else None
         )
         return self._load_private_key(key_bytes, self._secret)
@@ -308,7 +308,7 @@ class ESAlgorithm(BaseAlgorithm):
         """
         key_bytes = (
             self._load_key_data(self._secret)
-            if isinstance(self._secret, (str, bytes))
+            if isinstance(self._secret, str | bytes)
             else None
         )
         return self._load_private_key(key_bytes, self._secret)
@@ -386,7 +386,7 @@ class PSAlgorithm(BaseAlgorithm):
         """
         key_bytes = (
             self._load_key_data(self._secret)
-            if isinstance(self._secret, (str, bytes))
+            if isinstance(self._secret, str | bytes)
             else None
         )
         return self._load_private_key(key_bytes, self._secret)

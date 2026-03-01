@@ -12,41 +12,8 @@ from jam.exceptions import JamSessionEmptyAESKey
 from jam.logger import BaseLogger
 
 
-class BaseSessionModule(ABC):
-    """Abstract base class for session management modules.
-
-    You can create your own module for sessions. For example:
-
-    ```python
-    from jam.sessions import BaseSessionModule
-
-    class CustomSessionModule(BaseSessionModule):
-        def __init__(self, some_param: str) -> None:
-            super().__init__(
-                is_session_crypt=True,
-                session_aes_secret=b'your-32-byte-base64-encoded-key'
-            )
-
-        # Your initialization code here
-        def create(session_key: str) -> str:
-            ...
-
-        def get(session_id: str) -> dict:
-            ...
-
-        def delete(session_id: str) -> None:
-            ...
-
-        def update(session_id: str, data: dict) -> None:
-            ...
-
-        def rework(session_id: str) -> str:
-            ...
-
-        def clear(session_key: str) -> None:
-            ...
-    ```
-    """
+class BaseAsyncSessionModule(ABC):
+    """Abstract base class for async session management modules."""
 
     def __init__(
         self,
@@ -56,18 +23,7 @@ class BaseSessionModule(ABC):
         serializer: type[BaseEncoder] | BaseEncoder = JsonEncoder,
         logger: BaseLogger | None = None,
     ) -> None:
-        """Class constructor.
-
-        Args:
-            id_factory (Callable[str], optional): A callable that generates unique IDs. Defaults to a UUID factory.
-            is_session_crypt (bool, optional): If True, session keys will be encoded. Defaults to False.
-            session_aes_secret (Optional[bytes, str], optional): AES secret for encoding session keys.
-            serializer (Union[BaseEncoder, type[BaseEncoder]], optional): JSON encoder/decoder. Defaults to JsonEncoder.
-            logger (Optional[BaseLogger], optional): Logger instance. Defaults to None.
-
-        Raises:
-            JamSessionEmptyAESKey: If 'is_session_crypt' is True and 'session_aes_secret' is not provided.
-        """
+        """Initialize the async session module."""
         self._id = id_factory
         self._sk_mark_symbol = "J$_"
         self._serializer = serializer
@@ -139,29 +95,32 @@ class BaseSessionModule(ABC):
         return self._id()
 
     @abstractmethod
-    def create(self, session_key: str, data: dict[str, Any]) -> str:
+    async def create(self, session_key: str, data: dict[str, Any]) -> str:
         """Create a new session with the given session key and data.
 
         Args:
             session_key (str): The key for the session.
-            data (dict): The data to be stored in the session.
+            data (dict[str, Any]): The data to be stored in the session.
+
+        Returns:
+            str: The session ID.
         """
         raise NotImplementedError
 
     @abstractmethod
-    def get(self, session_id: str) -> dict[str, Any] | None:
+    async def get(self, session_id: str) -> dict[str, Any] | None:
         """Retrieve a session by its key or ID.
 
         Args:
             session_id (str): The ID of the session.
 
         Returns:
-            dict | None: The session data if found, otherwise None.
+            dict[str, Any] | None: The session data if found, otherwise None.
         """
         raise NotImplementedError
 
     @abstractmethod
-    def delete(self, session_id: str) -> None:
+    async def delete(self, session_id: str) -> None:
         """Delete a session by its key or ID.
 
         Args:
@@ -170,12 +129,12 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def update(self, session_id: str, data: dict[str, Any]) -> None:
+    async def update(self, session_id: str, data: dict[str, Any]) -> None:
         """Update an existing session with new data.
 
         Args:
             session_id (str): The ID of the session to update.
-            data (dict): The new data to be stored in the session.
+            data (dict[str, Any]): The new data to be stored in the session.
 
         Raises:
             JamSessionNotFound: If the session with the given ID does not exist.
@@ -183,7 +142,7 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def rework(self, session_id: str) -> str:
+    async def rework(self, session_id: str) -> str:
         """Rework a session and return its new ID.
 
         Args:
@@ -198,7 +157,7 @@ class BaseSessionModule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def clear(self, session_key: str) -> None:
+    async def clear(self, session_key: str) -> None:
         """Clear all sessions by key.
 
         Args:

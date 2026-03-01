@@ -4,10 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Literal, TypeVar
 
 from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric.rsa import (
-    RSAPrivateKey,
-    RSAPublicKey,
-)
+from cryptography.hazmat.primitives.asymmetric import ec, ed25519, rsa
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 from jam.__base_encoder__ import BaseEncoder
@@ -16,7 +13,7 @@ from jam.exceptions import JamPASETOInvalidRSAKey
 
 
 PASETO = TypeVar("PASETO", bound="BasePASETO")
-RSAKeyLike = str | bytes | RSAPrivateKey | RSAPublicKey
+RSAKeyLike = str | bytes | rsa.RSAPrivateKey | rsa.RSAPublicKey
 
 
 class BasePASETO(ABC):
@@ -27,7 +24,12 @@ class BasePASETO(ABC):
     def __init__(self):
         """Constructor."""
         self._secret: Any | None = None
-        self._public_key: RSAPublicKey | None = None
+        self._public_key: (
+            rsa.RSAPublicKey
+            | ed25519.Ed25519PublicKey
+            | ec.EllipticCurvePublicKey
+            | None
+        ) = None
         self._purpose: Literal["local", "public"] | None = None
 
     @property
@@ -36,9 +38,7 @@ class BasePASETO(ABC):
         return self._purpose
 
     @staticmethod
-    def load_rsa_key(
-        key: RSAKeyLike | None, *, private: bool = True
-    ) -> RSAPrivateKey | RSAPublicKey | None:
+    def load_rsa_key(key: RSAKeyLike | None, *, private: bool = True) -> Any:
         """Load rsa key from string | bytes.
 
         Args:
@@ -50,27 +50,32 @@ class BasePASETO(ABC):
         """
         if key is None:
             return None
-        if isinstance(key, (RSAPublicKey | RSAPrivateKey)):
+        if isinstance(key, rsa.RSAPublicKey | rsa.RSAPrivateKey):
             return key
         if isinstance(key, str):
-            key = key.encode("utf-8")
+            key_bytes: bytes = key.encode("utf-8")
+        else:
+            key_bytes = key
         try:
             if private:
-                return serialization.load_pem_private_key(key, password=None)
+                return serialization.load_pem_private_key(
+                    key_bytes, password=None
+                )  # type: ignore[no-any-return]
             else:
-                return serialization.load_pem_public_key(key)
+                return serialization.load_pem_public_key(key_bytes)  # type: ignore[no-any-return]
         except ValueError:
             try:
                 if private:
                     return serialization.load_der_private_key(
-                        key, password=None
+                        key_bytes,
+                        password=None,  # type: ignore[arg-type]
                     )
                 else:
-                    return serialization.load_der_public_key(key)
+                    return serialization.load_der_public_key(key_bytes)  # type: ignore[arg-type]
             except Exception as e:
                 raise JamPASETOInvalidRSAKey(
                     message=f"Invalid RSA {'private' if private else 'public'} key format.",
-                    details={"error": str(e)}
+                    details={"error": str(e)},
                 )
 
     @staticmethod
@@ -89,7 +94,7 @@ class BasePASETO(ABC):
                 return True
             elif key.startswith(b"-----BEGIN EC PRIVATE"):
                 return True
-        elif isinstance(key, RSAPrivateKey):
+        elif isinstance(key, rsa.RSAPrivateKey):
             return True
         return False
 

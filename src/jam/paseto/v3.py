@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# type: ignore
 
 import hashlib
 import hmac
@@ -64,7 +65,9 @@ class PASETOv3(BasePASETO):
             else:
                 raw = key
             if not isinstance(raw, (bytes | bytearray)) or len(raw) != 32:
-                raise JamPASETOInvalidSymmetricKey("v3.local requires a 32-byte secret key")
+                raise JamPASETOInvalidSymmetricKey(
+                    "v3.local requires a 32-byte secret key"
+                )
             inst._secret = bytes(raw)
             return inst
 
@@ -258,9 +261,7 @@ class PASETOv3(BasePASETO):
         footer_part = parts[3] if len(parts) > 3 else b""
         decoded = base64url_decode(payload_part)
         if len(decoded) < 80:
-            raise JamPASETOInvalidTokenFormat(
-                message="Invalid payload size"
-            )
+            raise JamPASETOInvalidTokenFormat(message="Invalid payload size")
 
         pl = decoded[:32]
         ciphertext_tag = decoded[32:]
@@ -329,14 +330,10 @@ class PASETOv3(BasePASETO):
     def _decode_public(self, token: str, serializer: BaseEncoder):
         parts = token.encode("utf-8").split(b".")
         if len(parts) < 3:
-            raise JamPASETOInvalidTokenFormat(
-                message="Invalid token format"
-            )
+            raise JamPASETOInvalidTokenFormat(message="Invalid token format")
         header = b".".join(parts[:2]) + b"."
         if header != b"v3.public.":
-            raise JamPASETOInvalidTokenFormat(
-                message="Invalid header"
-            )
+            raise JamPASETOInvalidTokenFormat(message="Invalid header")
 
         payload_part = parts[2]
         footer_part = parts[3] if len(parts) > 3 else b""
@@ -366,9 +363,7 @@ class PASETOv3(BasePASETO):
                 der_sig, pre_auth, ec.ECDSA(hashes.SHA384())
             )
         except InvalidSignature:
-            raise JamPASETOInvalidTokenFormat(
-                message="Invalid signature"
-            )
+            raise JamPASETOInvalidTokenFormat(message="Invalid signature")
 
         payload_data = serializer.loads(payload)
 

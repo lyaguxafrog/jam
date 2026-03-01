@@ -36,7 +36,7 @@ async def test_jwt_backend_from_cookie(async_jam):
     assert result is not None
     creds, user = result
     assert creds.scopes == ["authenticated"]
-    assert user.payload["user_id"] == 1
+    assert user.payload["user_id"] == 1  # type: ignore[index]
 
 
 @pytest.mark.asyncio
@@ -50,8 +50,8 @@ async def test_jwt_backend_from_header(async_jam):
         return_value={"user": "header_user"}
     )
 
-    creds, user = await backend.authenticate(conn)
-    assert user.payload == {"user": "header_user"}
+    creds, user = await backend.authenticate(conn)  # type: ignore[assignment]
+    assert user.payload == {"user": "header_user"}  # type: ignore[attr-defined]
 
 
 @pytest.mark.asyncio
@@ -96,7 +96,7 @@ async def test_session_backend_from_cookie(async_jam):
     assert result is not None
     creds, user = result
     assert creds.scopes == ["authenticated"]
-    assert user.payload["user_id"] == 42
+    assert user.payload["user_id"] == 42  # type: ignore[index]
 
 
 @pytest.mark.asyncio
@@ -112,8 +112,8 @@ async def test_session_backend_from_header(async_jam):
         return_value={"user": "header_user"}
     )
 
-    creds, user = await backend.authenticate(conn)
-    assert user.payload == {"user": "header_user"}
+    creds, user = await backend.authenticate(conn)  # type: ignore[assignment]
+    assert user.payload == {"user": "header_user"}  # type: ignore[attr-defined]
 
 
 @pytest.mark.asyncio
@@ -142,4 +142,4 @@ async def test_session_backend_invalid_session(async_jam):
     assert result is not None
     creds, user = result
     assert creds.scopes == ["authenticated"]
-    assert user.payload is None
+    assert user.payload is None  # type: ignore[attr-defined]

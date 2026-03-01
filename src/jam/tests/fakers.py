@@ -81,20 +81,20 @@ def fake_paseto_token(
     payload_data = payload or {}
 
     payload_json = json.dumps(payload_data, separators=(",", ": "))
-    payload_b64 = base64url_encode(payload_json.encode("utf-8")).decode("utf-8")
+    payload_b64 = base64url_encode(payload_json.encode("utf-8")).decode("utf-8")  # type: ignore[union-attr]
 
     token = f"{version}.{purpose}.{payload_b64}"
 
     if footer:
         if isinstance(footer, dict):
             footer_json = json.dumps(footer, separators=(",", ": "))
-            footer_b64 = base64url_encode(footer_json.encode("utf-8")).decode(
+            footer_b64 = base64url_encode(footer_json.encode("utf-8")).decode(  # type: ignore[union-attr]
                 "utf-8"
             )
         elif isinstance(footer, bytes):
-            footer_b64 = base64url_encode(footer).decode("utf-8")
+            footer_b64 = base64url_encode(footer).decode("utf-8")  # type: ignore[union-attr]
         else:
-            footer_b64 = base64url_encode(str(footer).encode("utf-8")).decode(
+            footer_b64 = base64url_encode(str(footer).encode("utf-8")).decode(  # type: ignore[union-attr]
                 "utf-8"
             )
         token += f".{footer_b64}"

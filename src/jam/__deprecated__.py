@@ -17,7 +17,7 @@ def deprecated(replacement: str | None = None):
             warnings.warn(msg, category=DeprecationWarning, stacklevel=2)
             return func(*args, **kwargs)
 
-        wrapper.__deprecated__ = True
+        wrapper.__deprecated__ = True  # type: ignore[attr-defined,assignment]
         wrapper.__doc__ = (
             func.__doc__ or ""
         ) + f"\n\n⚠️ Deprecated: {replacement or ''}".strip()

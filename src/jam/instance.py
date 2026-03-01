@@ -52,10 +52,8 @@ class Jam(BaseJam):
 
         Returns:
             str: New token
-
-        Raises:
-            JamJWTValidationError: If encodinf fails
         """
+        assert self.jwt is not None
         self._logger.debug(
             f"Creating JWT token with payload keys: {list(payload.keys())}"
         )
@@ -85,8 +83,6 @@ class Jam(BaseJam):
 
         Raises:
             JamJWTExpired: If token is expired
-            JamJWTValidationError: If token is invalid, malformed, or verification fails
-            JamJWTUnsupportedAlgorithm: If the token's algorithm is not supported
             JamConfigurationError: If JWT list is not connected
             JamJWTNotInWhiteList: If token is not in white list
             JamJWTInBlackList: If token is in black list
@@ -94,6 +90,7 @@ class Jam(BaseJam):
         self._logger.debug(
             f"Verifying JWT token (length: {len(token)} chars), check_exp={check_exp}, check_list={check_list}"
         )
+        assert self.jwt is not None
         payload = self.jwt.decode(token)
         self._logger.debug(
             f"JWT token verified successfully, payload keys: {list(payload.keys())}"
@@ -134,6 +131,7 @@ class Jam(BaseJam):
         Returns:
             str: New session ID
         """
+        assert self.session is not None
         self._logger.debug(
             f"Creating session with key: {session_key}, data keys: {list(data.keys())}"
         )
@@ -152,6 +150,7 @@ class Jam(BaseJam):
         Returns:
             dict[str, Any] | None: Session data if exist
         """
+        assert self.session is not None
         self._logger.debug(f"Getting session data for session_id: {session_id}")
         data = self.session.get(session_id)
         if data:
@@ -168,6 +167,7 @@ class Jam(BaseJam):
         Args:
             session_id (str): Session ID
         """
+        assert self.session is not None
         return self.session.delete(session_id)
 
     def session_update(self, session_id: str, data: dict[str, Any]) -> None:
@@ -180,6 +180,7 @@ class Jam(BaseJam):
         Raises:
             JamSessionNotFound: If session with given ID does not exist.
         """
+        assert self.session is not None
         return self.session.update(session_id, data)
 
     def session_clear(self, session_key: str) -> None:
@@ -188,6 +189,7 @@ class Jam(BaseJam):
         Args:
             session_key (str): Key of session
         """
+        assert self.session is not None
         return self.session.clear(session_key)
 
     def session_rework(self, old_session_id: str) -> str:
@@ -202,6 +204,7 @@ class Jam(BaseJam):
         Returns:
             str: New session id
         """
+        assert self.session is not None
         return self.session.rework(old_session_id)
 
     def otp_code(self, secret: str | bytes, factor: int | None = None) -> str:
@@ -214,7 +217,9 @@ class Jam(BaseJam):
         Returns:
             str: OTP code (fixed-length string).
         """
-        return self._otp(  # type: ignore
+        assert self.otp is not None
+        assert self._otp is not None
+        return self._otp(
             secret=secret, digits=self.otp.digits, digest=self.otp.digest
         ).at(factor)
 
@@ -236,6 +241,8 @@ class Jam(BaseJam):
         Returns:
             str: A string of the form "otpauth://..."
         """
+        assert self.otp is not None
+        assert self._otp is not None
         return self._otp(
             secret=secret, digits=self.otp.digits, digest=self.otp.digest
         ).provisioning_uri(name=name, issuer=issuer, counter=counter)
@@ -258,9 +265,11 @@ class Jam(BaseJam):
         Returns:
             bool: True if the code matches, otherwise False.
         """
-        return self._otp(  # type: ignore
+        assert self.otp is not None
+        assert self._otp is not None
+        return self._otp(
             secret=secret, digits=self.otp.digits, digest=self.otp.digest
-        ).verify(code=code, factor=factor, look_ahead=look_ahead)
+        ).verify(code=code, factor=factor, look_ahead=look_ahead or 1)
 
     def oauth2_get_authorized_url(
         self, provider: str, scope: list[str], **extra_params: Any
@@ -277,6 +286,7 @@ class Jam(BaseJam):
         """
         from jam.exceptions import JamConfigurationError
 
+        assert self.oauth2 is not None
         if provider not in self.oauth2:
             raise JamConfigurationError(
                 message=f"Provider {provider} not configured",
@@ -306,6 +316,7 @@ class Jam(BaseJam):
         """
         from jam.exceptions import JamOAuth2ProviderNotConfigured
 
+        assert self.oauth2 is not None
         if provider not in self.oauth2:
             raise JamOAuth2ProviderNotConfigured(details={"provider": provider})
         return self.oauth2[provider].fetch_token(
@@ -332,6 +343,7 @@ class Jam(BaseJam):
         """
         from jam.exceptions import JamOAuth2ProviderNotConfigured
 
+        assert self.oauth2 is not None
         if provider not in self.oauth2:
             raise JamOAuth2ProviderNotConfigured(details={"provider": provider})
         return self.oauth2[provider].refresh_token(
@@ -360,6 +372,7 @@ class Jam(BaseJam):
         """
         from jam.exceptions import JamOAuth2ProviderNotConfigured
 
+        assert self.oauth2 is not None
         if provider not in self.oauth2:
             raise JamOAuth2ProviderNotConfigured(details={"provider": provider})
         return self.oauth2[provider].client_credentials_flow(
@@ -396,6 +409,7 @@ class Jam(BaseJam):
         Returns:
             str: New token
         """
+        assert self.paseto is not None
         return self.paseto.encode(payload=payload, footer=footer)
 
     def paseto_decode(
@@ -411,5 +425,6 @@ class Jam(BaseJam):
         Returns:
             dict: {'payload' PAYLOAD, 'footer': FOOTER}
         """
+        assert self.paseto is not None
         payload, footer = self.paseto.decode(token)
         return {"payload": payload, "footer": footer}

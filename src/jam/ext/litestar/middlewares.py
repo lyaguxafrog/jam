@@ -98,13 +98,13 @@ class JamSessionsMiddleware(AbstractAuthenticationMiddleware):
         )
 
         if cookie:
-            payload = await await_maybe(instance.session_get(cookie))
+            payload = await await_maybe(instance.session_get(cookie))  # type: ignore[arg-type]
             return AuthenticationResult(
                 settings.user_dataclass(payload=payload),
                 settings.auth_dataclass(token=cookie),
             )
         if header:
-            payload = await await_maybe(instance.session_get(header))
+            payload = await await_maybe(instance.session_get(header))  # type: ignore[arg-type]
             return AuthenticationResult(
                 settings.user_dataclass(payload=payload),
                 settings.auth_dataclass(token=header),

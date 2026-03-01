@@ -40,7 +40,7 @@ def __yaml_config_parser(
         raise JamConfigurationError(
             message="To generate a configuration file from YAML/YML, you need to install PyYaml: "
             "`pip install pyyaml` or `pip install jamlib[yaml]`",
-            error_code="configuration.import_error"
+            error_code="configuration.import_error",
         )
 
     # Pattern to match ${VAR:-default} or ${VAR} or $VAR
@@ -61,7 +61,7 @@ def __yaml_config_parser(
                     return default_value
                 raise JamConfigurationError(
                     message=f"Environment variable '{var_name}' not set and no default provided",
-                    error_code="configuration.env_var_not_set"
+                    error_code="configuration.env_var_not_set",
                 )
             return env_value
         elif match.group(4):
@@ -70,7 +70,7 @@ def __yaml_config_parser(
             if env_value is None:
                 raise JamConfigurationError(
                     message=f"Environment variable '{var_name}' not set",
-                    error_code="configuration.env_var_not_set"
+                    error_code="configuration.env_var_not_set",
                 )
             return env_value
         return match.group(0)
@@ -98,12 +98,12 @@ def __yaml_config_parser(
     except FileNotFoundError:
         raise JamConfigurationError(
             message=f"YAML config file not found at: {path}",
-            error_code="configuration.file_not_found"
+            error_code="configuration.file_not_found",
         )
     except yaml.YAMLError as e:
         raise JamConfigurationError(
             message=f"Error parsing YAML file: {e}",
-            error_code="configuration.yaml_error"
+            error_code="configuration.yaml_error",
         )
 
 
@@ -136,7 +136,7 @@ def __toml_config_parser(
             raise JamConfigurationError(
                 message="To parse TOML config files, install toml: "
                 "`pip install toml` or use Python 3.11+ (built-in tomllib).",
-                error_code="configuration.toml_not_installed"
+                error_code="configuration.toml_not_installed",
             )
 
     try:
@@ -149,12 +149,12 @@ def __toml_config_parser(
     except FileNotFoundError:
         raise JamConfigurationError(
             message=f"TOML config file not found at: {path}",
-            error_code="configuration.file_not_found"
+            error_code="configuration.file_not_found",
         )
     except Exception as e:
         raise JamConfigurationError(
             message=f"Error parsing TOML file: {e}",
-            error_code="configuration.toml_error"
+            error_code="configuration.toml_error",
         )
 
     env_pattern = re.compile(
@@ -178,7 +178,7 @@ def __toml_config_parser(
                             return default_value
                         raise JamConfigurationError(
                             message=f"Environment variable '{var_name}' not set and no default provided",
-                            error_code="configuration.env_var_not_set"
+                            error_code="configuration.env_var_not_set",
                         )
                     return env_value
                 elif match.group(4):
@@ -187,7 +187,7 @@ def __toml_config_parser(
                     if env_value is None:
                         raise JamConfigurationError(
                             message=f"Environment variable '{var_name}' not set",
-                            error_code="configuration.env_vat_not_set"
+                            error_code="configuration.env_vat_not_set",
                         )
                     return env_value
                 return match.group(0)
@@ -239,7 +239,7 @@ def __json_config_parser(
     except FileNotFoundError:
         raise JamConfigurationError(
             message=f"JSON config file not found at: {path}",
-            error_code="configuration.file_not_found"
+            error_code="configuration.file_not_found",
         )
 
     env_pattern = re.compile(
@@ -253,7 +253,7 @@ def __json_config_parser(
                 return default_value
             raise JamConfigurationError(
                 message=f"Environment variable '{var_name}' not set and no default provided",
-                error_code="configuration.env_var_not_set"
+                error_code="configuration.env_var_not_set",
             )
         return env_value
 
@@ -310,7 +310,7 @@ def __json_config_parser(
     except Exception as e:
         raise JamConfigurationError(
             message=f"Error parsing JSON file: {e}",
-            error_code="configuration.json_parse_error"
+            error_code="configuration.json_parse_error",
         ) from e
 
     def _env_constructor(value: Any) -> Any:
@@ -359,7 +359,7 @@ def __config_maker__(
             case _:
                 raise JamConfigurationError(
                     message="YML/YAML, TOML or JSON configs only!",
-                    error_code="configuration.invalid_config_type"
+                    error_code="configuration.invalid_config_type",
                 )
     else:
         return config.copy()

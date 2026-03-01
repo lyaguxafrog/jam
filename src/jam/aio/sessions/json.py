@@ -14,13 +14,13 @@ except ImportError:
         "JSON module is not installed. Please install it with 'pip install jamlib[json]'."
     )
 
+from jam.aio.sessions.__base__ import BaseAsyncSessionModule
 from jam.encoders import BaseEncoder, JsonEncoder
 from jam.exceptions import JamSessionNotFound
 from jam.logger import BaseLogger
-from jam.sessions.__base__ import BaseSessionModule
 
 
-class JSONSessions(BaseSessionModule):
+class JSONSessions(BaseAsyncSessionModule):
     """Async session management module for JSON storage."""
 
     def __init__(

@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 import logging
 import os
-from typing import Literal
+from typing import Any, Literal
 
 
 class BaseLogger(ABC):
@@ -28,12 +28,17 @@ class BaseLogger(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def warning(self, message: str) -> None:
-        """Log a warning message."""
+    def warning(self, message: str, exc_info: bool = False) -> None:
+        """Log a warning message.
+
+        Args:
+            message (str): Warning message
+            exc_info (bool): Whether to include exception info
+        """
         raise NotImplementedError
 
     @abstractmethod
-    def debug(self, message: str) -> None:
+    def debug(self, message: str, *args: Any) -> None:
         """Log a debug message."""
         raise NotImplementedError
 
@@ -41,13 +46,16 @@ class BaseLogger(ABC):
 class JamLogger(BaseLogger):
     """Default jam logger, use stdlib logging."""
 
+    _LOG_LEVELS = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
+
     def __init__(
         self,
-        log_level: Literal[
-            "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
-        ] = "INFO",
+        log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+        | str = "INFO",
     ):
         """Initialize the logger."""
+        if log_level not in self._LOG_LEVELS:
+            log_level = "INFO"
         self.logger = logging.getLogger(self._LOG_NAME)
         self.logger.setLevel(log_level)
         if not self.logger.handlers:
@@ -66,13 +74,21 @@ class JamLogger(BaseLogger):
         """
         self.logger.error(message, exc_info=exc_info)
 
-    def warning(self, message: str) -> None:
-        """Log a warning message."""
-        self.logger.warning(message)
+    def warning(self, message: str, exc_info: bool = False) -> None:
+        """Log a warning message.
 
-    def debug(self, message: str) -> None:
+        Args:
+            message (str): Warning message
+            exc_info (bool): Whether to include exception info
+        """
+        self.logger.warning(message, exc_info=exc_info)
+
+    def debug(self, message: str, *args: Any) -> None:
         """Log a debug message."""
-        self.logger.debug(message)
+        if args:
+            self.logger.debug(message, *args)
+        else:
+            self.logger.debug(message)
 
     def __str__(self) -> str:
         """Return a string representation of the logger."""

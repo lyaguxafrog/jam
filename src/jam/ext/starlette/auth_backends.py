@@ -126,8 +126,8 @@ class SessionBackend(AuthenticationBackend):
 
         logger.debug(f"Getting session data for session ID: {session_id}")
         try:
-            payload: dict[str, Any] | None = await await_maybe(
-                self._jam.session_get(session_id)
+            payload: dict[str, Any] | None = await await_maybe(  # type: ignore[arg-type]
+                self._jam.session_get(session_id)  # type: ignore[arg-type]
             )
             if payload:
                 logger.debug(

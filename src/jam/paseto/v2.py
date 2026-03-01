@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# type: ignore
 
 import base64
 import secrets
@@ -10,7 +11,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PublicKey,
 )
 
-from jam import BaseEncoder, JsonEncoder
+from jam.encoders import BaseEncoder, JsonEncoder
 from jam.exceptions import (
     JamPASETOInvalidED25519Key,
     JamPASETOInvalidPurpose,
@@ -76,7 +77,7 @@ class PASETOv2(BasePASETO):
                     if not isinstance(public_key, Ed25519PublicKey):
                         raise JamPASETOInvalidED25519Key(
                             message="Expected Ed25519 public key",
-                            error_code="paseto.config.expected_ed25519_public_key"
+                            error_code="paseto.config.expected_ed25519_public_key",
                         )
                     k._secret = None
                     k._public_key = public_key
@@ -140,7 +141,7 @@ class PASETOv2(BasePASETO):
         if header != b"v2.local.":
             raise JamPASETOInvalidTokenFormat(
                 message="Invalid PASETO header",
-                error_code="paseto.validation.invalid_header"
+                error_code="paseto.validation.invalid_header",
             )
 
         body = base64url_decode(parts[2])
@@ -155,7 +156,9 @@ class PASETOv2(BasePASETO):
                 self._secret, nonce, ciphertext, aad
             )
         except Exception:
-            raise JamPASETOInvalidED25519Key("Invalid authentication or corrupt ciphertext")
+            raise JamPASETOInvalidED25519Key(
+                "Invalid authentication or corrupt ciphertext"
+            )
 
         payload = serializer.loads(plaintext)
 
@@ -184,7 +187,7 @@ class PASETOv2(BasePASETO):
         if header != b"v2.public.":
             raise JamPASETOInvalidTokenFormat(
                 message="Invalid header",
-                error_code="paseto.validation.invalid_header"
+                error_code="paseto.validation.invalid_header",
             )
 
         body = base64url_decode(parts[2])
@@ -193,7 +196,7 @@ class PASETOv2(BasePASETO):
         if len(body) < 64:
             raise JamPASETOInvalidTokenFormat(
                 message="Invalid token: too short to contain Ed25519 signature",
-                error_code="paseto.validation.invalid_payload_size"
+                error_code="paseto.validation.invalid_payload_size",
             )
 
         payload = body[:-64]
@@ -203,7 +206,7 @@ class PASETOv2(BasePASETO):
         if not isinstance(self._public_key, Ed25519PublicKey):
             raise JamPASETOInvalidED25519Key(
                 message="Public key must be Ed25519PublicKey for v2.public",
-                error_code="paseto.configuration.invalid_ed25519_key"
+                error_code="paseto.configuration.invalid_ed25519_key",
             )
 
         try:

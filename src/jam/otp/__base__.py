@@ -99,6 +99,32 @@ class BaseOTP:
         query = urllib.parse.urlencode(params)
         return f"otpauth://{type_}/{label}?{query}"
 
+    def at(self, factor: int | None = None) -> str:
+        """Generate OTP code.
+
+        Args:
+            factor (int | None): TOTP uses current time if None, HOTP uses counter.
+
+        Returns:
+            str: OTP code
+        """
+        raise NotImplementedError
+
+    def verify(
+        self, code: str, factor: int | None = None, look_ahead: int = 1
+    ) -> bool:
+        """Verify OTP code.
+
+        Args:
+            code (str): Code to verify
+            factor (int | None): TOTP uses current time if None, HOTP uses counter.
+            look_ahead (int): How many intervals to check ahead
+
+        Returns:
+            bool: True if valid
+        """
+        raise NotImplementedError
+
 
 @dataclass(slots=True)
 class OTPConfig:

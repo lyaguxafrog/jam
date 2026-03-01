@@ -4,29 +4,18 @@ from collections.abc import Callable
 import os
 from uuid import uuid4
 
+from redis.asyncio import Redis  # type: ignore[attr-defined]
 
-try:
-    from redis.asyncio import Redis
-except ImportError:
-    try:
-        from redis import Redis
-
-        raise ImportError(
-            "Redis async module is not installed. Please install it with 'pip install jamlib[redis]' (redis>=4.0.0 required for async support)."
-        )
-    except ImportError:
-        raise ImportError(
-            "Redis module is not installed. Please install it with 'pip install jamlib[redis]'."
-        )
-
+from jam.aio.sessions.__base__ import BaseAsyncSessionModule
 from jam.encoders import BaseEncoder, JsonEncoder
 from jam.exceptions import JamSessionNotFound
 from jam.logger import BaseLogger
-from jam.sessions.__base__ import BaseSessionModule
 
 
-class RedisSessions(BaseSessionModule):
+class RedisSessions(BaseAsyncSessionModule):
     """Async Redis session management module."""
+
+    _redis: Redis
 
     def __init__(
         self,
@@ -34,7 +23,7 @@ class RedisSessions(BaseSessionModule):
         redis_sessions_key: str = "sessions",
         default_ttl: int | None = 3600,
         is_session_crypt: bool = False,
-        session_aes_secret: bytes | str| None = os.getenv(
+        session_aes_secret: bytes | str | None = os.getenv(
             "JAM_SESSION_AES_SECRET", None
         ),
         id_factory: Callable[[], str] = lambda: str(uuid4()),
@@ -75,10 +64,10 @@ class RedisSessions(BaseSessionModule):
     async def _ping(self) -> bool:
         """Check if the Redis connection is alive."""
         try:
-            return await self._redis.ping()
+            return await self._redis.ping()  # type: ignore[not-async]
         except Exception as e:
             if self._logger:
-                self._logger.error("Redis ping failed: %s", e)
+                self._logger.error(f"Redis ping failed: {e}")
             return False
 
     async def create(self, session_key: str, data: dict) -> str:
@@ -104,7 +93,7 @@ class RedisSessions(BaseSessionModule):
             dumps_data = self._serializer.dumps(data).decode("utf-8")
         del data
 
-        await self._redis.hset(
+        await self._redis.hset(  # type: ignore[not-async]
             name=f"{self.session_path}:{session_key}",
             key=session_id,
             value=dumps_data,
@@ -112,7 +101,7 @@ class RedisSessions(BaseSessionModule):
         if self._logger:
             self._logger.debug("Set session %s successfully.", session_id)
         if self.ttl:
-            await self._redis.hexpire(
+            await self._redis.hexpire(  # type: ignore[not-async]
                 f"{self.session_path}:{session_key}", self.ttl, session_id
             )
             if self._logger:
@@ -142,7 +131,7 @@ class RedisSessions(BaseSessionModule):
             self._logger.debug(
                 f"Decoded session key: {decoded_session_key[0]}, looking in Redis key: {self.session_path}:{decoded_session_key[0]}"
             )
-        session = await self._redis.hget(
+        session = await self._redis.hget(  # type: ignore[not-async]
             name=f"{self.session_path}:{decoded_session_key[0]}",
             key=session_id,
         )
@@ -174,7 +163,7 @@ class RedisSessions(BaseSessionModule):
         decoded_session_key = self.__decode_session_id_if_needed__(
             session_id
         ).split(":", 1)
-        deleted_count = await self._redis.hdel(
+        deleted_count = await self._redis.hdel(  # type: ignore[not-async]
             f"{self.session_path}:{decoded_session_key[0]}",
             session_id,
         )
@@ -217,9 +206,7 @@ class RedisSessions(BaseSessionModule):
                 self._logger.warning(
                     f"Attempted to update non-existent session {session_id}"
                 )
-            raise JamSessionNotFound(
-                details={"session_id": session_id}
-            )
+            raise JamSessionNotFound(details={"session_id": session_id})
 
         try:
             dumps_data = self.__encode_session_data__(data)
@@ -227,7 +214,7 @@ class RedisSessions(BaseSessionModule):
             dumps_data = self._serializer.dumps(data).decode("utf-8")
         del data
 
-        await self._redis.hset(
+        await self._redis.hset(  # type: ignore[not-async]
             name=f"{self.session_path}:{decoded_session_key[0]}",
             key=session_id,
             value=dumps_data,
@@ -267,9 +254,7 @@ class RedisSessions(BaseSessionModule):
         ).split(":", 1)
         session_data = await self.get(session_id)
         if not session_data:
-            raise JamSessionNotFound(
-                details={"session_id": session_id}
-            )
+            raise JamSessionNotFound(details={"session_id": session_id})
 
         new_session_id = await self.create(decoded_session_key[0], session_data)
 

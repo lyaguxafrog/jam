@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABC, abstractmethod
-from collections.abc import Callable
-from secrets import token_urlsafe
 from typing import Any
 
 from jam.encoders import BaseEncoder, JsonEncoder
 
 
-class BaseOAuth2Client(ABC):
-    """Base OAuth2 client instance."""
+class BaseAsyncOAuth2Client(ABC):
+    """Base async OAuth2 client instance."""
 
     def __init__(
         self,
@@ -38,11 +36,14 @@ class BaseOAuth2Client(ABC):
         self._serializer = serializer
 
     @abstractmethod
-    def get_authorization_url(self, scope: list[str]) -> str:
+    async def get_authorization_url(
+        self, scope: list[str], **extra_params: Any
+    ) -> str:
         """Get OAuth2 url.
 
         Args:
             scope (list[str]): Auth scope
+            extra_params (Any): Extra auth params
 
         Returns:
             str: URL for auth
@@ -50,14 +51,18 @@ class BaseOAuth2Client(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def fetch_token(
-        self, code: str, grant_type: str = "authorization_code"
+    async def fetch_token(
+        self,
+        code: str,
+        grant_type: str = "authorization_code",
+        **extra_params: Any,
     ) -> dict[str, Any]:
         """Exchange code for access token.
 
         Args:
             code (str): Auth code
-            grant_type (str): Grant type
+            grant_type (str): Type of oauth2 grant
+            extra_params (Any): Extra auth params if needed
 
         Returns:
             dict: OAuth2 token response
@@ -65,14 +70,18 @@ class BaseOAuth2Client(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def refresh_token(
-        self, refresh_token: str, grant_type: str = "refresh_token"
+    async def refresh_token(
+        self,
+        refresh_token: str,
+        grant_type: str = "refresh_token",
+        **extra_params: Any,
     ) -> dict[str, Any]:
         """Update access token.
 
         Args:
             refresh_token (str): Refresh token
             grant_type (str): Grant type
+            extra_params (Any): Extra auth params if needed
 
         Returns:
             dict: New token response
@@ -80,40 +89,16 @@ class BaseOAuth2Client(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def client_credentials_flow(
-        self, scope: list[str] | None = None
+    async def client_credentials_flow(
+        self, scope: list[str] | None = None, **extra_params: Any
     ) -> dict[str, Any]:
         """Obtain access token using client credentials flow (no user interaction).
 
         Args:
-            scope (Optional[list[str]]): Auth scope
+            scope (list[str] | None): Auth scope
+            extra_params (Any): Extra auth params if needed
 
         Returns:
             dict: JSON with access token
         """
         raise NotImplementedError
-
-
-class __BaseOAuth2Server(ABC):
-    """Base OAuth2 server instance."""
-
-    def __init__(
-        self,
-        app_url: str,
-        code_factory: Callable[[], str] = lambda: token_urlsafe(8),
-    ) -> None:
-        """Constructor.
-
-        Args:
-            app_url (str): URL of your app
-            code_factory (Callable[[] ,str]): Factory for code generation
-        """
-        self.app_url = app_url
-        self.code_factory = code_factory
-        raise NotImplementedError("Not implemented in the current version!")
-
-    @property
-    def code(self) -> str:
-        return self.code_factory()
-
-    ...

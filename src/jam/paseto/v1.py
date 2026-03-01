@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# type: ignore
 
 import hashlib
 import hmac
@@ -61,14 +62,10 @@ class PASETOv1(BasePASETO):
                 raw = base64url_decode(key.encode("utf-8"))
             else:
                 raw = key
-            if not isinstance(raw, (bytes, bytearray) or len(raw) != 32):
+            if not isinstance(raw, (bytes, bytearray) or len(raw) != 32):  # type: ignore[bad-argument-type]
                 raise JamPASETOInvalidRSAKey(
                     message="v1.local requires a 32-byte secret key.",
-                    details={
-                        "version": "v1",
-                        "purpose": "local",
-                        "key": key
-                    }
+                    details={"version": "v1", "purpose": "local", "key": key},
                 )
             inst._secret = bytes(raw)
             return inst
@@ -76,7 +73,7 @@ class PASETOv1(BasePASETO):
         elif purpose == "public":
             if isinstance(key, RSAPrivateKey):
                 inst._secret = key
-                inst._public_key - key.public_key()
+                inst._public_key = key.public_key()
                 return inst
             if isinstance(key, RSAPublicKey):
                 inst._secret = None
@@ -86,7 +83,8 @@ class PASETOv1(BasePASETO):
             key_bytes = key.encode("utf-8") if isinstance(key, str) else key
             try:
                 priv = serialization.load_pem_private_key(
-                    key_bytes, password=None
+                    key_bytes,  # type: ignore[arg-type]
+                    password=None,
                 )
                 if isinstance(priv, RSAPrivateKey):
                     inst._secret = priv
@@ -95,8 +93,9 @@ class PASETOv1(BasePASETO):
             except Exception:
                 pass
             try:
-                priv = serialization.load_der_private_key(
-                    key_bytes, password=None
+                priv = serialization.load_der_private_key(  # type: ignore[arg-type]
+                    key_bytes,
+                    password=None,
                 )
                 if isinstance(priv, RSAPrivateKey):
                     inst._secret = priv
@@ -105,7 +104,7 @@ class PASETOv1(BasePASETO):
             except Exception:
                 pass
             try:
-                pub = serialization.load_pem_public_key(key_bytes)
+                pub = serialization.load_pem_public_key(key_bytes)  # type: ignore[arg-type]
                 if isinstance(pub, RSAPublicKey):
                     inst._secret = None
                     inst._public_key = pub
@@ -113,7 +112,7 @@ class PASETOv1(BasePASETO):
             except Exception:
                 pass
             try:
-                pub = serialization.load_der_public_key(key_bytes)
+                pub = serialization.load_der_public_key(key_bytes)  # type: ignore[arg-type]
                 if isinstance(pub, RSAPublicKey):
                     inst._secret = None
                     inst._public_key = pub
@@ -121,7 +120,9 @@ class PASETOv1(BasePASETO):
             except Exception:
                 pass
 
-            raise JamPASETOInvalidRSAKey(message="Invalid RSA key for v1.public")
+            raise JamPASETOInvalidRSAKey(
+                message="Invalid RSA key for v1.public"
+            )
         else:
             raise ValueError("Purpose must be 'local' or 'public'")
 
@@ -140,10 +141,10 @@ class PASETOv1(BasePASETO):
             "length": 32,
             "salt": pl[0:16],
         }
-        ek = HKDF(info=b"paseto-encryption-key", **hkdf_params).derive(
+        ek = HKDF(info=b"paseto-encryption-key", **hkdf_params).derive(  # type: ignore[arg-type]
             self._secret
         )
-        ak = HKDF(info=b"paseto-auth-key-for-aead", **hkdf_params).derive(
+        ak = HKDF(info=b"paseto-auth-key-for-aead", **hkdf_params).derive(  # type: ignore[arg-type]
             self._secret
         )
 
@@ -191,7 +192,7 @@ class PASETOv1(BasePASETO):
         if header != b"v1.local.":
             raise JamPASETOInvalidTokenFormat(
                 message="Invalid PASETO header",
-                error_code="paseto.validation.invalid_header"
+                error_code="paseto.validation.invalid_header",
             )
 
         payload_part = parts[2]
@@ -201,7 +202,7 @@ class PASETOv1(BasePASETO):
         if len(decoded) < 80:
             raise JamPASETOInvalidTokenFormat(
                 message="Invalid payload size.",
-                error_code="paseto.validation.invalid_payload_size"
+                error_code="paseto.validation.invalid_payload_size",
             )
 
         pl = decoded[:32]
@@ -216,10 +217,10 @@ class PASETOv1(BasePASETO):
             "length": 32,
             "salt": pl[0:16],
         }
-        ek = HKDF(info=b"paseto-encryption-key", **hkdf_params).derive(
+        ek = HKDF(info=b"paseto-encryption-key", **hkdf_params).derive(  # type: ignore[arg-type]
             self._secret
         )
-        ak = HKDF(info=b"paseto-auth-key-for-aead", **hkdf_params).derive(
+        ak = HKDF(info=b"paseto-auth-key-for-aead", **hkdf_params).derive(  # type: ignore[arg-type]
             self._secret
         )
 
@@ -228,7 +229,7 @@ class PASETOv1(BasePASETO):
         if not hmac.compare_digest(tag, expected_tag):
             raise JamPASETOInvalidTokenFormat(
                 message="Invalid authentication tag",
-                error_code="paseto.validation.invalid_authentication_tag"
+                error_code="paseto.validation.invalid_authentication_tag",
             )
 
         payload_bytes = self._decrypt(ek, pl[16:], ciphertext)
@@ -260,7 +261,7 @@ class PASETOv1(BasePASETO):
         if header != b"v1.public.":
             raise JamPASETOInvalidTokenFormat(
                 message="Invalid PASETO header",
-                error_code="paseto.validation.invalid_header"
+                error_code="paseto.validation.invalid_header",
             )
 
         payload_part = parts[2]
@@ -270,14 +271,14 @@ class PASETOv1(BasePASETO):
         if len(decoded) < 256:
             raise JamPASETOInvalidTokenFormat(
                 message="Invalid token body,",
-                error_code="paseto.validation.invalid_body"
+                error_code="paseto.validation.invalid_body",
             )
 
         key_size = self._public_key.key_size // 8
         if len(decoded) < key_size:
             raise JamPASETOInvalidTokenFormat(
                 message="Invalid payload/signature size",
-                error_code="paseto.validation.invalid_payload_signature_size"
+                error_code="paseto.validation.invalid_payload_signature_size",
             )
 
         payload = decoded[:-key_size]

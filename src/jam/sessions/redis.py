@@ -21,6 +21,8 @@ from jam.sessions.__base__ import BaseSessionModule
 class RedisSessions(BaseSessionModule):
     """Redis session management module."""
 
+    _redis: Redis
+
     def __init__(
         self,
         redis_uri: str | Redis = "redis://localhost:6379/0",
@@ -69,10 +71,10 @@ class RedisSessions(BaseSessionModule):
     def _ping(self) -> bool:
         """Check if the Redis connection is alive."""
         try:
-            return self._redis.ping()
+            return self._redis.ping()  # type: ignore[return-value]
         except Exception as e:
             if self._logger:
-                self._logger.error("Redis ping failed: %s", e)
+                self._logger.error(f"Redis ping failed: {e}")
             return False
 
     def create(self, session_key: str, data: dict) -> str:
@@ -146,9 +148,9 @@ class RedisSessions(BaseSessionModule):
             return None
 
         try:
-            loads_data = self.__decode_session_data__(session)
+            loads_data = self.__decode_session_data__(session)  # type: ignore[arg-type]
         except AttributeError:
-            loads_data = self._serializer.loads(session)
+            loads_data = self._serializer.loads(session)  # type: ignore[arg-type]
         if self._logger:
             self._logger.debug(
                 f"Session {session_id} found, data keys: {list(loads_data.keys()) if isinstance(loads_data, dict) else 'N/A'}"
@@ -211,9 +213,7 @@ class RedisSessions(BaseSessionModule):
                 self._logger.warning(
                     f"Attempted to update non-existent session {session_id}"
                 )
-            raise JamSessionNotFound(
-                details={"session_id": session_id}
-            )
+            raise JamSessionNotFound(details={"session_id": session_id})
 
         try:
             dumps_data = self.__encode_session_data__(data)
@@ -262,9 +262,7 @@ class RedisSessions(BaseSessionModule):
         ).split(":", 1)
         session_data = self.get(session_id)
         if not session_data:
-            raise JamSessionNotFound(
-                details={"session_id": session_id}
-            )
+            raise JamSessionNotFound(details={"session_id": session_id})
 
         new_session_id = self.create(decoded_session_key[0], session_data)
 

@@ -15,7 +15,7 @@ from jam.logger import BaseLogger, logger
 def create_instance(
     type: Literal["hotp", "totp"],
     # logger: BaseLogger = logger,
-    **kwargs: Any
+    **kwargs: Any,
 ) -> type[BaseOTP]:
     """Create OTP class (not instance, since secret is provided per-call).
 
@@ -29,7 +29,9 @@ def create_instance(
     """
     if kwargs.get("custom_module"):
         from jam.utils.config_maker import __module_loader__
-        return __module_loader__(kwargs["custom_module"])
+
+        return __module_loader__(kwargs["custom_module"])  # type: ignore[return-value]
 
     from jam.utils.config_maker import __module_loader__
-    return __module_loader__(f"jam.otp.{type}.{type.upper()}")
+
+    return __module_loader__(f"jam.otp.{type}.{type.upper()}")  # type: ignore[return-value]

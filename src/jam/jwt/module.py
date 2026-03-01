@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Literal
+from typing import Any
 
 from jam.encoders import BaseEncoder, JsonEncoder
 from jam.exceptions import JamJWTUnsupportedAlgorithm, JamJWTValidationError
@@ -43,20 +43,7 @@ class JWT(BaseJWT):
 
     def __init__(
         self,
-        alg: Literal[
-            "HS256",
-            "HS384",
-            "HS512",
-            "RS256",
-            "RS384",
-            "RS512",
-            "ES256",
-            "ES384",
-            "ES512",
-            "PS256",
-            "PS384",
-            "PS512",
-        ],
+        alg: str,
         secret: KeyLike,
         password: str | bytes | None = None,
         list: dict[str, Any] | None = None,
@@ -100,7 +87,7 @@ class JWT(BaseJWT):
             raise JamJWTUnsupportedAlgorithm(
                 details={
                     "algorithm": alg,
-                    "supported_algorithms": self._SUPPORTED_ALGORITHMS
+                    "supported_algorithms": self._SUPPORTED_ALGORITHMS,
                 }
             )
 
@@ -165,9 +152,7 @@ class JWT(BaseJWT):
             self._logger.error(
                 f"Failed to encode JWT: {e}",
             )
-            raise JamJWTValidationError(
-                details={"error": e}
-            )
+            raise JamJWTValidationError(details={"error": e})
 
     def decode(
         self, token: str, public_key: KeyLike | None = None
@@ -198,7 +183,7 @@ class JWT(BaseJWT):
             )
             raise JamJWTValidationError(
                 message="Invalid token format. Expected header.payload.signature",
-                error_code="jwt.validation.invalid_token_format"
+                error_code="jwt.validation.invalid_token_format",
             )
 
         try:
@@ -224,7 +209,7 @@ class JWT(BaseJWT):
                 )
                 raise JamJWTUnsupportedAlgorithm(
                     message="Algorithm mismatch.",
-                    details={"expected": self.alg, "got": token_alg}
+                    details={"expected": self.alg, "got": token_alg},
                 )
 
             # Verify signature
@@ -245,5 +230,5 @@ class JWT(BaseJWT):
             raise JamJWTValidationError(
                 message="JWT decoding failed.",
                 error_code="jwt.validation.decoding_failed",
-                details={"error": str(e)}
+                details={"error": str(e)},
             )

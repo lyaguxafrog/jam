@@ -18,7 +18,7 @@ def create_instance(
     purpose: Literal["local", "public"],
     key: str | bytes | Any,
     logger: BaseLogger = logger,
-    **kwargs: Any
+    **kwargs: Any,
 ) -> PASETO:
     """Create PASETO instance.
 
@@ -40,10 +40,10 @@ def create_instance(
 
     if kwargs.get("custom_module"):
         module_cls = __module_loader__(kwargs["custom_module"])
-        return module_cls.key(purpose, key)
+        return module_cls.key(purpose, key)  # type: ignore[no-any-return]
 
     module_cls = __module_loader__(f"jam.paseto.{version}.PASETO{version}")
-    return module_cls.key(purpose, key)
+    return module_cls.key(purpose, key)  # type: ignore[no-any-return]
 
 
 __all__ = [

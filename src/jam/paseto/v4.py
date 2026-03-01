@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# type: ignore
 
 import secrets
 from typing import Any, Literal
@@ -204,20 +205,14 @@ class PASETOv4(BasePASETO):
     ):
         parts = token.encode("utf-8").split(b".")
         if len(parts) < 3:
-            raise JamPASETOInvalidTokenFormat(
-                message="Invalid token format"
-            )
+            raise JamPASETOInvalidTokenFormat(message="Invalid token format")
         header = b".".join(parts[:2]) + b"."
         if header != b"v4.local.":
-            raise JamPASETOInvalidTokenFormat(
-                message="Invalid header"
-            )
+            raise JamPASETOInvalidTokenFormat(message="Invalid header")
 
         body = base64url_decode(parts[2])
         if len(body) < 24 + 16:
-            raise JamPASETOInvalidTokenFormat(
-                message="Invalid token body"
-            )
+            raise JamPASETOInvalidTokenFormat(message="Invalid token body")
 
         nonce = body[:24]
         ciphertext = body[24:]
@@ -269,14 +264,10 @@ class PASETOv4(BasePASETO):
     def _decode_public(self, token: str, serializer: BaseEncoder):
         parts = token.encode("utf-8").split(b".")
         if len(parts) < 3:
-            raise JamPASETOInvalidTokenFormat(
-                message="Invalid token format."
-            )
+            raise JamPASETOInvalidTokenFormat(message="Invalid token format.")
         header = b".".join(parts[:2]) + b"."
         if header != b"v4.public.":
-            raise JamPASETOInvalidTokenFormat(
-                message="Invalid header."
-            )
+            raise JamPASETOInvalidTokenFormat(message="Invalid header.")
 
         body = base64url_decode(parts[2])
         if len(body) < 64:
@@ -298,9 +289,7 @@ class PASETOv4(BasePASETO):
             # raises InvalidSignature on failure
             self._public_key.verify(signature, pre_auth)
         except Exception:
-            raise JamPASTOKeyVerificationError(
-                message="Invalid signature"
-            )
+            raise JamPASTOKeyVerificationError(message="Invalid signature")
 
         payload_data = serializer.loads(payload)
 

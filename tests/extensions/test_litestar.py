@@ -29,7 +29,7 @@ def test_jam_plugin_adds_dependency(jam):
 
     assert "jam" in updated_config.dependencies
     provider = updated_config.dependencies["jam"]
-    assert callable(provider.dependency)
+    assert callable(provider.dependency)  # type: ignore[attr-defined]
     assert provider.dependency() == jam
 
 
@@ -82,7 +82,7 @@ async def test_async_jam_plugin_adds_dependency(async_jam):
 
     assert "jam" in updated_config.dependencies
     provider = updated_config.dependencies["jam"]
-    assert callable(provider.dependency)
+    assert callable(provider.dependency)  # type: ignore[attr-defined]
     assert provider.dependency() == async_jam
 
 

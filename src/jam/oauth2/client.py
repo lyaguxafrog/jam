@@ -6,7 +6,7 @@ import json
 from typing import Any
 import urllib.parse
 
-from jam.exceptions import JamOAuth2Error, JamOAuth2EmptyRaw
+from jam.exceptions import JamOAuth2EmptyRaw, JamOAuth2Error
 
 from .__base__ import BaseOAuth2Client
 
@@ -143,11 +143,7 @@ class OAuth2Client(BaseOAuth2Client):
 
         if not raw:
             raise JamOAuth2EmptyRaw(
-                details={
-                    "endpoint": url,
-                    "methid": "POST",
-                    "params": params
-                }
+                details={"endpoint": url, "methid": "POST", "params": params}
             )
 
         try:
@@ -160,7 +156,7 @@ class OAuth2Client(BaseOAuth2Client):
                 details={
                     "status": response.status,
                     "reason": response.reason,
-                    "data": data
+                    "data": data,
                 }
             )
 

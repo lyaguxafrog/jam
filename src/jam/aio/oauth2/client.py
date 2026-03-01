@@ -7,11 +7,11 @@ import json
 from typing import Any
 import urllib.parse
 
-from jam.oauth2.__base__ import BaseOAuth2Client
-from jam.exceptions import JamOAuth2Error, JamOAuth2EmptyRaw
+from jam.aio.oauth2.__base__ import BaseAsyncOAuth2Client
+from jam.exceptions import JamOAuth2EmptyRaw, JamOAuth2Error
 
 
-class OAuth2Client(BaseOAuth2Client):
+class OAuth2Client(BaseAsyncOAuth2Client):
     """Async universal OAuth2 client implementation."""
 
     @contextmanager
@@ -24,9 +24,9 @@ class OAuth2Client(BaseOAuth2Client):
         finally:
             connection.close()
 
-    def get_authorization_url(
+    async def get_authorization_url(  # type: ignore[override]
         self, scope: list[str], **extra_params: Any
-    ) -> str:
+    ) -> str:  # type: ignore[override]
         """Generate full OAuth2 authorization URL.
 
         Args:
@@ -152,7 +152,7 @@ class OAuth2Client(BaseOAuth2Client):
                     details={
                         "endpoint": url,
                         "methid": "POST",
-                        "params": params
+                        "params": params,
                     }
                 )
 
@@ -166,7 +166,7 @@ class OAuth2Client(BaseOAuth2Client):
                     details={
                         "status": response.status,
                         "reason": response.reason,
-                        "data": data
+                        "data": data,
                     }
                 )
 
