@@ -4,7 +4,7 @@ from typing import Literal
 
 from icecream import ic
 
-from src.jam.logger import BaseLogger
+from jam.logger import BaseLogger
 
 
 class IcecreamLogger(BaseLogger):
@@ -19,18 +19,18 @@ class IcecreamLogger(BaseLogger):
         """Initialize the logger."""
         self.log_level = log_level
 
-    def info(self, message):
+    def info(self, message: str, *args: object) -> None:  # type: ignore[override]
         """Log an info message."""
-        ic(message)
+        ic(message, *args)
 
-    def error(self, message):
+    def error(self, message: str, exc_info: bool = False) -> None:  # type: ignore[override]
         """Log an error message."""
         ic(message)
 
-    def warning(self, message):
+    def warning(self, message: str, exc_info: bool = False) -> None:  # type: ignore[override]
         """Log a warning message."""
         ic(message)
 
-    def debug(self, message):
+    def debug(self, message: str, *args: object) -> None:  # type: ignore[override]
         """Log a debug message."""
-        ic(message)
+        ic(message, *args)
