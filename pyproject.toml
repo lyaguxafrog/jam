@@ -133,3 +133,17 @@ asyncio_default_fixture_loop_scope = "function"
 
 [tool.unicecream]
 exclude = ["__devtools/"]
+
+[tool.pyrefly]
+python_version = "3.10"
+include = ["src/jam/"]
+exclude = [
+    ".venv",
+    "venv",
+    "build",
+    "dist",
+    "__pycache__"
+]
+type_checking_mode = "basic"
+ignore_missing_imports = true
+show_warnings = true
