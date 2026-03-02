@@ -7,6 +7,13 @@ image: assets/logo_n_title.png
     <p>Welcome to Jam documentation!</p>
 </div>
 
+![Python Version](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white)
+[![PyPI - Version](https://img.shields.io/pypi/v/jamlib)](https://pypi.org/project/jamlib/)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/jamlib?period=total&units=INTERNATIONAL_SYSTEM&left_color=GRAY&right_color=RED&left_text=Downloads)](https://pypi.org/project/jamlib/)
+![tests](https://github.com/lyaguxafrog/jam/actions/workflows/run-tests.yml/badge.svg)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/lyaguxafrog/jam)
+[![GitHub License](https://img.shields.io/github/license/lyaguxafrog/jam)](https://github.com/lyaguxafrog/jam/blob/master/LICENSE.md)
+
 ## About
 Jam(Jeneric auth module) - a simple library that makes implementing authentication in your application effortless.
 
@@ -42,10 +49,11 @@ otp_code = jam.otp_code(secret="7K2HVNA3IQCYFFDX76IXKNCZHQ")
 ```python
 from jam.aio import Jam
 
-
 jam = Jam()
-payload = await jam.jwt_make_payload(**{"user_id": 1})
-token = await jam.jwt_create_token(payload)
+payload = await jam.jwt_make_payload(
+    exp=3600, data={"user_id": 1}
+)
+token = await jam.jwt_create(payload)
 ```
 
 
@@ -76,12 +84,13 @@ Each integration offers built-in middleware or plugin support for JWT and sessio
 Jam supports many authentication methods out of the box with minimal dependencies.
 Here is a comparison with other libraries:
 
-| Features / Library    | **Jam**                                                                                              | [Authx](https://authx.yezz.me/) | [PyJWT](https://pyjwt.readthedocs.io) | [AuthLib](https://docs.authlib.org) | [OTP Auth](https://otp.authlib.org/) |
-|-----------------------|------------------------------------------------------------------------------------------------------|--------------------------------|---------------------------------------|-------------------------------------|--------------------------------------|
-| JWT                   | ✅                                                                                                    | ✅ | ✅ | ✅ | ❌                                    |
-| JWT black/white lists | ✅                                                                                                    | ❌ | ❌ | ❌ | ❌ |
-| Server side sessions  | ✅                                                                                                    | ✅ | ❌ | ❌ | ❌                                    |
-| OTP                   | ✅                                                                                                    | ❌ | ❌ | ❌ | ✅ |
-| OAuth2                | ✅                                                                                                     | ✅ | ❌ | ✅ | ❌ |
-| Flexible config       | ✅                                                                                                    | ❌ | ❌ | ❌ | ❌ |
-| Modularity            | ✅                                                                                                    | ❌ | ❌ | ❌ | ❌ |
+| Features / Library    | **Jam** | [Authx](https://authx.yezz.me/) | [PyJWT](https://pyjwt.readthedocs.io) | [AuthLib](https://docs.authlib.org) | [OTP Auth](https://otp.authlib.org/) |
+|-----------------------|--------|----------------------------------|---------------------------------------|-------------------------------------|--------------------------------------|
+| JWT                   | ✅     | ✅                               | ✅                                    | ✅                                  | ❌                                   |
+| JWT black/white lists | ✅     | ❌                               | ❌                                    | ❌                                  | ❌                                   |
+| PASETO                | ✅     | ❌                               | ❌                                    | ❌                                  | ❌                                   |
+| Server side sessions  | ✅     | ✅                               | ❌                                    | ❌                                  | ❌                                   |
+| OTP                   | ✅     | ❌                               | ❌                                    | ❌                                  | ✅                                   |
+| OAuth2                | ✅     | ✅                               | ❌                                    | ✅                                  | ❌                                   |
+| Flexible config       | ✅     | ❌                               | ❌                                    | ❌                                  | ❌                                   |
+| Modularity            | ✅     | ❌                               | ❌                                    | ❌                                  | ❌                                   |
