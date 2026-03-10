@@ -36,6 +36,8 @@ from .paseto import (
     JamPASETOInvalidTokenFormat
 )
 
+from .plugins import JamLitestarPluginConfigError
+
 from .sessions import (
     JamSessionNotFound,
     JamSessionEmptyAESKey,
@@ -63,6 +65,7 @@ __all__ = [
     "JamPASETOInvalidPurpose",
     "JamPASETOInvalidTokenFormat",
     "JamPASTOKeyVerificationError",
+    "JamLitestarPluginConfigError",
     "JamSessionNotFound",
     "JamSessionEmptyAESKey",
 ]
