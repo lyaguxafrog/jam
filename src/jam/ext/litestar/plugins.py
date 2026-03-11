@@ -15,16 +15,16 @@ from jam.utils.config_maker import GENERIC_POINTER, __config_maker__
 class BasePlugin(InitPlugin):
     """Base Litestar plugin."""
 
-    _AUTH_MODULE: Callable
+    MODULE: Callable
 
     def _setup_config(self, config: dict[str, Any]) -> None:
-        self._auth = self._AUTH_MODULE(**config)
+        self._auth = self.MODULE(**config)
 
 
 class JamJWTPlugin(BasePlugin):
     """JWT plugin for litestar."""
 
-    _AUTH_MODULE = JWT
+    MODULE = JWT
 
     def __init__(  # noqa
         self,
@@ -32,9 +32,10 @@ class JamJWTPlugin(BasePlugin):
         pointer: str = GENERIC_POINTER,
         cookie_name: str | None = None,
         header_name: str | None = None,
+        middleware: bool = True,
         **kwargs,
     ) -> None:
-        if not cookie_name and not header_name:
+        if middleware and (not cookie_name and not header_name):
             raise JamLitestarPluginConfigError(
                 message="Cookie name and header name cannot be both None.",
                 details={
@@ -44,10 +45,14 @@ class JamJWTPlugin(BasePlugin):
             )
 
         _config: dict[str, Any] | None = (
-            (__config_maker__(config, pointer)) if config else None
+            __config_maker__(config, pointer) if config else None
         )
 
-    def on_app_init(self, app_config: AppConfig) -> AppConfig:  # noqa: D102
+        # TODO: Middleware setup
+
+        self._auth = self.MODULE(**(_config if _config else kwargs))
+
+    def on_app_init(self, app_config: AppConfig) -> AppConfig:  # noqa
         app_config.dependencies["jwt"] = Provide(
             lambda: self._auth, sync_to_thread=True
         )
