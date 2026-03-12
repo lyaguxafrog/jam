@@ -26,7 +26,7 @@ class BasePlugin(InitPlugin):
     """Base Litestar plugin."""
 
     MODULE: Callable
-    _MIDDLEWARE: type[BaseMiddleware]
+    MIDDLEWARE: type[BaseMiddleware]
     _DI_KEY: str
     _CONFIG_KEY: str
 
@@ -68,7 +68,7 @@ class BasePlugin(InitPlugin):
         self._middleware = None
 
         if middleware:
-            _middleware = self._MIDDLEWARE
+            _middleware = self.MIDDLEWARE
             _middleware.COOKIE_NAME = cookie_name
             _middleware.HEADER_NAME = header_name
             _middleware.AUTH_MODULE = self._auth
@@ -89,7 +89,7 @@ class JamJWTPlugin(BasePlugin):
     """JWT plugin for litestar."""
 
     MODULE = JWT
-    _MIDDLEWARE = JWTMiddleware
+    MIDDLEWARE = JWTMiddleware
     _DI_KEY = "jwt"
     _CONFIG_KEY = "jwt"
 
@@ -98,7 +98,7 @@ class JamSessionPlugin(BasePlugin):
     """Sessions plugin for litestar."""
 
     MODULE = staticmethod(create_session)
-    _MIDDLEWARE = SessionMiddleware
+    MIDDLEWARE = SessionMiddleware
     _DI_KEY = "session"
     _CONFIG_KEY = "sessions"
 
@@ -107,7 +107,7 @@ class JamPASETOPlugin(BasePlugin):
     """PASETO plugin for litestar."""
 
     MODULE = staticmethod(create_paseto)
-    _MIDDLEWARE = PASETOMiddleware
+    MIDDLEWARE = PASETOMiddleware
     _DI_KEY = "paseto"
     _CONFIG_KEY = "paseto"
 
