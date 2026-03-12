@@ -100,7 +100,11 @@ class BaseAlgorithm(ABC):
         from pathlib import Path
 
         path = Path(data)
-        return path.read_bytes() if path.is_file() else data.encode()
+        try:
+            is_file = path.is_file()
+        except OSError:
+            is_file = False
+        return path.read_bytes() if is_file else data.encode()
 
     def _load_private_key(
         self, key_bytes: bytes | None, key_obj: Any | None
