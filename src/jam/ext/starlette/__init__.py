@@ -6,7 +6,7 @@ Starlette docs: https://starlette.dev
 """
 
 from .objects import BaseUser, SimpleUser
-from .backends import JWTBackend, SessionBackend
+from .backends import JWTBackend, SessionBackend, PASETOBackend
 
 
 __all__ = [
@@ -14,4 +14,5 @@ __all__ = [
     "SimpleUser",
     "JWTBackend",
     "SessionBackend",
+    "PASETOBackend",
 ]

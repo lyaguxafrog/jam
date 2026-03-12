@@ -15,6 +15,7 @@ from jam.aio.sessions import create_instance as create_session
 from jam.exceptions import JamStarlettePluginConfigError
 from jam.ext.starlette.objects import BaseUser, SimpleUser
 from jam.jwt import JWT
+from jam.paseto import create_instance as create_paseto
 from jam.utils.config_maker import GENERIC_POINTER, __config_maker__
 
 
@@ -125,6 +126,26 @@ class SessionBackend(BaseBackend):
         session_id = self._get_auth_token(conn)
         if session_id:
             data = await self._auth.get(session_id)
+            if data:
+                user = self._user.from_payload(data)
+                return AuthCredentials(["authenticated"]), user
+
+        return AuthCredentials(None), UnauthenticatedUser()
+
+
+class PASETOBackend(BaseBackend):
+    """PASETO auth backend."""
+
+    MODULE = staticmethod(create_paseto)
+    _CONFIG_KEY = "paseto"
+
+    async def authenticate(  # noqa
+        self, conn: HTTPConnection
+    ) -> tuple[AuthCredentials, StarletteBaseUser] | None:
+        setattr(conn.state, "paseto", self._auth)
+        token = self._get_auth_token(conn)
+        if token:
+            data = self._auth.decode(token)
             if data:
                 user = self._user.from_payload(data)
                 return AuthCredentials(["authenticated"]), user
