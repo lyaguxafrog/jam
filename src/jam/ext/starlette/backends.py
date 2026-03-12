@@ -11,6 +11,7 @@ from starlette.authentication import (
 from starlette.authentication import BaseUser as StarletteBaseUser
 from starlette.requests import HTTPConnection
 
+from jam.aio.sessions import create_instance as create_session
 from jam.exceptions import JamStarlettePluginConfigError
 from jam.ext.starlette.objects import BaseUser, SimpleUser
 from jam.jwt import JWT
@@ -107,5 +108,25 @@ class JWTBackend(BaseBackend):
             data = self._auth.decode(token)
             user = self._user.from_payload(data)
             return AuthCredentials(["authenticated"]), user
+
+        return AuthCredentials(None), UnauthenticatedUser()
+
+
+class SessionBackend(BaseBackend):
+    """Session backend."""
+
+    MODULE = staticmethod(create_session)
+    _CONFIG_KEY = "sessions"
+
+    async def authenticate(  # noqa
+        self, conn: HTTPConnection
+    ) -> tuple[AuthCredentials, StarletteBaseUser] | None:
+        setattr(conn.state, "session", self._auth)
+        session_id = self._get_auth_token(conn)
+        if session_id:
+            data = await self._auth.get(session_id)
+            if data:
+                user = self._user.from_payload(data)
+                return AuthCredentials(["authenticated"]), user
 
         return AuthCredentials(None), UnauthenticatedUser()

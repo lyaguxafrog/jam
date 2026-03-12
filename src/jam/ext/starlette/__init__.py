@@ -6,11 +6,12 @@ Starlette docs: https://starlette.dev
 """
 
 from .objects import BaseUser, SimpleUser
-from .backends import JWTBackend
+from .backends import JWTBackend, SessionBackend
 
 
 __all__ = [
     "BaseUser",
     "SimpleUser",
     "JWTBackend",
+    "SessionBackend",
 ]
