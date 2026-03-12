@@ -6,8 +6,27 @@ Litestar integration.
 Litestar docs: https://docs.litestar.dev
 """
 
-from .plugins import JamPlugin, JWTPlugin, SessionsPlugin
-from .value import Auth, User
+from .objects import (
+    BaseUser,
+    SimpleUser,
+    Token
+)
 
+from .plugins import (
+    BasePlugin,
+    JamJWTPlugin,
+    JamSessionPlugin,
+    JamPASETOPlugin,
+    JamOAuth2Plugin,
+)
 
-__all__ = ["JamPlugin", "JWTPlugin", "User", "Auth", "SessionsPlugin"]
+__all__ = [
+    "BaseUser",
+    "SimpleUser",
+    "Token",
+    "BasePlugin",
+    "JamJWTPlugin",
+    "JamSessionPlugin",
+    "JamPASETOPlugin",
+    "JamOAuth2Plugin",
+]
