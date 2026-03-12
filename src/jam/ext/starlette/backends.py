@@ -101,6 +101,7 @@ class JWTBackend(BaseBackend):
     async def authenticate(  # noqa
         self, conn: HTTPConnection
     ) -> tuple[AuthCredentials, StarletteBaseUser] | None:
+        setattr(conn.state, "jwt", self._auth)
         token = self._get_auth_token(conn)
         if token:
             data = self._auth.decode(token)
