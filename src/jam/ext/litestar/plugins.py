@@ -7,7 +7,13 @@ from litestar.config.app import AppConfig
 from litestar.di import Provide
 from litestar.plugins import InitPlugin
 
+from jam.aio.sessions import create_instance
 from jam.exceptions import JamLitestarPluginConfigError
+from jam.ext.litestar.middleware import (
+    BaseMiddleware,
+    JWTMiddleware,
+    SessionMiddleware,
+)
 from jam.ext.litestar.objects import BaseUser
 from jam.jwt import JWT
 from jam.utils.config_maker import GENERIC_POINTER, __config_maker__
@@ -17,15 +23,12 @@ class BasePlugin(InitPlugin):
     """Base Litestar plugin."""
 
     MODULE: Callable
+    _MIDDLEWARE: type[BaseMiddleware]
+    _DI_KEY: str
+    _CONFIG_KEY: str
 
     def _setup_config(self, config: dict[str, Any]) -> None:
         self._auth = self.MODULE(**config)
-
-
-class JamJWTPlugin(BasePlugin):
-    """JWT plugin for litestar."""
-
-    MODULE = JWT
 
     def __init__(  # noqa
         self,
@@ -57,13 +60,12 @@ class JamJWTPlugin(BasePlugin):
             __config_maker__(config, pointer) if config else None
         )
 
-        self._auth = self.MODULE(**(_config if _config else kwargs))
+        params = _config.pop(self._CONFIG_KEY) if _config else kwargs
+        self._setup_config(params)
         self._middleware = None
 
         if middleware:
-            from jam.ext.litestar.middleware import JWTMiddleware
-
-            _middleware = JWTMiddleware
+            _middleware = self._MIDDLEWARE
             _middleware.COOKIE_NAME = cookie_name
             _middleware.HEADER_NAME = header_name
             _middleware.AUTH_MODULE = self._auth
@@ -71,10 +73,28 @@ class JamJWTPlugin(BasePlugin):
             self._middleware = _middleware
 
     def on_app_init(self, app_config: AppConfig) -> AppConfig:  # noqa
-        app_config.dependencies["jwt"] = Provide(
+        app_config.dependencies[self._DI_KEY] = Provide(
             lambda: self._auth, sync_to_thread=True
         )
         app_config.middleware.append(
             self._middleware
         ) if self._middleware else None
         return app_config
+
+
+class JamJWTPlugin(BasePlugin):
+    """JWT plugin for litestar."""
+
+    MODULE = JWT
+    _MIDDLEWARE = JWTMiddleware
+    _DI_KEY = "jwt"
+    _CONFIG_KEY = "jwt"
+
+
+class JamSessionPlugin(BasePlugin):
+    """Redis sessions plugin for litestar."""
+
+    MODULE = staticmethod(create_instance)
+    _MIDDLEWARE = SessionMiddleware
+    _DI_KEY = "session"
+    _CONFIG_KEY = "sessions"

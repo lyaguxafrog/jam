@@ -12,7 +12,7 @@ from .objects import (
     Token
 )
 
-from .plugins import BasePlugin, JamJWTPlugin
+from .plugins import BasePlugin, JamJWTPlugin, JamSessionPlugin
 
 __all__ = [
     "BaseUser",
@@ -20,4 +20,5 @@ __all__ = [
     "Token",
     "BasePlugin",
     "JamJWTPlugin",
+    "JamSessionPlugin",
 ]
