@@ -3,9 +3,17 @@
 from collections.abc import Callable
 from typing import Any
 
-from starlette.authentication import AuthenticationBackend, BaseUser
+from starlette.authentication import (
+    AuthCredentials,
+    AuthenticationBackend,
+    UnauthenticatedUser,
+)
+from starlette.authentication import BaseUser as StarletteBaseUser
+from starlette.requests import HTTPConnection
 
 from jam.exceptions import JamStarlettePluginConfigError
+from jam.ext.starlette.objects import BaseUser, SimpleUser
+from jam.jwt import JWT
 from jam.utils.config_maker import GENERIC_POINTER, __config_maker__
 
 
@@ -21,7 +29,7 @@ class BaseBackend(AuthenticationBackend):
         pointer: str = GENERIC_POINTER,
         cookie_name: str | None = None,
         header_name: str | None = None,
-        user: type[BaseUser] | None = None,
+        user: type[BaseUser] = SimpleUser,
         **kwargs,
     ) -> None:
         if not cookie_name and not header_name:
@@ -36,6 +44,25 @@ class BaseBackend(AuthenticationBackend):
         self._header_name = header_name
         self._user = user
         self._config_setup(config, pointer, kwargs)
+
+    def _get_auth_token(self, connection: HTTPConnection) -> str | None:
+        if self._cookie_name:
+            token = connection.cookies.get(self._cookie_name, None)
+        elif self._header_name:
+            token_bear = connection.headers.get(self._header_name, None)
+            if token_bear:
+                token = token_bear.split("Bearer ")[1]  # noqa: E701
+            else:
+                token = None  # noqa: E701
+        else:
+            raise JamStarlettePluginConfigError(
+                message="cookie_name or header_name must be provided.",
+                details={
+                    "cookie_name": self._cookie_name,
+                    "header_name": self._header_name,
+                },
+            )
+        return token
 
     def _config_setup(
         self,
@@ -63,3 +90,21 @@ class BaseBackend(AuthenticationBackend):
                     "error": str(e),
                 },
             )
+
+
+class JWTBackend(BaseBackend):
+    """JWT Backend for litestar."""
+
+    MODULE = JWT
+    _CONFIG_KEY = "jwt"
+
+    async def authenticate(  # noqa
+        self, conn: HTTPConnection
+    ) -> tuple[AuthCredentials, StarletteBaseUser] | None:
+        token = self._get_auth_token(conn)
+        if token:
+            data = self._auth.decode(token)
+            user = self._user.from_payload(data)
+            return AuthCredentials(["authenticated"]), user
+
+        return AuthCredentials(None), UnauthenticatedUser()
