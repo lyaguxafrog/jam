@@ -12,6 +12,7 @@ from jam.aio.sessions.__base__ import BaseAsyncSessionModule
 from jam.exceptions import JamLitestarPluginConfigError, JamLitestarPluginError
 from jam.ext.litestar.objects import BaseUser, Token
 from jam.jwt import JWT
+from jam.paseto import BasePASETO
 
 
 class BaseMiddleware(AbstractAuthenticationMiddleware):
@@ -73,6 +74,28 @@ class SessionMiddleware(BaseMiddleware):
             return AuthenticationResult(None, auth=token_model)
         try:
             data = await self.AUTH_MODULE.get(token)
+            if not data:
+                return AuthenticationResult(None, auth=token_model)
+            user = self.USER.from_payload(data)
+            return AuthenticationResult(user, token)
+        except Exception as e:
+            raise JamLitestarPluginError(message=str(e))
+
+
+class PASETOMiddleware(BaseMiddleware):
+    """Middleware for PASETO."""
+
+    AUTH_MODULE: BasePASETO
+
+    async def authenticate_request(  # noqa
+        self, connection: ASGIConnection
+    ) -> AuthenticationResult:
+        token = self._get_auth_token(connection)
+        token_model = Token(token=token)
+        if not token:
+            return AuthenticationResult(None, auth=token_model)
+        try:
+            data = self.AUTH_MODULE.decode(token)
             if not data:
                 return AuthenticationResult(None, auth=token_model)
             user = self.USER.from_payload(data)

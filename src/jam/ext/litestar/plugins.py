@@ -7,15 +7,17 @@ from litestar.config.app import AppConfig
 from litestar.di import Provide
 from litestar.plugins import InitPlugin
 
-from jam.aio.sessions import create_instance
+from jam.aio.sessions import create_instance as create_session
 from jam.exceptions import JamLitestarPluginConfigError
 from jam.ext.litestar.middleware import (
     BaseMiddleware,
     JWTMiddleware,
+    PASETOMiddleware,
     SessionMiddleware,
 )
 from jam.ext.litestar.objects import BaseUser
 from jam.jwt import JWT
+from jam.paseto import create_instance as create_paseto
 from jam.utils.config_maker import GENERIC_POINTER, __config_maker__
 
 
@@ -92,9 +94,18 @@ class JamJWTPlugin(BasePlugin):
 
 
 class JamSessionPlugin(BasePlugin):
-    """Redis sessions plugin for litestar."""
+    """Sessions plugin for litestar."""
 
-    MODULE = staticmethod(create_instance)
+    MODULE = staticmethod(create_session)
     _MIDDLEWARE = SessionMiddleware
     _DI_KEY = "session"
     _CONFIG_KEY = "sessions"
+
+
+class JamPASETOPlugin(BasePlugin):
+    """PASETO plugin for litestar."""
+
+    MODULE = staticmethod(create_paseto)
+    _MIDDLEWARE = PASETOMiddleware
+    _DI_KEY = "paseto"
+    _CONFIG_KEY = "paseto"
