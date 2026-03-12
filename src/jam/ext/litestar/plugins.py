@@ -17,6 +17,7 @@ from jam.ext.litestar.middleware import (
 )
 from jam.ext.litestar.objects import BaseUser
 from jam.jwt import JWT
+from jam.oauth2 import create_instance as create_oauth2
 from jam.paseto import create_instance as create_paseto
 from jam.utils.config_maker import GENERIC_POINTER, __config_maker__
 
@@ -109,3 +110,37 @@ class JamPASETOPlugin(BasePlugin):
     _MIDDLEWARE = PASETOMiddleware
     _DI_KEY = "paseto"
     _CONFIG_KEY = "paseto"
+
+
+class JamOAuth2Plugin(BasePlugin):
+    """OAuth2 plugin."""
+
+    MODULE = staticmethod(create_oauth2)
+    _DI_KEY = "oauth2"
+    _CONFIG_KEY = "oauth2"
+
+    def __init__(
+        self,
+        config: str | dict[str, Any] | None = None,
+        pointer: str = GENERIC_POINTER,
+        **kwargs,
+    ) -> None:
+        """Initialize the OAuth2 plugin.
+
+        Args:
+            config (str | dict[str, Any] | None): The configuration for the OAuth2 plugin.
+            pointer (str): The pointer to the configuration in the app config.
+            **kwargs: Additional keyword arguments.
+        """
+        _config: dict[str, Any] | None = (
+            __config_maker__(config, pointer) if config else None
+        )
+
+        params = _config.pop(self._CONFIG_KEY) if _config else kwargs
+        self._setup_config(params)
+
+    def on_app_init(self, app_config: AppConfig) -> AppConfig:  # noqa
+        app_config.dependencies[self._DI_KEY] = Provide(
+            lambda: self._auth, sync_to_thread=True
+        )
+        return app_config

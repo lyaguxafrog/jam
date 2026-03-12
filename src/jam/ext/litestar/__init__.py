@@ -16,7 +16,8 @@ from .plugins import (
     BasePlugin,
     JamJWTPlugin,
     JamSessionPlugin,
-    JamPASETOPlugin
+    JamPASETOPlugin,
+    JamOAuth2Plugin,
 )
 
 __all__ = [
@@ -27,4 +28,5 @@ __all__ = [
     "JamJWTPlugin",
     "JamSessionPlugin",
     "JamPASETOPlugin",
+    "JamOAuth2Plugin",
 ]
