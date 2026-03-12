@@ -33,16 +33,27 @@ class BasePlugin(InitPlugin):
     def _setup_config(self, config: dict[str, Any]) -> None:
         self._auth = self.MODULE(**config)
 
-    def __init__(  # noqa
+    def __init__(
         self,
         config: dict[str, Any] | str | None = None,
         pointer: str = GENERIC_POINTER,
         cookie_name: str | None = None,
         header_name: str | None = None,
         middleware: bool = True,
-        middleware_user: type[BaseUser] | None = None,
+        user: type[BaseUser] | None = None,
         **kwargs,
     ) -> None:
+        """Initialize the plugin.
+
+        Args:
+            config (dict[str, Any] | str | None): Jam config as path/to/file or dict.
+            pointer (str): Config pointer
+            cookie_name (str | None): Cookie name to read token
+            header_name (str | None): Header name to read token
+            middleware (bool): Use middleware?
+            user (type[BaseUser]): User for request state. See: DOCUMENTATION
+            **kwargs: Config arguments if config=None
+        """
         if middleware and (not cookie_name and not header_name):
             raise JamLitestarPluginConfigError(
                 message="Cookie name and header name cannot be both None.",
@@ -51,11 +62,11 @@ class BasePlugin(InitPlugin):
                     "header_name": header_name,
                 },
             )
-        if middleware and not middleware_user:
+        if middleware and not user:
             raise JamLitestarPluginConfigError(
                 message="Middleware user cannot be None when middleware is True.",
                 details={
-                    "middleware_user": middleware_user,
+                    "middleware_user": user,
                 },
             )
 
@@ -72,7 +83,7 @@ class BasePlugin(InitPlugin):
             _middleware.COOKIE_NAME = cookie_name
             _middleware.HEADER_NAME = header_name
             _middleware.AUTH_MODULE = self._auth
-            _middleware.USER = middleware_user  # type: ignore
+            _middleware.USER = user  # type: ignore
             self._middleware = _middleware
 
     def on_app_init(self, app_config: AppConfig) -> AppConfig:  # noqa
@@ -113,7 +124,7 @@ class JamPASETOPlugin(BasePlugin):
 
 
 class JamOAuth2Plugin(BasePlugin):
-    """OAuth2 plugin."""
+    """OAuth2 plugin for litestar."""
 
     MODULE = staticmethod(create_oauth2)
     _DI_KEY = "oauth2"
@@ -128,9 +139,9 @@ class JamOAuth2Plugin(BasePlugin):
         """Initialize the OAuth2 plugin.
 
         Args:
-            config (str | dict[str, Any] | None): The configuration for the OAuth2 plugin.
-            pointer (str): The pointer to the configuration in the app config.
-            **kwargs: Additional keyword arguments.
+            config (dict[str, Any] | str | None): Jam config as path/to/file or dict.
+            pointer (str): Config pointer
+            **kwargs: Config arguments if config=None
         """
         _config: dict[str, Any] | None = (
             __config_maker__(config, pointer) if config else None
