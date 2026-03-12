@@ -63,7 +63,7 @@ class TestJamJWTPlugin:
             config=jwt_config,
             cookie_name="auth_token",
             header_name="Authorization",
-            middleware_user=middleware_user,
+            user=middleware_user,
         )
         app_config = AppConfig()
 
@@ -78,7 +78,7 @@ class TestJamJWTPlugin:
             config=jwt_config,
             cookie_name="auth_token",
             header_name="Authorization",
-            middleware_user=middleware_user,
+            user=middleware_user,
         )
         app_config = AppConfig()
 
@@ -94,7 +94,7 @@ class TestJamJWTPlugin:
                 config=jwt_config,
                 cookie_name=None,
                 header_name=None,
-                middleware_user=middleware_user,
+                user=middleware_user,
             )
 
     def test_raises_error_when_no_middleware_user(self, jwt_config):
@@ -102,7 +102,7 @@ class TestJamJWTPlugin:
             JamJWTPlugin(
                 config=jwt_config,
                 cookie_name="auth_token",
-                middleware_user=None,
+                user=None,
             )
 
     def test_without_middleware(self, jwt_config):
@@ -124,7 +124,7 @@ class TestJamSessionPlugin:
             config=session_config,
             cookie_name="session_id",
             header_name="X-Session-ID",
-            middleware_user=middleware_user,
+            user=middleware_user,
         )
         app_config = AppConfig()
 
@@ -139,7 +139,7 @@ class TestJamSessionPlugin:
             config=session_config,
             cookie_name="session_id",
             header_name="X-Session-ID",
-            middleware_user=middleware_user,
+            user=middleware_user,
         )
         app_config = AppConfig()
 
@@ -154,7 +154,7 @@ class TestJamPASETOPlugin:
             config=paseto_config,
             cookie_name="paseto",
             header_name="X-PASETO",
-            middleware_user=middleware_user,
+            user=middleware_user,
         )
         app_config = AppConfig()
 
@@ -167,7 +167,7 @@ class TestJamPASETOPlugin:
             config=paseto_config,
             cookie_name="paseto",
             header_name="X-PASETO",
-            middleware_user=middleware_user,
+            user=middleware_user,
         )
         app_config = AppConfig()
 
