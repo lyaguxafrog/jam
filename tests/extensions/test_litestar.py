@@ -1,132 +1,196 @@
 # -*- coding: utf-8 -*-
+# ruff: noqa: D100, D101, D102, D103
 
-import sys
-from unittest.mock import Mock
-
-import pytest
 from litestar.config.app import AppConfig
-from pytest_asyncio import fixture
+import pytest
 
-from jam.ext.litestar.plugins import JamPlugin, JWTPlugin, SessionsPlugin
-from jam.tests import TestAsyncJam, TestJam
+from jam.ext.litestar import (
+    JamJWTPlugin,
+    JamOAuth2Plugin,
+    JamPASETOPlugin,
+    JamSessionPlugin,
+)
+from jam.ext.litestar.objects import SimpleUser
 
 
 @pytest.fixture
-def jam() -> TestJam:
-    return TestJam()
+def middleware_user():
+    return SimpleUser
 
 
-@fixture
-async def async_jam() -> TestAsyncJam:
-    return TestAsyncJam()
+@pytest.fixture
+def jwt_config():
+    return {"jwt": {"secret": "test-secret", "alg": "HS256"}}
 
 
-def test_jam_plugin_adds_dependency(jam):
-    plugin = JamPlugin(jam=jam)
-    app_config = AppConfig()
-
-    updated_config = plugin.on_app_init(app_config)
-
-    assert "jam" in updated_config.dependencies
-    provider = updated_config.dependencies["jam"]
-    assert callable(provider.dependency)  # type: ignore[attr-defined]
-    assert provider.dependency() == jam
+@pytest.fixture
+def session_config():
+    return {"sessions": {"session_type": "json", "json_path": ":memory:"}}
 
 
-def test_jwt_plugin_adds_middleware_and_state(monkeypatch, jam):
-    fake_middleware = Mock()
-
-    monkeypatch.setitem(
-        sys.modules,
-        "jam.ext.litestar.middlewares",
-        Mock(JamJWTMiddleware=fake_middleware),
-    )
-
-    app_config = AppConfig()
-    plugin = JWTPlugin(jam=jam)
-
-    updated_config = plugin.on_app_init(app_config)
-
-    assert fake_middleware in updated_config.middleware  # middleware добавлен
-    assert hasattr(updated_config.state, "jwt_middleware_settings")
-    assert hasattr(updated_config.state, "jam_instance")
-    assert updated_config.state.jam_instance == jam
+@pytest.fixture
+def paseto_config():
+    return {
+        "paseto": {
+            "version": "v2",
+            "purpose": "local",
+            "key": "YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWE",
+        }
+    }
 
 
-def test_sessions_plugin_adds_middleware_and_state(monkeypatch, jam):
-    fake_middleware = Mock()
-
-    monkeypatch.setitem(
-        sys.modules,
-        "jam.ext.litestar.middlewares",
-        Mock(JamSessionsMiddleware=fake_middleware),
-    )
-
-    app_config = AppConfig()
-    plugin = SessionsPlugin(jam=jam)
-
-    updated_config = plugin.on_app_init(app_config)
-
-    assert fake_middleware in updated_config.middleware
-    assert hasattr(updated_config.state, "session_middleware_settings")
-    assert hasattr(updated_config.state, "session_instance")
-    assert updated_config.state.session_instance == jam
+@pytest.fixture
+def oauth2_config():
+    return {
+        "oauth2": {
+            "providers": {
+                "test": {
+                    "custom_module": "jam.oauth2.client.OAuth2Client",
+                    "client_id": "test",
+                    "client_secret": "test-secret",
+                    "redirect_url": "http://localhost",
+                    "auth_url": "http://example.com/auth",
+                    "token_url": "http://example.com/token",
+                }
+            }
+        }
+    }
 
 
-@pytest.mark.asyncio
-async def test_async_jam_plugin_adds_dependency(async_jam):
-    plugin = JamPlugin(jam=async_jam)
-    app_config = AppConfig()
+class TestJamJWTPlugin:
+    def test_adds_dependency(self, jwt_config, middleware_user):
+        plugin = JamJWTPlugin(
+            config=jwt_config,
+            cookie_name="auth_token",
+            header_name="Authorization",
+            middleware_user=middleware_user,
+        )
+        app_config = AppConfig()
 
-    updated_config = plugin.on_app_init(app_config)
+        updated_config = plugin.on_app_init(app_config)
 
-    assert "jam" in updated_config.dependencies
-    provider = updated_config.dependencies["jam"]
-    assert callable(provider.dependency)  # type: ignore[attr-defined]
-    assert provider.dependency() == async_jam
+        assert "jwt" in updated_config.dependencies
+        provider = updated_config.dependencies["jwt"]
+        assert callable(provider.dependency)
+
+    def test_adds_middleware(self, jwt_config, middleware_user):
+        plugin = JamJWTPlugin(
+            config=jwt_config,
+            cookie_name="auth_token",
+            header_name="Authorization",
+            middleware_user=middleware_user,
+        )
+        app_config = AppConfig()
+
+        updated_config = plugin.on_app_init(app_config)
+
+        assert len(updated_config.middleware) == 1
+
+    def test_raises_error_when_no_cookie_or_header(
+        self, jwt_config, middleware_user
+    ):
+        with pytest.raises(Exception):
+            JamJWTPlugin(
+                config=jwt_config,
+                cookie_name=None,
+                header_name=None,
+                middleware_user=middleware_user,
+            )
+
+    def test_raises_error_when_no_middleware_user(self, jwt_config):
+        with pytest.raises(Exception):
+            JamJWTPlugin(
+                config=jwt_config,
+                cookie_name="auth_token",
+                middleware_user=None,
+            )
+
+    def test_without_middleware(self, jwt_config):
+        plugin = JamJWTPlugin(
+            config=jwt_config,
+            middleware=False,
+        )
+        app_config = AppConfig()
+
+        updated_config = plugin.on_app_init(app_config)
+
+        assert "jwt" in updated_config.dependencies
+        assert len(updated_config.middleware) == 0
 
 
-@pytest.mark.asyncio
-async def test_async_jwt_plugin_adds_middleware_and_state(
-    monkeypatch, async_jam
-):
-    fake_middleware = Mock()
+class TestJamSessionPlugin:
+    def test_adds_dependency(self, session_config, middleware_user):
+        plugin = JamSessionPlugin(
+            config=session_config,
+            cookie_name="session_id",
+            header_name="X-Session-ID",
+            middleware_user=middleware_user,
+        )
+        app_config = AppConfig()
 
-    monkeypatch.setitem(
-        sys.modules,
-        "jam.ext.litestar.middlewares",
-        Mock(JamJWTMiddleware=fake_middleware),
-    )
+        updated_config = plugin.on_app_init(app_config)
 
-    app_config = AppConfig()
-    plugin = JWTPlugin(jam=async_jam)
+        assert "session" in updated_config.dependencies
+        provider = updated_config.dependencies["session"]
+        assert callable(provider.dependency)
 
-    updated_config = plugin.on_app_init(app_config)
+    def test_adds_middleware(self, session_config, middleware_user):
+        plugin = JamSessionPlugin(
+            config=session_config,
+            cookie_name="session_id",
+            header_name="X-Session-ID",
+            middleware_user=middleware_user,
+        )
+        app_config = AppConfig()
 
-    assert fake_middleware in updated_config.middleware  # middleware добавлен
-    assert hasattr(updated_config.state, "jwt_middleware_settings")
-    assert hasattr(updated_config.state, "jam_instance")
-    assert updated_config.state.jam_instance == async_jam
+        updated_config = plugin.on_app_init(app_config)
+
+        assert len(updated_config.middleware) == 1
 
 
-@pytest.mark.asyncio
-async def test_async_sessions_plugin_adds_middleware_and_state(
-    monkeypatch, async_jam
-):
-    fake_middleware = Mock()
+class TestJamPASETOPlugin:
+    def test_adds_dependency(self, paseto_config, middleware_user):
+        plugin = JamPASETOPlugin(
+            config=paseto_config,
+            cookie_name="paseto",
+            header_name="X-PASETO",
+            middleware_user=middleware_user,
+        )
+        app_config = AppConfig()
 
-    monkeypatch.setitem(
-        sys.modules,
-        "jam.ext.litestar.middlewares",
-        Mock(JamSessionsMiddleware=fake_middleware),
-    )
+        updated_config = plugin.on_app_init(app_config)
 
-    app_config = AppConfig()
-    plugin = SessionsPlugin(jam=async_jam)
+        assert "paseto" in updated_config.dependencies
 
-    updated_config = plugin.on_app_init(app_config)
+    def test_adds_middleware(self, paseto_config, middleware_user):
+        plugin = JamPASETOPlugin(
+            config=paseto_config,
+            cookie_name="paseto",
+            header_name="X-PASETO",
+            middleware_user=middleware_user,
+        )
+        app_config = AppConfig()
 
-    assert fake_middleware in updated_config.middleware
-    assert hasattr(updated_config.state, "session_middleware_settings")
-    assert hasattr(updated_config.state, "session_instance")
-    assert updated_config.state.session_instance == async_jam
+        updated_config = plugin.on_app_init(app_config)
+
+        assert len(updated_config.middleware) == 1
+
+
+class TestJamOAuth2Plugin:
+    def test_adds_dependency(self, oauth2_config):
+        plugin = JamOAuth2Plugin(config=oauth2_config)
+        app_config = AppConfig()
+
+        updated_config = plugin.on_app_init(app_config)
+
+        assert "oauth2" in updated_config.dependencies
+        provider = updated_config.dependencies["oauth2"]
+        assert callable(provider.dependency)
+
+    def test_no_middleware(self, oauth2_config):
+        plugin = JamOAuth2Plugin(config=oauth2_config)
+        app_config = AppConfig()
+
+        updated_config = plugin.on_app_init(app_config)
+
+        assert len(updated_config.middleware) == 0
