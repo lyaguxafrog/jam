@@ -4,16 +4,12 @@
 All Jam exceptions
 """
 
-from .base import (
-    JamError,
-    JamConfigurationError,
-    JamValidationError
-)
+from .base import JamError, JamConfigurationError, JamValidationError
 
 from .oauth2 import (
     JamOAuth2Error,
     JamOAuth2EmptyRaw,
-    JamOAuth2ProviderNotConfigured
+    JamOAuth2ProviderNotConfigured,
 )
 
 from .jwt import (
@@ -33,10 +29,12 @@ from .paseto import (
     JamPASETOInvalidSecp384r1Key,
     JamPASTOKeyVerificationError,
     JamPASETOInvalidPurpose,
-    JamPASETOInvalidTokenFormat
+    JamPASETOInvalidTokenFormat,
 )
 
 from .plugins import (
+    JamFlaskPluginConfigError,
+    JamFlaskPluginError,
     JamLitestarPluginConfigError,
     JamLitestarPluginError,
     JamStarlettePluginConfigError,
@@ -72,6 +70,8 @@ __all__ = [
     "JamPASTOKeyVerificationError",
     "JamLitestarPluginConfigError",
     "JamLitestarPluginError",
+    "JamFlaskPluginConfigError",
+    "JamFlaskPluginError",
     "JamStarlettePluginConfigError",
     "JamStarlettePluginError",
     "JamSessionNotFound",
