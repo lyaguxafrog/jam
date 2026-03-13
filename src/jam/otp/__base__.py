@@ -133,3 +133,4 @@ class OTPConfig:
     type: str
     digits: int
     digest: Literal["sha1", "sha256", "sha512"]
+    interval: int = 30
