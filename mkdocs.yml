@@ -12,13 +12,14 @@ nav:
   - Geting start:
       - Installation: installation.md
       - Configuration: configuration.md
-      - Logging: logging.md
   - Usage:
       - JWT: usage/jwt.md
       - PASETO: usage/paseto.md
       - Server side sessions: usage/sessions.md
       - OAuth2: usage/oauth2.md
       - OTP: usage/otp.md
+      - Logging: usage/logging.md
+      - JSON serialization: usage/serializers.md
       - Utils:
           - Keys generators: usage/utils/key_generators.md
           - Auth utils: usage/utils/auth_utils.md

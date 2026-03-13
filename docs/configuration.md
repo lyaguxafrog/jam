@@ -166,7 +166,7 @@ alg = "HS256"
 secret_key = "$JWT_SECRET_KEY"
 ```
 
-For more details, see the documentation on logging. ТУТ ССЫЛКА НА ДОКУ ПО ЛОГИРОВАНИЮ
+For more details, see the [documentation on logging](/usage/logging).
 
 ---
 
@@ -200,7 +200,7 @@ alg = "HS256"
 secret_key = "$JWT_SECRET_KEY"
 ```
 
-For more details, see the documentation on serialization. ТУТ ССЫЛКА НА ДОКУ ПО СЕРИАЛИЗАЦИИ
+For more details, see the [documentation on serialization](/usage/serializers.md).
 
 ### Environment variables
 
