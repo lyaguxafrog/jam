@@ -25,6 +25,7 @@ nav:
           - Auth utils: usage/utils/auth_utils.md
   - Framework integration:
       - Litestar: framework_integrations/litestar.md
+      - Starlette: framework_integrations/starlette.md
   - Breaking changes:
       - Deprecated: breaking_changes/deprecated.md
       - 1.1.4 -> 2.0.0: breaking_changes/jam114_to_200.md

@@ -71,7 +71,7 @@ from litestar import Litestar
 from jam.ext.litestar import JamPASETOPlugin  # for example
 
 config = {
-    "paset": {
+    "paseto": {
         "version": "v4",
         "purpose": "local",
         "key": os.getenv("PASETO_KEY")
