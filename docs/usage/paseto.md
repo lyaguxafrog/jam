@@ -29,7 +29,7 @@ from jam import Jam
 jam = Jam(config="config.toml")
 ```
 
-### Generate payload
+#### Generate payload
 
 Method: `jam.paseto_make_payload`
 
@@ -59,7 +59,7 @@ print(token)
     }
 ```
 
-### Create token
+#### Create token
 
 Method: `jam.paset_create`
 
@@ -85,7 +85,7 @@ print(token)
 ```
 
 
-### Decode token
+#### Decode token
 
 Method: `jam.paseto_decode`
 
