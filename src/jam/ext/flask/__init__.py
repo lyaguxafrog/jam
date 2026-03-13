@@ -13,15 +13,11 @@ from .extensions import (
 )
 
 from .objects import (
-    BaseUser,
-    SimpleUser,
     Token,
 )
 
 
 __all__ = [
-    "BaseUser",
-    "SimpleUser",
     "Token",
     "JWTExtension",
     "SessionExtension",
