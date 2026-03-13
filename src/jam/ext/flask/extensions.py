@@ -4,8 +4,7 @@ from typing import Any
 
 import flask
 
-from jam.exceptions import JamFlaskPluginConfigError, JamFlaskPluginError
-from jam.ext.flask.objects import BaseUser, Token
+from jam.exceptions import JamFlaskPluginConfigError
 from jam.jwt import JWT
 from jam.oauth2 import create_instance as create_oauth2
 from jam.paseto import create_instance as create_paseto
@@ -64,7 +63,6 @@ class BaseAuthExtension(BaseExtension):
         pointer: str = GENERIC_POINTER,
         cookie_name: str | None = None,
         header_name: str | None = None,
-        user: type[BaseUser] | None = None,
         bearer: bool = True,
         **kwargs: Any,
     ) -> None:
@@ -77,13 +75,11 @@ class BaseAuthExtension(BaseExtension):
             pointer (str): Config pointer
             cookie_name (str | None): Cookie name to read token
             header_name (str | None): Header name to read token
-            user (type[BaseUser]): User class for request
             bearer (bool): Strip "Bearer " prefix from header
             **kwargs: Configuration arguments if config=None
         """
         self._cookie_name = cookie_name
         self._header_name = header_name
-        self._user = user
         self._bearer = bearer
 
         if not cookie_name and not header_name:
@@ -95,73 +91,53 @@ class BaseAuthExtension(BaseExtension):
                 },
             )
 
-        if not user:
-            raise JamFlaskPluginConfigError(
-                message="User class cannot be None.",
-                details={
-                    "user": user,
-                },
-            )
-
         _config: dict[str, Any] | None = (
             __config_maker__(config, pointer) if config else None
         )
 
         params = _config.pop(self._CONFIG_KEY) if _config else kwargs
-
         super().__init__(app, auth=auth, **params)
 
-    def _get_auth_token(self, request: flask.Request) -> str | None:
+    def _get_token(self) -> str | None:
         token = None
         if self._header_name:
-            token = request.headers.get(self._header_name, None)
+            token = flask.request.headers.get(self._header_name, None)
             if token and self._bearer and token.startswith("Bearer "):
                 token = token[7:]
         elif self._cookie_name:
-            token = request.cookies.get(self._cookie_name, None)
+            token = flask.request.cookies.get(self._cookie_name, None)
         return token
 
-    def load_user(
-        self, request: flask.Request
-    ) -> tuple[BaseUser | None, Token]:
-        """Load user from request.
-
-        Args:
-            request (flask.Request): Flask request object
-
-        Returns:
-            tuple[BaseUser | None, Token]: User and token
-        """
+    def _get_payload(self) -> dict[str, Any] | None:
         raise NotImplementedError
+
+    def init_app(self, app: flask.Flask) -> None:
+        """Initialize the Flask application."""
+        super().init_app(app)
+        app.before_request(self._put_auth_in_g)
+
+    def _put_auth_in_g(self) -> None:
+        setattr(flask.g, self._CONFIG_KEY, self._auth)
+        self._get_payload()
 
 
 class JWTExtension(BaseAuthExtension):
     """JWT extension for Flask."""
 
-    MODULE = staticmethod(JWT)  # type: ignore
+    MODULE = staticmethod(JWT)
     _CONFIG_KEY = "jwt"
 
-    def load_user(
-        self, request: flask.Request
-    ) -> tuple[BaseUser | None, Token]:
-        """Load user from JWT token.
-
-        Args:
-            request (flask.Request): Flask request object
-
-        Returns:
-            tuple[BaseUser | None, Token]: User and token
-        """
-        token = self._get_auth_token(request)
-        token_model = Token(token=token)
+    def _get_payload(self) -> dict[str, Any] | None:
+        token = self._get_token()
+        flask.g.payload = None
         if not token:
-            return None, token_model
+            return None
         try:
-            data = self._auth.decode(token)
-            user = self._user.from_payload(data)
-            return user, token_model
-        except Exception as e:
-            raise JamFlaskPluginError(message=str(e))
+            payload = self._auth.decode(token)
+            flask.g.payload = payload
+            return payload
+        except Exception:
+            return None
 
 
 class SessionExtension(BaseAuthExtension):
@@ -170,29 +146,17 @@ class SessionExtension(BaseAuthExtension):
     MODULE = staticmethod(create_session)
     _CONFIG_KEY = "sessions"
 
-    def load_user(
-        self, request: flask.Request
-    ) -> tuple[BaseUser | None, Token]:
-        """Load user from session.
-
-        Args:
-            request (flask.Request): Flask request object
-
-        Returns:
-            tuple[BaseUser | None, Token]: User and token
-        """
-        token = self._get_auth_token(request)
-        token_model = Token(token=token)
+    def _get_payload(self) -> dict[str, Any] | None:
+        token = self._get_token()
+        flask.g.payload = None
         if not token:
-            return None, token_model
+            return None
         try:
-            data = self._auth.get(token)
-            if not data:
-                return None, token_model
-            user = self._user.from_payload(data)
-            return user, token_model
-        except Exception as e:
-            raise JamFlaskPluginError(message=str(e))
+            payload = self._auth.get(token)
+            flask.g.payload = payload
+            return payload
+        except Exception:
+            return None
 
 
 class PASETOExtension(BaseAuthExtension):
@@ -201,30 +165,20 @@ class PASETOExtension(BaseAuthExtension):
     MODULE = staticmethod(create_paseto)
     _CONFIG_KEY = "paseto"
 
-    def load_user(
-        self, request: flask.Request
-    ) -> tuple[BaseUser | None, Token]:
-        """Load user from PASETO token.
-
-        Args:
-            request (flask.Request): Flask request object
-
-        Returns:
-            tuple[BaseUser | None, Token]: User and token
-        """
-        token = self._get_auth_token(request)
-        token_model = Token(token=token)
+    def _get_payload(self) -> dict[str, Any] | None:
+        token = self._get_token()
+        flask.g.payload = None
         if not token:
-            return None, token_model
+            return None
         try:
             data = self._auth.decode(token)
             if not data:
-                return None, token_model
+                return None
             payload = data[0] if isinstance(data, tuple) else data
-            user = self._user.from_payload(payload)
-            return user, token_model
-        except Exception as e:
-            raise JamFlaskPluginError(message=str(e))
+            flask.g.payload = payload
+            return payload
+        except Exception:
+            return None
 
 
 class OAuth2Extension(BaseExtension):
