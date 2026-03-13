@@ -23,6 +23,8 @@ nav:
       - Utils:
           - Keys generators: usage/utils/key_generators.md
           - Auth utils: usage/utils/auth_utils.md
+  - Framework integration:
+      - Litestar: framework_integrations/litestar.md
   - Breaking changes:
       - Deprecated: breaking_changes/deprecated.md
       - 1.1.4 -> 2.0.0: breaking_changes/jam114_to_200.md
