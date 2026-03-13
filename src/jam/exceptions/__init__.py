@@ -37,6 +37,8 @@ from .plugins import (
     JamFlaskPluginError,
     JamLitestarPluginConfigError,
     JamLitestarPluginError,
+    JamStarlettePluginConfigError,
+    JamStarlettePluginError
 )
 
 from .sessions import (
@@ -70,6 +72,8 @@ __all__ = [
     "JamLitestarPluginError",
     "JamFlaskPluginConfigError",
     "JamFlaskPluginError",
+    "JamStarlettePluginConfigError",
+    "JamStarlettePluginError",
     "JamSessionNotFound",
     "JamSessionEmptyAESKey",
 ]

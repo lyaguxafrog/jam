@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Exception format.
 - Refactoring litestar plugins.
 - Refactoring flask extensions.
+- Refactoring starlette integrations.
 
 ### Deprecated
 

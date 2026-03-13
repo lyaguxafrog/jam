@@ -29,3 +29,16 @@ class JamFlaskPluginError(JamError):
 
     default_message = "An error occurred for a flask plugin."
     default_code = "jam.plugin.flask"
+
+class JamStarlettePluginConfigError(JamConfigurationError):
+    """Exception raised when a configuration error occurs for a starlette plugin."""
+
+    default_message = "Configuration error occurred for a starlette plugin."
+    default_code = "jam.configuration.plugin.starlette"
+
+
+class JamStarlettePluginError(JamError):
+    """Exception raised when an error occurs for a starlette plugin."""
+
+    default_message = "An error occurred for a starlette plugin."
+    default_code = "jam.plugin.starlette"
