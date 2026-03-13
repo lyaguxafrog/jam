@@ -8,7 +8,6 @@ from jam.ext.flask import (
     JWTExtension,
     PASETOExtension,
     SessionExtension,
-    SimpleUser,
 )
 from jam.jwt import JWT
 from jam.paseto import create_instance as create_paseto
@@ -35,33 +34,26 @@ def session():
         os.remove(path)
 
 
-def test_jwt_get_user_from_header(token, jwt):
+def test_jwt_get_payload_from_header(token, jwt):
     app = Flask(__name__)
-    jwt_ext = JWTExtension(
-        app, auth=jwt, header_name="Authorization", user=SimpleUser
-    )
-
-    with app.test_request_context(headers={"Authorization": f"Bearer {token}"}):
-        from flask import request
-
-        user, token_model = jwt_ext.load_user(request)
-        assert user is not None
-        assert user.payload == {"user_id": 123}
-        assert token_model.token == token
-
-
-def test_jwt_get_user_from_cookie(token, jwt):
-    app = Flask(__name__)
-    jwt_ext = JWTExtension(
-        app, auth=jwt, cookie_name="access_token", user=SimpleUser
-    )
+    JWTExtension(app, auth=jwt, header_name="Authorization")
 
     @app.route("/")
     def index():
-        from flask import request
+        return {"user": g.payload}
 
-        user, _ = jwt_ext.load_user(request)
-        return {"user": user.payload if user else None}
+    with app.test_client() as client:
+        response = client.get("/", headers={"Authorization": f"Bearer {token}"})
+        assert response.get_json()["user"] == {"user_id": 123}
+
+
+def test_jwt_get_payload_from_cookie(token, jwt):
+    app = Flask(__name__)
+    JWTExtension(app, auth=jwt, cookie_name="access_token")
+
+    @app.route("/")
+    def index():
+        return {"user": g.payload}
 
     with app.test_client() as client:
         client.set_cookie("access_token", token)
@@ -69,65 +61,58 @@ def test_jwt_get_user_from_cookie(token, jwt):
         assert response.get_json()["user"] == {"user_id": 123}
 
 
-def test_jwt_get_user_invalid_token(jwt):
+def test_jwt_get_payload_invalid_token(jwt):
     app = Flask(__name__)
-    jwt_ext = JWTExtension(
-        app, auth=jwt, header_name="Authorization", user=SimpleUser
-    )
+    JWTExtension(app, auth=jwt, header_name="Authorization")
 
-    with app.test_request_context(
-        headers={"Authorization": "Bearer wrong_token"}
-    ):
-        from flask import request
+    @app.route("/")
+    def index():
+        return {"user": g.payload}
 
-        with pytest.raises(Exception):
-            jwt_ext.load_user(request)
+    with app.test_client() as client:
+        response = client.get(
+            "/", headers={"Authorization": "Bearer wrong_token"}
+        )
+        assert response.get_json()["user"] is None
 
 
-def test_jwt_get_user_no_token(jwt):
+def test_jwt_get_payload_no_token(jwt):
     app = Flask(__name__)
-    jwt_ext = JWTExtension(
-        app, auth=jwt, header_name="Authorization", user=SimpleUser
-    )
+    JWTExtension(app, auth=jwt, header_name="Authorization")
 
-    with app.test_request_context():
-        from flask import request
+    @app.route("/")
+    def index():
+        return {"user": g.payload}
 
-        user, token_model = jwt_ext.load_user(request)
-        assert user is None
-        assert token_model.token is None
+    with app.test_client() as client:
+        response = client.get("/")
+        assert response.get_json()["user"] is None
 
 
-def test_sessions_get_user_from_header(session):
+def test_sessions_get_payload_from_header(session):
     app = Flask(__name__)
-    session_ext = SessionExtension(
-        app, auth=session, header_name="Authorization", user=SimpleUser
-    )
-    session_id = session.create("test", {"user_id": 123})
-
-    with app.test_request_context(
-        headers={"Authorization": f"Bearer {session_id}"}
-    ):
-        from flask import request
-
-        user, token_model = session_ext.load_user(request)
-        assert user is not None
-        assert user.payload == {"user_id": 123}
-
-
-def test_sessions_get_user_from_cookie(session):
-    app = Flask(__name__)
-    session_ext = SessionExtension(
-        app, auth=session, cookie_name="sessionId", user=SimpleUser
-    )
+    SessionExtension(app, auth=session, header_name="Authorization")
     session_id = session.create("test", {"user_id": 123})
 
     @app.route("/")
     def index():
-        from flask import request
+        return {"user": g.payload}
 
-        user, _ = session_ext.load_user(request)
-        return {"user": user.payload if user else None}
+    with app.test_client() as client:
+        response = client.get(
+            "/", headers={"Authorization": f"Bearer {session_id}"}
+        )
+        assert response.get_json()["user"] == {"user_id": 123}
+
+
+def test_sessions_get_payload_from_cookie(session):
+    app = Flask(__name__)
+    SessionExtension(app, auth=session, cookie_name="sessionId")
+    session_id = session.create("test", {"user_id": 123})
+
+    @app.route("/")
+    def index():
+        return {"user": g.payload}
 
     with app.test_client() as client:
         client.set_cookie("sessionId", session_id)
@@ -135,36 +120,35 @@ def test_sessions_get_user_from_cookie(session):
         assert response.get_json()["user"] == {"user_id": 123}
 
 
-def test_sessions_get_user_invalid_token(session):
+def test_sessions_get_payload_invalid_token(session):
     app = Flask(__name__)
-    session_ext = SessionExtension(
-        app, auth=session, header_name="Authorization", user=SimpleUser
-    )
+    SessionExtension(app, auth=session, header_name="Authorization")
 
-    with app.test_request_context(
-        headers={"Authorization": "Bearer wrong_session"}
-    ):
-        from flask import request
+    @app.route("/")
+    def index():
+        return {"user": g.payload}
 
-        user, token_model = session_ext.load_user(request)
-        assert user is None
+    with app.test_client() as client:
+        response = client.get(
+            "/", headers={"Authorization": "Bearer wrong_session"}
+        )
+        assert response.get_json()["user"] is None
 
 
-def test_sessions_get_user_no_token(session):
+def test_sessions_get_payload_no_token(session):
     app = Flask(__name__)
-    session_ext = SessionExtension(
-        app, auth=session, header_name="Authorization", user=SimpleUser
-    )
+    SessionExtension(app, auth=session, header_name="Authorization")
 
-    with app.test_request_context():
-        from flask import request
+    @app.route("/")
+    def index():
+        return {"user": g.payload}
 
-        user, token_model = session_ext.load_user(request)
-        assert user is None
-        assert token_model.token is None
+    with app.test_client() as client:
+        response = client.get("/")
+        assert response.get_json()["user"] is None
 
 
-def test_paseto_get_user_from_header():
+def test_paseto_get_payload_from_header():
     import base64
 
     key = base64.urlsafe_b64encode(b"12345678901234567890123456789012").decode()
@@ -172,31 +156,30 @@ def test_paseto_get_user_from_header():
     token = paseto.encode({"user_id": 123})
 
     app = Flask(__name__)
-    paseto_ext = PASETOExtension(
-        app, auth=paseto, header_name="Authorization", user=SimpleUser
-    )
+    PASETOExtension(app, auth=paseto, header_name="Authorization")
 
-    with app.test_request_context(headers={"Authorization": f"Bearer {token}"}):
-        from flask import request
+    @app.route("/")
+    def index():
+        return {"user": g.payload}
 
-        user, token_model = paseto_ext.load_user(request)
-        assert user is not None
-        assert user.payload["user_id"] == 123
+    with app.test_client() as client:
+        response = client.get("/", headers={"Authorization": f"Bearer {token}"})
+        assert response.get_json()["user"] == {"user_id": 123}
 
 
-def test_paseto_get_user_no_token():
+def test_paseto_get_payload_no_token():
     import base64
 
     key = base64.urlsafe_b64encode(b"12345678901234567890123456789012").decode()
     paseto = create_paseto(version="v4", purpose="local", key=key)
 
     app = Flask(__name__)
-    paseto_ext = PASETOExtension(
-        app, auth=paseto, header_name="Authorization", user=SimpleUser
-    )
+    PASETOExtension(app, auth=paseto, header_name="Authorization")
 
-    with app.test_request_context():
-        from flask import request
+    @app.route("/")
+    def index():
+        return {"user": g.payload}
 
-        user, token_model = paseto_ext.load_user(request)
-        assert user is None
+    with app.test_client() as client:
+        response = client.get("/")
+        assert response.get_json()["user"] is None
