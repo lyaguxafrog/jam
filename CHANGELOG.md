@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rename all `__abc_*_module__` to `__base__`.
 - Exception format.
 - Refactoring litestar plugins.
+- Refactoring starlette integrations.
 
 ### Deprecated
 
