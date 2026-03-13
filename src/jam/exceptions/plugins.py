@@ -15,3 +15,17 @@ class JamLitestarPluginError(JamError):
 
     default_message = "An error occurred for a litestar plugin."
     default_code = "jam.plugin.litestar"
+
+
+class JamFlaskPluginConfigError(JamConfigurationError):
+    """Exception raised when a configuration error occurs for a flask plugin."""
+
+    default_message = "Configuration error occurred for a flask plugin."
+    default_code = "jam.configuration.plugin.flask"
+
+
+class JamFlaskPluginError(JamError):
+    """Exception raised when an error occurs for a flask plugin."""
+
+    default_message = "An error occurred for a flask plugin."
+    default_code = "jam.plugin.flask"
