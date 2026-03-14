@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from typing import Any
 
 from jam.encoders import BaseEncoder, JsonEncoder
@@ -44,7 +45,7 @@ class JWT(BaseJWT):
     def __init__(
         self,
         alg: str,
-        secret: KeyLike,
+        secret: KeyLike = os.getenv("JAM_JWT_SECRET_KEY"),  # type: ignore
         password: str | bytes | None = None,
         list: dict[str, Any] | None = None,
         serializer: BaseEncoder | type[BaseEncoder] = JsonEncoder,
