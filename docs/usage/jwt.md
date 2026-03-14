@@ -6,25 +6,16 @@ title: JWT
 
 ### Config
 
-Example:
+* `alg`: `str` - Algorithm for generating JWT tokens. Supports: `HS256`, `HS384`, `HS512`, `RS256`, `RS384`, `RS512`, `ES256`, `ES384`, `ES512`, `PS256`, `PS384`, `PS512`
+* `secret_key`: `str` - Secret key for token signing. By default, Jam reads the environment variable `JAM_JWT_SECRET_KEY`.
+* `password`: `str` - Password for encrypted private keys.
+
 ```toml
 [jam.jwt]
 alg = "HS256"
 secret_key = "YOURSECRETKEY"
 password = "PASSWORD_FOR_PRIVATE_KEY"
 ```
-
-#### alg: str
-Algorithm for generating JWT tokens. Supports:
-`HS256`, `HS384`, `HS512`, `RS256`, `RS384`, `RS512`, `ES256`, `ES384`, `ES512`, `PS256`, `PS384`, `PS512`
-
-#### secret_key: str
-Secret key for token signing.
-!!! note
-    By default, Jam reads the environment variable `JAM_JWT_SECRET_KEY`.
-
-#### password: str
-Password for encrypted private keys.
 
 ### Usage
 
@@ -122,7 +113,7 @@ Module: `jam.jwt.JWT`
 Args:
 
 * `alg`: `str` - Algorithm for token generation.
-* `secret_key`: `str | bytes` - Secret key for token generation.
+* `secret_key`: `str | bytes` - Secret key for token generation. By default, Jam reads the environment variable `JAM_JWT_SECRET_KEY`.
 * `password`: `str | bytes | None` - Password for token generation.
 
 ```python
