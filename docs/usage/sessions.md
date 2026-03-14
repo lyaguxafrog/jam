@@ -15,7 +15,7 @@ Different session types have different configuration parameters.
 
 Sometimes you need to encrypt the session ID so that it cannot be forged. If you want to encrypt the session ID, set this parameter to True and pass the encryption key in the session_aes_secret parameter.
 
-* `session_aes_secret`: `str` - The encryption key for the session ID. Key must be 32 url-safe base64-encoded bytes. You can use jam.utils.generate_aes_key to generate it.
+* `session_aes_secret`: `str` - The encryption key for the session ID. Key must be 32 url-safe base64-encoded bytes. You can use jam.utils.generate_aes_key to generate it. By default, Jam reads the key from the `JAM_SESSION_AES_SECRET` environment variable.
 
 #### Redis
 
