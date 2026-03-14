@@ -27,7 +27,7 @@ class RedisSessions(BaseSessionModule):
         self,
         redis_uri: str | Redis = "redis://localhost:6379/0",
         redis_sessions_key: str = "sessions",
-        default_ttl: int | None = 3600,
+        ttl: int | None = 3600,
         is_session_crypt: bool = False,
         session_aes_secret: bytes | str | None = os.getenv(
             "JAM_SESSION_AES_SECRET", None
@@ -41,7 +41,7 @@ class RedisSessions(BaseSessionModule):
         Args:
             redis_uri (str | Redis): The URI for the Redis server.
             redis_sessions_key (str): The key under which sessions are stored in Redis.
-            default_ttl (Optional[int]): Default time-to-live for sessions in seconds. Defaults to 3600 seconds (1 hour).
+            ttl (Optional[int]): Default time-to-live for sessions in seconds. Defaults to 3600 seconds (1 hour).
             is_session_crypt (bool): If True, session keys will be encoded.
             session_aes_secret (Optional[bytes, str]): AES secret for encoding session keys. Required if `is_session_key_crypt` is True.
             id_factory (Callable[[], str], optional): A callable that generates unique IDs. Defaults to a UUID factory.
@@ -65,7 +65,7 @@ class RedisSessions(BaseSessionModule):
         if self._logger:
             self._logger.debug("Redis connection established at %s", redis_uri)
 
-        self.ttl = default_ttl
+        self.ttl = ttl
         self.session_path = redis_sessions_key
 
     def _ping(self) -> bool:

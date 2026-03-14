@@ -19,7 +19,7 @@ def redis_session_instance_no_crypt(fake_redis):
     return RedisSessions(
         redis_uri=fake_redis,
         redis_sessions_key="test",
-        default_ttl=None,
+        ttl=None,
         is_session_crypt=False,
     )
 
@@ -41,7 +41,7 @@ def redis_session_with_crypt(fake_redis, aes_key):
     return RedisSessions(
         redis_uri=fake_redis,
         redis_sessions_key="test",
-        default_ttl=None,
+        ttl=None,
         is_session_crypt=True,
         session_aes_secret=aes_key,
     )
