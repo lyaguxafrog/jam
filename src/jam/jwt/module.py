@@ -5,7 +5,8 @@ from __future__ import annotations
 import os
 from typing import Any
 
-from jam.encoders import BaseEncoder, JsonEncoder
+from jam.__base_encoder__ import BaseEncoder
+from jam.encoders import JsonEncoder
 from jam.exceptions import JamJWTUnsupportedAlgorithm, JamJWTValidationError
 from jam.jwt.__algorithms__ import BaseAlgorithm, create_algorithm
 from jam.jwt.__base__ import BaseJWT

@@ -14,7 +14,8 @@ except ImportError:
         "JSON module is not installed. Please install it with 'pip install jamlib[json]'."
     )
 
-from jam.encoders import BaseEncoder, JsonEncoder
+from jam.__base_encoder__ import BaseEncoder
+from jam.encoders import JsonEncoder
 from jam.exceptions import JamSessionNotFound
 from jam.logger import BaseLogger
 from jam.sessions.__base__ import BaseSessionModule
