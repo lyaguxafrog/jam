@@ -32,7 +32,7 @@ class BaseAsyncJam(BaseJam):
         raise NotImplementedError
 
     @abstractmethod
-    async def jwt_create_token(  # type: ignore[override]
+    async def jwt_create(  # type: ignore[override]
         self, payload: dict[str, Any]
     ) -> str:
         """Create JWT token.
@@ -46,7 +46,7 @@ class BaseAsyncJam(BaseJam):
         raise NotImplementedError
 
     @abstractmethod
-    async def jwt_verify_token(  # type: ignore[override]
+    async def jwt_decode(  # type: ignore[override]
         self, token: str, check_exp: bool = True, check_list: bool = True
     ) -> dict[str, Any]:
         """Verify and decode JWT token.

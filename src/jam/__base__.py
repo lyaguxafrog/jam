@@ -204,7 +204,7 @@ class BaseJam(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def jwt_create_token(self, payload: dict[str, Any]) -> str:
+    def jwt_create(self, payload: dict[str, Any]) -> str:
         """Create JWT token.
 
         Args:
@@ -217,7 +217,7 @@ class BaseJam(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def jwt_verify_token(
+    def jwt_decode(
         self, token: str, check_exp: bool = True, check_list: bool = True
     ) -> dict[str, Any]:
         """Verify and decode JWT token.
@@ -463,15 +463,15 @@ class BaseJam(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def paseto_decode(  # mb refactoring this
+    def paseto_decode(
         self, token: str
-    ) -> dict[str, dict | str | dict | None]:
+    ) -> dict[str, dict[str, Any] | str | None]:
         """Decode PASETO and return payload and footer.
 
         Args:
             token (str): PASETO
 
         Returns:
-            dict: {`payload`: PAYLOAD, `footer`: FOOTER}
+            dict: {"payload": PAYLOAD, "footer": FOOTER}
         """
         raise NotImplementedError

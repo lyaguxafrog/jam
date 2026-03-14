@@ -44,7 +44,7 @@ class Jam(BaseJam):
         payload = payload | data
         return payload
 
-    def jwt_create_token(self, payload: dict[str, Any]) -> str:
+    def jwt_create(self, payload: dict[str, Any]) -> str:
         """Create JWT token.
 
         Args:
@@ -68,7 +68,7 @@ class Jam(BaseJam):
 
         return token
 
-    def jwt_verify_token(
+    def jwt_decode(
         self, token: str, check_exp: bool = True, check_list: bool = True
     ) -> dict[str, Any]:
         """Verify and decode JWT token.
