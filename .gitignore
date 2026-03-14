@@ -175,3 +175,4 @@ debug*
 .zed/
 :memory:
 .ruff_cache/
+sessions.json
