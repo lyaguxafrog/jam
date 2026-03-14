@@ -16,7 +16,7 @@ except ImportError:
         """
     )
 
-from jam.jwt.lists.__abc_list_repo__ import BaseJWTList
+from jam.jwt.lists.__base__ import BaseJWTList
 
 
 class RedisList(BaseJWTList):
