@@ -34,37 +34,37 @@ class PASETOv2(BasePASETO):
     def key(
         cls: type[PASETO],
         purpose: Literal["local", "public"],
-        key: str | bytes | Ed25519PrivateKey | Ed25519PublicKey,
+        secret_key: str | bytes | Ed25519PrivateKey | Ed25519PublicKey,
     ) -> PASETO:
         """Create PASETOv2 instance from provided key."""
         k = cls()
         k._purpose = purpose
 
         if purpose == "local":
-            if isinstance(key, str):
-                key = base64.urlsafe_b64decode(key + "==")
-            if not isinstance(key, bytes) or len(key) != 32:
+            if isinstance(secret_key, str):
+                secret_key = base64.urlsafe_b64decode(secret_key + "==")
+            if not isinstance(secret_key, bytes) or len(secret_key) != 32:
                 raise ValueError("v2.local key must be 32 bytes")
-            k._secret = key
+            k._secret = secret_key
             return k
 
         elif purpose == "public":
-            if isinstance(key, Ed25519PrivateKey):
-                k._secret = key
-                k._public_key = key.public_key()
+            if isinstance(secret_key, Ed25519PrivateKey):
+                k._secret = secret_key
+                k._public_key = secret_key.public_key()
                 return k
 
-            if isinstance(key, Ed25519PublicKey):
+            if isinstance(secret_key, Ed25519PublicKey):
                 k._secret = None
-                k._public_key = key
+                k._public_key = secret_key
                 return k
 
-            if isinstance(key, str):
-                key = key.encode()
+            if isinstance(secret_key, str):
+                secret_key = secret_key.encode()
 
             try:
                 private_key = serialization.load_pem_private_key(
-                    key, password=None
+                    secret_key, password=None
                 )
                 if not isinstance(private_key, Ed25519PrivateKey):
                     raise ValueError("Expected Ed25519 private key")
@@ -73,7 +73,7 @@ class PASETOv2(BasePASETO):
                 return k
             except Exception:
                 try:
-                    public_key = serialization.load_pem_public_key(key)
+                    public_key = serialization.load_pem_public_key(secret_key)
                     if not isinstance(public_key, Ed25519PublicKey):
                         raise JamPASETOInvalidED25519Key(
                             message="Expected Ed25519 public key",

@@ -125,13 +125,13 @@ class BasePASETO(ABC):
     def key(
         cls: type[PASETO],
         purpose: Literal["local", "public"],
-        key: str | bytes,
+        secret_key: str | bytes,
     ) -> PASETO:
         """Create a PASETO instance with the given key.
 
         Args:
             purpose: 'local' (symmetric encryption) or 'public' (asymmetric signing)
-            key: raw bytes or PEM text depending on purpose
+            secret_key: raw bytes or PEM text depending on purpose
 
         Returns:
             PASETO: configured PASETO instance for encoding/decoding tokens.

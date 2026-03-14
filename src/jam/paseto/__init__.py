@@ -16,7 +16,7 @@ from jam.logger import BaseLogger, logger
 def create_instance(
     version: Literal["v1", "v2", "v3", "v4"],
     purpose: Literal["local", "public"],
-    key: str | bytes | Any,
+    secret_key: str | bytes | Any,
     logger: BaseLogger = logger,
     **kwargs: Any,
 ) -> PASETO:
@@ -25,7 +25,7 @@ def create_instance(
     Args:
         version (str): "v1" | "v2" | "v3" | "v4"
         purpose (str): "local" | "public"
-        key (str | bytes | Any): Secret or asymmetric key (can be file path)
+        secret_key (str | bytes | Any): Secret or asymmetric key (can be file path)
         logger (BaseLogger): Logger instance
         **kwargs: Additional params (e.g., custom_module)
 
@@ -34,16 +34,16 @@ def create_instance(
     """
     from jam.utils.config_maker import __module_loader__
 
-    if isinstance(key, str) and os.path.isfile(key):
-        with open(key) as f:
+    if isinstance(secret_key, str) and os.path.isfile(secret_key):
+        with open(secret_key) as f:
             key = f.read()
 
     if kwargs.get("custom_module"):
         module_cls = __module_loader__(kwargs["custom_module"])
-        return module_cls.key(purpose, key)  # type: ignore[no-any-return]
+        return module_cls.key(purpose, secret_key)  # type: ignore[no-any-return]
 
     module_cls = __module_loader__(f"jam.paseto.{version}.PASETO{version}")
-    return module_cls.key(purpose, key)  # type: ignore[no-any-return]
+    return module_cls.key(purpose, secret_key)  # type: ignore[no-any-return]
 
 
 __all__ = [

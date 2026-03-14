@@ -41,29 +41,29 @@ class PASETOv3(BasePASETO):
     def key(
         cls: type[PASETO],
         purpose: Literal["local", "public"],
-        key: str | bytes,
+        secret_key: str | bytes,
         public_key: str | bytes | None = None,
     ) -> PASETO:
         """Create PASETOv3 instance.
 
         Args:
             purpose (str): "local" or "public"
-            key (str | bytes):  Private PEM
+            secret_key (str | bytes):  Private PEM
             public_key (str | bytes | None): Public PEM
         """
         inst = cls()
         inst._purpose = purpose
 
         if purpose == "local":
-            if isinstance(key, str):
+            if isinstance(secret_key, str):
                 try:
-                    raw = base64url_decode(key.encode("utf-8"))
+                    raw = base64url_decode(secret_key.encode("utf-8"))
                 except Exception:
                     raise JamPASETOInvalidSymmetricKey(
                         message="v3.local key string must be base64-url encoded 32 bytes",
                     )
             else:
-                raw = key
+                raw = secret_key
             if not isinstance(raw, (bytes | bytearray)) or len(raw) != 32:
                 raise JamPASETOInvalidSymmetricKey(
                     "v3.local requires a 32-byte secret key"
@@ -72,33 +72,33 @@ class PASETOv3(BasePASETO):
             return inst
 
         elif purpose == "public":
-            if hasattr(key, "sign") and isinstance(
-                key, ec.EllipticCurvePrivateKey
+            if hasattr(secret_key, "sign") and isinstance(
+                secret_key, ec.EllipticCurvePrivateKey
             ):
-                if key.curve.name != "secp384r1":
+                if secret_key.curve.name != "secp384r1":
                     raise JamPASETOInvalidSecp384r1Key(
                         "PASETOv3.public requires P-384 (secp384r1) keys"
                     )
-                inst._secret = key
-                inst._public_key = key.public_key()
+                inst._secret = secret_key
+                inst._public_key = secret_key.public_key()
                 return inst
 
-            if hasattr(key, "verify") and isinstance(
-                key, ec.EllipticCurvePublicKey
+            if hasattr(secret_key, "verify") and isinstance(
+                secret_key, ec.EllipticCurvePublicKey
             ):
-                if key.curve.name != "secp384r1":
+                if secret_key.curve.name != "secp384r1":
                     raise JamPASETOInvalidSecp384r1Key(
                         "PASETOv3.public requires P-384 (secp384r1) keys"
                     )
                 inst._secret = None
-                inst._public_key = key
+                inst._public_key = secret_key
                 return inst
 
             # bytes / PEM string -> try load PEM/DER
-            if isinstance(key, str):
-                key_bytes = key.encode("utf-8")
+            if isinstance(secret_key, str):
+                key_bytes = secret_key.encode("utf-8")
             else:
-                key_bytes = key
+                key_bytes = secret_key
 
             # try private PEM/DER first
             try:

@@ -36,13 +36,13 @@ class PASETOv4(BasePASETO):
     def key(
         cls: type[PASETO],
         purpose: Literal["local", "public"],
-        key: str | bytes | Ed25519PrivateKey,
+        secret_key: str | bytes | Ed25519PrivateKey,
     ) -> PASETO:
         """Create PASETO Factory.
 
         Args:
             purpose (Literal["local", "public"]): PASETO type
-            key (str | bytes | Ed25519PrivateKey): Secret or ED Private key
+            secret_key (str | bytes | Ed25519PrivateKey): Secret or ED Private key
 
         Raises:
             JamPASETOInvalidED25519Key: If the key is not a valid ED25519 key.
@@ -52,10 +52,10 @@ class PASETOv4(BasePASETO):
         inst._purpose = purpose
 
         if purpose == "local":
-            if isinstance(key, str):
-                raw = base64url_decode(key.encode("utf-8"))
+            if isinstance(secret_key, str):
+                raw = base64url_decode(secret_key.encode("utf-8"))
             else:
-                raw = key
+                raw = secret_key
             if not isinstance(raw, (bytes | bytearray)) or len(raw) != 32:
                 raise JamPASETOInvalidSymmetricKey(
                     message="v4.local requires a 32-byte secret key."
@@ -65,16 +65,20 @@ class PASETOv4(BasePASETO):
 
         elif purpose == "public":
             # Ed25519 objects
-            if isinstance(key, Ed25519PrivateKey):
-                inst._secret = key
-                inst._public_key = key.public_key()
+            if isinstance(secret_key, Ed25519PrivateKey):
+                inst._secret = secret_key
+                inst._public_key = secret_key.public_key()
                 return inst
-            if isinstance(key, Ed25519PublicKey):
+            if isinstance(secret_key, Ed25519PublicKey):
                 inst._secret = None
-                inst._public_key = key
+                inst._public_key = secret_key
                 return inst
 
-            key_bytes = key.encode("utf-8") if isinstance(key, str) else key
+            key_bytes = (
+                secret_key.encode("utf-8")
+                if isinstance(secret_key, str)
+                else secret_key
+            )
             try:
                 priv = serialization.load_pem_private_key(
                     key_bytes, password=None
