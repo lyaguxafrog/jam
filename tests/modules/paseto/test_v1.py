@@ -18,12 +18,12 @@ def rsa_keys() -> dict[str, str]:
 
 @fixture
 def local_paseto(symmetric_key) -> PASETOv1:
-    return PASETOv1.key(purpose="local", key=symmetric_key)
+    return PASETOv1.key(purpose="local", secret_key=symmetric_key)
 
 
 @fixture
 def public_paseto(rsa_keys) -> PASETOv1:
-    return PASETOv1.key(purpose="public", key=rsa_keys["private"])
+    return PASETOv1.key(purpose="public", secret_key=rsa_keys["private"])
 
 
 def test_encode_local_paseto(local_paseto):
@@ -39,6 +39,6 @@ def test_encode_public_paseto(public_paseto, rsa_keys):
     token = public_paseto.encode(payload)
     assert isinstance(token, str)
 
-    verifier = PASETOv1.key(purpose="public", key=rsa_keys["public"])
+    verifier = PASETOv1.key(purpose="public", secret_key=rsa_keys["public"])
     decoded_payload, _ = verifier.decode(token)
     assert decoded_payload == payload

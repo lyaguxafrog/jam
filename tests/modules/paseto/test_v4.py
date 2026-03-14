@@ -19,7 +19,7 @@ def ed_key_pair() -> dict[str, str]:
 
 @fixture
 def local_paseto(symmetric_key) -> PASETOv4:
-    return PASETOv4.key(purpose="local", key=symmetric_key)
+    return PASETOv4.key(purpose="local", secret_key=symmetric_key)
 
 
 @fixture
