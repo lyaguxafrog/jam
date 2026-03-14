@@ -100,12 +100,40 @@ class JWTBackend(BaseBackend):
     MODULE = staticmethod(create_jwt)
     _CONFIG_KEY = "jwt"
 
+    def __init__(  # noqa
+        self,
+        config: str | dict[str, Any] | None = None,
+        pointer: str = GENERIC_POINTER,
+        cookie_name: str | None = None,
+        header_name: str | None = None,
+        use_list: bool = False,
+        user: type[BaseUser] = SimpleUser,
+        **kwargs,
+    ) -> None:
+        self.use_list = use_list
+        super().__init__(
+            config=config,
+            pointer=pointer,
+            cookie_name=cookie_name,
+            header_name=header_name,
+            user=user,
+            **kwargs,
+        )
+
     async def authenticate(  # noqa
         self, conn: HTTPConnection
     ) -> tuple[AuthCredentials, StarletteBaseUser] | None:
         setattr(conn.state, "jwt", self._auth)
         token = self._get_auth_token(conn)
         if token:
+            if self.use_list:
+                match self._auth.list.__list_type__:
+                    case "black":
+                        if self._auth.list.check(token):
+                            return AuthCredentials(None), UnauthenticatedUser()
+                    case "white":
+                        if self._auth.list.check(token):
+                            return AuthCredentials(None), UnauthenticatedUser()
             data = self._auth.decode(token)
             user = self._user.from_payload(data)
             return AuthCredentials(["authenticated"]), user
