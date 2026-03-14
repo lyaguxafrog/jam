@@ -41,7 +41,7 @@ def session():
 @pytest.fixture
 def paseto():
     key = base64.urlsafe_b64encode(b"12345678901234567890123456789012").decode()
-    return create_paseto(version="v4", purpose="local", key=key)
+    return create_paseto(version="v4", purpose="local", secret_key=key)
 
 
 @pytest.fixture
@@ -200,7 +200,7 @@ class TestPASETOExtension:
             header_name="Authorization",
             version="v4",
             purpose="local",
-            key="MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=",
+            secret_key="MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=",
         )
 
         @app.route("/")
@@ -220,7 +220,7 @@ class TestPASETOExtension:
             cookie_name="paseto",
             version="v4",
             purpose="local",
-            key="MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=",
+            secret_key="MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=",
         )
 
         @app.route("/")
@@ -239,7 +239,7 @@ class TestPASETOExtension:
             header_name="Authorization",
             version="v4",
             purpose="local",
-            key="MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=",
+            secret_key="MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=",
         )
 
         @app.route("/")
@@ -257,7 +257,7 @@ class TestPASETOExtension:
             header_name="Authorization",
             version="v4",
             purpose="local",
-            key="MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=",
+            secret_key="MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=",
         )
 
         @app.route("/")

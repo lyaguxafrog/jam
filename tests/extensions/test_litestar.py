@@ -34,7 +34,7 @@ def paseto_config():
         "paseto": {
             "version": "v2",
             "purpose": "local",
-            "key": "YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWE",
+            "secret_key": "YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWE",
         }
     }
 
