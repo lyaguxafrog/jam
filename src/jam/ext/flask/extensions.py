@@ -3,6 +3,7 @@
 from typing import Any
 
 import flask
+from flask.testing import Flask
 
 from jam.exceptions import JamFlaskPluginConfigError
 from jam.jwt import JWT
@@ -21,7 +22,6 @@ class BaseExtension:
     def __init__(
         self,
         app: flask.Flask | None = None,
-        auth: Any | None = None,
         **kwargs: Any,
     ) -> None:
         """Initialize the extension.
@@ -32,7 +32,6 @@ class BaseExtension:
             **kwargs: Configuration arguments
         """
         self.app = app
-        self._auth = auth
         self._config = kwargs
         if app is not None:
             self.init_app(app)
@@ -44,8 +43,7 @@ class BaseExtension:
             app (flask.Flask): Flask application instance
         """
         self.app = app
-        if self._auth is None:
-            self._auth = self.MODULE(**self._config)
+        self._auth = self.MODULE(**self._config)
         app.extensions[self._CONFIG_KEY] = self._auth
 
 
@@ -57,8 +55,7 @@ class BaseAuthExtension(BaseExtension):
 
     def __init__(
         self,
-        app: flask.Flask | None = None,
-        auth: Any | None = None,
+        app: Flask | None = None,
         config: dict[str, Any] | str | None = None,
         pointer: str = GENERIC_POINTER,
         cookie_name: str | None = None,
@@ -96,7 +93,7 @@ class BaseAuthExtension(BaseExtension):
         )
 
         params = _config.pop(self._CONFIG_KEY) if _config else kwargs
-        super().__init__(app, auth=auth, **params)
+        super().__init__(app=app, **params)
 
     def _get_token(self) -> str | None:
         token = None
@@ -190,7 +187,6 @@ class OAuth2Extension(BaseExtension):
     def __init__(
         self,
         app: flask.Flask | None = None,
-        auth: Any | None = None,
         config: dict[str, Any] | str | None = None,
         pointer: str = GENERIC_POINTER,
         **kwargs: Any,
@@ -209,4 +205,4 @@ class OAuth2Extension(BaseExtension):
         )
 
         params = _config.pop(self._CONFIG_KEY) if _config else kwargs
-        super().__init__(app, auth=auth, **params)
+        super().__init__(app, **params)
