@@ -9,55 +9,33 @@ edit_uri: blob/release/docs/
 
 nav:
   - Home: index.md
+  - Geting start:
+      - Installation: installation.md
+      - Configuration: configuration.md
   - Usage:
-      - Configuration: config.md
-      - JWT:
-          - Config: jwt/config.md
-          - Instance: jwt/instance.md
-          - Lists:
-              - What is?: jwt/lists/what.md
-              - How to use?: jwt/lists/how.md
-              - JSONList: jwt/lists/json.md
-              - RedisList: jwt/lists/redis.md
-              - CustomList: jwt/lists/own_module.md
-      - PASETO:
-          - Config: paseto/config.md
-          - Instance: paseto/instance.md
-      - Sessions:
-          - Config: sessions/config.md
-          - Instance: sessions/instance.md
-          - Sessions crypt: sessions/session_crypt.md
-          - Own sessions backend: sessions/own_module.md
-      - OAuth2:
-          - Config: oauth2/config.md
-          - Instance: oauth2/instance.md
-          - Built-In providers: oauth2/builtins.md
-          - Custom Module: oauth2/custom_module.md
-      - OTP:
-          - Config: otp/config.md
-          - HOTP or TOTP: otp/hotp_and_totp.md
-          - HOTP: otp/hotp.md
-          - TOTP: otp/totp.md
-      - Async support: async.md
-      - Testing: testing.md
+      - JWT: usage/jwt.md
+      - PASETO: usage/paseto.md
+      - Server side sessions: usage/sessions.md
+      - OAuth2: usage/oauth2.md
+      - OTP: usage/otp.md
+      - Logging: usage/logging.md
+      - JSON serialization: usage/serializers.md
+      - Testing: usage/test_client.md
       - Utils:
-          - Key generators: utils/key_generations.md
-          - Passwords utils: utils/password_hashing.md
-  - Frameworks integration:
-      - Litestar: extensions/litestar.md
-      - Starlette: extensions/starlette.md
-      - FastAPI: extensions/fastapi.md
-      - Flask: extensions/flask.md
-  - API Reference: api/SUMMARY
+          - Keys generators: usage/utils/key_generators.md
+          - Auth utils: usage/utils/auth_utils.md
+  - Framework integration:
+      - Litestar: framework_integrations/litestar.md
+      - Starlette: framework_integrations/starlette.md
+      - FastAPI: framework_integrations/fastapi.md
+      - Flask: framework_integrations/flask.md
+  - API Reference: api/SUMMARY.md
   - Breaking changes:
-      #      - Deprecated: breaking_changes/deprecated
-      - 2.5.5 -> 3.0.0: breaking_changes/jam255_to_300
-      - 1.1.4 -> 2.0.0: breaking_changes/jam114_to_200
+      - Deprecated: breaking_changes/deprecated.md
+      - 2.5.6 -> 3.0.0: breaking_changes/jam256_to_300.md
+      - 1.1.4 -> 2.0.0: breaking_changes/jam114_to_200.md
   - Contributing: contributing.md
-  - Changelog: https://github.com/lyaguxafrog/jam/blob/master/CHANGELOG.md
-  - Security Policy: https://github.com/lyaguxafrog/jam/blob/master/SECURITY.md
   - Philosophy: philosophy.md
-  - License: https://github.com/lyaguxafrog/jam/blob/master/LICENSE.md
 
 theme:
   name: material

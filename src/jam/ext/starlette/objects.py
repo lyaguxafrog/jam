@@ -51,3 +51,6 @@ class SimpleUser(BaseUser):
     @classmethod
     def from_payload(cls, payload: dict[str, Any]):  # noqa
         return cls(payload=payload)
+
+    def is_authenticated(self) -> bool:  # type: ignore # noqa
+        return True
