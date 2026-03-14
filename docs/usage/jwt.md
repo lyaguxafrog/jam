@@ -85,7 +85,7 @@ print(token)
 
 #### Decode token
 
-Method: `jam.jwt_decode_token`
+Method: `jam.jwt_decode`
 
 Args:
 
@@ -98,7 +98,7 @@ Returns:
 `dict[str, Any]`: Decoded token data
 
 ```python
-data = jam.jwt_decode_token(
+data = jam.jwt_decode(
     token=token,
     check_exp=True,
     check_list=False
