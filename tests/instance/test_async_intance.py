@@ -33,10 +33,10 @@ async def test_jwt_instance(jam_jwt_instance):
     )
     assert jwt_payload["sub"] == "user123"
 
-    token = await jam_jwt_instance.jwt_create_token(jwt_payload)
+    token = await jam_jwt_instance.jwt_create(jwt_payload)
     assert isinstance(token, str)
     assert len(token.split(".")) == 3  # JWT has three parts separated by dots
-    decoded_payload = await jam_jwt_instance.jwt_verify_token(
+    decoded_payload = await jam_jwt_instance.jwt_decode(
         token, check_exp=False, check_list=False
     )
     assert decoded_payload == jwt_payload
