@@ -21,6 +21,7 @@ nav:
       - Logging: usage/logging.md
       - JSON serialization: usage/serializers.md
       - Testing: usage/test_client.md
+      - Customization: usage/custom.md
       - Utils:
           - Keys generators: usage/utils/key_generators.md
           - Auth utils: usage/utils/auth_utils.md
