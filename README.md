@@ -22,31 +22,30 @@ pip install jamlib
 ```python
 from jam import Jam
 
-jam = Jam(config)
+jam = Jam(config="config.toml")
 
 jwt = jam.jwt_create({"user": 1})
 session_id = jam.session_create(session_key="username", data={"user": 1})
+otp_code = jam.otp_code(secret="3DB7FOAOFBCI3WFDRE7EPF43CA")
 ```
 
 ## Why Jam?
 Jam is a library that provides the most popular AUTH* mechanisms right out of the box.
 
-* [JWT](https://jam.makridenko.ru/jwt/instance/)
-* [PASETO](https://jam.makridenko.ru/paseto/instance/)
-* [Server side sessions](https://jam.makridenko.ru/sessions/instance/)
-* OTP
-  * [TOTP](https://jam.makridenko.ru/otp/totp/)
-  * [HOTP](https://jam.makridenko.ru/otp/hotp/)
-* [OAuth2](https://jam.makridenko.ru/oauth2/instance/)
+* [JWT](https://jam.makridenko.ru/usage/jwt/)
+* [PASETO](https://jam.makridenko.ru/usage/paseto/)
+* [Server side sessions](https://jam.makridenko.ru/usage/sessions/)
+* [OTP](https://jam.makridenko.ru/usage/otp/)
+* [OAuth2](https://jam.makridenko.ru/usage/oauth2/)
 
 ### Framework integrations
 
 Jam provides ready-to-use integrations for the most popular frameworks:
 
-* [FastAPI](https://jam.makridenko.ru/extensions/fastapi)
-* [Starlette](https://jam.makridenko.ru/extensions/starlette)
-* [Litestar](https://jam.makridenko.ru/extensions/litestar)
-* [Flask](https://jam.makridenko.ru/extensions/flask)
+* [FastAPI](https://jam.makridenko.ru/framework_integrations/fastapi)
+* [Starlette](https://jam.makridenko.ru/framework_integrations/starlette)
+* [Litestar](https://jam.makridenko.ru/framework_integrations/litestar)
+* [Flask](https://jam.makridenko.ru/framework_integrations/flask)
 
 Each integration offers built-in middleware or plugin support for JWT and session-based authentication.
 

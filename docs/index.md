@@ -36,8 +36,7 @@ payload = {
 }
 
 jwt = jam.jwt_create(payload)
-paseto = jam.paseto_create(payload)
-session_id = jam.session_create(payload)
+session_id = jam.session_create("user@mail.com", payload)
 otp_code = jam.otp_code(secret="7K2HVNA3IQCYFFDX76IXKNCZHQ")
 ```
 
@@ -60,23 +59,21 @@ token = await jam.jwt_create(payload)
 ## Why Jam?
 Jam is a library that provides the most popular AUTH* mechanisms right out of the box.
 
-* [JWT](jwt/instance.md)
-* [PASETO](paseto/instance.md)
-* [Server side sessions](sessions/instance.md)
-* OTP
-    * [TOTP](otp/totp.md)
-    * [HOTP](otp/hotp.md)
-* [OAuth2](oauth2/instance.md)
+* [JWT](usage/jwt.md)
+* [PASETO](usage/paseto.md)
+* [Server side sessions](usage/sessions.md)
+* [OTP](usage/otp.md)
+* [OAuth2](usage/oauth2.md)
 
 
 ### Framework integrations
 
 Jam provides ready-to-use integrations for the most popular frameworks:
 
-* [FastAPI](extensions/fastapi.md)
-* [Starlette](extensions/starlette.md)
-* [Litestar](extensions/litestar.md)
-* [Flask](extensions/flask.md)
+* [FastAPI](framework_integrations/fastapi.md)
+* [Starlette](framework_integrations/starlette.md)
+* [Litestar](framework_integrations/litestar.md)
+* [Flask](framework_integrations/flask.md)
 
 Each integration offers built-in middleware or plugin support for JWT and session-based authentication.
 
