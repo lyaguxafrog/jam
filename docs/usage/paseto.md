@@ -10,15 +10,14 @@ Args:
 
 * `version`: `str` - PASETO version(v1 / v2 / v3 / v4)
 * `purpose`: `str` - `local` / `public`
-* `secret`: `str | None`: Secret key for PASETO
+* `secret_key`: `str | None`: Secret key for PASETO
 
 
-Example:
 ```toml
 [jam.paseto]
 version = "v4"
 purpose = "local"
-secret = "3KVs1nMaWb8jP0_aYMhsRN_hHf9dwV1UdqKk_wUXlnM"
+secret_key = "3KVs1nMaWb8jP0_aYMhsRN_hHf9dwV1UdqKk_wUXlnM"
 ```
 
 ### Usage
@@ -138,7 +137,7 @@ Method: `PASETOv4.key`
 Args:
 
 * `purpose`: `str` - `local` / `public`
-* `key`: `str | bytes`: Symmetric key for local and Asymmetric key for public
+* `secret_key`: `str | bytes`: Symmetric key for local and Asymmetric key for public
 
 Returns:
 
@@ -149,7 +148,7 @@ from jam.paseto import PASETOv4`
 
 paseto = PASETOv4.key(
     purpose="local",
-    key="3KVs1nMaWb8jP0_aYMhsRN_hHf9dwV1UdqKk_wUXlnM"
+    secret_key="3KVs1nMaWb8jP0_aYMhsRN_hHf9dwV1UdqKk_wUXlnM"
 )
 ```
 
