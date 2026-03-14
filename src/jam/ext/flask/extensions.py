@@ -3,7 +3,6 @@
 from typing import Any
 
 import flask
-from flask.testing import Flask
 
 from jam.exceptions import JamFlaskPluginConfigError
 from jam.jwt import JWT
@@ -55,7 +54,7 @@ class BaseAuthExtension(BaseExtension):
 
     def __init__(
         self,
-        app: Flask | None = None,
+        app: flask.Flask | None = None,
         config: dict[str, Any] | str | None = None,
         pointer: str = GENERIC_POINTER,
         cookie_name: str | None = None,
@@ -67,7 +66,6 @@ class BaseAuthExtension(BaseExtension):
 
         Args:
             app (flask.Flask | None): Flask application instance
-            auth (Any | None): Pre-created auth module instance
             config (dict[str, Any] | str | None): Jam config as path/to/file or dict.
             pointer (str): Config pointer
             cookie_name (str | None): Cookie name to read token
@@ -195,7 +193,6 @@ class OAuth2Extension(BaseExtension):
 
         Args:
             app (flask.Flask | None): Flask application instance
-            auth (Any | None): Pre-created auth module instance
             config (dict[str, Any] | str | None): Jam config as path/to/file or dict.
             pointer (str): Config pointer
             **kwargs: Configuration arguments if config=None
