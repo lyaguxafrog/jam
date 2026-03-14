@@ -24,7 +24,7 @@ Jam(Jeneric auth module) - a simple library that makes implementing authenticati
 ---> 100%
 Installed!
 ```
-How to install dev version: -> [Jam Unstable](install_unstable.md)
+
 
 ## Quick example
 ```python
