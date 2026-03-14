@@ -14,7 +14,7 @@ from starlette.requests import HTTPConnection
 from jam.aio.sessions import create_instance as create_session
 from jam.exceptions import JamStarlettePluginConfigError
 from jam.ext.starlette.objects import BaseUser, SimpleUser
-from jam.jwt import JWT
+from jam.jwt import create_instance as create_jwt
 from jam.paseto import create_instance as create_paseto
 from jam.utils.config_maker import GENERIC_POINTER, __config_maker__
 
@@ -97,7 +97,7 @@ class BaseBackend(AuthenticationBackend):
 class JWTBackend(BaseBackend):
     """JWT Backend for litestar."""
 
-    MODULE = JWT
+    MODULE = staticmethod(create_jwt)
     _CONFIG_KEY = "jwt"
 
     async def authenticate(  # noqa

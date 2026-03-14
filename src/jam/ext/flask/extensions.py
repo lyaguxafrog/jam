@@ -5,7 +5,7 @@ from typing import Any
 import flask
 
 from jam.exceptions import JamFlaskPluginConfigError
-from jam.jwt import JWT
+from jam.jwt import create_instance as create_jwt
 from jam.oauth2 import create_instance as create_oauth2
 from jam.paseto import create_instance as create_paseto
 from jam.sessions import create_instance as create_session
@@ -119,7 +119,7 @@ class BaseAuthExtension(BaseExtension):
 class JWTExtension(BaseAuthExtension):
     """JWT extension for Flask."""
 
-    MODULE = staticmethod(JWT)
+    MODULE = staticmethod(create_jwt)
     _CONFIG_KEY = "jwt"
 
     def _get_payload(self) -> dict[str, Any] | None:

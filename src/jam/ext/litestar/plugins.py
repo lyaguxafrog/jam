@@ -16,7 +16,7 @@ from jam.ext.litestar.middleware import (
     SessionMiddleware,
 )
 from jam.ext.litestar.objects import BaseUser
-from jam.jwt import JWT
+from jam.jwt import create_instance as create_jwt
 from jam.oauth2 import create_instance as create_oauth2
 from jam.paseto import create_instance as create_paseto
 from jam.utils.config_maker import GENERIC_POINTER, __config_maker__
@@ -99,7 +99,7 @@ class BasePlugin(InitPlugin):
 class JamJWTPlugin(BasePlugin):
     """JWT plugin for litestar."""
 
-    MODULE = JWT
+    MODULE = staticmethod(create_jwt)
     MIDDLEWARE = JWTMiddleware
     _DI_KEY = "jwt"
     _CONFIG_KEY = "jwt"
