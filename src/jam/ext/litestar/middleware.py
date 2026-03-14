@@ -43,6 +43,7 @@ class JWTMiddleware(BaseMiddleware):
     """JWT Middleware for litestar."""
 
     AUTH_MODULE: JWT
+    LIST: bool = False
 
     async def authenticate_request(  # noqa
         self, connection: ASGIConnection
@@ -53,6 +54,18 @@ class JWTMiddleware(BaseMiddleware):
             return AuthenticationResult(user=None, auth=token_model)
         try:
             data = self.AUTH_MODULE.decode(token)
+            if self.AUTH_MODULE.list and self.LIST:
+                match self.AUTH_MODULE.list.__list_type__:
+                    case "white":
+                        if not self.AUTH_MODULE.list.check(token):
+                            return AuthenticationResult(
+                                user=None, auth=token_model
+                            )
+                    case "black":
+                        if self.AUTH_MODULE.list.check(token):
+                            return AuthenticationResult(
+                                user=None, auth=token_model
+                            )
             user = self.USER.from_payload(data)
 
             return AuthenticationResult(user=user, auth=token_model)

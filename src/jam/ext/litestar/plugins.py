@@ -104,6 +104,41 @@ class JamJWTPlugin(BasePlugin):
     _DI_KEY = "jwt"
     _CONFIG_KEY = "jwt"
 
+    def __init__(
+        self,
+        config: dict[str, Any] | str | None = None,
+        pointer: str = GENERIC_POINTER,
+        cookie_name: str | None = None,
+        header_name: str | None = None,
+        middleware: bool = True,
+        use_list: bool = False,
+        user: type[BaseUser] | None = None,
+        **kwargs,
+    ) -> None:
+        """Initialize the plugin.
+
+        Args:
+            config (dict[str, Any] | str | None): Jam config as path/to/file or dict.
+            pointer (str): Config pointer
+            cookie_name (str | None): Cookie name to read token
+            header_name (str | None): Header name to read token
+            middleware (bool): Use middleware?
+            use_list (bool): Use token list for authentication?
+            user (type[BaseUser]): User for request state. See: DOCUMENTATION
+            **kwargs: Config arguments if config=None
+        """
+        super().__init__(
+            config=config,
+            pointer=pointer,
+            cookie_name=cookie_name,
+            header_name=header_name,
+            middleware=middleware,
+            user=user,
+            **kwargs,
+        )
+        if use_list:
+            self.MIDDLEWARE.LIST = True  # type: ignore
+
 
 class JamSessionPlugin(BasePlugin):
     """Sessions plugin for litestar."""
