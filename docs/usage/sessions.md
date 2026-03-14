@@ -33,7 +33,7 @@ Args:
 [jam.session]
 session_type = "redis"
 redis_uri = "redis://0.0.0.0:6379/0"
-default_ttl = 3600
+ttl = 3600
 session_path = "sessions
 ```
 
@@ -188,13 +188,13 @@ new_session_id = jam.session_rework(
 
 ### Redis
 
-Module: `jam.sessions.redis import Redis`
+Module: `jam.sessions.redis.Redis`
 
 Args:
 
 * `redis_uri`: `str | Redis` - Redis URI or Redis instance
 * `redis_sessions_key`: `str = "sessions"` - Redis key for sessions
-* `default_ttl`: `int | None = 3600` - Session life time
+* `ttl`: `int | None = 3600` - Session life time
 * `is_session_crypt`: `bool = False` - Encrypt session data
 * `session_aes_secret`: `bytes | str | None = None` - AES key for encrypting session data
 * `id_factory`: `Callable[[], str] = lambda: str(uuid4())` - Session ID factory.
@@ -211,7 +211,7 @@ session = RedisSessions(
 
 ### JSON
 
-Module: `jam.sessions.json import JSONSessions`
+Module: `jam.sessions.json.JSONSessions`
 
 Args:
 
