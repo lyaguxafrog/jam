@@ -31,6 +31,7 @@ class BaseBackend(AuthenticationBackend):
         pointer: str = GENERIC_POINTER,
         cookie_name: str | None = None,
         header_name: str | None = None,
+        bearer: bool = False,
         user: type[BaseUser] = SimpleUser,
         **kwargs,
     ) -> None:
@@ -44,6 +45,7 @@ class BaseBackend(AuthenticationBackend):
             )
         self._cookie_name = cookie_name
         self._header_name = header_name
+        self._bearer = bearer
         self._user = user
         self._config_setup(config, pointer, kwargs)
 
@@ -53,7 +55,11 @@ class BaseBackend(AuthenticationBackend):
         elif self._header_name:
             token_bear = connection.headers.get(self._header_name, None)
             if token_bear:
-                token = token_bear.split("Bearer ")[1]  # noqa: E701
+                token = (
+                    token_bear.split("Bearer ")[1]
+                    if self._bearer
+                    else token_bear
+                )  # noqa: E701
             else:
                 token = None  # noqa: E701
         else:
