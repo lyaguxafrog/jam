@@ -21,41 +21,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Security
 -->
 
-## 3.0.0 [Unreleased]
+## [3.0.0] - 15-03-2026
 
 ### Added
 - New changelog format.
-- Json configuration.
-- New JWT Module.
-- Environment variables support in config.
-- PASETO v1-v4 modules.
-- New utils:
-  - Util for generate symmetric keys
-  - Util for generate ED key pairs
+- JSON configuration.
+- New JWT module.
+- Environment variable support in config.
+- PASETO v1–v4 modules.
+- New utilities:
+  - Utility for generating symmetric keys
+  - Utility for generating ED key pairs
 
 ### Changed
-- Change license to Apache-2.0.
-- Rename all `__abc_*_module__` to `__base__`.
-- Exception format.
-- Refactoring litestar plugins.
-- Refactoring flask extensions.
-- Refactoring starlette integrations.
-- Rename `default_ttl` to `ttl` in redis sessions.
-
-### Deprecated
+- License changed to Apache-2.0.
+- Renamed all `__abc_*_module__` to `__base__`.
+- Exception format updated.
+- Refactored Litestar plugins.
+- Refactored Flask extensions.
+- Refactored Starlette integrations.
+- Renamed `default_ttl` to `ttl` in Redis sessions.
 
 ### Removed
-- Deleted old useless dependencies.
-- Delete module `jam.modules`.
-- Remove all deprecated modules.
+- Removed obsolete dependencies.
+- Removed module `jam.modules`.
+- Removed all deprecated modules.
 
 ### Fixed
-- YAML Config builder.
-- Fixed JWT lists in starlette/fastapi ext.
-- Fixed ALL TYPO errors.
+- YAML config builder.
+- Fixed JWT lists in Starlette/FastAPI extensions.
+- Fixed all typo errors.
 
 ### Security
-- Update all dependencies.
+- Updated all dependencies.
 
 ---
-[unreleased] https://github.com/lyaguxafrog/jam/compare/v2.5.6...unstable
+[3.0.0] https://github.com/lyaguxafrog/jam/compare/v2.5.6...v3.0.0

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""JAM - Universal auth* library
+"""JAM - Universal auth* library.
 
 Source code: https://github.com/lyaguxafrog/jam
 Documentation: https://jam.makridenko.ru
@@ -12,5 +12,5 @@ from jam.encoders import JsonEncoder
 from jam.instance import Jam
 
 
-__version__ = "3.0.0.rc3"
+__version__ = "3.0.0"
 __all__ = ["Jam", "JsonEncoder", "BaseJam", "BaseEncoder"]
