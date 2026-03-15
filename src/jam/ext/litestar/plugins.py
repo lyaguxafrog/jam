@@ -114,6 +114,7 @@ class JWTPlugin(BasePlugin):
         cookie_name: str | None = None,
         header_name: str | None = None,
         middleware: bool = True,
+        bearer: bool = False,
         use_list: bool = False,
         user: type[BaseUser] | None = None,
         **kwargs,
@@ -126,6 +127,7 @@ class JWTPlugin(BasePlugin):
             cookie_name (str | None): Cookie name to read token
             header_name (str | None): Header name to read token
             middleware (bool): Use middleware?
+            bearer (bool): Use bearer prefix for token (e.g. "Bearer ")
             use_list (bool): Use token list for authentication?
             user (type[BaseUser]): User for request state. See: DOCUMENTATION
             **kwargs: Config arguments if config=None
@@ -136,6 +138,7 @@ class JWTPlugin(BasePlugin):
             cookie_name=cookie_name,
             header_name=header_name,
             middleware=middleware,
+            bearer=bearer,
             user=user,
             **kwargs,
         )
