@@ -10,8 +10,8 @@ Integration with Litestar is implemented by [plugins](https://docs.litestar.dev/
 
 Plugins generally do two things:
 
-* Create a middleware for a specific authorization type
-* Add an authorization module to Litestar DI
+* Create a middleware for a specific authorization type.
+* Add an authorization module to Litestar DI.
 
 Example:
 
@@ -64,7 +64,7 @@ The plugins use the standard Jam configuration, along with some additional setti
 
 * `config`: `str | dict[str, Any] | None = None` - [Standard Jam configuration](/configuration).
 * `pointer`: `str` - [Pointer](/configuration/#pointer-str-jam) for config.
-* other plugin specific settings, see for each plugin
+* other plugin specific settings, see for each plugin.
 
 ```python
 import os
@@ -183,14 +183,14 @@ Module: `jam.ext.litestar.JWTPlugin`
 
 Args:
 
-* `config`: `str | dict[str, Any] | None = None` - Jam config
-* `pointer`: `str` - Config pointer
-* `cookie_name`: `str | None = None` - Cookie to check, if `middleware=True`
-* `header_name`: `str | None = None` - Header to check, if `middleware=True`
-* `middleware`: `bool = True` - Enable/disable middleware
-* `bearer`: `bool = False` - Use bearer prefix for token (e.g. "Bearer ")
-* `use_list`: `bool = False` - Use token black/white list
-* `user`: `type[BaseUser] | None = None` - User for request
+* `config`: `str | dict[str, Any] | None = None` - Jam config.
+* `pointer`: `str` - Config pointer.
+* `cookie_name`: `str | None = None` - Cookie to check, if `middleware=True`.
+* `header_name`: `str | None = None` - Header to check, if `middleware=True`.
+* `middleware`: `bool = True` - Enable/disable middleware.
+* `bearer`: `bool = False` - Use bearer prefix for token (e.g. "Bearer ").
+* `use_list`: `bool = False` - Use token black/white list.
+* `user`: `type[BaseUser] | None = None` - User for request.
 
 !!! tip
     This plugin added `jwt`: `jam.jwt.JWT` to Litestar DI.
@@ -217,13 +217,13 @@ Module: `jam.ext.litestar.PASETOPlugin`
 
 Args:
 
-* `config`: `str | dict[str, Any] | None = None` - Jam config
-* `pointer`: `str` - Config pointer
-* `cookie_name`: `str | None = None` - Cookie to check, if `middleware=True`
-* `header_name`: `str | None = None` - Header to check, if `middleware=True`
-* `bearer`: `bool = False` - Use bearer prefix for token (e.g. "Bearer ")
-* `middleware`: `bool = True` - Enable/disable middleware
-* `user`: `type[BaseUser] | None = None` - User for request
+* `config`: `str | dict[str, Any] | None = None` - Jam config.
+* `pointer`: `str` - Config pointer.
+* `cookie_name`: `str | None = None` - Cookie to check, if `middleware=True`.
+* `header_name`: `str | None = None` - Header to check, if `middleware=True`.
+* `bearer`: `bool = False` - Use bearer prefix for token (e.g. "Bearer").
+* `middleware`: `bool = True` - Enable/disable middleware.
+* `user`: `type[BaseUser] | None = None` - User for request.
 
 !!! tip
     This plugin added `paseto`: `jam.paseto.PASETOv*` to Litestar DI.
@@ -250,13 +250,13 @@ Module: `jam.ext.litestar.SessionPlugin`
 
 Args:
 
-* `config`: `str | dict[str, Any] | None = None` - Jam config
-* `pointer`: `str` - Config pointer
-* `cookie_name`: `str | None = None` - Cookie to check, if `middleware=True`
-* `header_name`: `str | None = None` - Header to check, if `middleware=True`
-* `bearer`: `bool = False` - Use bearer prefix for token (e.g. "Bearer ")
-* `middleware`: `bool = True` - Enable/disable middleware
-* `user`: `type[BaseUser] | None = None` - User for request
+* `config`: `str | dict[str, Any] | None = None` - Jam config.
+* `pointer`: `str` - Config pointer.
+* `cookie_name`: `str | None = None` - Cookie to check, if `middleware=True`.
+* `header_name`: `str | None = None` - Header to check, if `middleware=True`.
+* `bearer`: `bool = False` - Use bearer prefix for token (e.g. "Bearer").
+* `middleware`: `bool = True` - Enable/disable middleware.
+* `user`: `type[BaseUser] | None = None` - User for request.
 
 !!! tip
     This plugin added `session`: `jam.aio.sessions.*` to Litestar DI.
@@ -283,8 +283,8 @@ Module: `jam.ext.litestar.OAuth2Plugin`
 
 Args:
 
-* `config`: `str | dict[str, Any] | None = None` - Jam config
-* `pointer`: `str` - Config pointer
+* `config`: `str | dict[str, Any] | None = None` - Jam config.
+* `pointer`: `str` - Config pointer.
 
 !!! tip
     This plugin added `oauth2`: `jam.oauth2.*` to Litestar DI.

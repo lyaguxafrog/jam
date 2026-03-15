@@ -8,7 +8,7 @@ Integration with Flask is done in the form of extension classes, which are [reco
 
 ## How it works
 
-Jam extensions for Flask check requests for the presence of a token in cookies or the header (depending on the settings) and store the data in `flask.g`
+Jam extensions for Flask check requests for the presence of a token in cookies or the header (depending on the settings) and store the data in `flask.g`.
 
 Example:
 
@@ -65,12 +65,12 @@ Module: `jam.ext.flask.JWTExtension`
 
 Args:
 
-* `config`: `str | dict[str, Any] | None = None` - Jam config
-* `pointer`: `str` - Config pointer
-* `cookie_name`: `str | None = None` - Cookie to check
-* `header_name`: `str | None = None` - Header to check
-* `use_list`: `bool = False` - Use token black/white list
-* `bearer`: `bool = True` - Set `Bearer` to header
+* `config`: `str | dict[str, Any] | None = None` - Jam config.
+* `pointer`: `str` - Config pointer.
+* `cookie_name`: `str | None = None` - Cookie to check.
+* `header_name`: `str | None = None` - Header to check.
+* `use_list`: `bool = False` - Use token black/white list.
+* `bearer`: `bool = True` - Set `Bearer` to header.
 
 ```python
 from flask import Flask
@@ -91,11 +91,11 @@ Module: `jam.ext.flask.PASETOExtension`
 
 Args:
 
-* `config`: `str | dict[str, Any] | None = None` - Jam config
-* `pointer`: `str` - Config pointer
-* `cookie_name`: `str | None = None` - Cookie to check
-* `header_name`: `str | None = None` - Header to check
-* `bearer`: `bool = True` - Set `Bearer` to header
+* `config`: `str | dict[str, Any] | None = None` - Jam config.
+* `pointer`: `str` - Config pointer.
+* `cookie_name`: `str | None = None` - Cookie to check.
+* `header_name`: `str | None = None` - Header to check.
+* `bearer`: `bool = True` - Set `Bearer` to header.
 
 ```python
 from flask import Flask
@@ -116,11 +116,11 @@ Module: `jam.ext.flask.SessionExtension`
 
 Args:
 
-* `config`: `str | dict[str, Any] | None = None` - Jam config
-* `pointer`: `str` - Config pointer
-* `cookie_name`: `str | None = None` - Cookie to check
-* `header_name`: `str | None = None` - Header to check
-* `bearer`: `bool = True` - Set `Bearer` to header
+* `config`: `str | dict[str, Any] | None = None` - Jam config.
+* `pointer`: `str` - Config pointer.
+* `cookie_name`: `str | None = None` - Cookie to check.
+* `header_name`: `str | None = None` - Header to check.
+* `bearer`: `bool = True` - Set `Bearer` to header.
 
 ```python
 from flask import Flask
@@ -141,8 +141,8 @@ Module: `jam.ext.flask.OAuth2Extension`
 
 Args:
 
-* `config`: `str | dict[str, Any] | None = None` - Jam config
-* `pointer`: `str` - Config pointer
+* `config`: `str | dict[str, Any] | None = None` - Jam config.
+* `pointer`: `str` - Config pointer.
 
 ```python
 from flask import Flask

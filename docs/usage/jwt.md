@@ -6,10 +6,10 @@ title: JWT
 
 ### Config
 
-* `alg`: `str` - Algorithm for generating JWT tokens. Supports: `HS256`, `HS384`, `HS512`, `RS256`, `RS384`, `RS512`, `ES256`, `ES384`, `ES512`, `PS256`, `PS384`, `PS512`
+* `alg`: `str` - Algorithm for generating JWT tokens. Supports: `HS256`, `HS384`, `HS512`, `RS256`, `RS384`, `RS512`, `ES256`, `ES384`, `ES512`, `PS256`, `PS384`, `PS512`.
 * `secret_key`: `str` - Secret key for token signing. By default, Jam reads the environment variable `JAM_JWT_SECRET_KEY`.
 * `password`: `str` - Password for encrypted private keys.
-* `list`: `dict[str, Any] | None = None` - Token black/white list config. See: [`jam.jwt.list`](/api/jam.jwt.lists/)
+* `list`: `dict[str, Any] | None = None` - Token black/white list config. See: [`jam.jwt.list`](/api/jam.jwt.lists/).
 
 
 ```toml
@@ -38,12 +38,12 @@ Method: `jam.jwt_make_payload`
 
 Args:
 
-* `exp`: `int | None` - Token life time
-* `data`: `dict[str, Any]` - Custom data
+* `exp`: `int | None` - Token life time.
+* `data`: `dict[str, Any]` - Custom data.
 
 Returns:
 
-`dict[str, Any]`: Payload for token
+`dict[str, Any]`: Payload for token.
 
 ```python
 payload = jam.jwt_make_payload(
@@ -69,11 +69,11 @@ Method: `jam.jwt_create`
 
 Args:
 
-* `payload`: `dict[str, Any]` - Payload for token
+* `payload`: `dict[str, Any]` - Payload for token.
 
 Returns:
 
-`str`: Token
+`str`: Token.
 
 ```python
 token = jam.jwt_create(payload=payload)
@@ -87,13 +87,13 @@ Method: `jam.jwt_decode`
 
 Args:
 
-* `token`: `str` - Token to decode
+* `token`: `str` - Token to decode.
 * `check_exp`: `bool` - Check token expiration.
 * `check_list`: `bool` - Check token black/white list.
 
 Returns:
 
-`dict[str, Any]`: Decoded token data
+`dict[str, Any]`: Decoded token data.
 
 ```python
 data = jam.jwt_decode(
@@ -122,7 +122,7 @@ Method: `jam.jwt.list.add`
 
 Args:
 
-* `token`: `str` - Token to add
+* `token`: `str` - Token to add.
 
 ```python
 jam.jwt.list.add(
@@ -136,7 +136,7 @@ Method: `jam.jwt.list.delete`
 
 Args:
 
-* `token`: `str` - Token to remove
+* `token`: `str` - Token to remove.
 
 ```python
 jam.jwt.list.remove(
@@ -150,11 +150,11 @@ Method: `jam.jwt.list.check`
 
 Args:
 
-* `token`: `str` - Token to check
+* `token`: `str` - Token to check.
 
 Returns:
 
-`bool`: `True` if token is in list, `False` otherwise
+`bool`: `True` if token is in list, `False` otherwise.
 
 ```python
 result = jam.jwt.list.check(
@@ -176,7 +176,7 @@ Args:
 * `alg`: `str` - Algorithm for token generation.
 * `secret_key`: `str | bytes` - Secret key for token generation. By default, Jam reads the environment variable `JAM_JWT_SECRET_KEY`.
 * `password`: `str | bytes | None` - Password for token generation.
-* `list`: `dict[str, Any] | None` - List config. See: [`jam.jwt.list`](/api/jam.jwt.lists/)
+* `list`: `dict[str, Any] | None` - List config. See: [`jam.jwt.list`](/api/jam.jwt.lists/).
 
 ```python
 from jam.jwt import JWT
@@ -199,11 +199,11 @@ Method: `JWT.encode`
 
 Args:
 
-* `payload`: `dict[str, Any]` - Payload for token
+* `payload`: `dict[str, Any]` - Payload for token.
 
 Returns:
 
-`str`: Token
+`str`: Token.
 
 ```python
 token = jwt.encode(
@@ -222,12 +222,12 @@ Method: `JWT.decode`
 
 Args:
 
-* `token`: `str` - Token to decode
-* `public_key`: `str | bytes | None` - Public key for token verification
+* `token`: `str` - Token to decode.
+* `public_key`: `str | bytes | None` - Public key for token verification.
 
 Returns:
 
-`dict[str, Any]`: Decoded token data
+`dict[str, Any]`: Decoded token data.
 
 ```python
 data = jwt.decode(
@@ -251,7 +251,7 @@ Method: `JWT.list.add`
 
 Args:
 
-* `token`: `str` - Token to add
+* `token`: `str` - Token to add.
 
 ```python
 jwt.list.add(token)
@@ -263,7 +263,7 @@ Method: `JWT.list.delete`
 
 Args:
 
-* `token`: `str` - Token to remove
+* `token`: `str` - Token to remove.
 
 ```python
 jwt.list.delete(token)
@@ -275,11 +275,11 @@ Method: `JWT.list.check`
 
 Args:
 
-* `token`: `str` - Token to check
+* `token`: `str` - Token to check.
 
 Returns:
 
-`bool`: `True` if token is in list, `False` otherwise
+`bool`: `True` if token is in list, `False` otherwise.
 
 ```python
 result = jwt.list.check(token)

@@ -43,7 +43,7 @@ In JSON, sessions are stored as files in the directory specified in the `json_pa
 
 Args:
 
-* `json_path`: `str` - Path to file
+* `json_path`: `str` - Path to file.
 
 ```toml
 [jam.session]
@@ -53,7 +53,7 @@ json_path = "sessions.json"
 
 #### Custom
 
-You can also implement your session module using the `BaseSession`
+You can also implement your session module using the `BaseSession`.
 interface and passing it to the config, for example, to store sessions in a database.
 
 See: [Customization](/usage/custom)
@@ -75,11 +75,11 @@ Method: `jam.session_create`
 Args:
 
 * `session_key`: `str` - Key of session. Username for example.
-* `data`: `dict[str, Any]` - Some data to store
+* `data`: `dict[str, Any]` - Some data to store.
 
 Returns:
 
-`str`: Session ID
+`str`: Session ID.
 
 ```python
 session_id = jam.session_create(
@@ -98,7 +98,7 @@ Method: `jam.session_get`
 
 Args:
 
-* `session_id`: `str` - Session ID
+* `session_id`: `str` - Session ID.
 
 Returns:
 
@@ -120,8 +120,8 @@ Method: `jam.session_update`
 
 Args:
 
-* `session_id`: `str` - Session ID
-* `data`: `dict[str, Any]`: New data
+* `session_id`: `str` - Session ID.
+* `data`: `dict[str, Any]`: New data.
 
 Returns: `None`
 
@@ -140,7 +140,7 @@ Method: `jam.session_delete`
 
 Args:
 
-* `session_id`: `str` - Session ID
+* `session_id`: `str` - Session ID.
 
 Returns: `None`
 
@@ -156,7 +156,7 @@ Method: `jam.session_clear`
 
 Args:
 
-* `session_key`: `str` - Session key
+* `session_key`: `str` - Session key.
 
 Returns: `None`
 
@@ -172,11 +172,11 @@ Method: `jam.session_rework`
 
 Args:
 
-* `old_session_id`: `str` - Old session ID
+* `old_session_id`: `str` - Old session ID.
 
 Returns:
 
-`str`: New session ID
+`str`: New session ID.
 
 ```python
 new_session_id = jam.session_rework(
@@ -192,14 +192,14 @@ Module: `jam.sessions.redis.Redis`
 
 Args:
 
-* `redis_uri`: `str | Redis` - Redis URI or Redis instance
-* `redis_sessions_key`: `str = "sessions"` - Redis key for sessions
-* `ttl`: `int | None = 3600` - Session life time
-* `is_session_crypt`: `bool = False` - Encrypt session data
-* `session_aes_secret`: `bytes | str | None = None` - AES key for encrypting session data
+* `redis_uri`: `str | Redis` - Redis URI or Redis instance.
+* `redis_sessions_key`: `str = "sessions"` - Redis key for sessions.
+* `ttl`: `int | None = 3600` - Session life time.
+* `is_session_crypt`: `bool = False` - Encrypt session data.
+* `session_aes_secret`: `bytes | str | None = None` - AES key for encrypting session data.
 * `id_factory`: `Callable[[], str] = lambda: str(uuid4())` - Session ID factory.
-* `serializer`: `BaseEncoder | type[BaseEncoder] = JsonEncoder` - JSON serializer
-* `logger`: `BaseLogger | None = JamLogger` - Logger
+* `serializer`: `BaseEncoder | type[BaseEncoder] = JsonEncoder` - JSON serializer.
+* `logger`: `BaseLogger | None = JamLogger` - Logger.
 
 ```python
 session = RedisSessions(
@@ -215,12 +215,12 @@ Module: `jam.sessions.json.JSONSessions`
 
 Args:
 
-* `json_path`: `str = sessions.json` - Path to json file
-* `is_session_crypt`: `bool = False` - Encrypt session data
-* `session_aes_secret`: `bytes | str | None = None` - AES key for encrypting session data
+* `json_path`: `str = sessions.json` - Path to json file.
+* `is_session_crypt`: `bool = False` - Encrypt session data.
+* `session_aes_secret`: `bytes | str | None = None` - AES key for encrypting session data.
 * `id_factory`: `Callable[[], str] = lambda: str(uuid4())` - Session ID factory.
-* `serializer`: `BaseEncoder | type[BaseEncoder] = JsonEncoder` - JSON serializer
-* `logger`: `BaseLogger | None = JamLogger` - Logger
+* `serializer`: `BaseEncoder | type[BaseEncoder] = JsonEncoder` - JSON serializer.
+* `logger`: `BaseLogger | None = JamLogger` - Logger.
 
 ```python
 session = JSONSessions(
@@ -234,8 +234,8 @@ Method: `session.create`
 
 Args:
 
-* `session_key`: `str` - Session key
-* `session_data`: `dict` - Session data
+* `session_key`: `str` - Session key.
+* `session_data`: `dict` - Session data.
 
 Returns:
 
@@ -259,7 +259,7 @@ Method: `session.get`
 
 Args:
 
-* `session_id`: `str` - Session ID
+* `session_id`: `str` - Session ID.
 
 Returns:
 
@@ -311,7 +311,7 @@ Method: `session.clear`
 
 Args:
 
-* `session_key`: `str` - Session key
+* `session_key`: `str` - Session key.
 
 Returns: `None`
 
@@ -329,7 +329,7 @@ Args:
 
 Returns: 
 
-`str`: New session ID
+`str`: New session ID.
 
 ```python
 new_session_id = session.rework(

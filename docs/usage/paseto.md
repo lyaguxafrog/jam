@@ -8,9 +8,9 @@ title: PASETO
 
 Args:
 
-* `version`: `str` - PASETO version(v1 / v2 / v3 / v4)
-* `purpose`: `str` - `local` / `public`
-* `secret_key`: `str | None`: Secret key for PASETO
+* `version`: `str` - PASETO version(v1 / v2 / v3 / v4).
+* `purpose`: `str` - `local` / `public`.
+* `secret_key`: `str | None`: Secret key for PASETO.
 
 
 ```toml
@@ -34,12 +34,12 @@ Method: `jam.paseto_make_payload`
 
 Args:
 
-* `exp`: `int | None = Non`: Token lifetime
-* `data`: `dict[str, Any]`: Data to payload
+* `exp`: `int | None = Non`: Token lifetime.
+* `data`: `dict[str, Any]`: Data to payload.
 
 Returns:
 
-`dict[str, Any]`: Payload
+`dict[str, Any]`: Payload.
 
 ```python
 payload = jam.paseto_make_payload(
@@ -64,12 +64,12 @@ Method: `jam.paset_create`
 
 Args:
 
-* `payload`: `dict[str, Any]` - Token payload
-* `footer`: `dict[str, Any] | str | None` - Token footer
+* `payload`: `dict[str, Any]` - Token payload.
+* `footer`: `dict[str, Any] | str | None` - Token footer.
 
 Returns:
 
-`str`: PASETO
+`str`: PASETO.
 
 ```python
 token = jam.paseto_create(
@@ -90,13 +90,13 @@ Method: `jam.paseto_decode`
 
 Args:
 
-* `token`: `str` - PASETO
-* `check_exp`: `bool = True` - Check token expiration
-* `check_list`: `bool = True` - Check token list
+* `token`: `str` - PASETO.
+* `check_exp`: `bool = True` - Check token expiration.
+* `check_list`: `bool = True` - Check token list.
 
 Returns:
 
-`dict[str, dict[str, Any] | str | None]` - dict like `{"payload": {<payload_data>}, "footer": <footer_data>`
+`dict[str, dict[str, Any] | str | None]` - dict like `{"payload": {<payload_data>}, "footer": <footer_data>`.
 
 ```python
 data = jam.paseto_decode(
@@ -136,12 +136,12 @@ Method: `PASETOv4.key`
 
 Args:
 
-* `purpose`: `str` - `local` / `public`
-* `secret_key`: `str | bytes`: Symmetric key for local and Asymmetric key for public
+* `purpose`: `str` - `local` / `public`.
+* `secret_key`: `str | bytes`: Symmetric key for local and Asymmetric key for public.
 
 Returns:
 
-`PASETOv4`: Built PASETOv4 instance
+`PASETOv4`: Built PASETOv4 instance.
 
 ```python
 from jam.paseto import PASETOv4`
@@ -158,13 +158,13 @@ Method: `paseto.encode`
 
 Args:
 
-* `payload`: `dict[str, Any]` - Token payload
-* `footer`: `dict[str, Any] | str | None = Non` - Token footer
-* `serializer`: `type[BaseEncoder] | BaseEncoder = JamEncoder` - JSON serializer
+* `payload`: `dict[str, Any]` - Token payload.
+* `footer`: `dict[str, Any] | str | None = Non` - Token footer.
+* `serializer`: `type[BaseEncoder] | BaseEncoder = JamEncoder` - JSON serializer.
 
 Returns:
 
-`str`: PASETO
+`str`: PASETO.
 
 ```python
 token = paseto.encode(
@@ -181,12 +181,12 @@ Method: `paseto.decode`
 
 Args:
 
-* `token`: `str` - PASETO token
-* `serializer`: `type[BaseEncoder] | BaseEncoder = JamEncoder` - JSON serializer
+* `token`: `str` - PASETO token.
+* `serializer`: `type[BaseEncoder] | BaseEncoder = JamEncoder` - JSON serializer.
 
 Returns:
 
-`tuple[dict[str, Any], dict[str, Any] | str, | None]` - Decoded payload and footer
+`tuple[dict[str, Any], dict[str, Any] | str, | None]` - Decoded payload and footer.
 
 ```python
 payload, footer = paseto.decode(

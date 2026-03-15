@@ -51,7 +51,7 @@ The authorization backend accepts a standard Jam configuration as its configurat
 
 * `config`: `str | dict[str, Any] | None = None` - [Standard Jam configuration](/configuration).
 * `pointer`: `str` - [Pointer](/configuration/#pointer-str-jam) for config.
-* other backend specific settings, see for each backend
+* other backend specific settings, see for each backend.
 
 ```python
 config = {
@@ -162,13 +162,13 @@ Module: `jam.ext.starlette.JWTBackend`
 
 Args:
 
-* `config`: `str | dict[str, Any] | None = None` - Jam config
-* `pointer`: `str` - Config pointer
-* `cookie_name`: `str | None = None` - Cookie to check
-* `header_name`: `str | None = None` - Header to check
-* `bearer`: `bool = False` - Use bearer prefix for token (e.g. "Bearer ")
-* `use_list`: `bool = False` - Use token black/white list
-* `user`: `type[BaseUser] = SimpleUser` - User for request
+* `config`: `str | dict[str, Any] | None = None` - Jam config.
+* `pointer`: `str` - Config pointer.
+* `cookie_name`: `str | None = None` - Cookie to check.
+* `header_name`: `str | None = None` - Header to check.
+* `bearer`: `bool = False` - Use bearer prefix for token (e.g. "Bearer").
+* `use_list`: `bool = False` - Use token black/white list.
+* `user`: `type[BaseUser] = SimpleUser` - User for request.
 
 ```python
 from jam.ext.starlette import JWTBackend
@@ -193,12 +193,12 @@ Module: `jam.ext.starlette.PASETOBackend`
 
 Args:
 
-* `config`: `str | dict[str, Any] | None = None` - Jam config
-* `pointer`: `str` - Config pointer
-* `cookie_name`: `str | None = None` - Cookie to check
-* `header_name`: `str | None = None` - Header to check
-* `bearer`: `bool = False` - Use bearer prefix for token (e.g. "Bearer ")
-* `user`: `type[BaseUser] = SimpleUser` - User for request
+* `config`: `str | dict[str, Any] | None = None` - Jam config.
+* `pointer`: `str` - Config pointer.
+* `cookie_name`: `str | None = None` - Cookie to check.
+* `header_name`: `str | None = None` - Header to check.
+* `bearer`: `bool = False` - Use bearer prefix for token (e.g. "Bearer").
+* `user`: `type[BaseUser] = SimpleUser` - User for request.
 
 ```python
 from jam.ext.starlette import PASETOBackend
@@ -223,12 +223,12 @@ Module: `jam.ext.starlette.SessionBackend`
 
 Args:
 
-* `config`: `str | dict[str, Any] | None = None` - Jam config
-* `pointer`: `str` - Config pointer
-* `cookie_name`: `str | None = None` - Cookie to check
-* `header_name`: `str | None = None` - Header to check
-* `bearer`: `bool = False` - Use bearer prefix for token (e.g. "Bearer ")
-* `user`: `type[BaseUser] = SimpleUser` - User for request
+* `config`: `str | dict[str, Any] | None = None` - Jam config.
+* `pointer`: `str` - Config pointer.
+* `cookie_name`: `str | None = None` - Cookie to check.
+* `header_name`: `str | None = None` - Header to check.
+* `bearer`: `bool = False` - Use bearer prefix for token (e.g. "Bearer").
+* `user`: `type[BaseUser] = SimpleUser` - User for request.
 
 ```python
 from jam.ext.starlette import SessionBackend

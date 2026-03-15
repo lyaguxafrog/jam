@@ -50,7 +50,7 @@ Utils:
 
 Returns:
 
-`dict[str, str]` - Dict in format `{"private": KEY, "public": KEY}`
+`dict[str, str]` - Dict in format `{"private": KEY, "public": KEY}`.
 
 ```python 
 from jam.utils import generate_ed25519_keypair

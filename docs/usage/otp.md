@@ -60,7 +60,7 @@ Args:
 
 Returns:
 
-`str` - URI
+`str` - URI.
 
 ```python
 uri = jam.otp_uri(

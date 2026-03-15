@@ -38,12 +38,12 @@ Method: `jam.oauth2_get_authorized_url`
 
 Args:
 
-* `provider`: `str` - Provider name from config
-* `scope`: `list[str]` - Scope for provider
+* `provider`: `str` - Provider name from config.
+* `scope`: `list[str]` - Scope for provider.
 
 Returns:
 
-`str`: URL for authoriaztion
+`str`: URL for authoriaztion.
 
 ```python
 url = jam.oauth2_get_authorized_url(
@@ -59,13 +59,13 @@ Method: `jam.oauth2_fetch_token`
 
 Args:
 
-* `provider`: `str` - Provider name from config
-* `code`: `str` - OAuth2 code
-* `grant_type`: `str = authorization_code` - Type of oauth2 grant
+* `provider`: `str` - Provider name from config.
+* `code`: `str` - OAuth2 code.
+* `grant_type`: `str = authorization_code` - Type of oauth2 grant.
 
 Returns:
 
-`dict[str, Any]` - Tokens
+`dict[str, Any]` - Tokens.
 
 ```python
 tokens = jam.oauth2_fetch_token(
@@ -81,13 +81,13 @@ Method: `jam.oauth2_refresh_token`
 
 Args:
 
-* `provider`: `str` - Provider name from config
-* `refresh_token`: `str` - Refresh token
-* `grant_type`: `str = "refresh_token"` - Grant type
+* `provider`: `str` - Provider name from config.
+* `refresh_token`: `str` - Refresh token.
+* `grant_type`: `str = "refresh_token"` - Grant type.
 
 Returns:
 
-`dict[str, Any]`: Refresh token
+`dict[str, Any]`: Refresh token.
 
 ```python
 tokens = jam.oauth2_refresh_token(
@@ -102,12 +102,12 @@ Method: `jam.oauth2_client_credentials_flow`
 
 Args:
 
-* `provider`: `str` - Provider name from config
-* `scope`: `list[str]` - Scope for provider
+* `provider`: `str` - Provider name from config.
+* `scope`: `list[str]` - Scope for provider.
 
 Returns:
 
-`dict[str, Any]`: Data
+`dict[str, Any]`: Data.
 
 ```python
 tokens = jam.oauth2_client_credentials(

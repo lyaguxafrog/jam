@@ -13,8 +13,8 @@ Util: `jam.utils.hash_password`
 
 Args:
 
-* `password`: `str` - Password
-* `salt`: `bytes | None = None` - Some salt
+* `password`: `str` - Password.
+* `salt`: `bytes | None = None` - Some salt.
 * `iterations`: `int = 100_000` - Number of iterations for hashing.
 * `salt_size`: `int = 16` - Size of salt in bytes.
 
@@ -37,7 +37,7 @@ print(hash_)
 
 ### Verify password hash
 
-Util: `jam.utils.check_password
+Util: `jam.utils.check_password`
 
 Args:
 
@@ -98,7 +98,7 @@ Args:
 
 Returns:
 
-`tuple[str, str]` - Login, Password
+`tuple[str, str]` - Login, Password.
 
 ```python
 from jam.utils import basic_auth_decode
