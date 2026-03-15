@@ -55,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed ALL TYPO errors.
 
 ### Security
+- Update all dependencies.
 
 ---
 [unreleased] https://github.com/lyaguxafrog/jam/compare/v2.5.6...unstable
