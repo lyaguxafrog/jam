@@ -9,12 +9,19 @@ title: JWT
 * `alg`: `str` - Algorithm for generating JWT tokens. Supports: `HS256`, `HS384`, `HS512`, `RS256`, `RS384`, `RS512`, `ES256`, `ES384`, `ES512`, `PS256`, `PS384`, `PS512`
 * `secret_key`: `str` - Secret key for token signing. By default, Jam reads the environment variable `JAM_JWT_SECRET_KEY`.
 * `password`: `str` - Password for encrypted private keys.
+* `list`: `dict[str, Any] | None = None` - Token black/white list config. See: [`jam.jwt.list`](/api/jam.jwt.lists/)
+
 
 ```toml
 [jam.jwt]
 alg = "HS256"
 secret_key = "YOURSECRETKEY"
 password = "PASSWORD_FOR_PRIVATE_KEY"
+
+[jam.jwt.list]
+type = "black"
+backend = "redis"
+redis_uri = "redis://localhost:6379"
 ```
 
 ### Usage
@@ -104,6 +111,60 @@ print(data)
     }
 ```
 
+#### List
+
+Method: `jam.jwt.list`
+
+
+##### Add token to list
+
+Method: `jam.jwt.list.add`
+
+Args:
+
+* `token`: `str` - Token to add
+
+```python
+jam.jwt.list.add(
+    token=token
+)
+```
+
+##### Remove token from list
+
+Method: `jam.jwt.list.delete`
+
+Args:
+
+* `token`: `str` - Token to remove
+
+```python
+jam.jwt.list.remove(
+    token=token
+)
+```
+
+##### Check token in list
+
+Method: `jam.jwt.list.check`
+
+Args:
+
+* `token`: `str` - Token to check
+
+Returns:
+
+`bool`: `True` if token is in list, `False` otherwise
+
+```python
+result = jam.jwt.list.check(
+    token=token
+)
+print(result)
+>>> False
+```
+
+
 ## Use out of instance
 
 ### Built
@@ -115,6 +176,7 @@ Args:
 * `alg`: `str` - Algorithm for token generation.
 * `secret_key`: `str | bytes` - Secret key for token generation. By default, Jam reads the environment variable `JAM_JWT_SECRET_KEY`.
 * `password`: `str | bytes | None` - Password for token generation.
+* `list`: `dict[str, Any] | None` - List config. See: [`jam.jwt.list`](/api/jam.jwt.lists/)
 
 ```python
 from jam.jwt import JWT
@@ -122,7 +184,12 @@ from jam.jwt import JWT
 jwt = JWT(
     alg="HS256",
     secret_key="SECRET_KEY",
-    password=None
+    password=None,
+    list={
+        "type": "black",
+        "backend": "json",
+        "json_path": "lists.json"
+    }
 )
 ```
 
@@ -172,4 +239,50 @@ print(data)
         'id': 1,
         'username': 'lyaguxa'
     }
+```
+
+### List
+
+Method: `JWT.list`
+
+#### Add token to list
+
+Method: `JWT.list.add`
+
+Args:
+
+* `token`: `str` - Token to add
+
+```python
+jwt.list.add(token)
+```
+
+#### Remove token from list
+
+Method: `JWT.list.delete`
+
+Args:
+
+* `token`: `str` - Token to remove
+
+```python
+jwt.list.delete(token)
+```
+
+#### Check token in list
+
+Method: `JWT.list.check`
+
+Args:
+
+* `token`: `str` - Token to check
+
+Returns:
+
+`bool`: `True` if token is in list, `False` otherwise
+
+```python
+result = jwt.list.check(token)
+print(result)
+>>> False
 ```
