@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 
-"""
-Module for managing white and black lists.
-See: https://jam.makridenko.ru/jwt/lists/what/
-"""
+"""Module for managing white and black lists."""
 
-from .__abc_list_repo__ import BaseJWTList
+from .__base__ import BaseJWTList
 
 
 __all__ = ["BaseJWTList"]

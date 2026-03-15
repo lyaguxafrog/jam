@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from jam.otp.__abc_module__ import BaseOTP
+from jam.otp.__base__ import BaseOTP
 
 
 class HOTP(BaseOTP):
     """HOTP instance."""
 
-    def at(self, factor: int) -> str:
+    def at(self, factor: int) -> str:  # type: ignore[override]
         """Generates a HOTP code for the specified counter.
 
         Args:
@@ -19,7 +19,7 @@ class HOTP(BaseOTP):
             self.digits
         )
 
-    def verify(self, code: str, factor: int, look_ahead: int = 1) -> bool:
+    def verify(self, code: str, factor: int, look_ahead: int = 1) -> bool:  # type: ignore[override]
         """Verify HOTP-code.
 
         Args:

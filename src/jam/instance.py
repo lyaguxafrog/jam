@@ -1,112 +1,50 @@
 # -*- coding: utf-8 -*-
 
-import gc
-from collections.abc import Callable
-from typing import Any, Optional, Union
+import datetime
+from typing import Any
+import uuid
 
-from jam.__abc_instances__ import BaseJam
-from jam.__deprecated__ import deprecated
-from jam.__logger__ import logger
-from jam.modules import JWTModule, OAuth2Module, SessionModule
-from jam.utils.config_maker import __config_maker__, __module_loader__
+from jam.__base__ import BaseJam
+from jam.exceptions import (
+    JamConfigurationError,
+    JamJWTExpired,
+    JamJWTInBlackList,
+    JamJWTNotInWhiteList,
+)
 
 
 class Jam(BaseJam):
     """Main instance."""
 
-    _JAM_MODULES: dict[str, str] = {
-        "jwt": "jam.modules.JWTModule",
-        "session": "jam.modules.SessionModule",
-        "oauth2": "jam.modules.OAuth2Module",
+    MODULES: dict[str, str] = {
+        "jwt": "jam.jwt.create_instance",
+        "session": "jam.sessions.create_instance",
+        "oauth2": "jam.oauth2.create_instance",
+        "paseto": "jam.paseto.create_instance",
+        "otp": "jam.otp.__base__.OTPConfig",
     }
 
-    def __init__(
-        self,
-        config: Union[dict[str, Any], str] = "pyproject.toml",
-        pointer: str = "jam",
-    ) -> None:
-        """Class constructor.
-
-        Args:
-            config (dict[str, Any] | str): dict or path to config file
-            pointer (str): Config read point
-        """
-        self.jwt: Optional[JWTModule] = None
-        self.session: Optional[SessionModule] = None
-        self.oauth2: Optional[OAuth2Module] = None
-
-        config = __config_maker__(config, pointer)
-
-        # OTP
-        otp_config = config.pop("otp", None)
-        if otp_config:
-            from jam.otp.__abc_module__ import OTPConfig
-
-            self._otp = OTPConfig(**otp_config)
-            self._otp_module = self._otp_module_setup()
-            logger.debug("OTP module initialized")
-
-        # Other modules
-        if config.get("auth_type", None):
-            logger.warning(
-                "This configuration type is deprecated, see: https://jam.makridenko.ru/config"
-            )
-            name = config.pop("auth_type")
-            module = __module_loader__(self._JAM_MODULES[name])
-            self.module = module
-            setattr(self, name, module(**config))
-        else:
-            jam_modules = self._JAM_MODULES
-            for name, cfg in config.items():
-                try:
-                    module = self.build_module(name, cfg, jam_modules)
-                    if name == "jwt":
-                        self.module = module
-                    setattr(self, name, module)
-                    logger.debug(
-                        f"Auth module '{name}' successfully initialized"
-                    )
-                except Exception as e:
-                    logger.exception(
-                        f"Failed to initialize auth module '{name}': {e}"
-                    )
-        gc.collect()
-
-    # TODO: Refactor this too
-    def _otp_module_setup(self) -> Callable:
-        otp_type = self._otp.type
-        if otp_type == "hotp":
-            from jam.otp import HOTP
-
-            return HOTP
-        elif otp_type == "totp":
-            from jam.otp import TOTP
-
-            return TOTP
-        else:
-            raise ValueError("OTP type can only be totp or hotp.")
-
-    def _otp_checker(self) -> None:
-        if not hasattr(self, "_otp"):
-            raise NotImplementedError(
-                "OTP not configure. Check documentation: "
-            )
-
     def jwt_make_payload(
-        self, exp: Optional[int], data: dict[str, Any]
+        self, exp: int | None, data: dict[str, Any]
     ) -> dict[str, Any]:
         """Make JWT-specific payload.
 
         Args:
-            exp (int | None): Token expire, if None -> use default
+            exp (int | None): Token expire
             data (dict[str, Any]): Data to payload
 
         Returns:
             dict[str, Any]: Payload
         """
-        return self.jwt.make_payload(exp=exp, **data)
+        payload = {
+            "iat": datetime.datetime.now().timestamp(),
+            "exp": (datetime.datetime.now().timestamp() + exp) if exp else None,
+            "jti": str(uuid.uuid4()),
+        }
+        payload = payload | data
+        return payload
 
-    def jwt_create_token(self, payload: dict[str, Any]) -> str:
+    def jwt_create(self, payload: dict[str, Any]) -> str:
         """Create JWT token.
 
         Args:
@@ -114,14 +52,23 @@ class Jam(BaseJam):
 
         Returns:
             str: New token
-
-        Raises:
-            EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
-            EmtpyPrivateKey: If RSA algorithm is selected, but private key None
         """
-        return self.jwt.gen_token(**payload)
+        assert self.jwt is not None
+        self._logger.debug(
+            f"Creating JWT token with payload keys: {list(payload.keys())}"
+        )
+        token = self.jwt.encode(payload=payload)
+        self._logger.debug(
+            f"JWT token created successfully, length: {len(token)} characters"
+        )
 
-    def jwt_verify_token(
+        # white list checker
+        if self.jwt.list and self.jwt.list.__list_type__ == "white":
+            self.jwt.list.add(token)
+
+        return token
+
+    def jwt_decode(
         self, token: str, check_exp: bool = True, check_list: bool = True
     ) -> dict[str, Any]:
         """Verify and decode JWT token.
@@ -135,15 +82,44 @@ class Jam(BaseJam):
             dict[str, Any]: Decoded payload
 
         Raises:
-            ValueError: If the token is invalid.
-            EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None.
-            EmtpyPublicKey: If RSA algorithm is selected, but public key None.
-            NotFoundSomeInPayload: If 'exp' not found in payload.
-            TokenLifeTimeExpired: If token has expired.
-            TokenNotInWhiteList: If the list type is white, but the token is  not there
-            TokenInBlackList: If the list type is black and the token is there
+            JamJWTExpired: If token is expired
+            JamConfigurationError: If JWT list is not connected
+            JamJWTNotInWhiteList: If token is not in white list
+            JamJWTInBlackList: If token is in black list
         """
-        return self.jwt.validate_payload(token, check_exp, check_list)
+        self._logger.debug(
+            f"Verifying JWT token (length: {len(token)} chars), check_exp={check_exp}, check_list={check_list}"
+        )
+        assert self.jwt is not None
+        payload = self.jwt.decode(token)
+        self._logger.debug(
+            f"JWT token verified successfully, payload keys: {list(payload.keys())}"
+        )
+
+        if check_exp:
+            if payload["exp"] < datetime.datetime.now().timestamp():
+                raise JamJWTExpired
+
+        if check_list:
+            if not self.jwt.list:
+                raise JamConfigurationError(
+                    message="JWT list is not connected.",
+                    error_code="configuration.jwt.list_not_connected",
+                )
+            else:
+                match self.jwt.list.__list_type__:
+                    case "white":
+                        if not (self.jwt.list.check(token)):
+                            raise JamJWTNotInWhiteList
+                    case "black":
+                        if self.jwt.list.check(token):
+                            raise JamJWTInBlackList
+                    case _:
+                        raise JamConfigurationError(
+                            message="Invalid JWT list type",
+                            error_code="configuration.jwt.unknown_list_type",
+                        )
+        return payload
 
     def session_create(self, session_key: str, data: dict[str, Any]) -> str:
         """Create new session.
@@ -155,9 +131,17 @@ class Jam(BaseJam):
         Returns:
             str: New session ID
         """
-        return self.session.create(session_key, data)
+        assert self.session is not None
+        self._logger.debug(
+            f"Creating session with key: {session_key}, data keys: {list(data.keys())}"
+        )
+        session_id = self.session.create(session_key, data)
+        self._logger.debug(
+            f"Session created successfully, session_id: {session_id}"
+        )
+        return session_id
 
-    def session_get(self, session_id: str) -> Optional[dict[str, Any]]:
+    def session_get(self, session_id: str) -> dict[str, Any] | None:
         """Get data from session.
 
         Args:
@@ -166,7 +150,16 @@ class Jam(BaseJam):
         Returns:
             dict[str, Any] | None: Session data if exist
         """
-        return self.session.get(session_id)
+        assert self.session is not None
+        self._logger.debug(f"Getting session data for session_id: {session_id}")
+        data = self.session.get(session_id)
+        if data:
+            self._logger.debug(
+                f"Session data retrieved, keys: {list(data.keys())}"
+            )
+        else:
+            self._logger.debug(f"Session {session_id} not found")
+        return data
 
     def session_delete(self, session_id: str) -> None:
         """Delete session.
@@ -174,6 +167,7 @@ class Jam(BaseJam):
         Args:
             session_id (str): Session ID
         """
+        assert self.session is not None
         return self.session.delete(session_id)
 
     def session_update(self, session_id: str, data: dict[str, Any]) -> None:
@@ -182,7 +176,11 @@ class Jam(BaseJam):
         Args:
             session_id (str): Session ID
             data (dict[str, Any]): New data
+
+        Raises:
+            JamSessionNotFound: If session with given ID does not exist.
         """
+        assert self.session is not None
         return self.session.update(session_id, data)
 
     def session_clear(self, session_key: str) -> None:
@@ -191,6 +189,7 @@ class Jam(BaseJam):
         Args:
             session_key (str): Key of session
         """
+        assert self.session is not None
         return self.session.clear(session_key)
 
     def session_rework(self, old_session_id: str) -> str:
@@ -199,14 +198,16 @@ class Jam(BaseJam):
         Args:
             old_session_id (str): Old session id
 
+        Raises:
+            JamSessionNotFound: If session with given ID does not exist.
+
         Returns:
             str: New session id
         """
+        assert self.session is not None
         return self.session.rework(old_session_id)
 
-    def otp_code(
-        self, secret: Union[str, bytes], factor: Optional[int] = None
-    ) -> str:
+    def otp_code(self, secret: str | bytes, factor: int | None = None) -> str:
         """Generates an OTP.
 
         Args:
@@ -216,17 +217,18 @@ class Jam(BaseJam):
         Returns:
             str: OTP code (fixed-length string).
         """
-        self._otp_checker()
-        return self._otp_module(
-            secret=secret, digits=self._otp.digits, digest=self._otp.digest
+        assert self.otp is not None
+        assert self._otp is not None
+        return self._otp(
+            secret=secret, digits=self.otp.digits, digest=self.otp.digest
         ).at(factor)
 
     def otp_uri(
         self,
         secret: str,
-        name: Optional[str] = None,
-        issuer: Optional[str] = None,
-        counter: Optional[int] = None,
+        name: str,
+        issuer: str,
+        counter: int | None = None,
     ) -> str:
         """Generates an otpauth:// URI for Google Authenticator.
 
@@ -239,19 +241,18 @@ class Jam(BaseJam):
         Returns:
             str: A string of the form "otpauth://..."
         """
-        self._otp_checker()
-        return self._otp_module(
-            secret=secret, digits=self._otp.digits, digest=self._otp.digest
-        ).provisioning_uri(
-            name=name, issuer=issuer, type_=self._otp.type, counter=counter
-        )
+        assert self.otp is not None
+        assert self._otp is not None
+        return self._otp(
+            secret=secret, digits=self.otp.digits, digest=self.otp.digest
+        ).provisioning_uri(name=name, issuer=issuer, counter=counter)
 
     def otp_verify_code(
         self,
-        secret: Union[str, bytes],
+        secret: str | bytes,
         code: str,
-        factor: Optional[int] = None,
-        look_ahead: Optional[int] = 1,
+        factor: int | None = None,
+        look_ahead: int | None = 1,
     ) -> bool:
         """Checks the OTP code, taking into account the acceptable window.
 
@@ -264,256 +265,11 @@ class Jam(BaseJam):
         Returns:
             bool: True if the code matches, otherwise False.
         """
-        self._otp_checker()
-        return self._otp_module(
-            secret=secret, digits=self._otp.digits, digest=self._otp.digest
-        ).verify(code=code, factor=factor, look_ahead=look_ahead)
-
-    @deprecated("This method is deprecated, use: Jam.jwt_make_payload")
-    def make_payload(self, exp: Optional[int] = None, **data) -> dict[str, Any]:
-        """Payload maker tool.
-
-        Args:
-            exp (int | None): If none exp = JWTModule.exp
-            **data: Custom data
-
-        Deprecated:
-            Use `Jam.jwt_make_payload`
-        """
-        return self.jwt.make_payload(exp=exp, **data)
-
-    @deprecated("This method is deprecated, use: Jam.jwt_create_token")
-    def gen_jwt_token(self, payload: dict[str, Any]) -> str:
-        """Creating a new token.
-
-        Args:
-            payload (dict[str, Any]): Payload with information
-
-        Deprecated:
-            Use `Jam.jwt_create_token`
-
-        Raises:
-            EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None
-            EmtpyPrivateKey: If RSA algorithm is selected, but private key None
-        """
-        return self.jwt.gen_token(**payload)
-
-    @deprecated("This method is deprecated, use: Jam.jwt_verify_token")
-    def verify_jwt_token(
-        self, token: str, check_exp: bool = True, check_list: bool = True
-    ) -> dict[str, Any]:
-        """A method for verifying a token.
-
-        Args:
-            token (str): The token to check
-            check_exp (bool): Check for expiration?
-            check_list (bool): Check if there is a black/white list
-
-        Deprecated:
-            Use `Jam.jwt_verify_token`
-
-        Raises:
-            ValueError: If the token is invalid.
-            EmptySecretKey: If the HMAC algorithm is selected, but the secret key is None.
-            EmtpyPublicKey: If RSA algorithm is selected, but public key None.
-            NotFoundSomeInPayload: If 'exp' not found in payload.
-            TokenLifeTimeExpired: If token has expired.
-            TokenNotInWhiteList: If the list type is white, but the token is  not there
-            TokenInBlackList: If the list type is black and the token is there
-
-        Returns:
-            (dict[str, Any]): Payload from token
-        """
-        return self.jwt.validate_payload(
-            token=token, check_exp=check_exp, check_list=check_list
-        )
-
-    @deprecated("This method is deprecated, use: `Jam.session_create`")
-    def create_session(self, session_key: str, data: dict) -> str:
-        """Create a new session.
-
-        Args:
-            session_key (str): Session key
-            data (dict): Data to store in session
-
-        Deprecated:
-            Use: `Jam.session_create`
-
-        Raises:
-            NotImplementedError: If the auth type is not "session"
-
-        Returns:
-            str: The created session key
-        """
-        return self.session.create(session_key, data)
-
-    @deprecated("This method is deprecates, use: Jam.session_get")
-    def get_session(self, session_id: str) -> Optional[dict]:
-        """Retrieve session data by session ID.
-
-        Args:
-            session_id (str): The ID of the session to retrieve.
-
-        Raises:
-            NotImplementedError: If the auth type is not "session".
-
-        Deprecated:
-            Use: `Jam.session_get`
-
-        Returns:
-            dict | None: The session data if found, otherwise None.
-        """
-        return self.session.get(session_id)
-
-    @deprecated("This method is deprecated, use: Jam.session_delete")
-    def delete_session(self, session_id: str) -> None:
-        """Delete a session by its ID.
-
-        Args:
-            session_id (str): The ID of the session to delete.
-
-        Deprecated:
-            Use: `Jam.session_delete`
-
-        Raises:
-            NotImplementedError: If the auth type is not "session".
-
-        Returns:
-            None
-        """
-        return self.session.delete(session_id)
-
-    @deprecated("This method is deprecated, use: Jam.session_update")
-    def update_session(self, session_id: str, data: dict) -> None:
-        """Update session data by session ID.
-
-        Args:
-            session_id (str): The ID of the session to update.
-            data (dict): The new data to update the session with.
-
-        Deprecated:
-            Use: `Jam.session_update`
-
-        Raises:
-            NotImplementedError: If the auth type is not "session".
-
-        Returns:
-            None
-        """
-        return self.session.update(session_id, data)
-
-    @deprecated("This method is deprecated, use: Jam.session_clear")
-    def clear_sessions(self, session_key: str) -> None:
-        """Clear all sessions associated with a specific session key.
-
-        Args:
-            session_key (str): The session key whose sessions are to be cleared.
-
-        Deprecated:
-            Use: `Jam.session_clear`
-
-        Raises:
-            NotImplementedError: If the auth type is not "session".
-
-        Returns:
-            None
-        """
-        return self.session.clear(session_key)
-
-    @deprecated("This method is deprecated, use: Jam.session_rework")
-    def rework_session(self, old_session_key: str) -> str:
-        """Rework an existing session key to a new one.
-
-        Args:
-            old_session_key (str): The old session key to be reworked.
-
-        Deprecated:
-            Use: `Jam.session_rework`
-
-        Raises:
-            NotImplementedError: If the auth type is not "session".
-
-        Returns:
-            str: The new session key.
-        """
-        return self.session.rework(old_session_key)
-
-    @deprecated("This method is deprecated, use: Jam.otp_code")
-    def get_otp_code(
-        self, secret: Union[str, bytes], factor: Optional[int] = None
-    ) -> str:
-        """Generates an OTP.
-
-        Args:
-            secret (str | bytes): User secret key.
-            factor (int | None, optional): Unixtime for TOTP(if none, use now time) / Counter for HOTP.
-
-        Deprecated:
-            Use: Jam.otp_code
-
-        Returns:
-            str: OTP code (fixed-length string).
-        """
-        self._otp_checker()
-        return self._otp_module(
-            secret=secret, digits=self._otp.digits, digest=self._otp.digest
-        ).at(factor)
-
-    @deprecated("This method os deprecated, use: Jam.otp_uri")
-    def get_otp_uri(
-        self,
-        secret: str,
-        name: Optional[str] = None,
-        issuer: Optional[str] = None,
-        counter: Optional[int] = None,
-    ) -> str:
-        """Generates an otpauth:// URI for Google Authenticator.
-
-        Args:
-            secret (str): User secret key.
-            name (str): Account name (e.g., email).
-            issuer (str): Service name (e.g., "GitHub").
-            counter (int | None, optional): Counter (for HOTP). Default is None.
-
-        Deprecated:
-            Use: `Jam.otp_uri`
-
-        Returns:
-            str: A string of the form "otpauth://..."
-        """
-        self._otp_checker()
-        return self._otp_module(
-            secret=secret, digits=self._otp.digits, digest=self._otp.digest
-        ).provisioning_uri(
-            name=name, issuer=issuer, type_=self._otp.type, counter=counter
-        )
-
-    @deprecated("This method is deprecated, use: Jam.otp_verify_code")
-    def verify_otp_code(
-        self,
-        secret: Union[str, bytes],
-        code: str,
-        factor: Optional[int] = None,
-        look_ahead: Optional[int] = 1,
-    ) -> bool:
-        """Checks the OTP code, taking into account the acceptable window.
-
-        Args:
-            secret (str | bytes): User secret key.
-            code (str): The code entered.
-            factor (int | None, optional): Unixtime for TOTP(if none, use now time) / Counter for HOTP.
-            look_ahead (int, optional): Acceptable deviation in intervals (±window(totp) / ±look ahead(hotp)). Default is 1.
-
-        Deprecated:
-            Use: `Jam.otp_verify_code`
-
-        Returns:
-            bool: True if the code matches, otherwise False.
-        """
-        self._otp_checker()
-        return self._otp_module(
-            secret=secret, digits=self._otp.digits, digest=self._otp.digest
-        ).verify(code=code, factor=factor, look_ahead=look_ahead)
+        assert self.otp is not None
+        assert self._otp is not None
+        return self._otp(
+            secret=secret, digits=self.otp.digits, digest=self.otp.digest
+        ).verify(code=code, factor=factor, look_ahead=look_ahead or 1)
 
     def oauth2_get_authorized_url(
         self, provider: str, scope: list[str], **extra_params: Any
@@ -528,8 +284,16 @@ class Jam(BaseJam):
         Returns:
             str: Authorization url
         """
-        return self.oauth2.get_authorization_url(
-            provider, scope, **extra_params
+        from jam.exceptions import JamConfigurationError
+
+        assert self.oauth2 is not None
+        if provider not in self.oauth2:
+            raise JamConfigurationError(
+                message=f"Provider {provider} not configured",
+                error_code="oauth2.configuration.provider_not_configured",
+            )
+        return self.oauth2[provider].get_authorization_url(
+            scope, **extra_params
         )
 
     def oauth2_fetch_token(
@@ -550,8 +314,13 @@ class Jam(BaseJam):
         Returns:
             dict: OAuth2 token
         """
-        return self.oauth2.fetch_token(
-            provider, code, grant_type, **extra_params
+        from jam.exceptions import JamOAuth2ProviderNotConfigured
+
+        assert self.oauth2 is not None
+        if provider not in self.oauth2:
+            raise JamOAuth2ProviderNotConfigured(details={"provider": provider})
+        return self.oauth2[provider].fetch_token(
+            code, grant_type, **extra_params
         )
 
     def oauth2_refresh_token(
@@ -572,14 +341,19 @@ class Jam(BaseJam):
         Returns:
             dict: Refresh token
         """
-        return self.oauth2.refresh_token(
-            provider, refresh_token, grant_type, **extra_params
+        from jam.exceptions import JamOAuth2ProviderNotConfigured
+
+        assert self.oauth2 is not None
+        if provider not in self.oauth2:
+            raise JamOAuth2ProviderNotConfigured(details={"provider": provider})
+        return self.oauth2[provider].refresh_token(
+            refresh_token, grant_type, **extra_params
         )
 
     def oauth2_client_credentials_flow(
         self,
         provider: str,
-        scope: Optional[list[str]] = None,
+        scope: list[str] | None = None,
         **extra_params: Any,
     ) -> dict[str, Any]:
         """Obtain access token using client credentials flow (no user interaction).
@@ -589,9 +363,68 @@ class Jam(BaseJam):
             scope (list[str] | None): Auth scope
             extra_params (Any): Extra auth params if needed
 
+        Raises:
+            JamOAuth2EmptyRaw: If response is empty
+            JamOAuth2Error: HTTP error
+
         Returns:
             dict: JSON with access token
         """
-        return self.oauth2.client_credentials_flow(
-            provider, scope, **extra_params
+        from jam.exceptions import JamOAuth2ProviderNotConfigured
+
+        assert self.oauth2 is not None
+        if provider not in self.oauth2:
+            raise JamOAuth2ProviderNotConfigured(details={"provider": provider})
+        return self.oauth2[provider].client_credentials_flow(
+            scope, **extra_params
         )
+
+    def paseto_make_payload(
+        self, exp: int | None = None, **data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Generate payload for PASETO.
+
+        Args:
+            exp (int | None): Token expire
+            data (dict[str, Any]): Custom data
+
+        Returns:
+            dict: Payload
+        """
+        from jam.paseto.utils import payload_maker
+
+        return payload_maker(expire=exp, data=data)
+
+    def paseto_create(
+        self,
+        payload: dict[str, Any],
+        footer: dict[str, Any] | str | None,
+    ) -> str:
+        """Create new PASETO.
+
+        Args:
+            payload (dict[str, Any]): Payload
+            footer (dict | str  | None): Footer
+
+        Returns:
+            str: New token
+        """
+        assert self.paseto is not None
+        return self.paseto.encode(payload=payload, footer=footer)
+
+    def paseto_decode(
+        self, token: str, check_exp: bool = True, check_list: bool = True
+    ) -> dict[str, dict[str, Any] | str | None]:
+        """Decode PASETO.
+
+        Args:
+            token (str): Token
+            check_exp (bool): Check exp in payload
+            check_list (bool): Check token in list
+
+        Returns:
+            dict: {'payload' PAYLOAD, 'footer': FOOTER}
+        """
+        assert self.paseto is not None
+        payload, footer = self.paseto.decode(token)
+        return {"payload": payload, "footer": footer}

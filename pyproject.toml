@@ -1,12 +1,12 @@
 [project]
 name = "jamlib"
-version = "2.5.6.post0"
+version = "3.0.0"
 description = "Simple and universal library for authorization."
 authors = [
     {name = "Makridenko Adrian",email = "adrianmakridenko@duck.com"},
     {name = "Ksenia Travnikova",email = "kseniatravnikova@duck.com"}
 ]
-license = {text = "MIT License"}
+license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 keywords = [
     "Authentication",
@@ -21,21 +21,19 @@ keywords = [
     "Starlette",
     "Flask"
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
-    "pycryptodome>=3.21.0,<4.0.0",
-    "cryptography>=44.0.2,<47.0.0",
+    "cryptography>=46.0.5",
 ]
 
 classifiers = [
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
     "Development Status :: 5 - Production/Stable",
     "Operating System :: OS Independent",
     "Intended Audience :: Developers",
     "Intended Audience :: Information Technology",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -53,21 +51,21 @@ classifiers = [
 Homepage = "https://jam.makridenko.ru"
 Repository = "https://github.com/lyaguxafrog/jam"
 Issues = "https://github.com/lyaguxafrog/jam/issues"
-Changelog = "https://github.com/lyaguxafrog/jam/releases"
+Changelog = "https://github.com/lyaguxafrog/jam/blob/master/CHANGELOG.md"
 
 
 [project.optional-dependencies]
-redis=["redis>=6.4.0"]
+redis=["redis>=7.3.0"]
 json=["tinydb>=4.8.2"]
-yaml=["pyyaml>=6.0.2"]
+yaml=["pyyaml>=6.0.3"]
 toml=["toml>=0.10.2"]
-litestar=["litestar>=2.18.0"]
-starlette=["starlette>=0.48.0"]
-fastapi=["fastapi>=0.119.0"]
+litestar=["litestar>=2.21.1"]
+starlette=["starlette>=0.52.1"]
+fastapi=["fastapi>=0.135.1"]
 flask=["flask>=3.1.2"]
 
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=82.0.1", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
@@ -76,61 +74,72 @@ include = ["jam*"]
 
 [dependency-groups]
 dev = [
-    "black>=25.1.0",
-    "fakeredis>=2.28.1",
-    "icecream>=2.1.4",
-    "isort>=6.0.1",
-    "pre-commit>=4.2.0",
-    "ruff>=0.11.2",
-    "uvicorn>=0.37.0",
+    "fakeredis>=2.34.1",
+    "icecream>=2.1.10",
+    "pre-commit>=4.5.1",
+    "pyrefly>=0.56.0",
+    "ruff>=0.15.6",
+    "unicecream>=0.2.1",
+    "uvicorn>=0.41.0",
 ]
 docs = [
     "mkdocs>=1.6.1",
+    "mkdocs-gen-files>=0.6.0",
+    "mkdocs-literate-nav>=0.6.2",
     "mkdocs-material>=9.6.19",
     "mkdocstrings>=0.30.0",
     "mkdocstrings-python>=1.18.2",
     "termynal>=0.13.0",
 ]
 tests = [
-    "pytest>=8.4.2",
-    "pytest-asyncio>=1.1.0",
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0",
+    "coverage>=7.13.4"
 ]
 
 
 [tool.ruff]
-target-version = "py39"
+target-version = "py310"
 line-length = 80
-ignore = ["UP009", "D100"]
-exclude = ["*__init__.py", "tests/", "*exceptions/"]
+ignore = ["UP009", "D100", "UP007"]
+exclude = ["*__init__.py", "tests/", "*exceptions/", "env", ".env", ".env.example", "migrations/", ".venv/"]
 
 [tool.ruff.lint]
-extend-select = ["UP", "D"]
+extend-select = ["UP", "D", "I"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
-[tool.isort]
-profile = "black"
-default_section = "THIRDPARTY"
-balanced_wrapping = true
-known_first_party = "src"
-line_length = 80
-lines_after_imports = 2
-lines_between_sections = 1
-multi_line_output = 3
-sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
-skip = ["env", ".env", ".env.example", "migrations/", ".venv/"]
+[tool.ruff.lint.isort]
+known-first-party = ["jam"]
+split-on-trailing-comma = true
+force-wrap-aliases = true
+force-sort-within-sections = true
+lines-after-imports = 2
+lines-between-types = 1
 
-[tool.black]
-line-length = 80
-skip-string-normalization = false
-
-[tool.mypy]
-disable_error_code = ["no-redef", "import-not-found", "import-untyped", "attr-defined"]
+[tool.ruff.format]
+quote-style = "double"
+skip-magic-trailing-comma = false
+line-ending = "auto"
 
 [tool.pytest]
 python_files = ["test*.py"]
-
-[tool.pytest.ini_options]
-addopts = "--capture=no"
+addopts = ["--capture=no"]
 asyncio_default_fixture_loop_scope = "function"
+
+[tool.unicecream]
+exclude = ["__devtools/"]
+
+[tool.pyrefly]
+python_version = "3.10"
+project_includes = ["src/jam/**/*.py"]
+project_excludes = [
+    ".venv",
+    "venv",
+    "build",
+    "dist",
+    "__pycache__",
+    "tests/",
+    "docs/",
+]

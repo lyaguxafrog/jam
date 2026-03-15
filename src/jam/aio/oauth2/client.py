@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 
-import json
-import urllib.parse
-from contextlib import asynccontextmanager
+import asyncio
+from contextlib import contextmanager
 from http.client import HTTPSConnection
-from typing import Any, Optional
+import json
+from typing import Any
+import urllib.parse
 
-from jam.oauth2.__abc_oauth2_repo__ import BaseOAuth2Client
+from jam.aio.oauth2.__base__ import BaseAsyncOAuth2Client
+from jam.exceptions import JamOAuth2EmptyRaw, JamOAuth2Error
 
 
-class OAuth2Client(BaseOAuth2Client):
-    """Async OAuth2 client."""
+class OAuth2Client(BaseAsyncOAuth2Client):
+    """Async universal OAuth2 client implementation."""
 
-    @asynccontextmanager
-    async def __http(self, url: str):
+    @contextmanager
+    def __http(self, url: str):
         """Create HTTPS connection context manager."""
         parsed = urllib.parse.urlparse(url)
         connection = HTTPSConnection(parsed.netloc)
@@ -22,43 +24,14 @@ class OAuth2Client(BaseOAuth2Client):
         finally:
             connection.close()
 
-    async def __post_form(
-        self, url: str, params: dict[str, Any]
-    ) -> dict[str, Any]:
-        """Send POST form and parse JSON response."""
-        encoded = urllib.parse.urlencode(params)
-
-        async with self.__http(url) as (conn, parsed):
-            conn.request(
-                "POST",
-                parsed.path,
-                body=encoded,
-                headers={"Content-Type": "application/x-www-form-urlencoded"},
-            )
-            response = conn.getresponse()
-            raw = response.read().decode("utf-8")
-
-        if not raw:
-            raise ValueError("Empty response from token endpoint")
-
-        try:
-            data = json.loads(raw)
-        except json.JSONDecodeError:
-            data = {k: v[0] for k, v in urllib.parse.parse_qs(raw).items()}
-
-        if response.status >= 400:
-            raise RuntimeError(f"OAuth2 error ({response.status}): {data}")
-
-        return data
-
-    async def get_authorization_url(
+    async def get_authorization_url(  # type: ignore[override]
         self, scope: list[str], **extra_params: Any
-    ) -> str:
+    ) -> str:  # type: ignore[override]
         """Generate full OAuth2 authorization URL.
 
         Args:
             scope (list[str]): Auth scope
-            extra_params (Any): Extra ath params
+            extra_params (Any): Extra auth params
 
         Returns:
             str: Authorization url
@@ -128,13 +101,17 @@ class OAuth2Client(BaseOAuth2Client):
         return await self.__post_form(self.token_url, body)
 
     async def client_credentials_flow(
-        self, scope: Optional[list[str]] = None, **extra_params: Any
+        self, scope: list[str] | None = None, **extra_params: Any
     ) -> dict[str, Any]:
         """Obtain access token using client credentials flow (no user interaction).
 
         Args:
             scope (list[str] | None): Auth scope
             extra_params (Any): Extra auth params if needed
+
+        Raises:
+            JamOAuth2EmptyRaw: If response is empty
+            JamOAuth2Error: HTTP error
 
         Returns:
             dict: JSON with access token
@@ -149,3 +126,50 @@ class OAuth2Client(BaseOAuth2Client):
         body.update(extra_params)
 
         return await self.__post_form(self.token_url, body)
+
+    async def __post_form(
+        self, url: str, params: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Send POST form and parse JSON response (async version)."""
+        encoded = urllib.parse.urlencode(params)
+
+        def _sync_post():
+            """Synchronous POST operation wrapped for async execution."""
+            with self.__http(url) as (conn, parsed):
+                conn.request(
+                    "POST",
+                    parsed.path,
+                    body=encoded,
+                    headers={
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                )
+                response = conn.getresponse()
+                raw = response.read().decode("utf-8")
+
+            if not raw:
+                raise JamOAuth2EmptyRaw(
+                    details={
+                        "endpoint": url,
+                        "methid": "POST",
+                        "params": params,
+                    }
+                )
+
+            try:
+                data = self._serializer.loads(raw)
+            except (json.JSONDecodeError, AttributeError):
+                data = {k: v[0] for k, v in urllib.parse.parse_qs(raw).items()}
+
+            if response.status >= 400:
+                raise JamOAuth2Error(
+                    details={
+                        "status": response.status,
+                        "reason": response.reason,
+                        "data": data,
+                    }
+                )
+
+            return data
+
+        return await asyncio.to_thread(_sync_post)

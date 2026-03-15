@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from dataclasses import dataclass
-from typing import Union
+from .base import JamError, JamConfigurationError
 
 
-@dataclass
-class SessionNotFoundError(Exception):
-    """Exception raised when a session is not found."""
+class JamSessionNotFound(JamError):
+    default_message = "Session not found."
+    default_code = "sessions.not_found"
 
-    message: Union[str, Exception] = "Session not found."
+
+class JamSessionEmptyAESKey(JamConfigurationError):
+    default_message = "Session AES key is empty."
+    default_code = "sessions.empty_aes_key"

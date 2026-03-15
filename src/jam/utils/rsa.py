@@ -22,14 +22,16 @@ def generate_rsa_key_pair(key_size: int = 2048) -> dict[str, str]:
     ```
     """
     private_key = rsa.generate_private_key(
-        public_exponent=65537, key_size=key_size, backend=default_backend()
+        public_exponent=65537,
+        key_size=key_size,
+        backend=default_backend(),
     )
 
     public_key = private_key.public_key()
 
     pem_private = private_key.private_bytes(
         encoding=serialization.Encoding.PEM,
-        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        format=serialization.PrivateFormat.PKCS8,
         encryption_algorithm=serialization.NoEncryption(),
     )
 

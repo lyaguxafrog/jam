@@ -4,6 +4,34 @@
 *OTP auth module
 """
 
-from .__abc_module__ import BaseOTP
+from typing import Any, Literal
+
+from .__base__ import BaseOTP
 from .hotp import HOTP
 from .totp import TOTP
+from jam.logger import BaseLogger, logger
+
+
+def create_instance(
+    type: Literal["hotp", "totp"],
+    # logger: BaseLogger = logger,
+    **kwargs: Any,
+) -> type[BaseOTP]:
+    """Create OTP class (not instance, since secret is provided per-call).
+
+    Args:
+        type (str): "hotp" | "totp"
+        logger (BaseLogger): Logger instance
+        **kwargs: digits, digest, interval (for TOTP), custom_module
+
+    Returns:
+        HOTP or TOTP class
+    """
+    if kwargs.get("custom_module"):
+        from jam.utils.config_maker import __module_loader__
+
+        return __module_loader__(kwargs["custom_module"])  # type: ignore[return-value]
+
+    from jam.utils.config_maker import __module_loader__
+
+    return __module_loader__(f"jam.otp.{type}.{type.upper()}")  # type: ignore[return-value]

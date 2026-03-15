@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import json
-import urllib.parse
 from contextlib import contextmanager
 from http.client import HTTPSConnection
-from typing import Any, Optional
+import json
+from typing import Any
+import urllib.parse
 
-from .__abc_oauth2_repo__ import BaseOAuth2Client
+from jam.exceptions import JamOAuth2EmptyRaw, JamOAuth2Error
+
+from .__base__ import BaseOAuth2Client
 
 
 class OAuth2Client(BaseOAuth2Client):
@@ -99,13 +101,17 @@ class OAuth2Client(BaseOAuth2Client):
         return self.__post_form(self.token_url, body)
 
     def client_credentials_flow(
-        self, scope: Optional[list[str]] = None, **extra_params: Any
+        self, scope: list[str] | None = None, **extra_params: Any
     ) -> dict[str, Any]:
         """Obtain access token using client credentials flow (no user interaction).
 
         Args:
             scope (list[str] | None): Auth scope
             extra_params (Any): Extra auth params if needed
+
+        Raises:
+            JamOAuth2EmptyRaw: If response is empty
+            JamOAuth2Error: HTTP error
 
         Returns:
             dict: JSON with access token
@@ -136,14 +142,22 @@ class OAuth2Client(BaseOAuth2Client):
             raw = response.read().decode("utf-8")
 
         if not raw:
-            raise ValueError("Empty response from token endpoint")
+            raise JamOAuth2EmptyRaw(
+                details={"endpoint": url, "methid": "POST", "params": params}
+            )
 
         try:
-            data = json.loads(raw)
-        except json.JSONDecodeError:
+            data = self._serializer.loads(raw)
+        except (json.JSONDecodeError, AttributeError):
             data = {k: v[0] for k, v in urllib.parse.parse_qs(raw).items()}
 
         if response.status >= 400:
-            raise RuntimeError(f"OAuth2 error ({response.status}): {data}")
+            raise JamOAuth2Error(
+                details={
+                    "status": response.status,
+                    "reason": response.reason,
+                    "data": data,
+                }
+            )
 
         return data

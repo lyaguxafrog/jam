@@ -4,7 +4,7 @@ from jam.aio.oauth2.client import OAuth2Client
 
 
 class GitHubOAuth2Client(OAuth2Client):
-    """Rady to use GitHub OAuth2 provider.
+    """Async ready to use GitHub OAuth2 provider.
 
     See: https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
     """

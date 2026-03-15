@@ -4,16 +4,76 @@
 All Jam exceptions
 """
 
+from .base import JamError, JamConfigurationError, JamValidationError
+
+from .oauth2 import (
+    JamOAuth2Error,
+    JamOAuth2EmptyRaw,
+    JamOAuth2ProviderNotConfigured,
+)
+
 from .jwt import (
-    EmptyPublicKey,
-    EmptySecretKey,
-    EmtpyPrivateKey,
-    NotFoundSomeInPayload,
-    TokenInBlackList,
-    TokenLifeTimeExpired,
-    TokenNotInWhiteList,
+    JamJWTExpired,
+    JamJWTInBlackList,
+    JamJWTNotInWhiteList,
+    JamJWTEmptyPrivateKey,
+    JamJWTEmptySecretKey,
+    JamJWTUnsupportedAlgorithm,
+    JamJWTValidationError,
 )
-from .oauth2 import ProviderNotConfigurError
+
+from .paseto import (
+    JamPASETOInvalidSymmetricKey,
+    JamPASETOInvalidRSAKey,
+    JamPASETOInvalidED25519Key,
+    JamPASETOInvalidSecp384r1Key,
+    JamPASTOKeyVerificationError,
+    JamPASETOInvalidPurpose,
+    JamPASETOInvalidTokenFormat,
+)
+
+from .plugins import (
+    JamFlaskPluginConfigError,
+    JamFlaskPluginError,
+    JamLitestarPluginConfigError,
+    JamLitestarPluginError,
+    JamStarlettePluginConfigError,
+    JamStarlettePluginError
+)
+
 from .sessions import (
-    SessionNotFoundError,
+    JamSessionNotFound,
+    JamSessionEmptyAESKey,
 )
+
+
+__all__ = [
+    "JamError",
+    "JamConfigurationError",
+    "JamValidationError",
+    "JamOAuth2Error",
+    "JamOAuth2EmptyRaw",
+    "JamOAuth2ProviderNotConfigured",
+    "JamJWTExpired",
+    "JamJWTInBlackList",
+    "JamJWTNotInWhiteList",
+    "JamJWTEmptyPrivateKey",
+    "JamJWTEmptySecretKey",
+    "JamJWTUnsupportedAlgorithm",
+    "JamJWTValidationError",
+    "JamPASETOInvalidSymmetricKey",
+    "JamPASETOInvalidRSAKey",
+    "JamPASETOInvalidED25519Key",
+    "JamPASETOInvalidSecp384r1Key",
+    "JamPASETOInvalidPurpose",
+    "JamPASETOInvalidTokenFormat",
+    "JamPASTOKeyVerificationError",
+    "JamLitestarPluginConfigError",
+    "JamLitestarPluginError",
+    "JamFlaskPluginConfigError",
+    "JamFlaskPluginError",
+    "JamStarlettePluginConfigError",
+    "JamStarlettePluginError",
+    "JamSessionNotFound",
+    "JamSessionEmptyAESKey",
+]

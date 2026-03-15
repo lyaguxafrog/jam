@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-"""Built-in OAuth2 providers."""
+"""Async builtin OAuth2 providers."""

@@ -1,139 +1,247 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any, Optional
+from typing import Any
 
-from flask import Flask, g, request
+import flask
 
-from jam import Jam
-from jam.__logger__ import logger
+from jam.exceptions import JamFlaskPluginConfigError
+from jam.jwt import create_instance as create_jwt
+from jam.oauth2 import create_instance as create_oauth2
+from jam.paseto import create_instance as create_paseto
+from jam.sessions import create_instance as create_session
+from jam.utils.config_maker import GENERIC_POINTER, __config_maker__
 
 
-class JamExtension:
-    """Base jam extension.
+class BaseExtension:
+    """Base Jam extension for Flask."""
 
-    Simply adds instance jam to app.extensions.
-    """
+    MODULE: Any
+    _CONFIG_KEY: str
 
     def __init__(
         self,
-        jam: Jam,
-        app: Optional[Flask] = None,
+        app: flask.Flask | None = None,
+        **kwargs: Any,
     ) -> None:
-        """Constructor.
+        """Initialize the extension.
 
         Args:
-            jam (jam): Jam instance
-            app (Flask | None): Flask app
+            app (flask.Flask | None): Flask application instance
+            auth (Any | None): Pre-created auth module instance
+            **kwargs: Configuration arguments
         """
-        self._jam = jam
-        if app:
+        self.app = app
+        self._config = kwargs
+        if app is not None:
             self.init_app(app)
 
-    def init_app(self, app: Flask) -> None:
-        """Flask app init."""
-        app.extensions["jam"] = self._jam
+    def init_app(self, app: flask.Flask) -> None:
+        """Initialize the Flask application.
+
+        Args:
+            app (flask.Flask): Flask application instance
+        """
+        self.app = app
+        self._auth = self.MODULE(**self._config)
+        app.extensions[self._CONFIG_KEY] = self._auth
 
 
-class JWTExtension(JamExtension):
-    """JWT extension fot flask."""
+class BaseAuthExtension(BaseExtension):
+    """Base Jam authentication extension for Flask."""
+
+    MODULE: Any
+    _CONFIG_KEY: str
 
     def __init__(
         self,
-        jam: Jam,
-        app: Optional[Flask] = None,
-        header_name: Optional[str] = "Authorization",
-        cookie_name: Optional[str] = None,
+        app: flask.Flask | None = None,
+        config: dict[str, Any] | str | None = None,
+        pointer: str = GENERIC_POINTER,
+        cookie_name: str | None = None,
+        header_name: str | None = None,
+        bearer: bool = True,
+        **kwargs: Any,
     ) -> None:
-        """Constructor.
+        """Initialize the authentication extension.
 
         Args:
-            jam (Jam): Jam instance
-            app (Flask | None): Flask app
-            header_name (str | None): Header with access token
-            cookie_name (str | None): Cookie with access token
+            app (flask.Flask | None): Flask application instance
+            config (dict[str, Any] | str | None): Jam config as path/to/file or dict.
+            pointer (str): Config pointer
+            cookie_name (str | None): Cookie name to read token
+            header_name (str | None): Header name to read token
+            bearer (bool): Strip "Bearer " prefix from header
+            **kwargs: Configuration arguments if config=None
         """
-        super().__init__(jam, app)
-        self.__use_list = getattr(self._jam.module, "list", False)
-        self.header = header_name
-        self.cookie = cookie_name
+        self._cookie_name = cookie_name
+        self._header_name = header_name
+        self._bearer = bearer
 
-    def _get_payload(self) -> Optional[dict[str, Any]]:
+        if not cookie_name and not header_name:
+            raise JamFlaskPluginConfigError(
+                message="Cookie name and header name cannot be both None.",
+                details={
+                    "cookie_name": cookie_name,
+                    "header_name": header_name,
+                },
+            )
+
+        _config: dict[str, Any] | None = (
+            __config_maker__(config, pointer) if config else None
+        )
+
+        params = _config.pop(self._CONFIG_KEY) if _config else kwargs
+        super().__init__(app=app, **params)
+
+    def _get_token(self) -> str | None:
         token = None
-        g.payload = None
-        if self.cookie:
-            token = request.cookies.get(self.cookie)
+        if self._header_name:
+            token = flask.request.headers.get(self._header_name, None)
+            if token and self._bearer and token.startswith("Bearer "):
+                token = token[7:]
+        elif self._cookie_name:
+            token = flask.request.cookies.get(self._cookie_name, None)
+        return token
 
-        if not token and self.header:
-            header = request.headers.get(self.header)
-            if header and header.startswith("Bearer "):
-                token = header.split("Bearer ")[1]
+    def _get_payload(self) -> dict[str, Any] | None:
+        raise NotImplementedError
 
+    def init_app(self, app: flask.Flask) -> None:
+        """Initialize the Flask application."""
+        super().init_app(app)
+        app.before_request(self._put_auth_in_g)
+
+    def _put_auth_in_g(self) -> None:
+        setattr(flask.g, self._CONFIG_KEY, self._auth)
+        self._get_payload()
+
+
+class JWTExtension(BaseAuthExtension):
+    """JWT extension for Flask."""
+
+    MODULE = staticmethod(create_jwt)
+    _CONFIG_KEY = "jwt"
+
+    def __init__(
+        self,
+        app: flask.Flask | None = None,
+        config: dict[str, Any] | str | None = None,
+        pointer: str = GENERIC_POINTER,
+        cookie_name: str | None = None,
+        header_name: str | None = None,
+        use_list: bool = False,
+        bearer: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """Initialize the authentication extension.
+
+        Args:
+            app (flask.Flask | None): Flask application instance
+            config (dict[str, Any] | str | None): Jam config as path/to/file or dict.
+            pointer (str): Config pointer
+            cookie_name (str | None): Cookie name to read token
+            header_name (str | None): Header name to read token
+            use_list (bool): Use a list for token
+            bearer (bool): Strip "Bearer " prefix from header
+            **kwargs: Configuration arguments if config=None
+        """
+        self._use_list = use_list
+        super().__init__(
+            app=app,
+            config=config,
+            pointer=pointer,
+            cookie_name=cookie_name,
+            header_name=header_name,
+            bearer=bearer,
+            **kwargs,
+        )
+
+    def _get_payload(self) -> dict[str, Any] | None:
+        token = self._get_token()
+        if self._use_list:
+            match self._auth.list.__list_type__:
+                case "black":
+                    if self._auth.list.check(token):
+                        return None
+                case "white":
+                    if not self._auth.list.check(token):
+                        return None
+        flask.g.payload = None
         if not token:
             return None
         try:
-            payload: dict[str, Any] = self._jam.jwt_verify_token(
-                token=token, check_exp=True, check_list=self.__use_list
-            )
-        except Exception as e:
-            logger.warning(str(e))
+            payload = self._auth.decode(token)
+            flask.g.payload = payload
+            return payload
+        except Exception:
             return None
 
-        g.payload = payload
-        return payload
 
-    def init_app(self, app: Flask) -> None:
-        """Flask app init."""
-        app.before_request(self._get_payload)
-        app.extensions["jam"] = self._jam
+class SessionExtension(BaseAuthExtension):
+    """Session extension for Flask."""
+
+    MODULE = staticmethod(create_session)
+    _CONFIG_KEY = "sessions"
+
+    def _get_payload(self) -> dict[str, Any] | None:
+        token = self._get_token()
+        flask.g.payload = None
+        if not token:
+            return None
+        try:
+            payload = self._auth.get(token)
+            flask.g.payload = payload
+            return payload
+        except Exception:
+            return None
 
 
-class SessionExtension(JamExtension):
-    """Session extension for Jam."""
+class PASETOExtension(BaseAuthExtension):
+    """PASETO extension for Flask."""
+
+    MODULE = staticmethod(create_paseto)
+    _CONFIG_KEY = "paseto"
+
+    def _get_payload(self) -> dict[str, Any] | None:
+        token = self._get_token()
+        flask.g.payload = None
+        if not token:
+            return None
+        try:
+            data = self._auth.decode(token)
+            if not data:
+                return None
+            payload = data[0] if isinstance(data, tuple) else data
+            flask.g.payload = payload
+            return payload
+        except Exception:
+            return None
+
+
+class OAuth2Extension(BaseExtension):
+    """OAuth2 extension for Flask."""
+
+    MODULE = staticmethod(create_oauth2)
+    _CONFIG_KEY = "oauth2"
 
     def __init__(
         self,
-        jam: Jam,
-        app: Optional[Flask] = None,
-        header_name: Optional[str] = None,
-        cookie_name: Optional[str] = "sessionId",
+        app: flask.Flask | None = None,
+        config: dict[str, Any] | str | None = None,
+        pointer: str = GENERIC_POINTER,
+        **kwargs: Any,
     ) -> None:
-        """Constructor.
+        """Initialize the OAuth2 extension.
 
         Args:
-            jam (Jam): Jam instance
-            app (Flask | None): Flask app
-            header_name (str | None): Session id header
-            cookie_name (str | None): Session id cookie
+            app (flask.Flask | None): Flask application instance
+            config (dict[str, Any] | str | None): Jam config as path/to/file or dict.
+            pointer (str): Config pointer
+            **kwargs: Configuration arguments if config=None
         """
-        super().__init__(jam, app)
-        self.header = header_name
-        self.cookie = cookie_name
+        _config: dict[str, Any] | None = (
+            __config_maker__(config, pointer) if config else None
+        )
 
-    def _get_payload(self) -> Optional[dict[str, Any]]:
-        session_id = None
-        g.payload = None
-        if self.cookie:
-            session_id = request.cookies.get(self.cookie)
-
-        if not session_id and self.header:
-            header = request.headers.get(self.header)
-            if header and header.startswith("Bearer "):
-                session_id = header.split("Bearer ")[1]
-
-        if not session_id:
-            return None
-        try:
-            payload: Optional[dict[str, Any]] = self._jam.session_get(
-                session_id
-            )
-        except Exception as e:
-            logger.warning(str(e))
-            return None
-
-        g.payload = payload
-        return payload
-
-    def init_app(self, app: Flask) -> None:
-        """Flask app init."""
-        app.before_request(self._get_payload)
-        app.extensions["jam"] = self._jam
+        params = _config.pop(self._CONFIG_KEY) if _config else kwargs
+        super().__init__(app, **params)

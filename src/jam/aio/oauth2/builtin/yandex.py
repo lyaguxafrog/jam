@@ -4,7 +4,7 @@ from jam.aio.oauth2.client import OAuth2Client
 
 
 class YandexOAuth2Client(OAuth2Client):
-    """Ready to use yandex oauth2 client.
+    """Async ready to use yandex oauth2 client.
 
     See: https://yandex.ru/dev/id/doc
     """

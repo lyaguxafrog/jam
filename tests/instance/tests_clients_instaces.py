@@ -18,37 +18,37 @@ async def async_client_instance() -> TestAsyncJam:
 
 
 def test_client_instance(client_instance):
-    payload = client_instance.make_payload(**{"user": 1})
-    valid_token = client_instance.gen_jwt_token(payload)
+    payload = client_instance.jwt_make_payload(exp=None, data={"user": 1})
+    valid_token = client_instance.jwt_create_token(payload)
 
-    verify = client_instance.verify_jwt_token(valid_token)
+    verify = client_instance.jwt_verify_token(valid_token)
     assert verify == payload
 
     invalid_token_ = invalid_token()
 
     with pytest.raises(ValueError):
-        client_instance.verify_jwt_token(invalid_token_)
+        client_instance.jwt_verify_token(invalid_token_)
 
-    session_id = client_instance.create_session(
+    session_id = client_instance.session_create(
         session_key="TEST", data={"user": 1}
     )
 
-    session_data = client_instance.get_session(session_id)
+    session_data = client_instance.session_get(session_id)
     assert session_data == {"user": 1}
 
-    otp_code = client_instance.get_otp_code(
+    otp_code = client_instance.otp_code(
         secret="fdfdfd",
     )
 
     assert (
-        client_instance.verify_otp_code(
+        client_instance.otp_verify_code(
             secret="fdfd", code=otp_code, factor=None, look_ahead=1
         )
         is True
     )
 
     assert (
-        client_instance.verify_otp_code(
+        client_instance.otp_verify_code(
             secret="fdfd", code="dfdfd", factor=None, look_ahead=1
         )
         is False
@@ -57,37 +57,37 @@ def test_client_instance(client_instance):
 
 @pytest.mark.asyncio
 async def test_client_instance(async_client_instance):
-    payload = await async_client_instance.make_payload(**{"user": 1})
-    valid_token = await async_client_instance.gen_jwt_token(payload)
+    payload = await async_client_instance.jwt_make_payload(exp=None, data={"user": 1})
+    valid_token = await async_client_instance.jwt_create_token(payload)
 
-    verify = await async_client_instance.verify_jwt_token(valid_token)
+    verify = await async_client_instance.jwt_verify_token(valid_token)
     assert verify == payload
 
     invalid_token_ = invalid_token()
 
     with pytest.raises(ValueError):
-        await async_client_instance.verify_jwt_token(invalid_token_)
+        await async_client_instance.jwt_verify_token(invalid_token_)
 
-    session_id = await async_client_instance.create_session(
+    session_id = await async_client_instance.session_create(
         session_key="TEST", data={"user": 1}
     )
 
-    session_data = await async_client_instance.get_session(session_id)
+    session_data = await async_client_instance.session_get(session_id)
     assert session_data == {"user": 1}
 
-    otp_code = await async_client_instance.get_otp_code(
+    otp_code = await async_client_instance.otp_code(
         secret="fdfdfd",
     )
 
     assert (
-        await async_client_instance.verify_otp_code(
+        await async_client_instance.otp_verify_code(
             secret="fdfd", code=otp_code, factor=None, look_ahead=1
         )
         is True
     )
 
     assert (
-        await async_client_instance.verify_otp_code(
+        await async_client_instance.otp_verify_code(
             secret="fdfd", code="dfdfd", factor=None, look_ahead=1
         )
         is False
