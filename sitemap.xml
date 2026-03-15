@@ -2,434 +2,446 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://jam.makridenko.ru/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/config/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/configuration/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
          <loc>https://jam.makridenko.ru/contributing/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/install_unstable/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/old_config/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/installation/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
          <loc>https://jam.makridenko.ru/philosophy/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/quick/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/SUMMARY/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/testing/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.__base__/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/unstable_changelog/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.__base_encoder__/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.__deprecated__/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/base_jam/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.aio.__base__/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/exceptions/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.aio.instance/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/ext/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.aio.jwt/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.aio/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.aio.oauth2.__base__/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.aio.oauth2.builtin.github/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.aio.oauth2.builtin.gitlab/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.aio.oauth2.builtin.google/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.aio.oauth2.builtin/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.aio.oauth2.builtin.yandex/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.aio.oauth2.client/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.aio.oauth2/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.aio.sessions.__base__/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.aio.sessions.json/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.aio.sessions/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.aio.sessions.redis/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.encoders/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.exceptions.base/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.exceptions.jwt/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.exceptions/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.exceptions.oauth2/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.exceptions.paseto/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.exceptions.plugins/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.exceptions.sessions/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.ext.fastapi/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.ext.flask.extensions/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.ext.flask/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.ext.flask.objects/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.ext.litestar/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.ext.litestar.middleware/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.ext.litestar.objects/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.ext.litestar.plugins/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.ext/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.ext.starlette.backends/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.ext.starlette/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.ext.starlette.objects/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.instance/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.jwt.__algorithms__/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.jwt.__base__/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.jwt.__types__/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.jwt.lists.__base__/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.jwt.lists.json/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.jwt.lists/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.jwt.lists.redis/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.jwt/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.jwt.module/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.jwt.utils/</loc>
+         <lastmod>2026-03-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jam.makridenko.ru/api/jam.logger/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
          <loc>https://jam.makridenko.ru/api/jam/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/jwt/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.oauth2.__base__/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/modules/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.oauth2.builtin.github/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/oauth2/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.oauth2.builtin.gitlab/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/otp/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.oauth2.builtin.google/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/sessions/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.oauth2.builtin/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/tests/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.oauth2.builtin.yandex/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/utils/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.oauth2.client/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/jam/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.oauth2/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/jwt/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.otp.__base__/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/modules/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.otp.hotp/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/oauth2/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.otp/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/sessions/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.otp.totp/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/jwt/lists/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.paseto.__base__/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/jwt/tools/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.paseto/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/jwt/lists/json/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.paseto.utils/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/jwt/lists/redis/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.paseto.v1/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/modules/jwt_module/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.paseto.v2/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/modules/session_module/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.paseto.v3/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/oauth2/builtin/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.paseto.v4/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/oauth2/client/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.sessions.__base__/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/oauth2/builtin/github/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.sessions.json/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/oauth2/builtin/gitlab/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.sessions/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/oauth2/builtin/google/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.sessions.redis/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/oauth2/builtin/yandex/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.utils.aes/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/sessions/json/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.utils.await_maybe/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/aio/sessions/redis/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.utils.basic_auth/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/ext/fastapi/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.utils.config_maker/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/ext/flask/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.utils.ed/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/ext/litestar/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.utils/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/ext/starlette/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.utils.otp_keys/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/ext/flask/extensions/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.utils.rsa/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/ext/litestar/middlewares/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.utils.salt_hash/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/ext/litestar/plugins/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.utils.symmetric/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/ext/litestar/value/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.utils.xchacha20poly1305/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/ext/starlette/auth_backends/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/api/jam.utils.xor/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/api/ext/starlette/value/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/jwt/lists/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/jwt/tools/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/jwt/types/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/jwt/utils/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/jwt/lists/base_jwt_list/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/jwt/lists/json/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/jwt/lists/redis/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/modules/base_module/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/modules/jwt_module/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/modules/session_module/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/oauth2/base_client/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/oauth2/builtin/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/oauth2/client/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/oauth2/builtin/github/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/oauth2/builtin/gitlab/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/oauth2/builtin/google/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/oauth2/builtin/yandex/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/otp/base_otp/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/otp/hotp/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/otp/totp/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/sessions/base_session_module/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/sessions/json/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/sessions/redis/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/tests/clients/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/tests/fakers/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/utils/aes/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/utils/config_maker/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/utils/otp_keys/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/utils/rsa/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/utils/salt_hash/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/api/utils/xor/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/breaking_changes/deprecated/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
          <loc>https://jam.makridenko.ru/breaking_changes/jam114_to_200/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/extensions/fastapi/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/breaking_changes/jam256_to_300/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/extensions/flask/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/framework_integrations/fastapi/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/extensions/litestar/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/framework_integrations/flask/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/extensions/starlette/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/framework_integrations/litestar/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/jwt/config/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/framework_integrations/starlette/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/jwt/instance/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/usage/custom/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/jwt/lists/how/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/usage/jwt/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/jwt/lists/json/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/usage/logging/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/jwt/lists/own_module/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/usage/oauth2/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/jwt/lists/redis/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/usage/otp/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/jwt/lists/what/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/usage/paseto/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/oauth2/builtins/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/usage/serializers/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/oauth2/config/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/usage/sessions/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/oauth2/custom_module/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/usage/test_client/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/oauth2/instance/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/usage/utils/auth_utils/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
     <url>
-         <loc>https://jam.makridenko.ru/otp/config/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/otp/hotp/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/otp/hotp_and_totp/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/otp/totp/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/sessions/config/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/sessions/instance/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/sessions/own_module/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/sessions/session_crypt/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/utils/key_generations/</loc>
-         <lastmod>2026-03-13</lastmod>
-    </url>
-    <url>
-         <loc>https://jam.makridenko.ru/utils/password_hashing/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <loc>https://jam.makridenko.ru/usage/utils/key_generators/</loc>
+         <lastmod>2026-03-15</lastmod>
     </url>
 </urlset>
