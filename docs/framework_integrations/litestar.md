@@ -187,6 +187,7 @@ Args:
 * `cookie_name`: `str | None = None` - Cookie to check, if `middleware=True`
 * `header_name`: `str | None = None` - Header to check, if `middleware=True`
 * `middleware`: `bool = True` - Enable/disable middleware
+* `use_list`: `bool = False` - Use token black/white list
 * `user`: `type[BaseUser] | None = None` - User for request
 
 !!! tip

@@ -168,6 +168,7 @@ Args:
 * `pointer`: `str` - Config pointer
 * `cookie_name`: `str | None = None` - Cookie to check
 * `header_name`: `str | None = None` - Header to check
+* `use_list`: `bool = False` - Use token black/white list
 * `user`: `type[BaseUser] = SimpleUser` - User for request
 
 ```python
