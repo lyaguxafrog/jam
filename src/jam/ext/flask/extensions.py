@@ -122,8 +122,50 @@ class JWTExtension(BaseAuthExtension):
     MODULE = staticmethod(create_jwt)
     _CONFIG_KEY = "jwt"
 
+    def __init__(
+        self,
+        app: flask.Flask | None = None,
+        config: dict[str, Any] | str | None = None,
+        pointer: str = GENERIC_POINTER,
+        cookie_name: str | None = None,
+        header_name: str | None = None,
+        use_list: bool = False,
+        bearer: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """Initialize the authentication extension.
+
+        Args:
+            app (flask.Flask | None): Flask application instance
+            config (dict[str, Any] | str | None): Jam config as path/to/file or dict.
+            pointer (str): Config pointer
+            cookie_name (str | None): Cookie name to read token
+            header_name (str | None): Header name to read token
+            use_list (bool): Use a list for token
+            bearer (bool): Strip "Bearer " prefix from header
+            **kwargs: Configuration arguments if config=None
+        """
+        self._use_list = use_list
+        super().__init__(
+            app=app,
+            config=config,
+            pointer=pointer,
+            cookie_name=cookie_name,
+            header_name=header_name,
+            bearer=bearer,
+            **kwargs,
+        )
+
     def _get_payload(self) -> dict[str, Any] | None:
         token = self._get_token()
+        if self._use_list:
+            match self._auth.list.__list_type__:
+                case "black":
+                    if self._auth.list.check(token):
+                        return None
+                case "white":
+                    if not self._auth.list.check(token):
+                        return None
         flask.g.payload = None
         if not token:
             return None
