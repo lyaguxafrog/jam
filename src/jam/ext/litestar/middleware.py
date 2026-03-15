@@ -21,11 +21,15 @@ class BaseMiddleware(AbstractAuthenticationMiddleware):
     AUTH_MODULE: Callable
     HEADER_NAME: str | None
     COOKIE_NAME: str | None
+    BEARER: bool = False
     USER: type[BaseUser]
 
     def _get_auth_token(self, connection: ASGIConnection) -> str | None:
         if self.HEADER_NAME:
             token = connection.headers.get(self.HEADER_NAME, None)
+            if self.BEARER and token:
+                token = token.split(" ")[1]
+            return token
         elif self.COOKIE_NAME:
             token = connection.cookies.get(self.COOKIE_NAME, None)
         else:

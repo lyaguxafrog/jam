@@ -39,6 +39,7 @@ class BasePlugin(InitPlugin):
         pointer: str = GENERIC_POINTER,
         cookie_name: str | None = None,
         header_name: str | None = None,
+        bearer: bool = False,
         middleware: bool = True,
         user: type[BaseUser] | None = None,
         **kwargs,
@@ -50,6 +51,7 @@ class BasePlugin(InitPlugin):
             pointer (str): Config pointer
             cookie_name (str | None): Cookie name to read token
             header_name (str | None): Header name to read token
+            bearer (bool): Use bearer prefix for token (e.g. "Bearer ")
             middleware (bool): Use middleware?
             user (type[BaseUser]): User for request state. See: DOCUMENTATION
             **kwargs: Config arguments if config=None
@@ -84,6 +86,7 @@ class BasePlugin(InitPlugin):
             _middleware.HEADER_NAME = header_name
             _middleware.AUTH_MODULE = self._auth
             _middleware.USER = user  # type: ignore
+            _middleware.BEARER = bearer
             self._middleware = _middleware
 
     def on_app_init(self, app_config: AppConfig) -> AppConfig:  # noqa
