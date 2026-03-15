@@ -17,14 +17,14 @@ Example:
 
 ```python
 from litestar import Litestar
-from jam.ext.litestar import JamJWTPlugin, SimpleUser
+from jam.ext.litestar import JWTPlugin, SimpleUser
 
 app = Litestar(
-    plugin=JamJWTPlugin(
+    plugins=[JWTPlugin(
         config="config.toml",
         cookie_name="JWT",  # for example
         user=SimpleUser
-    )
+    )]
 )
 
 # ---
@@ -44,7 +44,8 @@ async def login(login: str, password: str, jwt: JWT) -> Response:
     
 # Middleware by JamPlugin check cookie "jwt"
 # (because it has `cookie_name="jwt"` at config)
-from litestar import get, Request, HTTPException
+from litestar import get, Request
+from litestar.exceptions import HTTPException
 
 @get("/user")
 async def get_user(request: Request) -> dict:
@@ -68,7 +69,7 @@ The plugins use the standard Jam configuration, along with some additional setti
 ```python
 import os
 from litestar import Litestar
-from jam.ext.litestar import JamPASETOPlugin  # for example
+from jam.ext.litestar import PASETOPlugin  # for example
 
 config = {
     "paseto": {
@@ -80,7 +81,7 @@ config = {
 
 app = Litestar(
     plugins=[
-        JamPASETOPlugin(
+        PASETOPlugin(
             config=config,
             header_name="Authorization",
             middleware=False
@@ -125,7 +126,7 @@ class MyUser(BaseUser):
         
 app = Litestar(
     plugins=[
-        JamJWTPlugin(
+        JWTPlugin(
             config=config,
             cookie_name="jwt",
             user=MyUser
@@ -154,7 +155,7 @@ Example:
 
 ```python
 from litestar import Litestar, get, Request
-from jam.ext.litestar import JamSessionsPlugin, SimpleUser
+from jam.ext.litestar import SessionsPlugin, SimpleUser
 
 
 @get("/profile")
@@ -167,7 +168,7 @@ async def get_profile(request: Request) -> dict | None:
 app = Litestar(
     routes=[get_profile],
     plugins=[
-        JamJWTPlugin(
+        SessionsPlugin(
             config=config,
             cookie_name="jwt",
             user=SimpleUser
