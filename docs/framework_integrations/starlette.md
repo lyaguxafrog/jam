@@ -18,19 +18,17 @@ from starlette.middleware import Middleware
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.routing import Route
 from starlette.requests import Request
+from starlette.responses import PlainTextResponse
 from starlette.exceptions import HTTPException
 from starlette.status import HTTP_401_UNAUTHORIZED
 
 from jam.ext.starlette import JWTBackend  # for example
 
 
-async def get_profile(request: Request) -> dict:
+async def get_profile(request: Request):
     if not request.user.is_authenticated:
         raise HTTPException(status_code=HTTP_401_UNAUTHORIZED)
-    return {
-        "username": request.user.username,
-        "email": request.user.email,
-    }
+    return PlainTextResponse(request.user.username)
 
 
 app = Starlette(
