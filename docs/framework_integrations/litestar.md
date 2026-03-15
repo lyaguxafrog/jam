@@ -178,7 +178,7 @@ app = Litestar(
 
 ## JWT Plugin
 
-Module: `jam.ext.litestar.JamJWTPlugin`
+Module: `jam.ext.litestar.JWTPlugin`
 
 Args:
 
@@ -195,12 +195,12 @@ Args:
   
 ```python
 from litestar import Litestar
-from jam.ext.litestar import JamJWTPlugin, SimpleUser
+from jam.ext.litestar import JWTPlugin, SimpleUser
 
 
 app = Litestar(
     plugins=[
-        JamJWTPlugin(
+        JWTPlugin(
             config=config,
             cookie_name="jwt",
             user=SimpleUser
@@ -211,7 +211,7 @@ app = Litestar(
 
 ## PASETO Plugin
 
-Module: `jam.ext.litestar.JamPASETOPlugin`
+Module: `jam.ext.litestar.PASETOPlugin`
 
 Args:
 
@@ -227,12 +227,12 @@ Args:
   
 ```python
 from litestar import Litestar
-from jam.ext.litestar import JamPASETOPlugin, SimpleUser
+from jam.ext.litestar import PASETOPlugin, SimpleUser
 
 
 app = Litestar(
     plugins=[
-        JamPASETOPlugin(
+        PASETOPlugin(
             config=config,
             header_name="Authorization",
             user=SimpleUser
@@ -243,7 +243,7 @@ app = Litestar(
 
 ## Server side sessions plugin
 
-Module: `jam.ext.litestar.JamSessionPlugin`
+Module: `jam.ext.litestar.SessionPlugin`
 
 Args:
 
@@ -259,12 +259,12 @@ Args:
 
 ```python
 from litestar import Litestar
-from jam.ext.litestar import JamSessionPlugin, SimpleUser
+from jam.ext.litestar import SessionPlugin, SimpleUser
 
 
 app = Litestar(
     plugins=[
-        JamSessionPlugin(
+        SessionPlugin(
             config=config,
             cookie_name="session",
             user=SimpleUser
@@ -275,7 +275,7 @@ app = Litestar(
 
 ## OAuth2 Plugin
 
-Module: `jam.ext.litestar.JamOAuth2Plugin`
+Module: `jam.ext.litestar.OAuth2Plugin`
 
 Args:
 
@@ -288,12 +288,12 @@ Args:
     
 ```python
 from litestar import Litestar
-from jam.ext.litestar import JamOAuth2Plugin
+from jam.ext.litestar import OAuth2Plugin
 
 
 app = Litestar(
     plugins=[
-        JamOAuth2Plugin(
+        OAuth2Plugin(
             config=config,
         )
     ],

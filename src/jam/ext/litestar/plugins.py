@@ -96,7 +96,7 @@ class BasePlugin(InitPlugin):
         return app_config
 
 
-class JamJWTPlugin(BasePlugin):
+class JWTPlugin(BasePlugin):
     """JWT plugin for litestar."""
 
     MODULE = staticmethod(create_jwt)
@@ -140,7 +140,7 @@ class JamJWTPlugin(BasePlugin):
             self.MIDDLEWARE.LIST = True  # type: ignore
 
 
-class JamSessionPlugin(BasePlugin):
+class SessionPlugin(BasePlugin):
     """Sessions plugin for litestar."""
 
     MODULE = staticmethod(create_session)
@@ -149,7 +149,7 @@ class JamSessionPlugin(BasePlugin):
     _CONFIG_KEY = "sessions"
 
 
-class JamPASETOPlugin(BasePlugin):
+class PASETOPlugin(BasePlugin):
     """PASETO plugin for litestar."""
 
     MODULE = staticmethod(create_paseto)
@@ -158,7 +158,7 @@ class JamPASETOPlugin(BasePlugin):
     _CONFIG_KEY = "paseto"
 
 
-class JamOAuth2Plugin(BasePlugin):
+class OAuth2Plugin(BasePlugin):
     """OAuth2 plugin for litestar."""
 
     MODULE = staticmethod(create_oauth2)

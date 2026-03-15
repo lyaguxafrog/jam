@@ -14,10 +14,10 @@ from .objects import (
 
 from .plugins import (
     BasePlugin,
-    JamJWTPlugin,
-    JamSessionPlugin,
-    JamPASETOPlugin,
-    JamOAuth2Plugin,
+    JWTPlugin,
+    SessionPlugin,
+    PASETOPlugin,
+    OAuth2Plugin,
 )
 
 __all__ = [
@@ -25,8 +25,8 @@ __all__ = [
     "SimpleUser",
     "Token",
     "BasePlugin",
-    "JamJWTPlugin",
-    "JamSessionPlugin",
-    "JamPASETOPlugin",
-    "JamOAuth2Plugin",
+    "JWTPlugin",
+    "SessionPlugin",
+    "PASETOPlugin",
+    "OAuth2Plugin",
 ]

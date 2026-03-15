@@ -5,10 +5,10 @@ from litestar.config.app import AppConfig
 import pytest
 
 from jam.ext.litestar import (
-    JamJWTPlugin,
-    JamOAuth2Plugin,
-    JamPASETOPlugin,
-    JamSessionPlugin,
+    JWTPlugin,
+    OAuth2Plugin,
+    PASETOPlugin,
+    SessionPlugin,
 )
 from jam.ext.litestar.objects import SimpleUser
 
@@ -59,7 +59,7 @@ def oauth2_config():
 
 class TestJamJWTPlugin:
     def test_adds_dependency(self, jwt_config, middleware_user):
-        plugin = JamJWTPlugin(
+        plugin = JWTPlugin(
             config=jwt_config,
             cookie_name="auth_token",
             header_name="Authorization",
@@ -74,7 +74,7 @@ class TestJamJWTPlugin:
         assert callable(provider.dependency)
 
     def test_adds_middleware(self, jwt_config, middleware_user):
-        plugin = JamJWTPlugin(
+        plugin = JWTPlugin(
             config=jwt_config,
             cookie_name="auth_token",
             header_name="Authorization",
@@ -90,7 +90,7 @@ class TestJamJWTPlugin:
         self, jwt_config, middleware_user
     ):
         with pytest.raises(Exception):
-            JamJWTPlugin(
+            JWTPlugin(
                 config=jwt_config,
                 cookie_name=None,
                 header_name=None,
@@ -99,14 +99,14 @@ class TestJamJWTPlugin:
 
     def test_raises_error_when_no_middleware_user(self, jwt_config):
         with pytest.raises(Exception):
-            JamJWTPlugin(
+            JWTPlugin(
                 config=jwt_config,
                 cookie_name="auth_token",
                 user=None,
             )
 
     def test_without_middleware(self, jwt_config):
-        plugin = JamJWTPlugin(
+        plugin = JWTPlugin(
             config=jwt_config,
             middleware=False,
         )
@@ -120,7 +120,7 @@ class TestJamJWTPlugin:
 
 class TestJamSessionPlugin:
     def test_adds_dependency(self, session_config, middleware_user):
-        plugin = JamSessionPlugin(
+        plugin = SessionPlugin(
             config=session_config,
             cookie_name="session_id",
             header_name="X-Session-ID",
@@ -135,7 +135,7 @@ class TestJamSessionPlugin:
         assert callable(provider.dependency)
 
     def test_adds_middleware(self, session_config, middleware_user):
-        plugin = JamSessionPlugin(
+        plugin = SessionPlugin(
             config=session_config,
             cookie_name="session_id",
             header_name="X-Session-ID",
@@ -150,7 +150,7 @@ class TestJamSessionPlugin:
 
 class TestJamPASETOPlugin:
     def test_adds_dependency(self, paseto_config, middleware_user):
-        plugin = JamPASETOPlugin(
+        plugin = PASETOPlugin(
             config=paseto_config,
             cookie_name="paseto",
             header_name="X-PASETO",
@@ -163,7 +163,7 @@ class TestJamPASETOPlugin:
         assert "paseto" in updated_config.dependencies
 
     def test_adds_middleware(self, paseto_config, middleware_user):
-        plugin = JamPASETOPlugin(
+        plugin = PASETOPlugin(
             config=paseto_config,
             cookie_name="paseto",
             header_name="X-PASETO",
@@ -178,7 +178,7 @@ class TestJamPASETOPlugin:
 
 class TestJamOAuth2Plugin:
     def test_adds_dependency(self, oauth2_config):
-        plugin = JamOAuth2Plugin(config=oauth2_config)
+        plugin = OAuth2Plugin(config=oauth2_config)
         app_config = AppConfig()
 
         updated_config = plugin.on_app_init(app_config)
@@ -188,7 +188,7 @@ class TestJamOAuth2Plugin:
         assert callable(provider.dependency)
 
     def test_no_middleware(self, oauth2_config):
-        plugin = JamOAuth2Plugin(config=oauth2_config)
+        plugin = OAuth2Plugin(config=oauth2_config)
         app_config = AppConfig()
 
         updated_config = plugin.on_app_init(app_config)
