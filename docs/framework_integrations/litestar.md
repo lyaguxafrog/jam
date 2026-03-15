@@ -188,6 +188,7 @@ Args:
 * `cookie_name`: `str | None = None` - Cookie to check, if `middleware=True`
 * `header_name`: `str | None = None` - Header to check, if `middleware=True`
 * `middleware`: `bool = True` - Enable/disable middleware
+* `bearer`: `bool = False` - Use bearer prefix for token (e.g. "Bearer ")
 * `use_list`: `bool = False` - Use token black/white list
 * `user`: `type[BaseUser] | None = None` - User for request
 
@@ -220,6 +221,7 @@ Args:
 * `pointer`: `str` - Config pointer
 * `cookie_name`: `str | None = None` - Cookie to check, if `middleware=True`
 * `header_name`: `str | None = None` - Header to check, if `middleware=True`
+* `bearer`: `bool = False` - Use bearer prefix for token (e.g. "Bearer ")
 * `middleware`: `bool = True` - Enable/disable middleware
 * `user`: `type[BaseUser] | None = None` - User for request
 
@@ -252,6 +254,7 @@ Args:
 * `pointer`: `str` - Config pointer
 * `cookie_name`: `str | None = None` - Cookie to check, if `middleware=True`
 * `header_name`: `str | None = None` - Header to check, if `middleware=True`
+* `bearer`: `bool = False` - Use bearer prefix for token (e.g. "Bearer ")
 * `middleware`: `bool = True` - Enable/disable middleware
 * `user`: `type[BaseUser] | None = None` - User for request
 

@@ -166,6 +166,7 @@ Args:
 * `pointer`: `str` - Config pointer
 * `cookie_name`: `str | None = None` - Cookie to check
 * `header_name`: `str | None = None` - Header to check
+* `bearer`: `bool = False` - Use bearer prefix for token (e.g. "Bearer ")
 * `use_list`: `bool = False` - Use token black/white list
 * `user`: `type[BaseUser] = SimpleUser` - User for request
 
@@ -196,6 +197,7 @@ Args:
 * `pointer`: `str` - Config pointer
 * `cookie_name`: `str | None = None` - Cookie to check
 * `header_name`: `str | None = None` - Header to check
+* `bearer`: `bool = False` - Use bearer prefix for token (e.g. "Bearer ")
 * `user`: `type[BaseUser] = SimpleUser` - User for request
 
 ```python
@@ -225,6 +227,7 @@ Args:
 * `pointer`: `str` - Config pointer
 * `cookie_name`: `str | None = None` - Cookie to check
 * `header_name`: `str | None = None` - Header to check
+* `bearer`: `bool = False` - Use bearer prefix for token (e.g. "Bearer ")
 * `user`: `type[BaseUser] = SimpleUser` - User for request
 
 ```python
