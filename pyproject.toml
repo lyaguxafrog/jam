@@ -1,6 +1,6 @@
 [project]
 name = "jamlib"
-version = "3.1.0.dev0"
+version = "3.1.0.a0"
 description = "Simple and universal library for authorization."
 authors = [
     {name = "Makridenko Adrian",email = "adrianmakridenko@duck.com"},
@@ -53,6 +53,9 @@ Repository = "https://github.com/lyaguxafrog/jam"
 Issues = "https://github.com/lyaguxafrog/jam/issues"
 Changelog = "https://github.com/lyaguxafrog/jam/blob/master/CHANGELOG.md"
 
+
+[project.scripts]
+jam = "jam.cli:cli"
 
 [project.optional-dependencies]
 cli=["click>=8.3.1"]
