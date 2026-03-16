@@ -689,13 +689,16 @@ wheels = [
 
 [[package]]
 name = "jamlib"
-version = "3.0.0"
+version = "3.1.0a0"
 source = { editable = "." }
 dependencies = [
     { name = "cryptography" },
 ]
 
 [package.optional-dependencies]
+cli = [
+    { name = "click" },
+]
 fastapi = [
     { name = "fastapi" },
 ]
@@ -723,6 +726,7 @@ yaml = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "click" },
     { name = "fakeredis" },
     { name = "icecream" },
     { name = "pre-commit" },
@@ -748,6 +752,7 @@ tests = [
 
 [package.metadata]
 requires-dist = [
+    { name = "click", marker = "extra == 'cli'", specifier = ">=8.3.1" },
     { name = "cryptography", specifier = ">=46.0.5" },
     { name = "fastapi", marker = "extra == 'fastapi'", specifier = ">=0.135.1" },
     { name = "flask", marker = "extra == 'flask'", specifier = ">=3.1.2" },
@@ -758,10 +763,11 @@ requires-dist = [
     { name = "tinydb", marker = "extra == 'json'", specifier = ">=4.8.2" },
     { name = "toml", marker = "extra == 'toml'", specifier = ">=0.10.2" },
 ]
-provides-extras = ["redis", "json", "yaml", "toml", "litestar", "starlette", "fastapi", "flask"]
+provides-extras = ["cli", "redis", "json", "yaml", "toml", "litestar", "starlette", "fastapi", "flask"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "click", specifier = ">=8.3.1" },
     { name = "fakeredis", specifier = ">=2.34.1" },
     { name = "icecream", specifier = ">=2.1.10" },
     { name = "pre-commit", specifier = ">=4.5.1" },
