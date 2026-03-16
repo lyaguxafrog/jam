@@ -8,18 +8,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- 
 ## VERSION
 
-### Added
+#### Added
 
-## Changed
+### Changed
 
-## Deprecated
+### Deprecated
 
-## Removed
+### Removed
 
-## Fixed
+### Fixed
 
-## Security
+### Security
 -->
+
+## [3.1.0] - unreleased
+
+### Added
+- Add CLI tool for generate keys.
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+---
 
 ## [3.0.0] - 15-03-2026
 
