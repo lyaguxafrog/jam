@@ -1,6 +1,6 @@
 [project]
 name = "jamlib"
-version = "3.0.0"
+version = "3.1.0.dev0"
 description = "Simple and universal library for authorization."
 authors = [
     {name = "Makridenko Adrian",email = "adrianmakridenko@duck.com"},
@@ -55,6 +55,7 @@ Changelog = "https://github.com/lyaguxafrog/jam/blob/master/CHANGELOG.md"
 
 
 [project.optional-dependencies]
+cli=["click>=8.3.1"]
 redis=["redis>=7.3.0"]
 json=["tinydb>=4.8.2"]
 yaml=["pyyaml>=6.0.3"]
@@ -74,6 +75,7 @@ include = ["jam*"]
 
 [dependency-groups]
 dev = [
+    "click>=8.3.1",
     "fakeredis>=2.34.1",
     "icecream>=2.1.10",
     "pre-commit>=4.5.1",
