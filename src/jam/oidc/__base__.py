@@ -1,35 +1,23 @@
 # -*- coding: utf-8 -*-
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Any
 
+from jam.oauth2.__base__ import BaseOAuth2Client
 
-class BaseOpenIDConnect(ABC):
-    """Base Open ID Conecct."""
 
-    @abstractmethod
-    def get_authorization_url(self, state: list[str], scope: str) -> str:
-        """Returns the authorization URL for the OpenID Connect flow.
-
-        Args:
-            state: The state to include in the authorization URL.
-            scope: The scope to include in the authorization URL.
-
-        Returns:
-            str: The authorization URL.
-        """
-        raise NotImplementedError
+class BaseOpenIDConnectClient(BaseOAuth2Client):
+    """Base OIDC Client."""
 
     @abstractmethod
-    def fetch_token(self, code: str, redirect_url: str) -> dict[str, Any]:
-        """Returns the access token for the OpenID Connect flow.
+    def get_userinfo(self, access_token: str) -> dict[str, Any]:
+        """Returns the user info for the OpenID Connect flow.
 
         Args:
-            code: The authorization code to exchange for a token.
-            redirect_url: The redirect URL to use for the token exchange.
+            access_token (str): The access token to use for the user info request.
 
         Returns:
-            dict[str, Any]: The access token.
+            dict[str, Any]: The user info.
         """
         raise NotImplementedError
 
@@ -38,33 +26,9 @@ class BaseOpenIDConnect(ABC):
         """Returns the claims for the OpenID Connect flow.
 
         Args:
-            id_token: The ID token to validate.
+            id_token (str): The ID token to validate.
 
         Returns:
             dict[str, Any]: The claims for the ID token.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def get_userinfo(self, access_token: str) -> dict[str, Any]:
-        """Returns the user info for the OpenID Connect flow.
-
-        Args:
-            access_token: The access token to use for the user info request.
-
-        Returns:
-            dict[str, Any]: The user info.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def refresh_token(self, refresh_token: str) -> dict[str, Any]:
-        """Returns the refreshed token for the OpenID Connect flow.
-
-        Args:
-            refresh_token: The refresh token to use for the token refresh.
-
-        Returns:
-            dict[str, Any]: The refreshed token.
         """
         raise NotImplementedError
