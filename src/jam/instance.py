@@ -5,6 +5,7 @@ from typing import Any
 import uuid
 
 from jam.__base__ import BaseJam
+from jam.__deprecated__ import deprecated
 from jam.exceptions import (
     JamConfigurationError,
     JamJWTExpired,
@@ -24,6 +25,9 @@ class Jam(BaseJam):
         "otp": "jam.otp.__base__.OTPConfig",
     }
 
+    @deprecated(
+        "This method is deprecated; the JWT payload is generated automatically in accordance with the specification."
+    )
     def jwt_make_payload(
         self, exp: int | None, data: dict[str, Any]
     ) -> dict[str, Any]:
@@ -44,6 +48,7 @@ class Jam(BaseJam):
         payload = payload | data
         return payload
 
+    @deprecated("Use jam.jwt_encode")
     def jwt_create(self, payload: dict[str, Any]) -> str:
         """Create JWT token.
 
