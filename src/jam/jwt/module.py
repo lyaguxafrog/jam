@@ -6,6 +6,7 @@ import os
 from typing import Any
 
 from jam.__base_encoder__ import BaseEncoder
+from jam.__deprecated__ import deprecated
 from jam.encoders import JsonEncoder
 from jam.exceptions import JamJWTUnsupportedAlgorithm, JamJWTValidationError
 from jam.jwt.__algorithms__ import BaseAlgorithm, create_algorithm
@@ -15,6 +16,7 @@ from jam.jwt.utils import base64url_decode, base64url_encode
 from jam.logger import BaseLogger, logger
 
 
+@deprecated("Use jam.jose.JWT")
 class JWT(BaseJWT):
     """JWT factory.
 

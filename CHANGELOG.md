@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- 
-## VERSION
+## VERSION - [unreleased]
 
 #### Added
 
@@ -20,6 +20,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 -->
+
+## 3.2.0 - [unreleased]
+
+#### Added
+
+### Changed
+
+### Deprecated
+- `jam.Jam.jwt_make_payload`: The JWT specification has been introduced, so signing is now done via JWS
+- `jam.jwt.JWT`: Use `jam.jose.JWT`
+
+### Removed
+
+### Fixed
+
+### Security
+
+---
 
 ## [3.1.0] - 16-03-2026
 
@@ -63,5 +81,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated all dependencies.
 
 ---
-[3.1.0] https://github.com/lyaguxafrog/jam/compare/v3.0.0...v3.1.0
-[3.0.0] https://github.com/lyaguxafrog/jam/compare/v2.5.6...v3.0.0
+- [3.2.0] https://github.com/lyaguxafrog/jam/compare/v3.1.0...unstable
+- [3.1.0] https://github.com/lyaguxafrog/jam/compare/v3.0.0...v3.1.0
+- [3.0.0] https://github.com/lyaguxafrog/jam/compare/v2.5.6...v3.0.0
