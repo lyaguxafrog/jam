@@ -16,9 +16,11 @@ except ImportError:
         """
     )
 
+from jam.__deprecated__ import deprecated
 from jam.jwt.lists.__base__ import BaseJWTList
 
 
+@deprecated()
 class JSONList(BaseJWTList):
     """Black/White list in JSON format, not recommended for blacklists  because it is not convenient to control token lifetime.
 
