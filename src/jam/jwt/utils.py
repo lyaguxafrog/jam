@@ -2,7 +2,10 @@
 
 import base64
 
+from jam.__deprecated__ import deprecated
 
+
+@deprecated("Use jam.jose.utils")
 def base64url_encode(data: bytes) -> str:
     """Encodes data using URL-safe Base64 encoding.
 
@@ -17,6 +20,7 @@ def base64url_encode(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).rstrip(b"=").decode("utf-8")
 
 
+@deprecated("Use jam.jose.utils")
 def base64url_decode(data: str) -> bytes:
     """Decodes a URL-safe Base64 encoded string back to bytes.
 
