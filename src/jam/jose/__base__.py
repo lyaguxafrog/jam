@@ -5,8 +5,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
-from jam.jose.__base_storage__ import BaseStorage
-
 
 REGISTERED_HEADER_NAMES = frozenset(
     {
@@ -22,6 +20,10 @@ REGISTERED_HEADER_NAMES = frozenset(
         "cty",
         "crit",
     }
+)
+
+REGISTERED_JWK_PARAMS = frozenset(
+    {"kty", "use", "key_ops", "alg", "kid", "x5u", "x5c", "x5t", "x5t#S256"}
 )
 
 RESERVED_CLAIMS = frozenset({"typ", "cty"})
@@ -80,6 +82,40 @@ class BaseJWT(ABC):
         """
         raise NotImplementedError
 
+    @abstractmethod
+    def encrypt(
+        self,
+        payload: dict[str, Any] | str,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Encrypt payload using JWE.
+
+        Creates JWE or JWS+JWE token (sign then encrypt).
+
+        Args:
+            payload: Data to encrypt. If dict, will be JSON encoded.
+            header: Additional JWE header.
+
+        Returns:
+            str: Encrypted JWT (JWE or JWS+JWE).
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def decrypt(self, token: str) -> dict[str, Any]:
+        """Decrypt JWE or JWS+JWE token.
+
+        Args:
+            token: Encrypted JWT token.
+
+        Returns:
+            dict[str, Any]: Decrypted payload.
+
+        Raises:
+            ValueError: If token is invalid or decryption fails.
+        """
+        raise NotImplementedError
+
 
 class BaseJWS(ABC):
     """Base JSON Web Signature - RFC 7515."""
@@ -117,7 +153,7 @@ class BaseJWS(ABC):
         Returns:
             dict[str, Any]: Parsed JWS with keys:
                 - header: Protected header dict
-                - payload: Decoded payload (str or dict)
+                - payload: Decoded payload bytes
                 - signature: Raw signature bytes
 
         Raises:
@@ -127,30 +163,185 @@ class BaseJWS(ABC):
 
 
 class BaseJWK(ABC):
-    """Base JWK."""
+    """JSON Web Key - RFC 7517."""
 
-    __storage: BaseStorage
-
-    @classmethod
+    @staticmethod
     @abstractmethod
-    def get(cls, name: str) -> BaseJWK:
-        """Get key from storage.
+    def validate(data: dict[str, Any]) -> BaseJWK:
+        """Validate and create JWK from dict.
 
         Args:
-            name (str): Key name
+            data: JWK dict to validate.
 
         Returns:
-            BaseJWK: JSON Web Key
+            JWK instance.
+
+        Raises:
+            ValueError: If JWK is invalid.
         """
         raise NotImplementedError
 
-    @property
+    @classmethod
     @abstractmethod
-    def store(self) -> None:
-        """Store key in storage.
+    def from_dict(cls, data: dict[str, Any]) -> BaseJWK:
+        """Create JWK from dict.
 
         Args:
-            name (str): Key name
-            key (BaseJWK): JSON Web Key
+            data: JWK dict.
+
+        Returns:
+            JWK instance.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def to_dict(self) -> dict[str, Any]:
+        """Convert JWK to dict.
+
+        Returns:
+            JWK dict.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def sign(self, data: bytes, alg: str | None = None) -> str:
+        """Sign data using JWK.
+
+        Args:
+            data: Data to sign.
+            alg: Algorithm to use. If None, uses default for kty.
+
+        Returns:
+            JWS compact serialization string.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def verify(self, token: str, alg: str | None = None) -> dict[str, Any]:
+        """Verify JWS token and return payload.
+
+        Args:
+            token: JWS compact serialization token.
+            alg: Algorithm to use. If None, uses default for kty.
+
+        Returns:
+            dict with 'header' and 'payload' keys.
+        """
+        raise NotImplementedError
+
+
+class BaseJWKSet(ABC):
+    """JWK Set - RFC 7517 Section 5."""
+
+    @abstractmethod
+    def get_by_kid(self, kid: str) -> dict[str, Any] | None:
+        """Get JWK by key ID (kid).
+
+        Args:
+            kid (str): Key ID to search for.
+
+        Returns:
+            dict[str, Any] | None: JWK dict if found, None otherwise.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_by_kty(self, kty: str) -> list[dict[str, Any]]:
+        """Get all JWKs by key type.
+
+        Args:
+            kty (str): Key type (RSA, EC, oct).
+
+        Returns:
+            list[dict[str, Any]]: List of matching JWK dicts.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def filter(self, **criteria: Any) -> list[dict[str, Any]]:
+        """Filter JWKs by criteria.
+
+        Args:
+            **criteria: Filter criteria (kty, use, alg, key_ops, kid).
+
+        Returns:
+            list[dict[str, Any]]: List of matching JWK dicts.
+        """
+        raise NotImplementedError
+
+
+class BaseJWKStorage(ABC):
+    """Base JWK Storage."""
+
+    @abstractmethod
+    def get(self, name: str) -> dict[str, Any] | None:
+        """Get a key by name.
+
+        Args:
+            name (str): The name of the key to retrieve.
+
+        Returns:
+            dict[str, Any] | None: JWK dict if found.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def store(self, name: str, jwk: dict[str, Any]) -> None:
+        """Store a JWK with the given name.
+
+        Args:
+            name (str): The name of the key to store.
+            jwk (dict[str, Any]): JWK dict to store.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def delete(self, name: str) -> None:
+        """Delete a key by name.
+
+        Args:
+            name (str): The name of the key to delete.
+        """
+        raise NotImplementedError
+
+
+class BaseJWE(ABC):
+    """Base JSON Web Encryption - RFC 7516."""
+
+    @abstractmethod
+    def encrypt(
+        self,
+        plaintext: bytes | str,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Encrypt plaintext.
+
+        Produces JWE Compact Serialization:
+        BASE64URL(header).BASE64URL(encrypted_key).BASE64URL(iv).BASE64URL(ciphertext).BASE64URL(tag)
+
+        Args:
+            plaintext: Data to encrypt. If str, will be encoded to UTF-8.
+            header: JWE header (must include 'alg' and 'enc').
+
+        Returns:
+            JWE compact serialization string.
+
+        Raises:
+            JamJWEEncryptionError: If encryption fails.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def decrypt(self, token: str) -> bytes:
+        """Decrypt JWE token.
+
+        Args:
+            token: JWE compact serialization string.
+
+        Returns:
+            Decrypted plaintext bytes.
+
+        Raises:
+            JamJWEDecryptionError: If decryption fails.
         """
         raise NotImplementedError
