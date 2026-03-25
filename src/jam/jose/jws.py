@@ -1,56 +1,52 @@
 # -*- coding: utf-8 -*-
 
-import hashlib
-import hmac
 import json
 from typing import Any
 
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric import ec, padding
-from cryptography.hazmat.primitives.serialization import (
-    load_pem_private_key,
-    load_pem_public_key,
+from jam.exceptions import JamJWSVerificationError, JamJWTUnsupportedAlgorithm
+from jam.jose.__algorithms__ import (
+    SUPPORTED_ALGORITHMS,
+    KeyLike,
+    create_algorithm,
 )
-
-from jam.exceptions import JamJWTUnsupportedAlgorithm
-from jam.jose.__algorithms__ import SUPPORTED_ALGORITHMS
 from jam.jose.__base__ import BaseJWS
 from jam.jose.utils import __base64url_decode__, __base64url_encode__
+from jam.logger import BaseLogger, logger
 
 
 class JWS(BaseJWS):
-    """JWS (JSON Web Signature) implementation."""
+    """JWS (JSON Web Signature) implementation - RFC 7515."""
 
     _SUPPORTED_ALGORITHMS = SUPPORTED_ALGORITHMS
 
     def __init__(
         self,
         alg: str,
-        key: str | bytes,
+        key: KeyLike,
+        password: bytes | None = None,
+        logger: BaseLogger = logger,
     ) -> None:
         """Initialize the JWS object.
 
         Args:
             alg (str): Algorithm name
-            key (str | bytes): Key to use for signing/verifying
+            key (KeyLike): Key to use for signing/verifying
+            password (bytes | None): Password for encrypted private keys
+            logger (BaseLogger): Logger instance
         """
         self._alg = alg.upper()
         self._validate_algorithm(self._alg)
 
-        if isinstance(key, str):
-            key = key.encode()
-
         self._key = key
+        self._password = password
+        self._logger = logger
 
-        self._private_key = None
-        self._public_key = None
-
-        if self._alg.startswith(("RS", "PS", "ES")):
-            try:
-                self._private_key = load_pem_private_key(key, password=None)
-                self._public_key = self._private_key.public_key()
-            except Exception:
-                self._public_key = load_pem_public_key(key)
+        self._algorithm = create_algorithm(
+            alg=self._alg,
+            secret=key,
+            password=password,
+            logger=logger,
+        )
 
     def _validate_algorithm(self, alg: str) -> None:
         """Validate algorithm name.
@@ -69,146 +65,91 @@ class JWS(BaseJWS):
                 }
             )
 
-    def _hash(self):
-        return {
-            "256": hashes.SHA256(),
-            "384": hashes.SHA384(),
-            "512": hashes.SHA512(),
-        }[self._alg[-3:]]
-
-    def _sign_bytes(self, signing_input: bytes) -> bytes:
-        if self._alg.startswith("HS"):
-            digestmod = {
-                "256": hashlib.sha256,
-                "384": hashlib.sha384,
-                "512": hashlib.sha512,
-            }[self._alg[-3:]]
-            return hmac.new(self._key, signing_input, digestmod).digest()
-
-        elif self._alg.startswith("RS"):
-            if not self._private_key:
-                raise ValueError("Private key required for signing")
-            return self._private_key.sign(  # type: ignore
-                signing_input,
-                padding.PKCS1v15(),  # type: ignore
-                self._hash(),  # type: ignore
-            )
-
-        elif self._alg.startswith("PS"):
-            if not self._private_key:
-                raise ValueError("Private key required for signing")
-            return self._private_key.sign(  # type: ignore
-                signing_input,
-                padding.PSS(  # type: ignore
-                    mgf=padding.MGF1(self._hash()),
-                    salt_length=padding.PSS.MAX_LENGTH,
-                ),
-                self._hash(),  # type: ignore
-            )
-
-        elif self._alg.startswith("ES"):
-            if not self._private_key:
-                raise ValueError("Private key required for signing")
-            return self._private_key.sign(  # type: ignore
-                signing_input,
-                ec.ECDSA(self._hash()),  # type: ignore
-            )
-
-        raise ValueError("Unsupported algorithm")
-
-    def _verify_bytes(self, signing_input: bytes, signature: bytes) -> None:
-        if self._alg.startswith("HS"):
-            digestmod = {
-                "256": hashlib.sha256,
-                "384": hashlib.sha384,
-                "512": hashlib.sha512,
-            }[self._alg[-3:]]
-            expected = hmac.new(self._key, signing_input, digestmod).digest()
-            if not hmac.compare_digest(expected, signature):
-                raise Exception("Invalid signature")
-
-        elif self._alg.startswith("RS"):
-            self._public_key.verify(  # type: ignore
-                signature,
-                signing_input,
-                padding.PKCS1v15(),  # type: ignore
-                self._hash(),  # type: ignore
-            )
-
-        elif self._alg.startswith("PS"):
-            self._public_key.verify(  # type: ignore
-                signature,
-                signing_input,
-                padding.PSS(  # type: ignore
-                    mgf=padding.MGF1(self._hash()),
-                    salt_length=padding.PSS.MAX_LENGTH,
-                ),
-                self._hash(),  # type: ignore
-            )
-
-        elif self._alg.startswith("ES"):
-            self._public_key.verify(  # type: ignore
-                signature,
-                signing_input,
-                ec.ECDSA(self._hash()),  # type: ignore
-            )
-
-    def sign(self, header: dict[str, Any] | None, data: dict[str, Any]) -> str:
-        """Sign the given data and return the JWS.
+    def serialize_compact(
+        self,
+        protected: dict[str, Any],
+        payload: bytes | str,
+    ) -> str:
+        """Create JWS Compact Serialization.
 
         Args:
-            header (dict[str, Any] | None): The header to include in the JWS.
-            data (dict[str, Any]): The data to sign.
+            protected (dict[str, Any]): Protected header (must include 'alg').
+            payload (bytes | str): Payload to sign. If dict, will be JSON encoded.
 
         Returns:
-            str: The JWS.
+            str: JWS in compact serialization format:
+                 BASE64URL(protected).BASE64URL(payload).BASE64URL(signature)
         """
-        _header = {
-            "alg": self._alg,
-        }
-        if header:
-            _header.update(header)
+        _protected = {"alg": self._alg, **protected}
 
-        header_b64 = __base64url_encode__(
-            json.dumps(_header, separators=(",", ":")).encode()
-        )
-        payload_b64 = __base64url_encode__(
-            json.dumps(data, separators=(",", ":")).encode()
+        protected_b64 = __base64url_encode__(
+            json.dumps(_protected, separators=(",", ":")).encode()
         )
 
-        signing_input = f"{header_b64}.{payload_b64}".encode()
-        signature = self._sign_bytes(signing_input)
+        if isinstance(payload, dict):
+            payload_bytes = json.dumps(payload, separators=(",", ":")).encode()
+        elif isinstance(payload, str):
+            payload_bytes = payload.encode()
+        else:
+            payload_bytes = payload
+        payload_b64 = __base64url_encode__(payload_bytes)
 
-        return f"{header_b64}.{payload_b64}.{__base64url_encode__(signature)}"
+        signing_input = f"{protected_b64}.{payload_b64}".encode()
+        signature_b64 = self._algorithm.sign(signing_input)
 
-    def verify(self, jws: str, verify: bool = True) -> dict[str, Any]:
-        """Verify the given JWS against the given data.
+        return f"{protected_b64}.{payload_b64}.{signature_b64}"
+
+    def deserialize_compact(
+        self,
+        s: str,
+        validate: bool = True,
+    ) -> dict[str, Any]:
+        """Parse JWS Compact Serialization.
 
         Args:
-            jws (str): The JWS to verify.
-            verify (bool, optional): Whether to verify the JWS. Defaults to True.
+            s (str): JWS in compact serialization format.
+            validate (bool): Whether to validate signature. Defaults to True.
 
         Returns:
-            dict[str, Any]: The verified data.
+            dict[str, Any]: Parsed JWS with keys:
+                - header: Protected header dict
+                - payload: Decoded payload bytes
+                - signature: Raw signature bytes
 
         Raises:
-            JamJWSVerificationError: If the JWS verification fails.
+            JamJWSVerificationError: If validation fails or format is invalid.
         """
         try:
-            header_b64, payload_b64, signature_b64 = jws.split(".")
+            protected_b64, payload_b64, signature_b64 = s.split(".")
         except ValueError:
-            raise Exception("Invalid JWS format")
+            raise JamJWSVerificationError(
+                details={"reason": "invalid_jws_format"}
+            )
 
-        signing_input = f"{header_b64}.{payload_b64}".encode()
+        header = json.loads(__base64url_decode__(protected_b64).decode())
+        header_alg = header.get("alg")
+        if header_alg != self._alg:
+            raise JamJWSVerificationError(
+                details={
+                    "reason": "algorithm_mismatch",
+                    "expected": self._alg,
+                    "got": header_alg,
+                }
+            )
+
         signature = __base64url_decode__(signature_b64)
 
-        if verify:
+        if validate:
+            signing_input = f"{protected_b64}.{payload_b64}".encode()
             try:
-                self._verify_bytes(signing_input, signature)
-            except Exception as e:
-                raise Exception("Signature verification failed") from e
+                self._algorithm.verify(signature, signing_input, self._key)
+            except ValueError:
+                raise JamJWSVerificationError(
+                    details={"reason": "signature_verification_failed"}
+                )
 
         return {
-            "header": json.loads(__base64url_decode__(header_b64).decode()),
-            "payload": json.loads(__base64url_decode__(payload_b64).decode()),
+            "header": header,
+            "payload": __base64url_decode__(payload_b64),
+            "signature": signature,
         }
