@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
-"""All Jam exceptions
-"""
+"""All Jam exceptions"""
 
 from .base import JamConfigurationError, JamError, JamValidationError
-from .jose import JamJWSVerificationError
+from .jose import (
+    JamJWEEncryptionError,
+    JamJWEDecryptionError,
+    JamJWKValidationError,
+    JamJWSVerificationError,
+)
 from .jwt import (
     JamJWTEmptyPrivateKey,
     JamJWTEmptySecretKey,
@@ -57,6 +61,9 @@ __all__ = [
     "JamJWTUnsupportedAlgorithm",
     "JamJWTValidationError",
     "JamJWSVerificationError",
+    "JamJWKValidationError",
+    "JamJWEEncryptionError",
+    "JamJWEDecryptionError",
     "JamPASETOInvalidSymmetricKey",
     "JamPASETOInvalidRSAKey",
     "JamPASETOInvalidED25519Key",
