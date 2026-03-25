@@ -176,3 +176,4 @@ debug*
 :memory:
 .ruff_cache/
 sessions.json
+*.bak
