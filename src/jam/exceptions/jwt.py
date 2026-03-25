@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .base import JamError, JamValidationError, JamConfigurationError
+from .base import JamConfigurationError, JamError, JamValidationError
 
 
 class JamJWTExpired(JamError):
@@ -24,7 +24,9 @@ class JamJWTEmptySecretKey(JamConfigurationError):
 
 
 class JamJWTEmptyPrivateKey(JamConfigurationError):
-    default_message = "For asymmetric encryption, you must specify `private_key`."
+    default_message = (
+        "For asymmetric encryption, you must specify `private_key`."
+    )
     default_code = "jwt.config.empty_private_key"
 
 
