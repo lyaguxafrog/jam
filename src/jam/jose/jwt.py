@@ -167,15 +167,31 @@ class JWT(BaseJWT):
             case "redis":
                 from jam.jose.lists.redis import RedisList
 
-                list_config.pop("backend")
-                return RedisList(**list_config)
+                return RedisList(
+                    type=list_config.get("type", "black"),
+                    prefix=list_config.get("prefix", "jwt_list"),
+                    redis_uri=list_config.get("redis_uri"),
+                    ttl=list_config.get("ttl"),
+                )
             case "json":
                 from jam.jose.lists.json import JSONList
 
-                list_config.pop("backend")
-                return JSONList(**list_config)
+                return JSONList(
+                    type=list_config.get("type", "black"),
+                    prefix=list_config.get("prefix", "jwt_list"),
+                    json_path=list_config.get("json_path", "whitelist.json"),
+                )
+            case "memory":
+                from jam.jose.lists.memory import MemoryList
+
+                return MemoryList(
+                    type=list_config.get("type", "black"),
+                    prefix=list_config.get("prefix", "jwt_list"),
+                )
             case _:
-                raise ValueError(f"Unknown list type: {list_config['type']}")
+                raise ValueError(
+                    f"Unknown list backend: {list_config['backend']}"
+                )
 
     def _validate_algorithm(self, alg: str) -> None:
         """Validate JWS algorithm."""
@@ -280,6 +296,7 @@ class JWT(BaseJWT):
         exp: bool = False,
         nbf: bool = False,
         include_headers: bool = False,
+        check_list: bool = False,
     ) -> dict[str, Any]:
         """Decode the JWT and return the payload (JWS).
 
@@ -288,12 +305,15 @@ class JWT(BaseJWT):
             exp (bool): Whether to check the expiration time. Defaults to False.
             nbf (bool): Whether to check the not-before time. Defaults to False.
             include_headers (bool): Whether to include the headers in the result. Defaults to False.
+            check_list (bool): Whether to check token in list. Defaults to False.
 
         Returns:
             dict[str, Any]: The decoded payload.
 
         Raises:
             ValueError: If alg is not provided.
+            JamJWTInBlackList: If token is in blacklist and check_list is True.
+            JamJWTNotInWhiteList: If token is not in whitelist and check_list is True.
         """
         if not self.jws:
             raise ValueError("JWS not configured. Provide 'alg' parameter.")
@@ -310,6 +330,19 @@ class JWT(BaseJWT):
             token_nbf = data["payload"]["nbf"]
             if token_nbf < int(datetime.now().timestamp()):
                 raise ValueError("Token is not yet valid")
+
+        if check_list and self.list:
+            is_in_list = self.list.check(token)
+            if hasattr(self.list, "_type"):
+                if self.list._type == "black" and is_in_list:
+                    from jam.exceptions import JamJWTInBlackList
+
+                    raise JamJWTInBlackList()
+                elif self.list._type == "white" and not is_in_list:
+                    from jam.exceptions import JamJWTNotInWhiteList
+
+                    raise JamJWTNotInWhiteList()
+
         if include_headers:
             return data
         return data["payload"]
