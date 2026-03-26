@@ -20,7 +20,7 @@ from jam.__deprecated__ import deprecated
 from jam.jwt.lists.__base__ import BaseJWTList
 
 
-@deprecated()
+@deprecated("Use jam.jose.lists.JSONList")
 class JSONList(BaseJWTList):
     """Black/White list in JSON format, not recommended for blacklists  because it is not convenient to control token lifetime.
 
