@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import datetime
 from typing import Literal
 
 from jam.logger import BaseLogger
@@ -20,92 +19,143 @@ from jam.jose.lists.__base__ import BaseJWTList
 
 
 class RedisList(BaseJWTList):
-    """Black/White lists in Redis, most optimal format.
+    """Redis-based JWT black/white list.
+
+    Most optimal for production use with TTL support.
 
     Dependency required: `pip install jamlib[redis]`
 
     Attributes:
-        __list__ (Redis): Redis instance
-        exp (int | None): Token lifetime
+        _redis (Redis): Redis instance.
+        _prefix (str): Key prefix.
+
+    Methods:
+        add: add single token to list
+        add_many: add multiple tokens to list
+        check: check if token exists in list
+        check_many: check multiple tokens in list
+        delete: remove token from list
+        delete_many: remove multiple tokens from list
     """
 
     def __init__(
         self,
         type: Literal["white", "black"],
-        redis_uri: str | Redis,
-        in_list_life_time: int | None = None,
+        prefix: str = "jwt_list",
+        redis_uri: str | Redis | None = None,
+        redis: Redis | None = None,
+        ttl: int | None = None,
         logger: BaseLogger | None = None,
     ) -> None:
-        """Class constructor.
+        """Initialize RedisList.
 
         Args:
-            type (Literal["white", "black"]): Type og list
-            redis_uri (str): Uri to redis connect
-            in_list_life_time (int | None): The lifetime of a token in the list
-            logger (Optional[BaseLogger], optional): Logger instance. Defaults to None.
+            type (Literal["white", "black"]): Type of list.
+            prefix (str): Key prefix for Redis keys.
+            redis_uri (str | Redis): Redis connection URI or Redis instance.
+            redis (Redis | None): Redis instance (alias for redis_uri).
+            ttl (int | None): Token TTL in seconds.
+            logger (BaseLogger | None): Logger instance.
         """
-        super().__init__(list_type=type)
-        if isinstance(redis_uri, str):
-            self.__list__ = Redis.from_url(redis_uri, decode_responses=True)
+        self._prefix = prefix
+        self._ttl = ttl
+        self._type = type
+
+        if isinstance(redis_uri, Redis):
+            self._redis = redis_uri
+        elif isinstance(redis, Redis):
+            self._redis = redis
+        elif redis_uri:
+            self._redis = Redis.from_url(redis_uri, decode_responses=True)
+        elif redis:
+            self._redis = redis
         else:
-            self.__list__ = redis_uri
-        self.exp = in_list_life_time
+            raise ValueError("redis_uri or redis must be provided")
+
         self._logger = logger
+        if self._logger:
+            self._logger.info(
+                f"Initialized RedisList with type={type}, prefix={prefix}, ttl={ttl}"
+            )
+
+    def _make_key(self, token: str) -> str:
+        """Create Redis key with prefix."""
+        return f"{self._prefix}:{token}"
 
     def add(self, token: str) -> None:
-        """Method for adding token to list.
+        """Add a single token to the list.
 
         Args:
-            token (str): Your JWT token
-
-        Returns:
-            (None)
+            token (str): JWT token.
         """
-        self.__list__.set(
-            name=token, value=str(datetime.datetime.now()), ex=self.exp
-        )
+        self._redis.set(self._make_key(token), "1", ex=self._ttl)
         if self._logger:
-            self._logger.info("Set token in list.")
-            self._logger.debug(f"Set {token} in list")
-        return None
+            self._logger.debug(f"Added token to {self._prefix} list")
+
+    def add_many(self, tokens: list[str]) -> None:
+        """Add multiple tokens to the list.
+
+        Args:
+            tokens (list[str]): List of JWT tokens.
+        """
+        if not tokens:
+            return
+        pipe = self._redis.pipeline()
+        for token in tokens:
+            pipe.set(self._make_key(token), "1", ex=self._ttl)
+        pipe.execute()
+        if self._logger:
+            self._logger.debug(
+                f"Added {len(tokens)} tokens to {self._prefix} list"
+            )
 
     def check(self, token: str) -> bool:
-        """Method for checking if a token is present in the list.
+        """Check if a token is present in the list.
 
         Args:
-            token (str): Your JWT token
+            token (str): JWT token.
 
         Returns:
-            (bool)
+            bool: True if token exists in list.
         """
-        if self._logger:
-            self._logger.debug(
-                f"Checking token in {self.__list_type__} list (token length: {len(token)} chars)"
-            )
-        _token = self.__list__.get(name=token)
-        result = bool(_token)
-        if self._logger:
-            self._logger.debug(
-                f"Token {'found' if result else 'not found'} in {self.__list_type__} list"
-            )
-        return result
+        return bool(self._redis.exists(self._make_key(token)))
+
+    def check_many(self, tokens: list[str]) -> dict[str, bool]:
+        """Check multiple tokens in the list.
+
+        Args:
+            tokens (list[str]): List of JWT tokens.
+
+        Returns:
+            dict[str, bool]: Mapping of token to presence.
+        """
+        if not tokens:
+            return {}
+        keys = [self._make_key(t) for t in tokens]
+        exists = self._redis.exists(*keys)
+        return {token: bool(result) for token, result in zip(tokens, exists)}
 
     def delete(self, token: str) -> None:
-        """Method for removing a token from a list.
+        """Remove a token from the list.
 
         Args:
-            token (str): Your JWT token
-
-        Returns:
-            None
+            token (str): JWT token.
         """
+        self._redis.delete(self._make_key(token))
+        if self._logger:
+            self._logger.debug(f"Deleted token from {self._prefix} list")
+
+    def delete_many(self, tokens: list[str]) -> None:
+        """Remove multiple tokens from the list.
+
+        Args:
+            tokens (list[str]): List of JWT tokens.
+        """
+        if not tokens:
+            return
+        keys = [self._make_key(t) for t in tokens]
+        self._redis.delete(*keys)
         if self._logger:
             self._logger.debug(
-                f"Deleting token from {self.__list_type__} list (token length: {len(token)} chars)"
+                f"Deleted {len(tokens)} tokens from {self._prefix} list"
             )
-        deleted_count = self.__list__.delete(token)
-        if self._logger:
-            self._logger.debug(
-                f"Token removed from {self.__list_type__} list, deleted {deleted_count} key(s)"
-            )
-        return None
