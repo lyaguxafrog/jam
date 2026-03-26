@@ -20,7 +20,7 @@ from jam.__deprecated__ import deprecated
 from jam.jwt.lists.__base__ import BaseJWTList
 
 
-@deprecated()
+@deprecated("Use jam.jose.lists.RedisList")
 class RedisList(BaseJWTList):
     """Black/White lists in Redis, most optimal format.
 

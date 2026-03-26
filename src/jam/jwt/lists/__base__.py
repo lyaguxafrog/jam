@@ -6,7 +6,7 @@ from typing import Literal
 from jam.__deprecated__ import deprecated
 
 
-@deprecated()
+@deprecated("Use jam.jose.lists.BaseJWTList")
 class BaseJWTList(ABC):
     """Abstract class for lists manipulation."""
 
