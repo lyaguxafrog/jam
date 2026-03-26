@@ -7,21 +7,34 @@ from typing import Literal
 class BaseJWTList(ABC):
     """Abstract class for lists manipulation."""
 
-    def __init__(self, list_type: Literal["white", "black"]) -> None:
-        """Class constructor."""
-        self.__list_type__ = list_type
+    __list_type__: Literal["black", "white"]
 
     @abstractmethod
     def add(self, token: str) -> None:
-        """Method for adding token to list."""
+        """Add a single token to the list."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def add_many(self, tokens: list[str]) -> None:
+        """Add multiple tokens to the list."""
         raise NotImplementedError
 
     @abstractmethod
     def check(self, token: str) -> bool:
-        """Method for checking if a token is present in the list."""
+        """Check if a token is present in the list."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def check_many(self, tokens: list[str]) -> dict[str, bool]:
+        """Check multiple tokens in the list."""
         raise NotImplementedError
 
     @abstractmethod
     def delete(self, token: str) -> None:
-        """Method for removing a token from a list."""
+        """Remove a single token from the list."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def delete_many(self, tokens: list[str]) -> None:
+        """Remove multiple tokens from the list."""
         raise NotImplementedError
