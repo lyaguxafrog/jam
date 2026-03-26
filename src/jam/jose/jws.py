@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from jam.exceptions import JamJWSVerificationError, JamJWTUnsupportedAlgorithm
 from jam.jose.__algorithms__ import (
@@ -14,6 +14,10 @@ from jam.jose.utils import __base64url_decode__, __base64url_encode__
 from jam.logger import BaseLogger, logger
 
 
+if TYPE_CHECKING:
+    from jam.jose.jwk import JWK
+
+
 class JWS(BaseJWS):
     """JWS (JSON Web Signature) implementation - RFC 7515."""
 
@@ -22,7 +26,7 @@ class JWS(BaseJWS):
     def __init__(
         self,
         alg: str,
-        key: KeyLike,
+        key: KeyLike | "JWK",
         password: bytes | None = None,
         logger: BaseLogger = logger,
     ) -> None:
@@ -30,12 +34,17 @@ class JWS(BaseJWS):
 
         Args:
             alg (str): Algorithm name
-            key (KeyLike): Key to use for signing/verifying
+            key (KeyLike | JWK): Key to use for signing/verifying
             password (bytes | None): Password for encrypted private keys
             logger (BaseLogger): Logger instance
         """
+        from jam.jose.jwk import JWK as JWKClass
+
         self._alg = alg.upper()
         self._validate_algorithm(self._alg)
+
+        if isinstance(key, JWKClass):
+            key = key._to_keylike()
 
         self._key = key
         self._password = password
@@ -153,3 +162,31 @@ class JWS(BaseJWS):
             "payload": __base64url_decode__(payload_b64),
             "signature": signature,
         }
+
+    def sign(
+        self,
+        header: dict[str, Any],
+        data: bytes | str | dict[str, Any],
+    ) -> str:
+        """Sign data and return JWS compact serialization.
+
+        Args:
+            header: Protected header (alg will be added automatically).
+            data: Data to sign. If dict, will be JSON encoded.
+
+        Returns:
+            JWS compact serialization string.
+        """
+        return self.serialize_compact(protected=header, payload=data)
+
+    def verify(self, token: str, validate: bool = True) -> dict[str, Any]:
+        """Verify and parse JWS token.
+
+        Args:
+            token: JWS compact serialization string.
+            validate: Whether to validate signature.
+
+        Returns:
+            dict with 'header', 'payload', 'signature' keys.
+        """
+        return self.deserialize_compact(s=token, validate=validate)
