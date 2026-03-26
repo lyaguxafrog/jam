@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import datetime
 from typing import Literal
 
 from jam.logger import BaseLogger
@@ -20,99 +19,118 @@ from jam.jose.lists.__base__ import BaseJWTList
 
 
 class JSONList(BaseJWTList):
-    """Black/White list in JSON format, not recommended for blacklists  because it is not convenient to control token lifetime.
+    """JSON file-based JWT black/white list.
 
-    Dependency required:
-    `pip install jamlib[json]`
+    Not recommended for blacklists - no TTL support, user must manage token lifetime.
+
+    Dependency required: `pip install jamlib[json]`
 
     Attributes:
-        __list__ (TinyDB): TinyDB instance
+        _db (TinyDB): TinyDB instance.
+        _prefix (str): Key prefix.
 
     Methods:
-        add: adding token to list
-        check: check token in list
-        delete: removing token from list
+        add: add single token to list
+        add_many: add multiple tokens to list
+        check: check if token exists in list
+        check_many: check multiple tokens in list
+        delete: remove token from list
+        delete_many: remove multiple tokens from list
     """
 
     def __init__(
         self,
         type: Literal["white", "black"],
+        prefix: str = "jwt_list",
         json_path: str = "whitelist.json",
         logger: BaseLogger | None = None,
     ) -> None:
-        """Class constructor.
+        """Initialize JSONList.
 
         Args:
-            type (Literal["white", "black"]): Type of list
-            json_path (str): Path to .json file
-            logger (Optional[BaseLogger], optional): Logger instance. Defaults to None.
+            type (Literal["white", "black"]): Type of list.
+            prefix (str): Key prefix (used for logging).
+            json_path (str): Path to JSON file.
+            logger (BaseLogger | None): Logger instance.
         """
-        super().__init__(list_type=type)
-        self.__list__ = TinyDB(json_path)
+        self._prefix = prefix
+        self._type = type
+        self._db = TinyDB(json_path)
         self._logger = logger
         if self._logger:
-            self._logger.info(f"Save JSON to: {json_path}")
+            self._logger.info(f"Initialized JSONList at {json_path}")
 
     def add(self, token: str) -> None:
-        """Method for adding token to list.
+        """Add a single token to the list.
 
         Args:
-            token (str): Your JWT token
-
-        Returns:
-            (None)
+            token (str): JWT token.
         """
-        _doc = {
-            "token": token,
-            "timestamp": datetime.datetime.now().timestamp(),
-        }
-
-        self.__list__.insert(_doc)
-
+        self._db.insert({"token": token})
         if self._logger:
-            self._logger.info("Set token in list.")
-            self._logger.debug(f"Set {token} in list")
-            self._logger.debug(f"JSON document: {_doc}")
-        return None
+            self._logger.debug(f"Added token to {self._prefix} list")
+
+    def add_many(self, tokens: list[str]) -> None:
+        """Add multiple tokens to the list.
+
+        Args:
+            tokens (list[str]): List of JWT tokens.
+        """
+        for token in tokens:
+            self._db.insert({"token": token})
+        if self._logger:
+            self._logger.debug(
+                f"Added {len(tokens)} tokens to {self._prefix} list"
+            )
 
     def check(self, token: str) -> bool:
-        """Method for checking if a token is present in list.
+        """Check if a token is present in the list.
 
         Args:
-            token (str): Your jwt token
+            token (str): JWT token.
 
         Returns:
-            (bool)
+            bool: True if token exists in list.
         """
-        if self._logger:
-            self._logger.debug(
-                f"Checking token in {self.__list_type__} list (token length: {len(token)} chars)"
-            )
         cond = Query()
-        _token = self.__list__.search(cond.token == token)
-        result = bool(_token)
-        if self._logger:
-            self._logger.debug(
-                f"Token {'found' if result else 'not found'} in {self.__list_type__} list"
-            )
+        return bool(self._db.search(cond.token == token))
+
+    def check_many(self, tokens: list[str]) -> dict[str, bool]:
+        """Check multiple tokens in the list.
+
+        Args:
+            tokens (list[str]): List of JWT tokens.
+
+        Returns:
+            dict[str, bool]: Mapping of token to presence.
+        """
+        result = {}
+        cond = Query()
+        for token in tokens:
+            result[token] = bool(self._db.search(cond.token == token))
         return result
 
     def delete(self, token: str) -> None:
-        """Method for removing token from list.
+        """Remove a token from the list.
 
         Args:
-            token (str): Your jwt token
-
-        Returns:
-            (None)
+            token (str): JWT token.
         """
-        if self._logger:
-            self._logger.debug(
-                f"Deleting token from {self.__list_type__} list (token length: {len(token)} chars)"
-            )
         cond = Query()
-        removed_count = self.__list__.remove(cond.token == token)
+        self._db.remove(cond.token == token)
+        if self._logger:
+            self._logger.debug(f"Deleted token from {self._prefix} list")
+
+    def delete_many(self, tokens: list[str]) -> None:
+        """Remove multiple tokens from the list.
+
+        Args:
+            tokens (list[str]): List of JWT tokens.
+        """
+        cond = Query()
+        for token in tokens:
+            self._db.remove(cond.token == token)
         if self._logger:
             self._logger.debug(
-                f"Token removed from {self.__list_type__} list, deleted {len(removed_count)} document(s)"
+                f"Deleted {len(tokens)} tokens from {self._prefix} list"
             )
