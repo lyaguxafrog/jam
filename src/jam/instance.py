@@ -147,7 +147,17 @@ class Jam(BaseJam):
             f"Verifying JWT token (length: {len(token)} chars), check_exp={check_exp}, check_list={check_list}"
         )
         assert self.jwt is not None
-        payload = self.jwt.decode(token, check_exp, check_nbf, include_headers)
+        data = self.jwt.decode(token, include_headers)
+
+        if include_headers:
+            payload = data
+        else:
+            payload = data
+            if isinstance(payload, bytes):
+                import json
+
+                payload = json.loads(payload)
+
         self._logger.debug(
             f"JWT token verified successfully, payload keys: {list(payload.keys())}"
         )
