@@ -293,10 +293,7 @@ class JWT(BaseJWT):
     def decode(
         self,
         token: str,
-        exp: bool = False,
-        nbf: bool = False,
         include_headers: bool = False,
-        check_list: bool = False,
     ) -> dict[str, Any]:
         """Decode the JWT and return the payload (JWS).
 
@@ -312,8 +309,6 @@ class JWT(BaseJWT):
 
         Raises:
             ValueError: If alg is not provided.
-            JamJWTInBlackList: If token is in blacklist and check_list is True.
-            JamJWTNotInWhiteList: If token is not in whitelist and check_list is True.
         """
         if not self.jws:
             raise ValueError("JWS not configured. Provide 'alg' parameter.")
@@ -322,27 +317,6 @@ class JWT(BaseJWT):
         header = data["header"]
         if header.get("typ") != "JWT":
             raise ValueError("Invalid token type")
-        if exp:
-            token_exp = data["payload"]["exp"]
-            if token_exp < int(datetime.now().timestamp()):
-                raise ValueError("Token has expired")
-        if nbf:
-            token_nbf = data["payload"]["nbf"]
-            if token_nbf < int(datetime.now().timestamp()):
-                raise ValueError("Token is not yet valid")
-
-        if check_list and self.list:
-            is_in_list = self.list.check(token)
-            if hasattr(self.list, "_type"):
-                if self.list._type == "black" and is_in_list:
-                    from jam.exceptions import JamJWTInBlackList
-
-                    raise JamJWTInBlackList()
-                elif self.list._type == "white" and not is_in_list:
-                    from jam.exceptions import JamJWTNotInWhiteList
-
-                    raise JamJWTNotInWhiteList()
-
         if include_headers:
             return data
         return data["payload"]
