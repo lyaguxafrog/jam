@@ -39,7 +39,7 @@ class MemoryList(BaseJWTList):
         """
         self._storage: dict[str, bool] = {}
         self._prefix = prefix
-        self._type = type
+        self.__list_type__ = type
         self._logger = logger
 
     def add(self, token: str) -> None:
