@@ -5,6 +5,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
+from jam.jose.lists.__base__ import BaseJWTList
+
 
 REGISTERED_HEADER_NAMES = frozenset(
     {
@@ -33,6 +35,7 @@ class BaseJWT(ABC):
     """Base JWT."""
 
     JWS: type[BaseJWS]
+    list: BaseJWTList | None = None
 
     @abstractmethod
     def encode(
@@ -65,8 +68,6 @@ class BaseJWT(ABC):
     def decode(
         self,
         token: str,
-        exp: bool = False,
-        nbf: bool = False,
         include_headers: bool = False,
     ) -> dict[str, Any]:
         """Decode the JWT and return the payload.
