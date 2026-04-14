@@ -68,6 +68,45 @@ class Jam(BaseAsyncJam):
 
         return token
 
+    async def jwt_encode(
+        self,
+        iss: str | None = None,
+        sub: str | None = None,
+        aud: str | None = None,
+        exp: int | None = None,
+        nbf: int | None = None,
+        *,
+        payload: dict[str, Any] | None = None,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Encode the JWT with the given expire, header, and payload.
+
+        Args:
+            exp (int | None): The expiration time in seconds.
+            nbf (int | None): The not-before time in seconds.
+            iss (str | None): The issuer.
+            sub (str | None): The subject.
+            aud (str | None): The audience.
+            header (dict[str, Any] | None): The header to include in the JWT.
+            payload (dict[str, Any] | None): The payload to include in the JWT.
+
+        Returns:
+            str: The encoded JWT.
+        """
+        assert self.jwt is not None
+        token = self.jwt.encode(
+            iss=iss,
+            sub=sub,
+            aud=aud,
+            exp=exp,
+            nbf=nbf,
+            payload=payload,
+            header=header,
+        )
+        if self.jwt.list and self.jwt.list.__list_type__ == "white":
+            self.jwt.list.add(token)
+        return token
+
     async def jwt_decode(
         self, token: str, check_exp: bool = True, check_list: bool = True
     ) -> dict[str, Any]:
