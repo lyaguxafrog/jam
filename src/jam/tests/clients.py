@@ -86,6 +86,34 @@ class TestJam(Jam):
         payload = payload | data
         return payload
 
+    def jwt_encode(
+        self,
+        iss: str | None = None,
+        sub: str | None = None,
+        aud: str | None = None,
+        exp: int | None = None,
+        nbf: int | None = None,
+        *,
+        payload: dict[str, Any] | None = None,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Encode the JWT with the given expire, header, and payload.
+
+        Args:
+            exp (int | None): The expiration time in seconds.
+            nbf (int | None): The not-before time in seconds.
+            iss (str | None): The issuer.
+            sub (str | None): The subject.
+            aud (str | None): The audience.
+            header (dict[str, Any] | None): The header to include in the JWT.
+            payload (dict[str, Any] | None): The payload to include in the JWT.
+
+        Returns:
+            str: The encoded JWT.
+        """
+        jwt_payload = self.jwt_make_payload(exp, payload or {})
+        return self.jwt_create_token(jwt_payload)
+
     def jwt_create_token(self, payload: dict[str, Any]) -> str:
         """Create JWT token.
 
@@ -499,6 +527,34 @@ class TestAsyncJam(AioJam):
         }
         payload = payload | data
         return payload
+
+    async def jwt_encode(
+        self,
+        iss: str | None = None,
+        sub: str | None = None,
+        aud: str | None = None,
+        exp: int | None = None,
+        nbf: int | None = None,
+        *,
+        payload: dict[str, Any] | None = None,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Encode the JWT with the given expire, header, and payload.
+
+        Args:
+            exp (int | None): The expiration time in seconds.
+            nbf (int | None): The not-before time in seconds.
+            iss (str | None): The issuer.
+            sub (str | None): The subject.
+            aud (str | None): The audience.
+            header (dict[str, Any] | None): The header to include in the JWT.
+            payload (dict[str, Any] | None): The payload to include in the JWT.
+
+        Returns:
+            str: The encoded JWT.
+        """
+        jwt_payload = await self.jwt_make_payload(exp, payload or {})
+        return await self.jwt_create_token(jwt_payload)
 
     async def jwt_create_token(self, payload: dict[str, Any]) -> str:
         """Create JWT token.
