@@ -100,6 +100,10 @@ class JWE(BaseJWE):
         try:
             if isinstance(plaintext, str):
                 plaintext_bytes = plaintext.encode("utf-8")
+            elif isinstance(plaintext, dict):
+                plaintext_bytes = json.dumps(
+                    plaintext, separators=(",", ":")
+                ).encode()
             else:
                 plaintext_bytes = plaintext
 
