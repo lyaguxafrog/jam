@@ -6,7 +6,7 @@ from typing import Any, Literal
 
 from jam.encoders import BaseEncoder, JsonEncoder
 from jam.exceptions import JamConfigurationError
-from jam.jwt.__base__ import BaseJWT
+from jam.jose.__base__ import BaseJWT
 from jam.logger import BaseLogger, JamLogger
 from jam.oauth2.__base__ import BaseOAuth2Client
 from jam.otp.__base__ import BaseOTP, OTPConfig
@@ -189,36 +189,41 @@ class BaseJam(ABC):
                 raise JamConfigurationError(message="Unknown OTP type.")
 
     @abstractmethod
-    def jwt_make_payload(
-        self, exp: int | None, data: dict[str, Any]
-    ) -> dict[str, Any]:
-        """Make JWT-specific payload.
+    def jwt_encode(
+        self,
+        iss: str | None = None,
+        sub: str | None = None,
+        aud: str | None = None,
+        exp: int | None = None,
+        nbf: int | None = None,
+        *,
+        payload: dict[str, Any] | None = None,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Encode the JWT with the given expire, header, and payload.
 
         Args:
-            exp (int | None): Token expire, if None -> use default
-            data (dict[str, Any]): Data to payload
+            exp (int | None): The expiration time in seconds.
+            nbf (int | None): The not-before time in seconds.
+            iss (str | None): The issuer.
+            sub (str | None): The subject.
+            aud (str | None): The audience.
+            header (dict[str, Any] | None): The header to include in the JWT.
+            payload (dict[str, Any] | None): The payload to include in the JWT.
 
         Returns:
-            dict[str, Any]: Payload
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def jwt_create(self, payload: dict[str, Any]) -> str:
-        """Create JWT token.
-
-        Args:
-            payload (dict[str, Any]): Data payload
-
-        Returns:
-            str: New token
-
+            str: The encoded JWT.
         """
         raise NotImplementedError
 
     @abstractmethod
     def jwt_decode(
-        self, token: str, check_exp: bool = True, check_list: bool = True
+        self,
+        token: str,
+        check_exp: bool = True,
+        check_list: bool = True,
+        check_nbf: bool = False,
+        include_headers: bool = False,
     ) -> dict[str, Any]:
         """Verify and decode JWT token.
 
@@ -226,6 +231,8 @@ class BaseJam(ABC):
             token (str): JWT token
             check_exp (bool): Check expire
             check_list (bool): Check white/black list. Docs: https://jam.makridenko.ru/jwt/lists/what/
+            check_nbf (bool): Check not-before time
+            include_headers (bool): Include headers in the decoded payload
 
         Returns:
             dict[str, Any]: Decoded payload
