@@ -54,7 +54,7 @@ class JSONList(BaseJWTList):
             logger (BaseLogger | None): Logger instance.
         """
         self._prefix = prefix
-        self._type = type
+        self.__list_type__ = type
         self._db = TinyDB(json_path)
         self._logger = logger
         if self._logger:

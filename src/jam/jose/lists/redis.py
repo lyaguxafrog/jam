@@ -59,7 +59,7 @@ class RedisList(BaseJWTList):
         """
         self._prefix = prefix
         self._ttl = ttl
-        self._type = type
+        self.__list_type__ = type
 
         if isinstance(redis_uri, Redis):
             self._redis = redis_uri
