@@ -46,6 +46,34 @@ class BaseAsyncJam(BaseJam):
         raise NotImplementedError
 
     @abstractmethod
+    async def jwt_encode(
+        self,
+        iss: str | None = None,
+        sub: str | None = None,
+        aud: str | None = None,
+        exp: int | None = None,
+        nbf: int | None = None,
+        *,
+        payload: dict[str, Any] | None = None,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Encode the JWT with the given expire, header, and payload.
+
+        Args:
+            exp (int | None): The expiration time in seconds.
+            nbf (int | None): The not-before time in seconds.
+            iss (str | None): The issuer.
+            sub (str | None): The subject.
+            aud (str | None): The audience.
+            header (dict[str, Any] | None): The header to include in the JWT.
+            payload (dict[str, Any] | None): The payload to include in the JWT.
+
+        Returns:
+            str: The encoded JWT.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
     async def jwt_decode(  # type: ignore[override]
         self, token: str, check_exp: bool = True, check_list: bool = True
     ) -> dict[str, Any]:
