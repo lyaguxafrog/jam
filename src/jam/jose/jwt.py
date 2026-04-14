@@ -77,7 +77,7 @@ class JWT(BaseJWT):
         self._key = self._normalize_key(secret_key)
         self._algorithm: BaseAlgorithm | None = None
 
-        if self._alg:
+        if self._alg and not self._enc:
             self._validate_algorithm(self._alg)
 
         if self._enc:
@@ -113,9 +113,28 @@ class JWT(BaseJWT):
     def _build_jws(self) -> BaseJWS:
         if not self._alg or not self._key:
             raise ValueError("JWS requires 'alg' and 'key'")
+
+        jws_alg = self._alg
+        jws_key = self._key
+
+        # TODO: Optimize this
+        if self._enc and jws_alg in (
+            "RS256",
+            "RS384",
+            "RS512",
+            "ES256",
+            "ES384",
+            "ES512",
+            "PS256",
+            "PS384",
+            "PS512",
+            "RSA-OAEP",
+        ):
+            jws_alg = "RS256"
+
         return self.JWS(
-            alg=self._alg,
-            key=self._key,
+            alg=jws_alg,
+            key=jws_key,
             password=self._password,
             logger=self._logger,
         )
@@ -127,11 +146,24 @@ class JWT(BaseJWT):
         alg = self._alg
         enc_key = self._key
 
-        if not alg or self._alg in ("HS256", "HS384", "HS512"):
+        if not alg:
             key_len = len(self._key) if isinstance(self._key, bytes) else 16
             alg = "A256KW" if key_len >= 32 else "A128KW"
-            if self._alg in ("HS256", "HS384", "HS512"):
-                enc_key = self._derive_encryption_key(self._key)
+        elif alg in ("HS256", "HS384", "HS512"):
+            alg = "A256KW" if len(self._key) >= 32 else "A128KW"
+            enc_key = self._derive_encryption_key(self._key)
+        elif alg in (  # TODO: and this
+            "RS256",
+            "RS384",
+            "RS512",
+            "ES256",
+            "ES384",
+            "ES512",
+            "PS256",
+            "PS384",
+            "PS512",
+        ):
+            alg = "RSA-OAEP"
 
         return self.JWE(
             alg=alg,
@@ -247,7 +279,7 @@ class JWT(BaseJWT):
             "sub": sub,
             "aud": aud,
             "exp": now + exp if exp else None,
-            "nbf": now + nbf if nbf else None,
+            "nbf": now + nbf if nbf is not None else None,
         }
         if data:
             payload.update(data)
@@ -385,12 +417,38 @@ class JWT(BaseJWT):
         if self._alg:
             if isinstance(plaintext, bytes):
                 plaintext = plaintext.decode("utf-8")
-            decoded = self.decode(plaintext)
-            if isinstance(decoded, bytes):
-                return self._serializer.loads(decoded)
-            return decoded
+
+            alg = self._alg
+            if alg in (  # TODO: and this
+                "RS256",
+                "RS384",
+                "RS512",
+                "ES256",
+                "ES384",
+                "ES512",
+                "PS256",
+                "PS384",
+                "PS512",
+                "RSA-OAEP",
+            ):
+                alg = "RS256"
+
+            original_alg = self.jws._alg
+            original_key = self.jws._key
+            self.jws._alg = alg
+            try:
+                decoded = self.jws.verify(plaintext, True)
+                payload = decoded.get("payload")
+                if isinstance(payload, bytes):
+                    return self._serializer.loads(payload)
+                return decoded
+            finally:
+                self.jws._alg = original_alg
+                self.jws._key = original_key
 
         try:
             return self._serializer.loads(plaintext)
         except (json.JSONDecodeError, UnicodeDecodeError):
+            if isinstance(plaintext, bytes):
+                plaintext = plaintext.decode("utf-8")
             return {"raw": plaintext}
