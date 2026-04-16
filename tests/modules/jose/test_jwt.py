@@ -1,0 +1,469 @@
+# -*- coding: utf-8 -*-
+
+import pytest
+import json
+import os
+import tempfile
+from jam.jose import JWT
+from jam.exceptions import JamJWTUnsupportedAlgorithm
+from jam.exceptions.jose import JamJWSVerificationError
+from jam.utils import generate_rsa_key_pair, generate_ecdsa_p384_keypair
+
+
+def decode_payload(jwt, token):
+    data = jwt.decode(token, include_headers=True)
+    if isinstance(data["payload"], bytes):
+        return json.loads(data["payload"])
+    return data["payload"]
+
+
+class TestJWTHS:
+    @pytest.fixture
+    def symmetric_key(self):
+        return "SOME_JWT_KEY_THIS_IS_MORE_THAN_16_BYTES"
+
+    @pytest.fixture
+    def jwt(self, symmetric_key):
+        return JWT(alg="HS256", secret_key=symmetric_key)
+
+    def test_encode(self, jwt):
+        token = jwt.encode(payload={"user_id": 123})
+        assert token.count(".") == 2
+        assert token.startswith("ey")
+
+    def test_encode_with_exp(self, jwt):
+        token = jwt.encode(exp=3600, payload={"user_id": 123})
+        decoded = decode_payload(jwt, token)
+        assert decoded["exp"] is not None
+        assert decoded["iat"] is not None
+
+    def test_encode_with_claims(self, jwt):
+        token = jwt.encode(
+            iss="issuer",
+            sub="subject",
+            aud="audience",
+            exp=3600,
+            nbf=0,
+            payload={"user_id": 123},
+        )
+        decoded = decode_payload(jwt, token)
+        assert decoded["iss"] == "issuer"
+        assert decoded["sub"] == "subject"
+        assert decoded["aud"] == "audience"
+        assert "nbf" in decoded
+
+    def test_decode(self, jwt):
+        token = jwt.encode(payload={"user_id": 123})
+        decoded = decode_payload(jwt, token)
+        assert decoded["user_id"] == 123
+
+    def test_decode_with_include_headers(self, jwt):
+        token = jwt.encode(payload={"user_id": 123})
+        decoded = jwt.decode(token, include_headers=True)
+        assert "header" in decoded
+        assert decoded["header"]["alg"] == "HS256"
+        assert "payload" in decoded
+
+    def test_tid_generated(self, jwt):
+        token = jwt.encode(payload={"data": "test"})
+        decoded = decode_payload(jwt, token)
+        assert "tid" in decoded
+        assert decoded["tid"] is not None
+
+
+class TestJWTHS384:
+    @pytest.fixture
+    def symmetric_key(self):
+        return "SOME_JWT_KEY_THIS_IS_MORE_THAN_24_BYTES_LONG"
+
+    @pytest.fixture
+    def jwt(self, symmetric_key):
+        return JWT(alg="HS384", secret_key=symmetric_key)
+
+    def test_encode_decode(self, jwt):
+        token = jwt.encode(payload={"data": "test"})
+        decoded = decode_payload(jwt, token)
+        assert decoded["data"] == "test"
+
+
+class TestJWTHS512:
+    @pytest.fixture
+    def symmetric_key(self):
+        return "SOME_JWT_KEY_THIS_IS_MORE_THAN_32_BYTES_LONG"
+
+    @pytest.fixture
+    def jwt(self, symmetric_key):
+        return JWT(alg="HS512", secret_key=symmetric_key)
+
+    def test_encode_decode(self, jwt):
+        token = jwt.encode(payload={"data": "test"})
+        decoded = decode_payload(jwt, token)
+        assert decoded["data"] == "test"
+
+
+class TestJWTRSA:
+    @pytest.fixture
+    def rsa_key_pair(self):
+        return generate_rsa_key_pair()
+
+    @pytest.fixture
+    def jwt(self, rsa_key_pair):
+        return JWT(alg="RS256", secret_key=rsa_key_pair["private"])
+
+    def test_encode_decode(self, jwt):
+        token = jwt.encode(payload={"user_id": 123})
+        decoded = decode_payload(jwt, token)
+        assert decoded["user_id"] == 123
+
+    def test_decode_with_public_key(self, rsa_key_pair):
+        jwt_private = JWT(alg="RS256", secret_key=rsa_key_pair["private"])
+        jwt_public = JWT(alg="RS256", secret_key=rsa_key_pair["public"])
+
+        token = jwt_private.encode(payload={"user_id": 123})
+        decoded = decode_payload(jwt_public, token)
+        assert decoded["user_id"] == 123
+
+
+class TestJWTRSAVariants:
+    @pytest.fixture
+    def rsa_key_pair(self):
+        return generate_rsa_key_pair()
+
+    def test_rs384(self, rsa_key_pair):
+        jwt = JWT(alg="RS384", secret_key=rsa_key_pair["private"])
+        token = jwt.encode(payload={"data": "test"})
+        decoded = decode_payload(jwt, token)
+        assert decoded["data"] == "test"
+
+    def test_rs512(self, rsa_key_pair):
+        jwt = JWT(alg="RS512", secret_key=rsa_key_pair["private"])
+        token = jwt.encode(payload={"data": "test"})
+        decoded = decode_payload(jwt, token)
+        assert decoded["data"] == "test"
+
+
+class TestJWTECDSA:
+    @pytest.fixture
+    def ecdsa_key_pair(self):
+        return generate_ecdsa_p384_keypair()
+
+    @pytest.fixture
+    def jwt(self, ecdsa_key_pair):
+        return JWT(alg="ES256", secret_key=ecdsa_key_pair["private"])
+
+    def test_encode_decode(self, jwt):
+        token = jwt.encode(payload={"user_id": 123})
+        decoded = decode_payload(jwt, token)
+        assert decoded["user_id"] == 123
+
+    def test_decode_with_public_key(self, ecdsa_key_pair):
+        jwt_private = JWT(alg="ES256", secret_key=ecdsa_key_pair["private"])
+        jwt_public = JWT(alg="ES256", secret_key=ecdsa_key_pair["public"])
+
+        token = jwt_private.encode(payload={"user_id": 123})
+        decoded = decode_payload(jwt_public, token)
+        assert decoded["user_id"] == 123
+
+
+class TestJWTECDSAVariants:
+    @pytest.fixture
+    def ecdsa_key_pair(self):
+        return generate_ecdsa_p384_keypair()
+
+    def test_es384(self, ecdsa_key_pair):
+        jwt = JWT(alg="ES384", secret_key=ecdsa_key_pair["private"])
+        token = jwt.encode(payload={"data": "test"})
+        decoded = decode_payload(jwt, token)
+        assert decoded["data"] == "test"
+
+    def test_es512(self, ecdsa_key_pair):
+        jwt = JWT(alg="ES512", secret_key=ecdsa_key_pair["private"])
+        token = jwt.encode(payload={"data": "test"})
+        decoded = decode_payload(jwt, token)
+        assert decoded["data"] == "test"
+
+
+class TestJWTJWE:
+    @pytest.fixture
+    def symmetric_key(self):
+        return "SOME_JWE_KEY_THIS_IS_32_BYTES_LONG"
+
+    def test_encrypt_decrypt_a128kw_a128cbc(self, symmetric_key):
+        jwt = JWT(enc="A128CBC-HS256", secret_key=symmetric_key)
+
+        ciphertext = jwt.encrypt({"user_id": 123})
+        assert ciphertext.count(".") == 4
+
+        decrypted = jwt.decrypt(ciphertext)
+        assert decrypted["user_id"] == 123
+
+    def test_encrypt_decrypt_a128kw_a256gcm(self, symmetric_key):
+        jwt = JWT(enc="A256GCM", secret_key=symmetric_key)
+
+        ciphertext = jwt.encrypt({"user_id": 123})
+        decrypted = jwt.decrypt(ciphertext)
+        assert decrypted["user_id"] == 123
+
+    def test_encrypt_decrypt_a256kw_a256gcm(self):
+        symmetric_key = "THIS_KEY_IS_MORE_THAN_32_BYTES_LONG"
+        jwt = JWT(enc="A256GCM", secret_key=symmetric_key)
+
+        ciphertext = jwt.encrypt({"user_id": 123})
+        decrypted = jwt.decrypt(ciphertext)
+        assert decrypted["user_id"] == 123
+
+    def test_encrypt_with_header(self, symmetric_key):
+        jwt = JWT(enc="A128CBC-HS256", secret_key=symmetric_key)
+
+        ciphertext = jwt.encrypt({"data": "test"}, {"kid": "my-key"})
+        decrypted = jwt.decrypt(ciphertext)
+        assert decrypted["data"] == "test"
+
+    def test_encrypt_string_payload(self, symmetric_key):
+        jwt = JWT(enc="A128CBC-HS256", secret_key=symmetric_key)
+
+        ciphertext = jwt.encrypt("plain text")
+        decrypted = jwt.decrypt(ciphertext)
+        assert decrypted.get("raw") == "plain text"
+
+
+class TestJWTJWERSA:
+    @pytest.fixture
+    def rsa_key_pair(self):
+        return generate_rsa_key_pair()
+
+    def test_encrypt_rsa_oaep_decrypt(self, rsa_key_pair):
+        jwt = JWT(
+            enc="A256GCM",
+            secret_key=rsa_key_pair["private"],
+        )
+
+        ciphertext = jwt.encrypt({"user_id": 123})
+        decrypted = jwt.decrypt(ciphertext)
+        assert decrypted["user_id"] == 123
+
+    def test_jws_jwe_sign_then_encrypt(self, rsa_key_pair):
+        jwt = JWT(
+            alg="RSA-OAEP",
+            enc="A256GCM",
+            secret_key=rsa_key_pair["private"],
+        )
+
+        token = jwt.encode(payload={"data": "secret"})
+        ciphertext = jwt.encrypt(token)
+
+        decrypted = jwt.decrypt(ciphertext)
+        assert decrypted["data"] == "secret"
+
+
+class TestJWTErrors:
+    def test_missing_alg_and_enc(self):
+        with pytest.raises(ValueError):
+            JWT(secret_key="some_key")
+
+    def test_invalid_algorithm(self):
+        with pytest.raises(JamJWTUnsupportedAlgorithm):
+            JWT(alg="INVALID", secret_key="some_key")
+
+    def test_invalid_enc_algorithm(self):
+        with pytest.raises(JamJWTUnsupportedAlgorithm):
+            JWT(enc="INVALID", secret_key="some_key")
+
+    def test_decode_without_jws_config(self):
+        jwt = JWT(enc="A128CBC-HS256", secret_key="some_key_32_bytes_long")
+        with pytest.raises(ValueError):
+            jwt.decode("some.token")
+
+    def test_encrypt_without_jwe_config(self):
+        jwt = JWT(alg="HS256", secret_key="some_key")
+        with pytest.raises(ValueError):
+            jwt.encrypt({"data": "test"})
+
+    def test_invalid_token_type(self):
+        jwt = JWT(
+            alg="HS256", secret_key="SOME_JWT_KEY_THIS_IS_MORE_THAN_16_BYTES"
+        )
+        token = jwt.encode(payload={"data": "test"})
+
+        parts = token.split(".")
+        header = json.loads(
+            __import__("base64").b64decode(parts[0] + "==").decode()
+        )
+        header["typ"] = "NOT_JWT"
+        import base64
+
+        new_header = (
+            base64.urlsafe_b64encode(json.dumps(header).encode())
+            .decode()
+            .rstrip("=")
+        )
+        new_token = f"{new_header}.{parts[1]}.{parts[2]}"
+
+        with pytest.raises(JamJWSVerificationError):
+            jwt.decode(new_token)
+
+
+class TestJWTListMemory:
+    def test_blacklist_add_and_check(self):
+        jwt = JWT(
+            alg="HS256",
+            secret_key="SOME_JWT_KEY_THIS_IS_MORE_THAN_16_BYTES",
+            list={"backend": "memory", "type": "black"},
+        )
+
+        token = jwt.encode(payload={"user_id": 123})
+        decoded = decode_payload(jwt, token)
+
+        jwt.list.add(decoded["tid"])
+
+        assert jwt.list.check(decoded["tid"]) is True
+
+    def test_whitelist_add_and_check(self):
+        jwt = JWT(
+            alg="HS256",
+            secret_key="SOME_JWT_KEY_THIS_IS_MORE_THAN_16_BYTES",
+            list={"backend": "memory", "type": "white"},
+        )
+
+        token = jwt.encode(payload={"user_id": 123})
+        decoded = decode_payload(jwt, token)
+
+        jwt.list.add(decoded["tid"])
+
+        assert jwt.list.check(decoded["tid"]) is True
+
+    def test_whitelist_not_exists(self):
+        jwt = JWT(
+            alg="HS256",
+            secret_key="SOME_JWT_KEY_THIS_IS_MORE_THAN_16_BYTES",
+            list={"backend": "memory", "type": "white"},
+        )
+
+        token = jwt.encode(payload={"user_id": 123})
+        decoded = decode_payload(jwt, token)
+
+        assert jwt.list.check(decoded["tid"]) is False
+
+
+class TestJWTListJSON:
+    def test_blacklist_json(self):
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".json", delete=False
+        ) as f:
+            json_path = f.name
+
+        try:
+            jwt = JWT(
+                alg="HS256",
+                secret_key="SOME_JWT_KEY_THIS_IS_MORE_THAN_16_BYTES",
+                list={
+                    "backend": "json",
+                    "type": "black",
+                    "json_path": json_path,
+                },
+            )
+
+            token = jwt.encode(payload={"user_id": 123})
+            decoded = decode_payload(jwt, token)
+
+            jwt.list.add(decoded["tid"])
+
+            assert jwt.list.check(decoded["tid"]) is True
+
+            jwt2 = JWT(
+                alg="HS256",
+                secret_key="SOME_JWT_KEY_THIS_IS_MORE_THAN_16_BYTES",
+                list={
+                    "backend": "json",
+                    "type": "black",
+                    "json_path": json_path,
+                },
+            )
+            assert jwt2.list.check(decoded["tid"]) is True
+        finally:
+            if os.path.exists(json_path):
+                os.remove(json_path)
+
+    def test_whitelist_json(self):
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".json", delete=False
+        ) as f:
+            json_path = f.name
+
+        try:
+            jwt = JWT(
+                alg="HS256",
+                secret_key="SOME_JWT_KEY_THIS_IS_MORE_THAN_16_BYTES",
+                list={
+                    "backend": "json",
+                    "type": "white",
+                    "json_path": json_path,
+                },
+            )
+
+            token = jwt.encode(payload={"user_id": 123})
+            decoded = decode_payload(jwt, token)
+
+            jwt.list.add(decoded["tid"])
+
+            assert jwt.list.check(decoded["tid"]) is True
+        finally:
+            if os.path.exists(json_path):
+                os.remove(json_path)
+
+
+class TestJWTJWKIntegration:
+    @pytest.fixture
+    def rsa_key_pair(self):
+        return generate_rsa_key_pair()
+
+    def test_jwk_with_jwt(self, rsa_key_pair):
+        jwt = JWT(alg="RS256", secret_key=rsa_key_pair["private"])
+        token = jwt.encode(payload={"user_id": 123})
+        decoded = decode_payload(jwt, token)
+        assert decoded["user_id"] == 123
+
+
+class TestJWTEncoding:
+    def test_encode_with_custom_header(self):
+        jwt = JWT(
+            alg="HS256",
+            secret_key="SOME_JWT_KEY_THIS_IS_MORE_THAN_16_BYTES",
+        )
+
+        token = jwt.encode(
+            payload={"data": "test"},
+            header={"kid": "my-key", "x5t": "thumbprint"},
+        )
+
+        decoded = jwt.decode(token, include_headers=True)
+        assert decoded["header"]["kid"] == "my-key"
+        assert decoded["header"]["x5t"] == "thumbprint"
+
+
+class TestJWTClaims:
+    def test_all_claims(self):
+        jwt = JWT(
+            alg="HS256",
+            secret_key="SOME_JWT_KEY_THIS_IS_MORE_THAN_16_BYTES",
+        )
+
+        token = jwt.encode(
+            iss="issuer",
+            sub="subject",
+            aud="audience",
+            exp=3600,
+            nbf=10,
+            payload={"custom": "claim"},
+        )
+
+        decoded = decode_payload(jwt, token)
+
+        assert decoded["iss"] == "issuer"
+        assert decoded["sub"] == "subject"
+        assert decoded["aud"] == "audience"
+        assert decoded["exp"] is not None
+        assert decoded["nbf"] is not None
+        assert decoded["iat"] is not None
+        assert decoded["tid"] is not None
+        assert decoded["custom"] == "claim"
