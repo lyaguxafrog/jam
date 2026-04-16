@@ -31,10 +31,12 @@ class JWE(BaseJWE):
     Provides encryption and decryption of data using JWK keys.
 
     Example:
+        ```python
         >>> jwk = JWK.from_dict({"kty": "oct", "k": "your-secret-key"})
         >>> jwe = JWE(alg="A128KW", enc="A128CBC-HS256", key=jwk)
         >>> token = jwe.encrypt("secret data")
         >>> plaintext = jwe.decrypt(token)
+        ```
     """
 
     def __init__(

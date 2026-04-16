@@ -142,9 +142,11 @@ class JWK(BaseJWK):
     Provides JWK validation and signing capabilities.
 
     Example:
+        ```python
         >>> jwk = JWK.from_dict({"kty": "oct", "k": "your-secret-key"})
         >>> jwk.sign(b"data", "HS256")
         >>> jwk.verify(token)
+        ```
     """
 
     _SUPPORTED_KEY_TYPES = frozenset({"RSA", "EC", "oct"})
