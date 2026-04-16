@@ -15,6 +15,7 @@ from .jwt import (
     JamJWTExpired,
     JamJWTInBlackList,
     JamJWTNotInWhiteList,
+    JamJWTNotYetValid,
     JamJWTUnsupportedAlgorithm,
     JamJWTValidationError,
 )
@@ -56,6 +57,7 @@ __all__ = [
     "JamJWTExpired",
     "JamJWTInBlackList",
     "JamJWTNotInWhiteList",
+    "JamJWTNotYetValid",
     "JamJWTEmptyPrivateKey",
     "JamJWTEmptySecretKey",
     "JamJWTUnsupportedAlgorithm",
