@@ -14,7 +14,7 @@ pip install jamlib[cli]
 
 ## Usage
 
-```bahs
+```bash
 $ jam [OPTIONS] COMMAND [ARGS]...
 ```
 
