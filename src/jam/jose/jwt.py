@@ -48,47 +48,85 @@ class JWT(BaseJWT):
         list: dict[str, Any] | None = None,
         serializer: BaseEncoder | type[BaseEncoder] = JsonEncoder,
         logger: BaseLogger = logger,
+        jws: JWS | None = None,
+        jwe: JWE | None = None,
     ) -> None:
         """Initialize JWT instance.
 
         Args:
-            alg (str | None): JWT algorithm name for signing (JWS). Required if encoding JWS.
-            enc (str | None): JWE algorithm for encryption. If provided, creates encrypted JWT.
+            alg (str | None): JWT algorithm name for signing (JWS). Used if jws is not provided.
+            enc (str | None): JWE content encryption algorithm. If provided, creates encrypted JWT.
             secret_key (str | bytes | KeyLike | JWK | None): Key for signing/encryption.
             password (str | bytes | None): Password for encrypted private keys.
             list (dict[str, Any] | None): List config for token storage.
             serializer (BaseEncoder | type[BaseEncoder]): JSON encoder/decoder.
             logger (BaseLogger): Logger instance.
+            jws (JWS | None): Pre-built JWS instance. If provided, alg is ignored.
+            jwe (JWE | None): Pre-built JWE instance. If provided, enc and secret_key are ignored.
 
         Raises:
-            ValueError: If neither alg nor enc is provided.
+            ValueError: If neither alg/enc provided and no jws/jwe provided.
+            ValueError: If both alg and jws are provided.
+            ValueError: If both enc and jwe are provided.
             JamJWTUnsupportedAlgorithm: If algorithm is not supported.
         """
-        if not alg and not enc:
-            raise ValueError(
-                "Either 'alg' (JWS) or 'enc' (JWE) must be provided"
-            )
-
-        self._alg = alg.upper() if alg else None
-        self._enc = enc.upper() if enc else None
-        self._password = self._normalize_password(password)
         self._logger = logger
         self._serializer = serializer
 
-        self._key = self._normalize_key(secret_key)
-        self._algorithm: BaseAlgorithm | None = None
+        if jws is not None:
+            if alg is not None:
+                raise ValueError(
+                    "Cannot specify both 'alg' and 'jws'. Use either 'jws' or 'alg'."
+                )
+            self.jws = jws
+            self._alg = jws._alg
+            self._key = self._normalize_key(secret_key)
+            self._password = self._normalize_password(password)
+            self._algorithm: BaseAlgorithm | None = None
+        elif alg:
+            if not enc:
+                self._validate_algorithm(alg.upper())
+            self._alg = alg.upper()
+            self._key = self._normalize_key(secret_key)
+            self._password = self._normalize_password(password)
+            self._algorithm: BaseAlgorithm | None = None
+            self.jws = self._build_jws()
+        else:
+            self.jws = None
+            self._alg = None
+            self._key = None
+            self._password = None
+            self._algorithm = None
 
-        if self._alg and not self._enc:
-            self._validate_algorithm(self._alg)
-
-        if self._enc:
+        if jwe is not None:
+            if enc is not None:
+                raise ValueError(
+                    "Cannot specify both 'enc' and 'jwe'. Use either 'jwe' or 'enc'."
+                )
+            self.jwe = jwe
+            self._enc = jwe._enc
+        elif enc:
+            self._enc = enc.upper()
+            if self._key is None:
+                self._key = self._normalize_key(secret_key)
+                self._password = self._normalize_password(password)
             self._validate_enc_algorithm(self._enc)
+            self.jwe = self._build_jwe()
+        else:
+            self.jwe = None
+            self._enc = None
+
+        if not self.jws and not self.jwe:
+            raise ValueError(
+                "Either 'alg', 'enc', 'jws', or 'jwe' must be provided"
+            )
 
         self.list = self._list_built(list) if list else None
-        self.jws = self._build_jws() if self._alg else None
-        self.jwe = self._build_jwe() if self._enc else None
 
-        self._logger.info(f"Initialized JWT with alg={alg}, enc={enc}")
+        self._logger.info(
+            f"Initialized JWT with alg={self._alg}, enc={self._enc}, "
+            f"has_jws={self.jws is not None}, has_jwe={self.jwe is not None}"
+        )
 
     def _normalize_key(
         self, key: str | bytes | KeyLike | "JWK" | None
@@ -115,65 +153,113 @@ class JWT(BaseJWT):
         if not self._alg or not self._key:
             raise ValueError("JWS requires 'alg' and 'key'")
 
-        jws_alg = self._alg
-        jws_key = self._key
-
-        # TODO: Optimize this
-        if self._enc and jws_alg in (
-            "RS256",
-            "RS384",
-            "RS512",
-            "ES256",
-            "ES384",
-            "ES512",
-            "PS256",
-            "PS384",
-            "PS512",
-            "RSA-OAEP",
-        ):
-            jws_alg = "RS256"
-
         return self.JWS(
-            alg=jws_alg,
-            key=jws_key,
+            alg=self._alg,
+            key=self._key,
             password=self._password,
             logger=self._logger,
         )
 
     def _build_jwe(self) -> JWE:
-        if not self._enc or not self._key:
-            raise ValueError("JWE requires 'enc' and 'key'")
+        if not self._enc:
+            raise ValueError("JWE requires 'enc' to be provided")
 
-        alg = self._alg
-        enc_key = self._key
+        key_type = self._detect_key_type(self._key)
 
-        if not alg:
-            key_len = len(self._key) if isinstance(self._key, bytes) else 16
-            alg = "A256KW" if key_len >= 32 else "A128KW"
-        elif alg in ("HS256", "HS384", "HS512"):
-            alg = "A256KW" if len(self._key) >= 32 else "A128KW"
+        if key_type == "rsa":
+            jwe_alg = "RSA-OAEP"
+            enc_key = self._key
+        elif key_type == "ec":
+            jwe_alg = "ECDH-ES"
+            enc_key = self._key
+        elif key_type == "symmetric":
+            key_len = (
+                len(self._key)
+                if isinstance(self._key, bytes)
+                else len(self._key.encode())
+            )
+            jwe_alg = "A256KW" if key_len >= 32 else "A128KW"
             enc_key = self._derive_encryption_key(self._key)
-        elif alg in (  # TODO: and this
-            "RS256",
-            "RS384",
-            "RS512",
-            "ES256",
-            "ES384",
-            "ES512",
-            "PS256",
-            "PS384",
-            "PS512",
-        ):
-            alg = "RSA-OAEP"
+        else:
+            raise ValueError(f"Unsupported key type for JWE: {key_type}")
 
         return self.JWE(
-            alg=alg,
+            alg=jwe_alg,
             enc=self._enc,
             key=enc_key,
             password=self._password,
             serializer=self._serializer,
             logger=self._logger,
         )
+
+    def _detect_key_type(self, key: KeyLike | None) -> str:
+        """Detect the type of key.
+
+        Returns:
+            'rsa', 'ec', or 'symmetric'.
+        """
+        if key is None:
+            return "symmetric"
+
+        try:
+            from cryptography.hazmat.primitives.asymmetric import ec, rsa
+            from cryptography.hazmat.primitives.serialization import (
+                load_der_private_key,
+                load_pem_private_key,
+                load_ssh_public_key,
+            )
+
+            if isinstance(key, (rsa.RSAPrivateKey, rsa.RSAPublicKey)):
+                return "rsa"
+            if isinstance(
+                key, (ec.EllipticCurvePrivateKey, ec.EllipticCurvePublicKey)
+            ):
+                return "ec"
+
+            if isinstance(key, bytes):
+                try:
+                    loaded = load_pem_private_key(key, password=None)
+                    if isinstance(
+                        loaded, (rsa.RSAPrivateKey, ec.EllipticCurvePrivateKey)
+                    ):
+                        return (
+                            "rsa"
+                            if isinstance(loaded, rsa.RSAPrivateKey)
+                            else "ec"
+                        )
+                except (ValueError, TypeError):
+                    pass
+
+                try:
+                    loaded = load_der_private_key(key, password=None)
+                    if isinstance(
+                        loaded, (rsa.RSAPrivateKey, ec.EllipticCurvePrivateKey)
+                    ):
+                        return (
+                            "rsa"
+                            if isinstance(loaded, rsa.RSAPrivateKey)
+                            else "ec"
+                        )
+                except (ValueError, TypeError):
+                    pass
+
+                try:
+                    loaded = load_ssh_public_key(key)
+                    if isinstance(
+                        loaded, (rsa.RSAPublicKey, ec.EllipticCurvePublicKey)
+                    ):
+                        return (
+                            "rsa"
+                            if isinstance(loaded, rsa.RSAPublicKey)
+                            else "ec"
+                        )
+                except (ValueError, TypeError):
+                    pass
+
+        except ImportError:
+            pass
+
+        return "symmetric"
 
     def _derive_encryption_key(self, signing_key: bytes) -> bytes:
         """Derive encryption key from signing key using HKDF.
@@ -351,7 +437,7 @@ class JWT(BaseJWT):
     ) -> str:
         """Encrypt payload using JWE.
 
-        If both alg and enc are provided, creates JWS+JWE (sign then encrypt):
+        If both jws and jwe are configured, creates JWS+JWE (sign then encrypt):
         1. Create JWS compact serialization (sign)
         2. Use JWS result as plaintext for JWE (encrypt)
 
@@ -363,7 +449,7 @@ class JWT(BaseJWT):
             str: Encrypted JWT (JWE or JWS+JWE).
 
         Raises:
-            ValueError: If enc is not provided.
+            ValueError: If jwe is not configured.
         """
         if not self.jwe:
             raise ValueError("JWE not configured. Provide 'enc' parameter.")
@@ -375,23 +461,8 @@ class JWT(BaseJWT):
         else:
             payload_bytes = payload
 
-        if self._alg and self._enc:
-            jws_alg = self._alg
-            # TODO: optimize it
-            if jws_alg in (
-                "RS256",
-                "RS384",
-                "RS512",
-                "ES256",
-                "ES384",
-                "ES512",
-                "PS256",
-                "PS384",
-                "PS512",
-                "RSA-OAEP",
-            ):
-                jws_alg = "RS256"
-            _base_header = {"alg": jws_alg, "typ": "JWT"}
+        if self.jws and self.jwe:
+            _base_header = {"alg": self._alg, "typ": "JWT"}
             if header:
                 _base_header.update(header)
             jws_payload = self.jws.sign(header=_base_header, data=payload_bytes)
@@ -420,28 +491,13 @@ class JWT(BaseJWT):
 
         plaintext = self.jwe.decrypt(token)
 
-        if self._alg:
+        if self.jws and self._alg:
             if isinstance(plaintext, bytes):
                 plaintext = plaintext.decode("utf-8")
 
-            alg = self._alg
-            if alg in (  # TODO: and this
-                "RS256",
-                "RS384",
-                "RS512",
-                "ES256",
-                "ES384",
-                "ES512",
-                "PS256",
-                "PS384",
-                "PS512",
-                "RSA-OAEP",
-            ):
-                alg = "RS256"
-
             original_alg = self.jws._alg
             original_key = self.jws._key
-            self.jws._alg = alg
+            self.jws._alg = self._alg
             try:
                 decoded = self.jws.verify(plaintext, True)
                 payload = decoded.get("payload")
