@@ -11,9 +11,7 @@ from jam.utils import generate_rsa_key_pair, generate_ecdsa_p384_keypair
 
 
 def decode_payload(jwt, token):
-    data = jwt.decode(token, include_headers=True)
-    if isinstance(data["payload"], bytes):
-        return json.loads(data["payload"])
+    data = jwt.decode(token)
     return data["payload"]
 
 
@@ -59,7 +57,7 @@ class TestJWTHS:
 
     def test_decode_with_include_headers(self, jwt):
         token = jwt.encode(payload={"user_id": 123})
-        decoded = jwt.decode(token, include_headers=True)
+        decoded = jwt.decode(token)
         assert "header" in decoded
         assert decoded["header"]["alg"] == "HS256"
         assert "payload" in decoded
@@ -436,7 +434,7 @@ class TestJWTEncoding:
             header={"kid": "my-key", "x5t": "thumbprint"},
         )
 
-        decoded = jwt.decode(token, include_headers=True)
+        decoded = jwt.decode(token)
         assert decoded["header"]["kid"] == "my-key"
         assert decoded["header"]["x5t"] == "thumbprint"
 
