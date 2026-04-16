@@ -690,11 +690,7 @@ wheels = [
 
 [[package]]
 name = "jamlib"
-<<<<<<< HEAD
-version = "3.1.2"
-=======
-version = "3.2.0a0"
->>>>>>> d061576 ([~] Deprecated old JWT implementation)
+version = "3.2.0b0"
 source = { editable = "." }
 dependencies = [
     { name = "cryptography" },
