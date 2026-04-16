@@ -65,21 +65,11 @@ class BaseJWT(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def decode(
-        self,
-        token: str,
-        include_headers: bool = False,
-    ) -> dict[str, Any]:
-        """Decode the JWT and return the payload.
-
-        Args:
-            token (str): The JWT to decode.
-            exp (bool): Whether to check the expiration time. Defaults to False.
-            nbf (bool): Whether to check the not-before time. Defaults to False.
-            include_headers (bool): Whether to include the headers in the result. Defaults to False.
+    def decode(self, token: str) -> dict[str, Any]:
+        """Decode the JWT and return the header and payload.
 
         Returns:
-            dict[str, Any]: The decoded payload.
+            dict with 'header' and 'payload' keys (both dicts).
         """
         raise NotImplementedError
 

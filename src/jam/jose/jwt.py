@@ -323,25 +323,14 @@ class JWT(BaseJWT):
         _payload = self._make_payload(iss, sub, aud, exp, nbf, payload)
         return self.jws.sign(header=_base_header, data=_payload)
 
-    def decode(
-        self,
-        token: str,
-        include_headers: bool = False,
-    ) -> dict[str, Any]:
-        """Decode the JWT and return the payload (JWS).
-
-        Args:
-            token (str): The JWT to decode.
-            exp (bool): Whether to check the expiration time. Defaults to False.
-            nbf (bool): Whether to check the not-before time. Defaults to False.
-            include_headers (bool): Whether to include the headers in the result. Defaults to False.
-            check_list (bool): Whether to check token in list. Defaults to False.
+    def decode(self, token: str) -> dict[str, Any]:
+        """Decode the JWT and return the header and payload.
 
         Returns:
-            dict[str, Any]: The decoded payload.
+            dict with 'header' and 'payload' keys (both dicts).
 
         Raises:
-            ValueError: If alg is not provided.
+            ValueError: If alg is not provided or token has invalid type.
         """
         if not self.jws:
             raise ValueError("JWS not configured. Provide 'alg' parameter.")
@@ -350,9 +339,10 @@ class JWT(BaseJWT):
         header = data["header"]
         if header.get("typ") != "JWT":
             raise ValueError("Invalid token type")
-        if include_headers:
-            return data
-        return data["payload"]
+        return {
+            "header": header,
+            "payload": json.loads(data["payload"]),
+        }
 
     def encrypt(
         self,
