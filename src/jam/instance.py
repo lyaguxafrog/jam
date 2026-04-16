@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import time
 from typing import Any
 import uuid
 
@@ -8,8 +9,10 @@ from jam.__base__ import BaseJam
 from jam.__deprecated__ import deprecated
 from jam.exceptions import (
     JamConfigurationError,
+    JamJWTExpired,
     JamJWTInBlackList,
     JamJWTNotInWhiteList,
+    JamJWTNotYetValid,
 )
 
 
@@ -139,24 +142,25 @@ class Jam(BaseJam):
 
         Raises:
             JamJWTExpired: If token is expired
+            JamJWTNotYetValid: If token is not yet valid (nbf claim)
             JamConfigurationError: If JWT list is not connected
             JamJWTNotInWhiteList: If token is not in white list
             JamJWTInBlackList: If token is in black list
         """
         self._logger.debug(
-            f"Verifying JWT token (length: {len(token)} chars), check_exp={check_exp}, check_list={check_list}"
+            f"Verifying JWT token (length: {len(token)} chars), check_exp={check_exp}, check_list={check_list}, check_nbf={check_nbf}"
         )
         assert self.jwt is not None
-        data = self.jwt.decode(token, include_headers)
+        data = self.jwt.decode(token)
+        payload = data["payload"]
 
-        if include_headers:
-            payload = data
-        else:
-            payload = data
-            if isinstance(payload, bytes):
-                import json
+        if check_exp and "exp" in payload:
+            if payload["exp"] < time.time():
+                raise JamJWTExpired
 
-                payload = json.loads(payload)
+        if check_nbf and "nbf" in payload:
+            if payload["nbf"] > time.time():
+                raise JamJWTNotYetValid
 
         self._logger.debug(
             f"JWT token verified successfully, payload keys: {list(payload.keys())}"
@@ -181,6 +185,9 @@ class Jam(BaseJam):
                             message="Invalid JWT list type",
                             error_code="configuration.jwt.unknown_list_type",
                         )
+
+        if include_headers:
+            return data
         return payload
 
     def session_create(self, session_key: str, data: dict[str, Any]) -> str:
