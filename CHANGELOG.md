@@ -29,6 +29,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - JWE
   - JWK(s)
   - JWS
+- `JamJWTNotYetValid` exception for nbf claim validation
+- `check_nbf` parameter in `Jam.jwt_decode()` and `Jam.aio.jwt_decode()`
+- `include_headers` parameter in `Jam.aio.jwt_decode()`
 
 ### Changed
 
@@ -39,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
+- Fixed typo in CLI documentation (`bahs` → `bash`)
 
 ### Security
 
