@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import base64
 from datetime import datetime
 import json
 from typing import TYPE_CHECKING, Any
@@ -385,7 +386,22 @@ class JWT(BaseJWT):
             payload_bytes = payload
 
         if self._alg and self._enc:
-            _base_header = {"alg": self._alg, "typ": "JWT"}
+            jws_alg = self._alg
+            # TODO: optimize it
+            if jws_alg in (
+                "RS256",
+                "RS384",
+                "RS512",
+                "ES256",
+                "ES384",
+                "ES512",
+                "PS256",
+                "PS384",
+                "PS512",
+                "RSA-OAEP",
+            ):
+                jws_alg = "RS256"
+            _base_header = {"alg": jws_alg, "typ": "JWT"}
             if header:
                 _base_header.update(header)
             jws_payload = self.jws.sign(header=_base_header, data=payload_bytes)
@@ -440,8 +456,36 @@ class JWT(BaseJWT):
                 decoded = self.jws.verify(plaintext, True)
                 payload = decoded.get("payload")
                 if isinstance(payload, bytes):
-                    return self._serializer.loads(payload)
-                return decoded
+                    payload_str = payload.decode("utf-8")
+                else:
+                    payload_str = payload
+
+                if "." in payload_str:
+                    inner_parts = payload_str.split(".")
+                    inner_header_b64 = inner_parts[0]
+                    inner_header = json.loads(
+                        base64.urlsafe_b64decode(
+                            inner_header_b64 + "=="
+                        ).decode()
+                    )
+                    inner_alg = inner_header.get("alg")
+
+                    if inner_alg != original_alg:
+                        temp_alg = self.jws._alg
+                        self.jws._alg = inner_alg
+                        try:
+                            inner_decoded = self.jws.verify(payload_str, True)
+                        finally:
+                            self.jws._alg = temp_alg
+                    else:
+                        inner_decoded = self.jws.verify(payload_str, True)
+
+                    inner_payload = inner_decoded.get("payload")
+                    if isinstance(inner_payload, bytes):
+                        return self._serializer.loads(inner_payload)
+                    return self._serializer.loads(inner_payload)
+
+                return self._serializer.loads(payload_str)
             finally:
                 self.jws._alg = original_alg
                 self.jws._key = original_key
