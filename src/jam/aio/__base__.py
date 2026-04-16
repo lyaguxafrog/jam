@@ -75,7 +75,12 @@ class BaseAsyncJam(BaseJam):
 
     @abstractmethod
     async def jwt_decode(  # type: ignore[override]
-        self, token: str, check_exp: bool = True, check_list: bool = True
+        self,
+        token: str,
+        check_exp: bool = True,
+        check_list: bool = True,
+        check_nbf: bool = False,
+        include_headers: bool = False,
     ) -> dict[str, Any]:
         """Verify and decode JWT token.
 
@@ -83,6 +88,8 @@ class BaseAsyncJam(BaseJam):
             token (str): JWT token
             check_exp (bool): Check expire
             check_list (bool): Check white/black list. Docs: https://jam.makridenko.ru/jwt/lists/what/
+            check_nbf (bool): Check not-before time
+            include_headers (bool): Include headers in the decoded payload
 
         Returns:
             dict[str, Any]: Decoded payload
