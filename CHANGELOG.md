@@ -24,6 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 3.2.0 - [unreleased]
 
 #### Added
+- New JOSE module:
+  - JWT
+  - JWE
+  - JWK(s)
+  - JWS
 
 ### Changed
 
@@ -81,6 +86,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated all dependencies.
 
 ---
+
 - [3.2.0] https://github.com/lyaguxafrog/jam/compare/v3.1.0...unstable
 - [3.1.0] https://github.com/lyaguxafrog/jam/compare/v3.0.0...v3.1.0
 - [3.0.0] https://github.com/lyaguxafrog/jam/compare/v2.5.6...v3.0.0
