@@ -32,8 +32,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `JamJWTNotYetValid` exception for nbf claim validation
 - `check_nbf` parameter in `Jam.jwt_decode()` and `Jam.aio.jwt_decode()`
 - `include_headers` parameter in `Jam.aio.jwt_decode()`
+- Support for pre-built JWS/JWE instances in JWT constructor
+- `JWT.decode()` always returns `{"header": dict, "payload": dict}`
 
 ### Changed
+- JWT sign-then-encrypt now follows RFC 7519 specification
+- Auto-detection of JWE key management algorithm based on key type (RSA→RSA-OAEP, EC→ECDH-ES, symmetric→A*-KW)
+- `exp` and `nbf` claims validation moved from JOSE module to `Jam` instances
+
+### Deprecated
 
 ### Deprecated
 - `jam.Jam.jwt_make_payload`: The JWT specification has been introduced, so signing is now done via JWS
