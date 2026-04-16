@@ -4,7 +4,7 @@ import pytest
 import json
 import os
 import tempfile
-from jam.jose import JWT
+from jam.jose import JWT, JWS, JWE
 from jam.exceptions import JamJWTUnsupportedAlgorithm
 from jam.exceptions.jose import JamJWSVerificationError
 from jam.utils import generate_rsa_key_pair, generate_ecdsa_p384_keypair
@@ -242,7 +242,7 @@ class TestJWTJWERSA:
 
     def test_jws_jwe_sign_then_encrypt(self, rsa_key_pair):
         jwt = JWT(
-            alg="RSA-OAEP",
+            alg="RS256",
             enc="A256GCM",
             secret_key=rsa_key_pair["private"],
         )
@@ -276,6 +276,18 @@ class TestJWTErrors:
         jwt = JWT(alg="HS256", secret_key="some_key")
         with pytest.raises(ValueError):
             jwt.encrypt({"data": "test"})
+
+    def test_cannot_specify_both_alg_and_jws(self):
+        jws = JWS(alg="HS256", key="SOME_KEY_THAT_IS_LONG")
+        with pytest.raises(ValueError, match="Cannot specify both"):
+            JWT(alg="HS256", jws=jws, secret_key="SOME_KEY")
+
+    def test_cannot_specify_both_enc_and_jwe(self):
+        jwe = JWE(
+            alg="A128KW", enc="A128CBC-HS256", key="SOME_KEY_THAT_IS_LONG"
+        )
+        with pytest.raises(ValueError, match="Cannot specify both"):
+            JWT(enc="A128CBC-HS256", jwe=jwe, secret_key="SOME_KEY")
 
     def test_invalid_token_type(self):
         jwt = JWT(
@@ -420,6 +432,51 @@ class TestJWTJWKIntegration:
         token = jwt.encode(payload={"user_id": 123})
         decoded = decode_payload(jwt, token)
         assert decoded["user_id"] == 123
+
+
+class TestJWTSignThenEncryptHybrid:
+    @pytest.fixture
+    def rsa_key_pair(self):
+        return generate_rsa_key_pair()
+
+    @pytest.fixture
+    def ec_key_pair(self):
+        return generate_ecdsa_p384_keypair()
+
+    def test_with_prebuilt_jws_jwe(self, rsa_key_pair):
+        jws = JWS(alg="RS256", key=rsa_key_pair["private"])
+        jwe = JWE(alg="RSA-OAEP", enc="A256GCM", key=rsa_key_pair["private"])
+
+        jwt = JWT(jws=jws, jwe=jwe, secret_key=rsa_key_pair["private"])
+        token = jwt.encode(payload={"data": "secret"})
+        ciphertext = jwt.encrypt(token)
+        decrypted = jwt.decrypt(ciphertext)
+        assert decrypted["data"] == "secret"
+
+    def test_sign_then_encrypt_with_symmetric_key(self):
+        jwt = JWT(
+            alg="HS256",
+            enc="A256GCM",
+            secret_key="SOME_SECRET_KEY_THAT_IS_LONG_ENOUGH",
+        )
+        token = jwt.encode(payload={"data": "symmetric_test"})
+        ciphertext = jwt.encrypt(token)
+        decrypted = jwt.decrypt(ciphertext)
+        assert decrypted["data"] == "symmetric_test"
+
+    def test_mixed_prebuilt_and_auto(self, rsa_key_pair):
+        jws = JWS(alg="RS256", key=rsa_key_pair["private"])
+        jwt = JWT(
+            jws=jws,
+            enc="A256GCM",
+            secret_key=rsa_key_pair["private"],
+        )
+        assert jwt.jws is jws
+        assert jwt.jwe is not None
+        token = jwt.encode(payload={"data": "mixed"})
+        ciphertext = jwt.encrypt(token)
+        decrypted = jwt.decrypt(ciphertext)
+        assert decrypted["data"] == "mixed"
 
 
 class TestJWTEncoding:
