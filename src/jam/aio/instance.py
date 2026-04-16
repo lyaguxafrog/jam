@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import time
 from typing import Any
 import uuid
 
@@ -10,6 +11,7 @@ from jam.exceptions import (
     JamJWTExpired,
     JamJWTInBlackList,
     JamJWTNotInWhiteList,
+    JamJWTNotYetValid,
 )
 
 
@@ -108,7 +110,12 @@ class Jam(BaseAsyncJam):
         return token
 
     async def jwt_decode(
-        self, token: str, check_exp: bool = True, check_list: bool = True
+        self,
+        token: str,
+        check_exp: bool = True,
+        check_list: bool = True,
+        check_nbf: bool = False,
+        include_headers: bool = False,
     ) -> dict[str, Any]:
         """Verify and decode JWT token.
 
@@ -116,22 +123,42 @@ class Jam(BaseAsyncJam):
             token (str): JWT token
             check_exp (bool): Check expire
             check_list (bool): Check white/black list. Docs: https://jam.makridenko.ru/jwt/lists/what/
+            check_nbf (bool): Check not-before time
+            include_headers (bool): Include headers in the decoded payload
 
         Returns:
             dict[str, Any]: Decoded payload
+
+        Raises:
+            JamJWTExpired: If token is expired
+            JamJWTNotYetValid: If token is not yet valid (nbf claim)
+            JamConfigurationError: If JWT list is not connected
+            JamJWTNotInWhiteList: If token is not in white list
+            JamJWTInBlackList: If token is in black list
         """
         assert self.jwt is not None
         self._logger.debug(
-            f"Verifying JWT token (length: {len(token)} chars), check_exp={check_exp}, check_list={check_list}"
+            f"Verifying JWT token (length: {len(token)} chars), check_exp={check_exp}, check_list={check_list}, check_nbf={check_nbf}"
         )
-        payload = self.jwt.decode(token)
+        data = self.jwt.decode(token)
+        if "payload" in data:
+            payload = data["payload"]
+            headers = data.get("header")
+        else:
+            payload = data
+            headers = None
+
+        if check_exp and "exp" in payload:
+            if payload["exp"] < time.time():
+                raise JamJWTExpired
+
+        if check_nbf and "nbf" in payload:
+            if payload["nbf"] > time.time():
+                raise JamJWTNotYetValid
+
         self._logger.debug(
             f"JWT token verified successfully, payload keys: {list(payload.keys())}"
         )
-
-        if check_exp:
-            if payload["exp"] < datetime.datetime.now().timestamp():
-                raise JamJWTExpired
 
         if check_list:
             if not self.jwt.list:
@@ -152,6 +179,9 @@ class Jam(BaseAsyncJam):
                             message="Invalid JWT list type",
                             error_code="configuration.jwt.unknown_list_type",
                         )
+
+        if include_headers and headers is not None:
+            return {"header": headers, "payload": payload}
         return payload
 
     async def session_create(
