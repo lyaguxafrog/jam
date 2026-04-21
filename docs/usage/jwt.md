@@ -2,6 +2,9 @@
 title: JWT
 ---
 
+!!! Deprecated
+    `jam.jwt` is deprecated, use `jam.jose`.
+
 ## Use in instance
 
 ### Config
