@@ -3,17 +3,21 @@
 If you want to help develop Jam, there are a few rules to follow.
 
 ## Code style
-```python
-# -*- coding: utf-8 -*-
 
+- Python >= 3.10
+- Line length: 80 characters, indented 4 spaces
+- Import order: stdlib → third-party → library modules (handled by ruff/isort)
+- Docstrings: Google convention (handled by ruff/pydocstyle)
+
+```python
 # Built-in libraries
 from typing import Literal
 
 # Third-party libraries
-from Crypto import Hash
+from cryptography.hazmat.primitives import hashes
 
 # Library modules
-from jam.jwt.__utils__ import __base64url_decode__
+from jam.jwt import Token
 
 
 class SomeClass:
@@ -28,7 +32,7 @@ class SomeClass:
         self.sv = some_value
 
     def some_method(self, something: int) -> int:
-        """Method Description.
+        """Method description.
 
         Args:
             something (int): Argument description
@@ -37,25 +41,31 @@ class SomeClass:
             ValueError: if something < 1
 
         Returns:
-            (int)
+            int: Something plus one
         """
         if something < 1:
             raise ValueError("something < 1")
 
         return something + 1
 ```
-Line length 80 characters, indented 4 spaces.
+
+## Development Tools
+
+- **ruff** — linter + formatter (`uv run ruff check`, `uv run ruff format`)
+- **pytest** — tests (`uv run pytest`)
+- **pyrefly** — type checking (`uv run pyrefly check`)
+- **pre-commit** — `uv run pre-commit run --all-files`
 
 ## Gitflow
 
-### Commits:
+### Commits
 
 The project must have `pre-commit`
 
-* `[+]` Adding new functionality.
-* `[-]` Removing something, e.g. removing a function or deleting a file.
-* `[*]` Changing the logic.
-* `[~]` Changes that do not affect the logic, documentation, linters, etc.
+* `[+]` Adding new functionality
+* `[-]` Removing something, e.g. removing a function or deleting a file
+* `[*]` Changing the logic
+* `[~]` Changes that do not affect the logic, documentation, linters, etc
 
 The keys in the commit body are also used:
 
@@ -63,7 +73,8 @@ The keys in the commit body are also used:
 * `FB`(fix by): How it was made or fixed
 * `N`(note): A note of some kind
 
-Example of a correct commit
+Example of a correct commit:
+
 ```
 [*] Changed JWT decryption logic
 R: Used a third-party heavy dependency that slowed down the code
@@ -71,17 +82,18 @@ FB: Removed the dependency and wrote independently
 ```
 
 ### Branches
-The project has one main branche:
 
-* `master` - Stable code of the latest release
-* `unstable` - Unstable code of the latest release
+The project has two main branches:
+
+* `release` — Stable code of the latest release
+* `unstable` — Unstable code of the latest release
 
 All branches are created from `unstable` and adhere to strict branch naming:
 
 * New feature: `feature/<id-issue-if-it-is>-<pair-words-about-feature>`
 * Bug fixes: `fix/<id-issue-if-it-is>-<pair-words-about-bug>`
 * Refactoring: `refactor/<id-issue-if-it-is>-<what-exactly-you-do>`
-* Writing documentation: `docs/<what-exactly-you-do>`.
+* Writing documentation: `docs/<what-exactly-you-do>`
 
 Examples:
 
@@ -91,23 +103,22 @@ Examples:
 ### Pull requests
 
 The title of the pull request must contain a keyword:
-* `FEAT` Adding a new feature
-* `BUGFIX` Bug fix
-* `HOTFIX` Urgent bug fix
-* `DOCS` Edits/additions to documentation
 
-There is a template for the poolquest,
-in it clearly describe what you did and why.
+* `FEAT` — Adding a new feature
+* `BUGFIX` — Bug fix
+* `HOTFIX` — Urgent bug fix
+* `DOCS` — Edits/additions to documentation
 
 Example:
+
 ```markdown
-<!--this is a title -->
 FEAT Validation of a redis session
 
 ## What was done
-* <!--A brief description of what we've done-->
-*
+
+- Brief description of what was done
 
 ## Test report
-<!-- Describe how you tested -->
+
+- How you tested
 ```
