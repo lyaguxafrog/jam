@@ -5,7 +5,7 @@ from typing import Any
 import flask
 
 from jam.exceptions import JamFlaskPluginConfigError
-from jam.jwt import create_instance as create_jwt
+from jam.jose import create_instance as create_jwt
 from jam.oauth2 import create_instance as create_oauth2
 from jam.paseto import create_instance as create_paseto
 from jam.sessions import create_instance as create_session
@@ -170,7 +170,8 @@ class JWTExtension(BaseAuthExtension):
         if not token:
             return None
         try:
-            payload = self._auth.decode(token)
+            result = self._auth.decode(token)
+            payload = result.get("payload", result)
             flask.g.payload = payload
             return payload
         except Exception:

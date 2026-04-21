@@ -16,7 +16,7 @@ from jam.ext.litestar.middleware import (
     SessionMiddleware,
 )
 from jam.ext.litestar.objects import BaseUser
-from jam.jwt import create_instance as create_jwt
+from jam.jose import create_instance as create_jwt
 from jam.oauth2 import create_instance as create_oauth2
 from jam.paseto import create_instance as create_paseto
 from jam.utils.config_maker import GENERIC_POINTER, __config_maker__

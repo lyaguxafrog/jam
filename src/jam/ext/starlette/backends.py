@@ -14,7 +14,7 @@ from starlette.requests import HTTPConnection
 from jam.aio.sessions import create_instance as create_session
 from jam.exceptions import JamStarlettePluginConfigError
 from jam.ext.starlette.objects import BaseUser, SimpleUser
-from jam.jwt import create_instance as create_jwt
+from jam.jose import create_instance as create_jwt
 from jam.paseto import create_instance as create_paseto
 from jam.utils.config_maker import GENERIC_POINTER, __config_maker__
 
@@ -141,7 +141,8 @@ class JWTBackend(BaseBackend):
                         if self._auth.list.check(token):
                             return AuthCredentials(None), UnauthenticatedUser()
             data = self._auth.decode(token)
-            user = self._user.from_payload(data)
+            payload = data.get("payload", data)
+            user = self._user.from_payload(payload)
             return AuthCredentials(["authenticated"]), user
 
         return AuthCredentials(None), UnauthenticatedUser()
