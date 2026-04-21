@@ -7,7 +7,7 @@ import uuid
 
 from jam.aio import Jam as AioJam
 from jam.instance import Jam
-from jam.jwt.utils import base64url_decode
+from jam.jose.utils import __base64url_decode__ as base64url_decode
 from jam.tests.fakers import (
     fake_jwt_token,
     fake_oauth2_token,

@@ -5,7 +5,7 @@ from secrets import token_urlsafe
 from typing import Any
 import uuid
 
-from jam.jwt.utils import base64url_encode
+from jam.jose.utils import __base64url_encode__ as base64url_encode
 from jam.utils import xor_my_data
 
 
