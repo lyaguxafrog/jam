@@ -11,7 +11,7 @@ from litestar.middleware import (
 from jam.aio.sessions.__base__ import BaseAsyncSessionModule
 from jam.exceptions import JamLitestarPluginConfigError, JamLitestarPluginError
 from jam.ext.litestar.objects import BaseUser, Token
-from jam.jwt import JWT
+from jam.jose.__base__ import BaseJWT as JWTClass
 from jam.paseto import BasePASETO
 
 
@@ -46,7 +46,7 @@ class BaseMiddleware(AbstractAuthenticationMiddleware):
 class JWTMiddleware(BaseMiddleware):
     """JWT Middleware for litestar."""
 
-    AUTH_MODULE: JWT
+    AUTH_MODULE: JWTClass
     LIST: bool = False
 
     async def authenticate_request(  # noqa
@@ -57,7 +57,8 @@ class JWTMiddleware(BaseMiddleware):
         if not token:
             return AuthenticationResult(user=None, auth=token_model)
         try:
-            data = self.AUTH_MODULE.decode(token)
+            result = self.AUTH_MODULE.decode(token)
+            data = result.get("payload", result)
             if self.AUTH_MODULE.list and self.LIST:
                 match self.AUTH_MODULE.list.__list_type__:
                     case "white":

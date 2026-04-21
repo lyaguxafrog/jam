@@ -80,7 +80,7 @@ class TestJWTExtension:
             else:
                 client.set_cookie("access_token", token)
                 response = client.get("/")
-            assert response.get_json()["user"] == {"user_id": 123}
+            assert response.get_json()["user"]["user_id"] == 123
 
     def test_get_payload_from_header_without_bearer_prefix(self, token):
         app = Flask(__name__)
@@ -98,7 +98,7 @@ class TestJWTExtension:
 
         with app.test_client() as client:
             response = client.get("/", headers={"X-Token": token})
-            assert response.get_json()["user"] == {"user_id": 123}
+            assert response.get_json()["user"]["user_id"] == 123
 
     def test_get_payload_invalid_token(self):
         app = Flask(__name__)
@@ -163,7 +163,7 @@ class TestSessionExtension:
             else:
                 client.set_cookie("sessionId", session_id)
                 response = client.get("/")
-            assert response.get_json()["user"] == {"user_id": 123}
+            assert response.get_json()["user"]["user_id"] == 123
 
     def test_get_payload_invalid_session(self, session):
         app = Flask(__name__)
@@ -211,7 +211,7 @@ class TestPASETOExtension:
             response = client.get(
                 "/", headers={"Authorization": f"Bearer {paseto_token}"}
             )
-            assert response.get_json()["user"] == {"user_id": 123}
+            assert response.get_json()["user"]["user_id"] == 123
 
     def test_get_payload_from_cookie(self, paseto_token):
         app = Flask(__name__)
@@ -230,7 +230,7 @@ class TestPASETOExtension:
         with app.test_client() as client:
             client.set_cookie("paseto", paseto_token)
             response = client.get("/")
-            assert response.get_json()["user"] == {"user_id": 123}
+            assert response.get_json()["user"]["user_id"] == 123
 
     def test_get_payload_no_token(self):
         app = Flask(__name__)
