@@ -19,8 +19,12 @@ from jam.exceptions import (
 class Jam(BaseJam):
     """Main instance."""
 
-    MODULES: dict[str, str] = {
-        "jwt": "jam.jose.JWT",
+    MODULES: dict[str, str | dict[str, str]] = {
+        "jwt": "jam.jwt.create_instance",  # deprecated
+        "jose": {
+            "jwt": "jam.jose.create_instance",
+            # TODO: Add jws, jwk, jwe
+        },
         "session": "jam.sessions.create_instance",
         "oauth2": "jam.oauth2.create_instance",
         "paseto": "jam.paseto.create_instance",

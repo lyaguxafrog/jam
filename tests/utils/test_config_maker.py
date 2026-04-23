@@ -377,14 +377,20 @@ class TestConfigMaker:
 
     def test_config_maker_with_dict(self):
         """Test config maker with dictionary input."""
+        import warnings
         config_dict = {
             "jwt": {
                 "alg": "HS256",
                 "secret_key": "test_secret"
             }
         }
-        result = _config_maker(config_dict)
-        assert result == config_dict
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            result = _config_maker(config_dict)
+        assert result["jwt"]["alg"] == "HS256"
+        assert result["jwt"]["secret_key"] == "test_secret"
+        assert "jose" in result
+        assert result["jose"]["jwt"]["alg"] == "HS256"
         assert result is not config_dict
 
     def test_config_maker_with_yaml(self, yaml_config_file):

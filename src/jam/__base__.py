@@ -18,7 +18,7 @@ from jam.utils.config_maker import __config_maker__, __module_loader__
 class BaseJam(ABC):
     """Base jam instance."""
 
-    MODULES: dict[str, str] = {}
+    MODULES: dict[str, str | dict[str, str]] = {}
 
     def __init__(
         self,
@@ -55,6 +55,7 @@ class BaseJam(ABC):
         self._logger = logger(log_level)
         self._serializer = serializer
         self.jwt: BaseJWT | None = None
+        self.jose: dict[str, Any] | None = None
         self.session: BaseSessionModule | None = None
         self.oauth2: dict[str, BaseOAuth2Client] | None = None
         self.otp: OTPConfig | None = None
@@ -69,7 +70,7 @@ class BaseJam(ABC):
         )
         self._logger.debug(
             "BaseJam initialization complete. Modules loaded:\n"
-            f" jwt={self.jwt is not None}, session={self.session is not None}, oauth2={self.oauth2 is not None}"
+            f" jwt={self.jwt is not None}, jose={self.jose is not None}, session={self.session is not None}, oauth2={self.oauth2 is not None}"
         )
         gc.collect()
 
@@ -139,6 +140,7 @@ class BaseJam(ABC):
         """Build instance.
 
         Load modules from configuration and initialize them.
+        Supports both flat modules (name -> path) and nested modules (name -> {subname -> path}).
 
         Args:
             config (dict[str, Any]): Configuration
@@ -151,24 +153,64 @@ class BaseJam(ABC):
                 self._logger.debug(f"Missing configuration for module {name}")
                 continue
 
-            try:
-                module_cls = __module_loader__(path)
-                self._logger.debug(f"Loading module {name} from {path}")
-                params = config.get(name, {})
-                self._logger.debug(
-                    f"Module {name} config params: {list(params.keys())}"
-                )
-                # params["logger"] = self._logger
-                # params["serializer"] = self._serializer
-                module_instance = module_cls(**params)
-                self.__setattr__(name, module_instance)
-                self._logger.debug(f"Module {name} initialized successfully")
+            if isinstance(path, dict):
+                subconfig = config.get(name, {})
+                if not isinstance(subconfig, dict):
+                    subconfig = {}
 
-            except Exception as e:
-                self._logger.error(
-                    f"Failed to load module {name} from {path}: {e}",
-                    exc_info=True,
-                )
+                for subname, subpath in path.items():
+                    if subname not in subconfig:
+                        self._logger.debug(
+                            f"Missing configuration for module {name}.{subname}"
+                        )
+                        continue
+
+                    try:
+                        module_cls = __module_loader__(subpath)
+                        self._logger.debug(
+                            f"Loading module {name}.{subname} from {subpath}"
+                        )
+                        params = subconfig.get(subname, {})
+                        self._logger.debug(
+                            f"Module {name}.{subname} config params: {list(params.keys())}"
+                        )
+                        module_instance = module_cls(**params)
+
+                        if self.jose is None:
+                            self.jose = {}
+                        self.jose[subname] = module_instance
+
+                        if subname == "jwt":
+                            self.jwt = module_instance
+
+                        self._logger.debug(
+                            f"Module {name}.{subname} initialized successfully"
+                        )
+
+                    except Exception as e:
+                        self._logger.error(
+                            f"Failed to load module {name}.{subname} from {subpath}: {e}",
+                            exc_info=True,
+                        )
+            else:
+                try:
+                    module_cls = __module_loader__(path)
+                    self._logger.debug(f"Loading module {name} from {path}")
+                    params = config.get(name, {})
+                    self._logger.debug(
+                        f"Module {name} config params: {list(params.keys())}"
+                    )
+                    module_instance = module_cls(**params)
+                    self.__setattr__(name, module_instance)
+                    self._logger.debug(
+                        f"Module {name} initialized successfully"
+                    )
+
+                except Exception as e:
+                    self._logger.error(
+                        f"Failed to load module {name} from {path}: {e}",
+                        exc_info=True,
+                    )
 
     def __otp(
         self, type: Literal["totp", "hotp"] | None = None

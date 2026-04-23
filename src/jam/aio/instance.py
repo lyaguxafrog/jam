@@ -18,8 +18,11 @@ from jam.exceptions import (
 class Jam(BaseAsyncJam):
     """Main async Jam instance."""
 
-    MODULES: dict[str, str] = {
-        "jwt": "jam.aio.jwt.create_instance",
+    MODULES: dict[str, str | dict[str, str]] = {
+        "jwt": "jam.jose.JWT",
+        "jose": {
+            "jwt": "jam.jose.create_instance",
+        },
         "session": "jam.aio.sessions.create_instance",
         "oauth2": "jam.aio.oauth2.create_instance",
         "paseto": "jam.paseto.create_instance",
