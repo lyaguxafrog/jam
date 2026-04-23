@@ -62,11 +62,11 @@ class TestJWTHS:
         assert decoded["header"]["alg"] == "HS256"
         assert "payload" in decoded
 
-    def test_tid_generated(self, jwt):
+    def test_jti_generated(self, jwt):
         token = jwt.encode(payload={"data": "test"})
         decoded = decode_payload(jwt, token)
-        assert "tid" in decoded
-        assert decoded["tid"] is not None
+        assert "jti" in decoded
+        assert decoded["jti"] is not None
 
 
 class TestJWTHS384:
@@ -324,9 +324,9 @@ class TestJWTListMemory:
         token = jwt.encode(payload={"user_id": 123})
         decoded = decode_payload(jwt, token)
 
-        jwt.list.add(decoded["tid"])
+        jwt.list.add(decoded["jti"])
 
-        assert jwt.list.check(decoded["tid"]) is True
+        assert jwt.list.check(decoded["jti"]) is True
 
     def test_whitelist_add_and_check(self):
         jwt = JWT(
@@ -338,9 +338,9 @@ class TestJWTListMemory:
         token = jwt.encode(payload={"user_id": 123})
         decoded = decode_payload(jwt, token)
 
-        jwt.list.add(decoded["tid"])
+        jwt.list.add(decoded["jti"])
 
-        assert jwt.list.check(decoded["tid"]) is True
+        assert jwt.list.check(decoded["jti"]) is True
 
     def test_whitelist_not_exists(self):
         jwt = JWT(
@@ -352,7 +352,7 @@ class TestJWTListMemory:
         token = jwt.encode(payload={"user_id": 123})
         decoded = decode_payload(jwt, token)
 
-        assert jwt.list.check(decoded["tid"]) is False
+        assert jwt.list.check(decoded["jti"]) is False
 
 
 class TestJWTListJSON:
@@ -376,9 +376,9 @@ class TestJWTListJSON:
             token = jwt.encode(payload={"user_id": 123})
             decoded = decode_payload(jwt, token)
 
-            jwt.list.add(decoded["tid"])
+            jwt.list.add(decoded["jti"])
 
-            assert jwt.list.check(decoded["tid"]) is True
+            assert jwt.list.check(decoded["jti"]) is True
 
             jwt2 = JWT(
                 alg="HS256",
@@ -389,7 +389,7 @@ class TestJWTListJSON:
                     "json_path": json_path,
                 },
             )
-            assert jwt2.list.check(decoded["tid"]) is True
+            assert jwt2.list.check(decoded["jti"]) is True
         finally:
             if os.path.exists(json_path):
                 os.remove(json_path)
@@ -414,9 +414,9 @@ class TestJWTListJSON:
             token = jwt.encode(payload={"user_id": 123})
             decoded = decode_payload(jwt, token)
 
-            jwt.list.add(decoded["tid"])
+            jwt.list.add(decoded["jti"])
 
-            assert jwt.list.check(decoded["tid"]) is True
+            assert jwt.list.check(decoded["jti"]) is True
         finally:
             if os.path.exists(json_path):
                 os.remove(json_path)
@@ -520,5 +520,5 @@ class TestJWTClaims:
         assert decoded["exp"] is not None
         assert decoded["nbf"] is not None
         assert decoded["iat"] is not None
-        assert decoded["tid"] is not None
+        assert decoded["jti"] is not None
         assert decoded["custom"] == "claim"
