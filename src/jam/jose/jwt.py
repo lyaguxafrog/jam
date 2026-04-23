@@ -360,7 +360,7 @@ class JWT(BaseJWT):
     ) -> dict[str, Any]:
         now = int(datetime.now().timestamp())
         payload = {
-            "tid": str(uuid4()),
+            "jti": str(uuid4()),  # TODO: Make it replecable
             "iat": now,
             "iss": iss,
             "sub": sub,
