@@ -11,10 +11,11 @@ from jam.aio.sessions.__base__ import BaseAsyncSessionModule
 class BaseAsyncJam(BaseJam):
     """Base async jam instance."""
 
-    MODULES: dict[str, str] = {}
+    MODULES: dict[str, str | dict[str, str]] = {}
 
     session: BaseAsyncSessionModule | None = None  # type: ignore[override]
     oauth2: dict[str, BaseAsyncOAuth2Client] | None = None  # type: ignore[override]
+    jose: dict[str, Any] | None = None  # type: ignore[override]
 
     @abstractmethod
     async def jwt_make_payload(  # type: ignore[override]
