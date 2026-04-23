@@ -6,6 +6,7 @@ from typing import Any
 from jam.__base__ import BaseJam
 from jam.aio.oauth2.__base__ import BaseAsyncOAuth2Client
 from jam.aio.sessions.__base__ import BaseAsyncSessionModule
+from jam.jose.__base__ import BaseJWE, BaseJWS
 
 
 class BaseAsyncJam(BaseJam):
@@ -16,6 +17,8 @@ class BaseAsyncJam(BaseJam):
     session: BaseAsyncSessionModule | None = None  # type: ignore[override]
     oauth2: dict[str, BaseAsyncOAuth2Client] | None = None  # type: ignore[override]
     jose: dict[str, Any] | None = None  # type: ignore[override]
+    jws: BaseJWS | None = None  # type: ignore[override]
+    jwe: BaseJWE | None = None  # type: ignore[override]
 
     @abstractmethod
     async def jwt_make_payload(  # type: ignore[override]
@@ -338,6 +341,70 @@ class BaseAsyncJam(BaseJam):
 
         Returns:
             str: PASETO
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    async def jws_sign(
+        self,
+        data: dict[str, Any] | str,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Sign data using JWS.
+
+        Args:
+            data: Data to sign. If dict, will be JSON encoded.
+            header: JWS header.
+
+        Returns:
+            str: JWS token.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    async def jws_verify(self, token: str) -> dict[str, Any]:
+        """Verify JWS token.
+
+        Args:
+            token: JWS token.
+
+        Returns:
+            dict[str, Any]: Decoded payload.
+
+        Raises:
+            JamJWSVerificationError: If verification fails.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    async def jwe_encrypt(
+        self,
+        data: dict[str, Any] | str,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Encrypt data using JWE.
+
+        Args:
+            data: Data to encrypt. If dict, will be JSON encoded.
+            header: JWE header.
+
+        Returns:
+            str: JWE token.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    async def jwe_decrypt(self, token: str) -> bytes:
+        """Decrypt JWE token.
+
+        Args:
+            token: JWE token.
+
+        Returns:
+            bytes: Decrypted data.
+
+        Raises:
+            JamJWEDecryptionError: If decryption fails.
         """
         raise NotImplementedError
 

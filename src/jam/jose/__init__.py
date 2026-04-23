@@ -12,7 +12,7 @@ from jam.logger import BaseLogger, logger
 from jam.encoders import BaseEncoder, JsonEncoder
 
 
-def create_instance(
+def create_jwt_instance(
     alg: str,
     secret: Any = None,
     secret_key: Any = None,
@@ -42,6 +42,61 @@ def create_instance(
     )
 
 
+def create_jws_instance(
+    alg: str,
+    key: Any = None,
+    password: bytes | None = None,
+    logger: BaseLogger = logger,
+    **kwargs: Any,
+) -> JWS:
+    """Create JWS instance."""
+    if key is None:
+        raise ValueError("'key' must be provided")
+
+    from jam.jose.jwk import JWK as JWKClass
+
+    if isinstance(key, JWKClass):
+        key = key._to_keylike()
+
+    return JWS(
+        alg=alg,
+        key=key,
+        password=password,
+        logger=logger,
+    )
+
+
+def create_jwe_instance(
+    alg: str,
+    enc: str,
+    key: Any = None,
+    password: bytes | None = None,
+    serializer: BaseEncoder | type[BaseEncoder] = JsonEncoder,
+    logger: BaseLogger = logger,
+    **kwargs: Any,
+) -> JWE:
+    """Create JWE instance."""
+    if key is None:
+        raise ValueError("'key' must be provided")
+
+    from jam.jose.jwk import JWK as JWKClass
+
+    if isinstance(key, JWKClass):
+        key = key._to_keylike()
+
+    return JWE(
+        alg=alg,
+        enc=enc,
+        key=key,
+        password=password,
+        serializer=serializer,
+        logger=logger,
+    )
+
+
+create_instance = create_jwt_instance
+
+
 __all__ = [
     "JWK",
     "JWKSet",
@@ -52,4 +107,7 @@ __all__ = [
     "JWKEC",
     "JWKOct",
     "create_instance",
+    "create_jwt_instance",
+    "create_jws_instance",
+    "create_jwe_instance",
 ]

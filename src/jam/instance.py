@@ -20,10 +20,10 @@ class Jam(BaseJam):
     """Main instance."""
 
     MODULES: dict[str, str | dict[str, str]] = {
-        "jwt": "jam.jwt.create_instance",  # deprecated
         "jose": {
-            "jwt": "jam.jose.create_instance",
-            # TODO: Add jws, jwk, jwe
+            "jwt": "jam.jose.create_jwt_instance",
+            "jws": "jam.jose.create_jws_instance",
+            "jwe": "jam.jose.create_jwe_instance",
         },
         "session": "jam.sessions.create_instance",
         "oauth2": "jam.oauth2.create_instance",
@@ -193,6 +193,79 @@ class Jam(BaseJam):
         if include_headers:
             return data
         return payload
+
+    def jws_sign(
+        self,
+        data: dict[str, Any] | str,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Sign data using JWS.
+
+        Args:
+            data: Data to sign. If dict, will be JSON encoded.
+            header: JWS header.
+
+        Returns:
+            str: JWS token.
+        """
+        assert self.jws is not None
+        self._logger.debug(f"Signing data with JWS, header: {header}")
+        token = self.jws.sign(header or {}, data)
+        self._logger.debug(f"JWS token created, length: {len(token)}")
+        return token
+
+    def jws_verify(self, token: str) -> dict[str, Any]:
+        """Verify JWS token.
+
+        Args:
+            token: JWS token.
+
+        Returns:
+            dict[str, Any]: Decoded payload.
+        """
+        assert self.jws is not None
+        self._logger.debug(f"Verifying JWS token, length: {len(token)}")
+        result = self.jws.verify(token)
+        self._logger.debug("JWS token verified successfully")
+        return result
+
+    def jwe_encrypt(
+        self,
+        data: dict[str, Any] | str,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Encrypt data using JWE.
+
+        Args:
+            data: Data to encrypt. If dict, will be JSON encoded.
+            header: JWE header.
+
+        Returns:
+            str: JWE token.
+        """
+        assert self.jwe is not None
+        self._logger.debug(f"Encrypting data with JWE, header: {header}")
+        token = self.jwe.encrypt(
+            self._serializer.dumps(data) if isinstance(data, dict) else data,
+            header,
+        )
+        self._logger.debug(f"JWE token created, length: {len(token)}")
+        return token
+
+    def jwe_decrypt(self, token: str) -> bytes:
+        """Decrypt JWE token.
+
+        Args:
+            token: JWE token.
+
+        Returns:
+            bytes: Decrypted data.
+        """
+        assert self.jwe is not None
+        self._logger.debug(f"Decrypting JWE token, length: {len(token)}")
+        result = self.jwe.decrypt(token)
+        self._logger.debug("JWE token decrypted successfully")
+        return result
 
     def session_create(self, session_key: str, data: dict[str, Any]) -> str:
         """Create new session.

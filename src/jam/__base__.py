@@ -6,7 +6,7 @@ from typing import Any, Literal
 
 from jam.encoders import BaseEncoder, JsonEncoder
 from jam.exceptions import JamConfigurationError
-from jam.jose.__base__ import BaseJWT
+from jam.jose.__base__ import BaseJWE, BaseJWS, BaseJWT
 from jam.logger import BaseLogger, JamLogger
 from jam.oauth2.__base__ import BaseOAuth2Client
 from jam.otp.__base__ import BaseOTP, OTPConfig
@@ -55,6 +55,8 @@ class BaseJam(ABC):
         self._logger = logger(log_level)
         self._serializer = serializer
         self.jwt: BaseJWT | None = None
+        self.jws: BaseJWS | None = None
+        self.jwe: BaseJWE | None = None
         self.jose: dict[str, Any] | None = None
         self.session: BaseSessionModule | None = None
         self.oauth2: dict[str, BaseOAuth2Client] | None = None
@@ -182,6 +184,10 @@ class BaseJam(ABC):
 
                         if subname == "jwt":
                             self.jwt = module_instance
+                        elif subname == "jws":
+                            self.jws = module_instance
+                        elif subname == "jwe":
+                            self.jwe = module_instance
 
                         self._logger.debug(
                             f"Module {name}.{subname} initialized successfully"
@@ -279,6 +285,70 @@ class BaseJam(ABC):
         Returns:
             dict[str, Any]: Decoded payload
 
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def jws_sign(
+        self,
+        data: dict[str, Any] | str,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Sign data using JWS.
+
+        Args:
+            data: Data to sign. If dict, will be JSON encoded.
+            header: JWS header.
+
+        Returns:
+            str: JWS token.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def jws_verify(self, token: str) -> dict[str, Any]:
+        """Verify JWS token.
+
+        Args:
+            token: JWS token.
+
+        Returns:
+            dict[str, Any]: Decoded payload.
+
+        Raises:
+            JamJWSVerificationError: If verification fails.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def jwe_encrypt(
+        self,
+        data: dict[str, Any] | str,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Encrypt data using JWE.
+
+        Args:
+            data: Data to encrypt. If dict, will be JSON encoded.
+            header: JWE header.
+
+        Returns:
+            str: JWE token.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def jwe_decrypt(self, token: str) -> bytes:
+        """Decrypt JWE token.
+
+        Args:
+            token: JWE token.
+
+        Returns:
+            bytes: Decrypted data.
+
+        Raises:
+            JamJWEDecryptionError: If decryption fails.
         """
         raise NotImplementedError
 
