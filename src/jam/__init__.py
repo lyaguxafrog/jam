@@ -12,5 +12,5 @@ from jam.encoders import JsonEncoder
 from jam.instance import Jam
 
 
-__version__ = "3.2.0b2"
+__version__ = "3.2.0b3"
 __all__ = ["Jam", "JsonEncoder", "BaseJam", "BaseEncoder"]
