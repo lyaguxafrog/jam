@@ -8,29 +8,6 @@ from typing import Any
 from jam.jose.lists.__base__ import BaseJWTList
 
 
-REGISTERED_HEADER_NAMES = frozenset(
-    {
-        "alg",
-        "jku",
-        "jwk",
-        "kid",
-        "x5u",
-        "x5c",
-        "x5t",
-        "x5t#S256",
-        "typ",
-        "cty",
-        "crit",
-    }
-)
-
-REGISTERED_JWK_PARAMS = frozenset(
-    {"kty", "use", "key_ops", "alg", "kid", "x5u", "x5c", "x5t", "x5t#S256"}
-)
-
-RESERVED_CLAIMS = frozenset({"typ", "cty"})
-
-
 class BaseJWT(ABC):
     """Base JWT."""
 
