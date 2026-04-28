@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from collections.abc import Callable
-import datetime
 import time
 from typing import Any
 import uuid
@@ -50,9 +48,10 @@ class Jam(BaseJam):
         Returns:
             dict[str, Any]: Payload
         """
+        now = time.time()
         payload = {
-            "iat": datetime.datetime.now().timestamp(),
-            "exp": (datetime.datetime.now().timestamp() + exp) if exp else None,
+            "iat": now,
+            "exp": (now + exp) if exp else None,
             "jti": str(uuid.uuid4()),
         }
         payload = payload | data
