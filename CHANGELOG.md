@@ -31,7 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - JWS
 - `JamJWTNotYetValid` exception for nbf claim validation
 - `check_nbf` parameter in `Jam.jwt_decode()` and `Jam.aio.jwt_decode()`
-- `include_headers` parameter in `Jam.aio.jwt_decode()`
+- `include_headers` parameter in `Jam.jwt_decode()` and `Jam.aio.jwt_decode()`
+- `jti` parameter in `Jam.jwt_encode()` and `Jam.aio.jwt_encode()`
 - Support for pre-built JWS/JWE instances in JWT constructor
 - `JWT.decode()` always returns `{"header": dict, "payload": dict}`
 
@@ -39,11 +40,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - JWT sign-then-encrypt now follows RFC 7519 specification
 - Auto-detection of JWE key management algorithm based on key type (RSA→RSA-OAEP, EC→ECDH-ES, symmetric→A*-KW)
 - `exp` and `nbf` claims validation moved from JOSE module to `Jam` instances
-
-### Deprecated
+- `include_headers` parameter added to both sync and async `jwt_decode()`
 
 ### Deprecated
 - `jam.Jam.jwt_make_payload`: The JWT specification has been introduced, so signing is now done via JWS
+- `jam.Jam.jwt_create`: Use `jam.Jam.jwt_encode`
 - `jam.jwt.JWT`: Use `jam.jose.JWT`
 
 ### Removed
