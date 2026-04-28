@@ -441,9 +441,11 @@ class JWKSet(BaseJWKSet):
     Represents a set of JWKs. Used to organize and filter collections of keys.
 
     Example:
+        ```python
         >>> jwkset = JWKSet(keys=[rsa_key, ec_key])
         >>> jwkset.get_by_kid("my-key-id")
         >>> jwkset.filter(kty="RSA")
+        ```
     """
 
     def __init__(self, keys: list[dict[str, Any]] | None = None):
