@@ -14,6 +14,12 @@ class BaseJWT(ABC):
     JWS: type[BaseJWS]
     list: BaseJWTList | None = None
 
+    @property
+    @abstractmethod
+    def jti(self) -> str:
+        """The JWT ID."""
+        raise NotImplementedError
+
     @abstractmethod
     def encode(
         self,
@@ -22,6 +28,7 @@ class BaseJWT(ABC):
         aud: str | None = None,
         exp: int | None = None,
         nbf: int | None = None,
+        jti: str | None = None,
         header: dict[str, Any] | None = None,
         payload: dict[str, Any] | None = None,
     ) -> str:
@@ -33,6 +40,7 @@ class BaseJWT(ABC):
             iss (str | None): The issuer.
             sub (str | None): The subject.
             aud (str | None): The audience.
+            jti (str | None): The JWT ID.
             header (dict[str, Any] | None): The header to include in the JWT.
             payload (dict[str, Any] | None): The payload to include in the JWT.
 

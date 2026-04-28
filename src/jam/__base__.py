@@ -4,7 +4,8 @@ from abc import ABC, abstractmethod
 import gc
 from typing import Any, Literal
 
-from jam.encoders import BaseEncoder, JsonEncoder
+from jam.__base_encoder__ import BaseEncoder
+from jam.encoders import JsonEncoder
 from jam.exceptions import JamConfigurationError
 from jam.jose.__base__ import BaseJWE, BaseJWS, BaseJWT
 from jam.logger import BaseLogger, JamLogger
@@ -244,6 +245,7 @@ class BaseJam(ABC):
         aud: str | None = None,
         exp: int | None = None,
         nbf: int | None = None,
+        jti: str | None = None,
         *,
         payload: dict[str, Any] | None = None,
         header: dict[str, Any] | None = None,
@@ -256,6 +258,7 @@ class BaseJam(ABC):
             iss (str | None): The issuer.
             sub (str | None): The subject.
             aud (str | None): The audience.
+            jti (str | None): The JWT ID. If none use the JTI fabric function.
             header (dict[str, Any] | None): The header to include in the JWT.
             payload (dict[str, Any] | None): The payload to include in the JWT.
 
