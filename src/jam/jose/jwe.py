@@ -84,13 +84,14 @@ class JWE(BaseJWE):
 
     def encrypt(
         self,
-        plaintext: bytes | str,
+        plaintext: bytes | str | dict[str, Any],
         header: dict[str, Any] | None = None,
     ) -> str:
         """Encrypt plaintext.
 
         Args:
             plaintext: Data to encrypt. If str, will be encoded to UTF-8.
+                If dict, will be serialized using self._serializer.
             header: Additional JWE header.
 
         Returns:
@@ -103,9 +104,7 @@ class JWE(BaseJWE):
             if isinstance(plaintext, str):
                 plaintext_bytes = plaintext.encode("utf-8")
             elif isinstance(plaintext, dict):
-                plaintext_bytes = json.dumps(
-                    plaintext, separators=(",", ":")
-                ).encode()
+                plaintext_bytes = self._serializer.dumps(plaintext)
             else:
                 plaintext_bytes = plaintext
 

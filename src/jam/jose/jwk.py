@@ -315,6 +315,9 @@ class JWK(BaseJWK):
 
         Returns:
             PEM encoded key string.
+
+        Raises:
+            ValueError: If required parameters are missing.
         """
         from cryptography.hazmat.primitives import serialization
         from cryptography.hazmat.primitives.asymmetric import rsa
@@ -323,6 +326,14 @@ class JWK(BaseJWK):
         e = int.from_bytes(__base64url_decode__(self._data["e"]), "big")
 
         if "d" in self._data:
+            required_private = ["d", "p", "q"]
+            missing = [p for p in required_private if p not in self._data]
+            if missing:
+                raise ValueError(
+                    f"Missing RSA private key parameters: {missing}. "
+                    "For RSA private key conversion, 'd', 'p', and 'q' are required."
+                )
+
             d = int.from_bytes(__base64url_decode__(self._data["d"]), "big")
             p = int.from_bytes(__base64url_decode__(self._data["p"]), "big")
             q = int.from_bytes(__base64url_decode__(self._data["q"]), "big")
