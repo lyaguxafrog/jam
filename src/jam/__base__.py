@@ -290,6 +290,7 @@ class BaseJam(ABC):
         aud: str | None = None,
         exp: int | None = None,
         nbf: int | None = None,
+        jti: str | None = None,
         *,
         payload: dict[str, Any] | None = None,
         header: dict[str, Any] | None = None,
@@ -302,6 +303,7 @@ class BaseJam(ABC):
             iss (str | None): The issuer.
             sub (str | None): The subject.
             aud (str | None): The audience.
+            jti (str | None): The JWT ID. If none use the JTI fabric function.
             header (dict[str, Any] | None): The header to include in the JWT.
             payload (dict[str, Any] | None): The payload to include in the JWT.
 

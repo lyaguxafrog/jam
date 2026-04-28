@@ -4,7 +4,7 @@ import base64
 from datetime import datetime
 import json
 from typing import TYPE_CHECKING, Any
-from uuid import uuid4
+import uuid
 
 from jam.__base_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
@@ -356,11 +356,12 @@ class JWT(BaseJWT):
         aud: str | None,
         exp: int | None,
         nbf: int | None,
+        jti: str | None,
         data: dict[str, Any] | None,
     ) -> dict[str, Any]:
         now = int(datetime.now().timestamp())
         payload = {
-            "jti": str(uuid4()),  # TODO: Make it replecable
+            "jti": jti,
             "iat": now,
             "iss": iss,
             "sub": sub,
@@ -373,6 +374,11 @@ class JWT(BaseJWT):
         payload = {k: v for k, v in payload.items() if v is not None}
         return payload
 
+    @property
+    def jti(self) -> str:
+        """The JWT ID."""
+        return str(uuid.uuid4())
+
     def encode(
         self,
         iss: str | None = None,
@@ -380,6 +386,7 @@ class JWT(BaseJWT):
         aud: str | None = None,
         exp: int | None = None,
         nbf: int | None = None,
+        jti: str | None = None,
         header: dict[str, Any] | None = None,
         payload: dict[str, Any] | None = None,
     ) -> str:
@@ -391,6 +398,7 @@ class JWT(BaseJWT):
             iss (str | None): The issuer.
             sub (str | None): The subject.
             aud (str | None): The audience.
+            jti (str | None): The JWT ID.
             header (dict[str, Any] | None): The header to include in the JWT.
             payload (dict[str, Any] | None): The payload to include in the JWT.
 
@@ -406,7 +414,7 @@ class JWT(BaseJWT):
         _base_header = {"alg": self._alg, "typ": "JWT"}
         if header:
             _base_header.update(header)
-        _payload = self._make_payload(iss, sub, aud, exp, nbf, payload)
+        _payload = self._make_payload(iss, sub, aud, exp, nbf, jti, payload)
         return self.jws.sign(header=_base_header, data=_payload)
 
     def decode(self, token: str) -> dict[str, Any]:
