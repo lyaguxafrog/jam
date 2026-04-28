@@ -50,13 +50,14 @@ class BaseAsyncJam(BaseJam):
         raise NotImplementedError
 
     @abstractmethod
-    async def jwt_encode(
+    async def jwt_encode(  # type: ignore[override]
         self,
         iss: str | None = None,
         sub: str | None = None,
         aud: str | None = None,
         exp: int | None = None,
         nbf: int | None = None,
+        jti: str | None = None,
         *,
         payload: dict[str, Any] | None = None,
         header: dict[str, Any] | None = None,
@@ -69,6 +70,7 @@ class BaseAsyncJam(BaseJam):
             iss (str | None): The issuer.
             sub (str | None): The subject.
             aud (str | None): The audience.
+            jti (str | None): The JWT ID. If none use the JTI fabric function.
             header (dict[str, Any] | None): The header to include in the JWT.
             payload (dict[str, Any] | None): The payload to include in the JWT.
 
@@ -345,7 +347,7 @@ class BaseAsyncJam(BaseJam):
         raise NotImplementedError
 
     @abstractmethod
-    async def jws_sign(
+    async def jws_sign(  # type: ignore[override]
         self,
         data: dict[str, Any] | str,
         header: dict[str, Any] | None = None,
@@ -362,7 +364,9 @@ class BaseAsyncJam(BaseJam):
         raise NotImplementedError
 
     @abstractmethod
-    async def jws_verify(self, token: str) -> dict[str, Any]:
+    async def jws_verify(  # type: ignore[override]
+        self, token: str
+    ) -> dict[str, Any]:
         """Verify JWS token.
 
         Args:
@@ -377,7 +381,7 @@ class BaseAsyncJam(BaseJam):
         raise NotImplementedError
 
     @abstractmethod
-    async def jwe_encrypt(
+    async def jwe_encrypt(  # type: ignore[override]
         self,
         data: dict[str, Any] | str,
         header: dict[str, Any] | None = None,
@@ -394,7 +398,9 @@ class BaseAsyncJam(BaseJam):
         raise NotImplementedError
 
     @abstractmethod
-    async def jwe_decrypt(self, token: str) -> bytes:
+    async def jwe_decrypt(  # type: ignore[override]
+        self, token: str
+    ) -> bytes:
         """Decrypt JWE token.
 
         Args:

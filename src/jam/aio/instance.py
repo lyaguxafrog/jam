@@ -81,6 +81,7 @@ class Jam(BaseAsyncJam):
         aud: str | None = None,
         exp: int | None = None,
         nbf: int | None = None,
+        jti: str | None = None,
         *,
         payload: dict[str, Any] | None = None,
         header: dict[str, Any] | None = None,
@@ -93,6 +94,7 @@ class Jam(BaseAsyncJam):
             iss (str | None): The issuer.
             sub (str | None): The subject.
             aud (str | None): The audience.
+            jti (str | None): The JWT ID. If none use the JTI fabric function.
             header (dict[str, Any] | None): The header to include in the JWT.
             payload (dict[str, Any] | None): The payload to include in the JWT.
 
@@ -100,12 +102,15 @@ class Jam(BaseAsyncJam):
             str: The encoded JWT.
         """
         assert self.jwt is not None
+        if not jti:
+            jti = self.jwt.jti
         token = self.jwt.encode(
             iss=iss,
             sub=sub,
             aud=aud,
             exp=exp,
             nbf=nbf,
+            jti=jti,
             payload=payload,
             header=header,
         )
