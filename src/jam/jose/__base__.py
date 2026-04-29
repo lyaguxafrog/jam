@@ -50,8 +50,12 @@ class BaseJWT(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def decode(self, token: str) -> dict[str, Any]:
+    def decode(self, token: str, verify=True) -> dict[str, Any]:
         """Decode the JWT and return the header and payload.
+
+        Args:
+            token (str): JWT
+            verify (bool): Verify the JWT signature.
 
         Returns:
             dict with 'header' and 'payload' keys (both dicts).
