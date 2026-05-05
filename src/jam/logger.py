@@ -10,7 +10,14 @@ class BaseLogger(ABC):
     """Interface for logging."""
 
     _LOG_NAME: str = "jam"
-    log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
+
+    def __init__(
+        self,
+        log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+        | str = "INFO",
+    ):
+        """Initialize the logger."""
+        self.log_level = log_level
 
     @abstractmethod
     def info(self, message: str) -> None:

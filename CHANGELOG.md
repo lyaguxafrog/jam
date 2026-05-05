@@ -21,6 +21,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 -->
 
+## [3.1.1] - 05-05-2026
+
+#### Added
+- Experemental plugin system.
+- AGENTS.md file.
+
+### Changed
+- Remove `unstable` branch.
+
+### Fixed
+- Fix typo in main instance.
+
+---
+
 ## [3.1.0] - 16-03-2026
 
 ### Added
@@ -63,5 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated all dependencies.
 
 ---
-[3.1.0] https://github.com/lyaguxafrog/jam/compare/v3.0.0...v3.1.0
-[3.0.0] https://github.com/lyaguxafrog/jam/compare/v2.5.6...v3.0.0
+
+- [3.1.1] https://github.com/lyaguxafrog/jam/compare/v3.1.0...v3.1.1
+- [3.1.0] https://github.com/lyaguxafrog/jam/compare/v3.0.0...v3.1.0
+- [3.0.0] https://github.com/lyaguxafrog/jam/compare/v2.5.6...v3.0.0
