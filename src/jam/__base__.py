@@ -189,6 +189,16 @@ class BaseJam(ABC):
                 raise JamConfigurationError(message="Unknown OTP type.")
 
     @abstractmethod
+    def emit(self, event: str, **kwargs) -> None:
+        """Emit event.
+
+        Args:
+            event (str): Event name
+            **kwargs: Event data
+        """
+        raise NotImplementedError
+
+    @abstractmethod
     def jwt_make_payload(
         self, exp: int | None, data: dict[str, Any]
     ) -> dict[str, Any]:
