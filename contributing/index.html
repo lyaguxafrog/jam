@@ -1256,6 +1256,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#development-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development Tools
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#gitflow" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1271,7 +1282,7 @@
   <a href="#commits" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Commits:
+        Commits
       
     </span>
   </a>
@@ -1405,6 +1416,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#development-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development Tools
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#gitflow" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1420,7 +1442,7 @@
   <a href="#commits" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Commits:
+        Commits
       
     </span>
   </a>
@@ -1477,16 +1499,20 @@
 <h1 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Permanent link">&para;</a></h1>
 <p>If you want to help develop Jam, there are a few rules to follow.</p>
 <h2 id="code-style">Code style<a class="headerlink" href="#code-style" title="Permanent link">&para;</a></h2>
-<p><div class="highlight"><pre><span></span><code><span class="c1"># -*- coding: utf-8 -*-</span>
-
-<span class="c1"># Built-in libraries</span>
+<ul>
+<li>Python &gt;= 3.10</li>
+<li>Line length: 80 characters, indented 4 spaces</li>
+<li>Import order: stdlib → third-party → library modules (handled by ruff/isort)</li>
+<li>Docstrings: Google convention (handled by ruff/pydocstyle)</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1"># Built-in libraries</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
 
 <span class="c1"># Third-party libraries</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">Crypto</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hash</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cryptography.hazmat.primitives</span><span class="w"> </span><span class="kn">import</span> <span class="n">hashes</span>
 
 <span class="c1"># Library modules</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">jam.jwt.__utils__</span><span class="w"> </span><span class="kn">import</span> <span class="n">__base64url_decode__</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jam.jwt</span><span class="w"> </span><span class="kn">import</span> <span class="n">Token</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">SomeClass</span><span class="p">:</span>
@@ -1501,7 +1527,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sv</span> <span class="o">=</span> <span class="n">some_value</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">some_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">something</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Method Description.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Method description.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            something (int): Argument description</span>
@@ -1510,22 +1536,28 @@
 <span class="sd">            ValueError: if something &lt; 1</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            (int)</span>
+<span class="sd">            int: Something plus one</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">something</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;something &lt; 1&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">something</span> <span class="o">+</span> <span class="mi">1</span>
 </code></pre></div>
-Line length 80 characters, indented 4 spaces.</p>
+<h2 id="development-tools">Development Tools<a class="headerlink" href="#development-tools" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>ruff</strong> — linter + formatter (<code>uv run ruff check</code>, <code>uv run ruff format</code>)</li>
+<li><strong>pytest</strong> — tests (<code>uv run pytest</code>)</li>
+<li><strong>pyrefly</strong> — type checking (<code>uv run pyrefly check</code>)</li>
+<li><strong>pre-commit</strong> — <code>uv run pre-commit run --all-files</code></li>
+</ul>
 <h2 id="gitflow">Gitflow<a class="headerlink" href="#gitflow" title="Permanent link">&para;</a></h2>
-<h3 id="commits">Commits:<a class="headerlink" href="#commits" title="Permanent link">&para;</a></h3>
+<h3 id="commits">Commits<a class="headerlink" href="#commits" title="Permanent link">&para;</a></h3>
 <p>The project must have <code>pre-commit</code></p>
 <ul>
-<li><code>[+]</code> Adding new functionality.</li>
-<li><code>[-]</code> Removing something, e.g. removing a function or deleting a file.</li>
-<li><code>[*]</code> Changing the logic.</li>
-<li><code>[~]</code> Changes that do not affect the logic, documentation, linters, etc.</li>
+<li><code>[+]</code> Adding new functionality</li>
+<li><code>[-]</code> Removing something, e.g. removing a function or deleting a file</li>
+<li><code>[*]</code> Changing the logic</li>
+<li><code>[~]</code> Changes that do not affect the logic, documentation, linters, etc</li>
 </ul>
 <p>The keys in the commit body are also used:</p>
 <ul>
@@ -1533,23 +1565,18 @@ Line length 80 characters, indented 4 spaces.</p>
 <li><code>FB</code>(fix by): How it was made or fixed</li>
 <li><code>N</code>(note): A note of some kind</li>
 </ul>
-<p>Example of a correct commit
+<p>Example of a correct commit:</p>
 <div class="highlight"><pre><span></span><code>[*] Changed JWT decryption logic
 R: Used a third-party heavy dependency that slowed down the code
 FB: Removed the dependency and wrote independently
-</code></pre></div></p>
+</code></pre></div>
 <h3 id="branches">Branches<a class="headerlink" href="#branches" title="Permanent link">&para;</a></h3>
-<p>The project has one main branche:</p>
-<ul>
-<li><code>master</code> - Stable code of the latest release</li>
-<li><code>unstable</code> - Unstable code of the latest release</li>
-</ul>
-<p>All branches are created from <code>unstable</code> and adhere to strict branch naming:</p>
+<p>All branches are created from <code>master</code> and adhere to strict branch naming:</p>
 <ul>
 <li>New feature: <code>feature/&lt;id-issue-if-it-is&gt;-&lt;pair-words-about-feature&gt;</code></li>
 <li>Bug fixes: <code>fix/&lt;id-issue-if-it-is&gt;-&lt;pair-words-about-bug&gt;</code></li>
 <li>Refactoring: <code>refactor/&lt;id-issue-if-it-is&gt;-&lt;what-exactly-you-do&gt;</code></li>
-<li>Writing documentation: <code>docs/&lt;what-exactly-you-do&gt;</code>.</li>
+<li>Writing documentation: <code>docs/&lt;what-exactly-you-do&gt;</code></li>
 </ul>
 <p>Examples:</p>
 <ul>
@@ -1557,24 +1584,24 @@ FB: Removed the dependency and wrote independently
 <li><code>fix/18-jwt-making</code></li>
 </ul>
 <h3 id="pull-requests">Pull requests<a class="headerlink" href="#pull-requests" title="Permanent link">&para;</a></h3>
-<p>The title of the pull request must contain a keyword:
-* <code>FEAT</code> Adding a new feature
-* <code>BUGFIX</code> Bug fix
-* <code>HOTFIX</code> Urgent bug fix
-* <code>DOCS</code> Edits/additions to documentation</p>
-<p>There is a template for the poolquest,
-in it clearly describe what you did and why.</p>
-<p>Example:
-<div class="highlight"><pre><span></span><code>&lt;!--this is a title --&gt;
-FEAT Validation of a redis session
+<p>The title of the pull request must contain a keyword:</p>
+<ul>
+<li><code>FEAT</code> — Adding a new feature</li>
+<li><code>BUGFIX</code> — Bug fix</li>
+<li><code>HOTFIX</code> — Urgent bug fix</li>
+<li><code>DOCS</code> — Edits/additions to documentation</li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>FEAT Validation of a redis session
 
 <span class="gu">## What was done</span>
-<span class="k">*</span><span class="w"> </span>&lt;!--A brief description of what we&#39;ve done--&gt;
-*
+
+<span class="k">-</span><span class="w"> </span>Brief description of what was done
 
 <span class="gu">## Test report</span>
-&lt;!-- Describe how you tested --&gt;
-</code></pre></div></p>
+
+<span class="k">-</span><span class="w"> </span>How you tested
+</code></pre></div>
 
 
 

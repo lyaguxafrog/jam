@@ -1378,6 +1378,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#jam.BaseJam.__setup_plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;__setup_plugins
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jam.BaseJam.emit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;emit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#jam.BaseJam.jwt_create" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2000,6 +2022,14 @@ Documentation: <a href="https://jam.makridenko.ru">https://jam.makridenko.ru</a>
             </td>
           </tr>
           <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="            plugins (jam.plugins)" href="../jam.plugins/#jam.plugins">plugins</a></code></td>
+            <td>
+              <div class="doc-md-description">
+                <p>Jam plugin system.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code><a class="autorefs autorefs-internal" title="            sessions (jam.sessions)" href="../jam.sessions/#jam.sessions">sessions</a></code></td>
             <td>
               <div class="doc-md-description">
@@ -2252,8 +2282,9 @@ Documentation: <a href="https://jam.makridenko.ru">https://jam.makridenko.ru</a>
     <span class="n">log_level</span><span class="p">:</span> <span class="n"><span title="typing.Literal">Literal</span></span><span class="p">[</span>
         <span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span> <span class="s2">&quot;WARNING&quot;</span><span class="p">,</span> <span class="s2">&quot;ERROR&quot;</span><span class="p">,</span> <span class="s2">&quot;CRITICAL&quot;</span>
     <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
-    <span class="n">serializer</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseEncoder (jam.encoders.BaseEncoder)" href="#jam.BaseEncoder">BaseEncoder</a></span>
-    <span class="o">|</span> <span class="n"><span title="type">type</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            BaseEncoder (jam.encoders.BaseEncoder)" href="#jam.BaseEncoder">BaseEncoder</a></span><span class="p">]</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-internal" title="            JsonEncoder (jam.encoders.JsonEncoder)" href="../jam.encoders/#jam.encoders.JsonEncoder">JsonEncoder</a></span><span class="p">,</span>
+    <span class="n">serializer</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseEncoder (jam.__base_encoder__.BaseEncoder)" href="../jam.__base_encoder__/#jam.__base_encoder__.BaseEncoder">BaseEncoder</a></span>
+    <span class="o">|</span> <span class="n"><span title="type">type</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            BaseEncoder (jam.__base_encoder__.BaseEncoder)" href="../jam.__base_encoder__/#jam.__base_encoder__.BaseEncoder">BaseEncoder</a></span><span class="p">]</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-internal" title="            JsonEncoder (jam.encoders.JsonEncoder)" href="../jam.encoders/#jam.encoders.JsonEncoder">JsonEncoder</a></span><span class="p">,</span>
+    <span class="n">plugins</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="type">type</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            BasePlugin (jam.plugins.__base__.BasePlugin)" href="../jam.plugins.__base__/#jam.plugins.__base__.BasePlugin">BasePlugin</a></span><span class="p">]]</span> <span class="o">=</span> <span class="p">[],</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -2347,7 +2378,7 @@ Documentation: <a href="https://jam.makridenko.ru">https://jam.makridenko.ru</a>
                 <code>serializer</code>
             </td>
             <td>
-                  <code><span title="Union">Union</span>[<a class="autorefs autorefs-internal" title="            BaseEncoder (jam.encoders.BaseEncoder)" href="#jam.BaseEncoder">BaseEncoder</a>, <span title="type">type</span>[<span title="BaseBrowser">BaseBrowser</span>]]</code>
+                  <code><span title="Union">Union</span>[<a class="autorefs autorefs-internal" title="            BaseEncoder (jam.__base_encoder__.BaseEncoder)" href="../jam.__base_encoder__/#jam.__base_encoder__.BaseEncoder">BaseEncoder</a>, <span title="type">type</span>[<span title="BaseBrowser">BaseBrowser</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2356,6 +2387,22 @@ Documentation: <a href="https://jam.makridenko.ru">https://jam.makridenko.ru</a>
             </td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="            JsonEncoder (jam.encoders.JsonEncoder)" href="../jam.encoders/#jam.encoders.JsonEncoder">JsonEncoder</a></code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>plugins</code>
+            </td>
+            <td>
+                  <code><span title="list">list</span>[<span title="type">type</span>[<a class="autorefs autorefs-internal" title="            BasePlugin (jam.plugins.__base__.BasePlugin)" href="../jam.plugins.__base__/#jam.plugins.__base__.BasePlugin">BasePlugin</a>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of plugins</p>
+              </div>
+            </td>
+            <td>
+                  <code>[]</code>
             </td>
           </tr>
       </tbody>
@@ -2404,6 +2451,14 @@ Documentation: <a href="https://jam.makridenko.ru">https://jam.makridenko.ru</a>
         </tr>
       </thead>
       <tbody>
+            <tr class="doc-section-item">
+              <td><code><a class="autorefs autorefs-internal" title="            emit (jam.BaseJam.emit)" href="#jam.BaseJam.emit">emit</a></code></td>
+              <td>
+                <div class="doc-md-description">
+                  <p>Emit event.</p>
+                </div>
+              </td>
+            </tr>
             <tr class="doc-section-item">
               <td><code><a class="autorefs autorefs-internal" title="            jwt_create
 
@@ -2759,7 +2814,7 @@ Documentation: <a href="https://jam.makridenko.ru">https://jam.makridenko.ru</a>
     <span class="n">default_log_level</span><span class="p">:</span> <span class="n"><span title="typing.Literal">Literal</span></span><span class="p">[</span>
         <span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span> <span class="s2">&quot;WARNING&quot;</span><span class="p">,</span> <span class="s2">&quot;ERROR&quot;</span><span class="p">,</span> <span class="s2">&quot;CRITICAL&quot;</span>
     <span class="p">],</span>
-    <span class="n">default_serializer</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseEncoder (jam.encoders.BaseEncoder)" href="#jam.BaseEncoder">BaseEncoder</a></span> <span class="o">|</span> <span class="n"><span title="type">type</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            BaseEncoder (jam.encoders.BaseEncoder)" href="#jam.BaseEncoder">BaseEncoder</a></span><span class="p">],</span>
+    <span class="n">default_serializer</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseEncoder (jam.__base_encoder__.BaseEncoder)" href="../jam.__base_encoder__/#jam.__base_encoder__.BaseEncoder">BaseEncoder</a></span> <span class="o">|</span> <span class="n"><span title="type">type</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            BaseEncoder (jam.__base_encoder__.BaseEncoder)" href="../jam.__base_encoder__/#jam.__base_encoder__.BaseEncoder">BaseEncoder</a></span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span>
 </code></pre></div>
 
@@ -2832,7 +2887,7 @@ Documentation: <a href="https://jam.makridenko.ru">https://jam.makridenko.ru</a>
                 <code>default_serializer</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            BaseEncoder (jam.encoders.BaseEncoder)" href="#jam.BaseEncoder">BaseEncoder</a> | <span title="type">type</span>[<a class="autorefs autorefs-internal" title="            BaseEncoder (jam.encoders.BaseEncoder)" href="#jam.BaseEncoder">BaseEncoder</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="            BaseEncoder (jam.__base_encoder__.BaseEncoder)" href="../jam.__base_encoder__/#jam.__base_encoder__.BaseEncoder">BaseEncoder</a> | <span title="type">type</span>[<a class="autorefs autorefs-internal" title="            BaseEncoder (jam.__base_encoder__.BaseEncoder)" href="../jam.__base_encoder__/#jam.__base_encoder__.BaseEncoder">BaseEncoder</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2890,6 +2945,92 @@ Documentation: <a href="https://jam.makridenko.ru">https://jam.makridenko.ru</a>
     <div class="doc doc-contents ">
 
         <p>Get OTP type.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="jam.BaseJam.__setup_plugins" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__setup_plugins</span>
+
+
+<a href="#jam.BaseJam.__setup_plugins" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">__setup_plugins</span><span class="p">(</span><span class="n">plugins</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="type">type</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            BasePlugin (jam.plugins.__base__.BasePlugin)" href="../jam.plugins.__base__/#jam.plugins.__base__.BasePlugin">BasePlugin</a></span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Setup plugins.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="jam.BaseJam.emit" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">emit</span>
+
+
+<a href="#jam.BaseJam.emit" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">emit</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="typing.Any">Any</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Emit event.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>event</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Event name,</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>**kwargs</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Event data</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     </div>
@@ -4763,8 +4904,9 @@ Documentation: <a href="https://jam.makridenko.ru">https://jam.makridenko.ru</a>
     <span class="n">log_level</span><span class="p">:</span> <span class="n"><span title="typing.Literal">Literal</span></span><span class="p">[</span>
         <span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span> <span class="s2">&quot;WARNING&quot;</span><span class="p">,</span> <span class="s2">&quot;ERROR&quot;</span><span class="p">,</span> <span class="s2">&quot;CRITICAL&quot;</span>
     <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
-    <span class="n">serializer</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseEncoder (jam.encoders.BaseEncoder)" href="#jam.BaseEncoder">BaseEncoder</a></span>
-    <span class="o">|</span> <span class="n"><span title="type">type</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            BaseEncoder (jam.encoders.BaseEncoder)" href="#jam.BaseEncoder">BaseEncoder</a></span><span class="p">]</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-internal" title="            JsonEncoder (jam.encoders.JsonEncoder)" href="../jam.encoders/#jam.encoders.JsonEncoder">JsonEncoder</a></span><span class="p">,</span>
+    <span class="n">serializer</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseEncoder (jam.__base_encoder__.BaseEncoder)" href="../jam.__base_encoder__/#jam.__base_encoder__.BaseEncoder">BaseEncoder</a></span>
+    <span class="o">|</span> <span class="n"><span title="type">type</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            BaseEncoder (jam.__base_encoder__.BaseEncoder)" href="../jam.__base_encoder__/#jam.__base_encoder__.BaseEncoder">BaseEncoder</a></span><span class="p">]</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-internal" title="            JsonEncoder (jam.encoders.JsonEncoder)" href="../jam.encoders/#jam.encoders.JsonEncoder">JsonEncoder</a></span><span class="p">,</span>
+    <span class="n">plugins</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="type">type</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            BasePlugin (jam.plugins.__base__.BasePlugin)" href="../jam.plugins.__base__/#jam.plugins.__base__.BasePlugin">BasePlugin</a></span><span class="p">]]</span> <span class="o">=</span> <span class="p">[],</span>
 <span class="p">)</span>
 </code></pre></div>
 
