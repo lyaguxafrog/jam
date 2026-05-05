@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- 
 ## VERSION
 
-#### Added
+### Added
 
 ### Changed
 
@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.1.1] - 05-05-2026
 
-#### Added
+### Added
 - Experemental plugin system.
 - AGENTS.md file.
 
