@@ -83,12 +83,7 @@ FB: Removed the dependency and wrote independently
 
 ### Branches
 
-The project has two main branches:
-
-* `release` — Stable code of the latest release
-* `unstable` — Unstable code of the latest release
-
-All branches are created from `unstable` and adhere to strict branch naming:
+All branches are created from `master` and adhere to strict branch naming:
 
 * New feature: `feature/<id-issue-if-it-is>-<pair-words-about-feature>`
 * Bug fixes: `fix/<id-issue-if-it-is>-<pair-words-about-bug>`
