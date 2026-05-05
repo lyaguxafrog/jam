@@ -1,16 +1,21 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 import gc
+import os
 from typing import Any, Literal
 
-from jam.encoders import BaseEncoder, JsonEncoder
+from jam.__base_encoder__ import BaseEncoder
+from jam.encoders import JsonEncoder
 from jam.exceptions import JamConfigurationError
 from jam.jwt.__base__ import BaseJWT
 from jam.logger import BaseLogger, JamLogger
 from jam.oauth2.__base__ import BaseOAuth2Client
 from jam.otp.__base__ import BaseOTP, OTPConfig
 from jam.paseto.__base__ import BasePASETO
+from jam.plugins.__base__ import BasePlugin
 from jam.sessions.__base__ import BaseSessionModule
 from jam.utils.config_maker import __config_maker__, __module_loader__
 
@@ -30,15 +35,17 @@ class BaseJam(ABC):
             "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
         ] = "INFO",
         serializer: BaseEncoder | type[BaseEncoder] = JsonEncoder,
+        plugins: list[type[BasePlugin]] = [],
     ) -> None:
         """Initialize instance.
 
         Args:
-                config (Union[str, dict[str, Any]]): Configuration
-                pointer (str): Pointer
-                logger (BaseLogger): Logger
-                log_level (Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]): Log level
-                serializer (Union[BaseEncoder, type[BaseBrowser]]): Serializer
+            config (Union[str, dict[str, Any]]): Configuration
+            pointer (str): Pointer
+            logger (BaseLogger): Logger
+            log_level (Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]): Log level
+            serializer (Union[BaseEncoder, type[BaseBrowser]]): Serializer
+            plugins (list[type[BasePlugin]]): List of plugins
 
         Returns:
                 None
@@ -54,6 +61,8 @@ class BaseJam(ABC):
 
         self._logger = logger(log_level)
         self._serializer = serializer
+        self._plugins = []
+
         self.jwt: BaseJWT | None = None
         self.session: BaseSessionModule | None = None
         self.oauth2: dict[str, BaseOAuth2Client] | None = None
@@ -71,6 +80,9 @@ class BaseJam(ABC):
             "BaseJam initialization complete. Modules loaded:\n"
             f" jwt={self.jwt is not None}, session={self.session is not None}, oauth2={self.oauth2 is not None}"
         )
+        if os.getenv("JAM_ENABLE_PLUGINS", "0") == "1":
+            self._logger.warning("Experimental plugins are enabled!")
+            self.__setup_plugins(plugins)
         gc.collect()
 
     def __build_main_config(
@@ -187,6 +199,40 @@ class BaseJam(ABC):
                 return None
             case _:
                 raise JamConfigurationError(message="Unknown OTP type.")
+
+    def __setup_plugins(self, plugins: list[type[BasePlugin]]) -> None:
+        """Setup plugins."""
+        for plugin in plugins:
+            self._logger.debug(f"Setup plugin: {plugin.name}")
+            from jam.utils.version_check import __is_compatible__
+
+            if not __is_compatible__(None, plugin.jam_requires):
+                continue
+
+            _plugin = plugin(self)
+            _plugin.setup()
+            self._plugins.append(_plugin)
+
+    def emit(self, event: str, **kwargs) -> Any:
+        """Emit event.
+
+        Args:
+            event (str): Event name,
+            **kwargs: Event data
+        """
+        for plugin in self._plugins:
+            handler = getattr(plugin, f"on_{event}", None)
+
+            if handler:
+                try:
+                    result = handler(**kwargs)
+                    if isinstance(result, dict):
+                        kwargs.update(result)
+
+                except Exception as e:
+                    self._logger.error(f"Plugin:{plugin.name} | error: {e}")
+
+        return kwargs
 
     @abstractmethod
     def jwt_make_payload(
