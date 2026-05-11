@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `jam.jwt.JWT`: Use `jam.jose.JWT`
 
 ### Removed
+- Remove `JsonEncoder` and `BaseEncoder` from `__all__` imports.
 
 ### Fixed
 - Fixed typo in CLI documentation (`bahs` → `bash`)
