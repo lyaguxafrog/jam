@@ -32,7 +32,7 @@ otp_code = jam.otp_code(secret="3DB7FOAOFBCI3WFDRE7EPF43CA")
 ## Why Jam?
 Jam is a library that provides the most popular AUTH* mechanisms right out of the box.
 
-* [JWT](https://jam.makridenko.ru/usage/jwt/)
+* [JOSE](https://jam.makridenko.ru/usage/jose/index/)
 * [PASETO](https://jam.makridenko.ru/usage/paseto/)
 * [Server side sessions](https://jam.makridenko.ru/usage/sessions/)
 * [OTP](https://jam.makridenko.ru/usage/otp/)
@@ -56,7 +56,7 @@ Here is a comparison with other libraries:
 
 | Features / Library    | **Jam** | [Authx](https://authx.yezz.me/) | [PyJWT](https://pyjwt.readthedocs.io) | [AuthLib](https://docs.authlib.org) | [OTP Auth](https://otp.authlib.org/) |
 |-----------------------|--------|----------------------------------|---------------------------------------|-------------------------------------|--------------------------------------|
-| JWT                   | ✅     | ✅                               | ✅                                    | ✅                                  | ❌                                   |
+| JOSE                  | ✅     | ❌ only JWT                      | ❌ only JWT                           | ✅                                  | ❌                                   |
 | JWT black/white lists | ✅     | ❌                               | ❌                                    | ❌                                  | ❌                                   |
 | PASETO                | ✅     | ❌                               | ❌                                    | ❌                                  | ❌                                   |
 | Server side sessions  | ✅     | ✅                               | ❌                                    | ❌                                  | ❌                                   |
