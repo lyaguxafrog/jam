@@ -10,6 +10,8 @@ permissions:
 
 jobs:
   deploy:
+    if: ${{ !matches(github.ref_name, '.*(rc|alpha|beta).*') }}
+
     runs-on: ubuntu-latest
 
     steps:
@@ -32,9 +34,10 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.x
+          python-version: "3.x"
 
-      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - name: Set cache id
+        run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
 
       - uses: actions/cache@v4
         with:
@@ -43,6 +46,11 @@ jobs:
           restore-keys: |
             mkdocs-material-
 
-      - run: pip install uv
-      - run: uv sync --group docs
-      - run: uv run mkdocs gh-deploy --force
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install dependencies
+        run: uv sync --group docs
+
+      - name: Deploy documentation
+        run: uv run mkdocs gh-deploy --force
