@@ -8,7 +8,7 @@ def deprecated(replacement: str | None = None):
     """Mark funcs are deprecated."""
 
     def decorator(func):
-        msg = f"Function {func.__name__}() is deprecated."
+        msg = f"{func.__name__}() is deprecated."
         if replacement:
             msg += f" {replacement}"
 

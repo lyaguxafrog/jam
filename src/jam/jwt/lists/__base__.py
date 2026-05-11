@@ -3,7 +3,10 @@
 from abc import ABC, abstractmethod
 from typing import Literal
 
+from jam.__deprecated__ import deprecated
 
+
+@deprecated("Use jam.jose.lists.BaseJWTList")
 class BaseJWTList(ABC):
     """Abstract class for lists manipulation."""
 

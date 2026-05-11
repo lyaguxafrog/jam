@@ -2,4 +2,8 @@
 title: Deprecated methods
 ---
 
-Everything is relevant 👌
+<!--Everything is relevant 👌-->
+
+- `jam.Jam.jwt_make_payload`: The JWT specification has been introduced, so signing is now done via JWS
+- `jam.Jam.jwt_create`: Use `jam.Jam.jwt_encode`
+- `jam.jwt.JWT`: Use `jam.jose.JWT`

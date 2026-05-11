@@ -37,7 +37,8 @@ def test_jwt_instance(jam_jwt_instance):
     decoded_payload = jam_jwt_instance.jwt_decode(
         token, check_exp=False, check_list=False
     )
-    assert decoded_payload == jwt_payload
+    assert decoded_payload["sub"] == "user123"
+    assert "exp" in decoded_payload
 
 
 def test_session_instance(jam_session_instance):

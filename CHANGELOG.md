@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- 
-## VERSION
+## VERSION - [unreleased]
 
 ### Added
 
@@ -20,6 +20,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 -->
+
+## 3.2.0 - [unreleased]
+
+#### Added
+- New JOSE module:
+  - JWT
+  - JWE
+  - JWK(s)
+  - JWS
+- `JamJWTNotYetValid` exception for nbf claim validation
+- `check_nbf` parameter in `Jam.jwt_decode()` and `Jam.aio.jwt_decode()`
+- `include_headers` parameter in `Jam.jwt_decode()` and `Jam.aio.jwt_decode()`
+- `jti` parameter in `Jam.jwt_encode()` and `Jam.aio.jwt_encode()`
+- Support for pre-built JWS/JWE instances in JWT constructor
+- `JWT.decode()` always returns `{"header": dict, "payload": dict}`
+
+### Changed
+- JWT sign-then-encrypt now follows RFC 7519 specification
+- Auto-detection of JWE key management algorithm based on key type (RSA→RSA-OAEP, EC→ECDH-ES, symmetric→A*-KW)
+- `exp` and `nbf` claims validation moved from JOSE module to `Jam` instances
+- `include_headers` parameter added to both sync and async `jwt_decode()`
+
+### Deprecated
+- `jam.Jam.jwt_make_payload`: The JWT specification has been introduced, so signing is now done via JWS
+- `jam.Jam.jwt_create`: Use `jam.Jam.jwt_encode`
+- `jam.jwt.JWT`: Use `jam.jose.JWT`
+
+### Removed
+- Remove `JsonEncoder` and `BaseEncoder` from `__all__` imports.
+
+### Fixed
+- Fixed typo in CLI documentation (`bahs` → `bash`)
+
+### Security
+
+---
 
 ## [3.1.2] - 06-05-2026
 
@@ -85,6 +121,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+- [3.2.0] https://github.com/lyaguxafrog/jam/compare/v3.1.0...unstable
 - [3.1.2] https://github.com/lyaguxafrog/jam/compare/v3.1.1...v3.1.2
 - [3.1.1] https://github.com/lyaguxafrog/jam/compare/v3.1.0...v3.1.1
 - [3.1.0] https://github.com/lyaguxafrog/jam/compare/v3.0.0...v3.1.0

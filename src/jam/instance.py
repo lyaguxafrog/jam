@@ -1,33 +1,45 @@
 # -*- coding: utf-8 -*-
 
-import datetime
+import time
 from typing import Any
 import uuid
 
 from jam.__base__ import BaseJam
+from jam.__deprecated__ import deprecated
 from jam.exceptions import (
     JamConfigurationError,
     JamJWTExpired,
     JamJWTInBlackList,
     JamJWTNotInWhiteList,
+    JamJWTNotYetValid,
 )
 
 
 class Jam(BaseJam):
     """Main instance."""
 
-    MODULES: dict[str, str] = {
-        "jwt": "jam.jwt.create_instance",
+    MODULES: dict[str, str | dict[str, str]] = {
+        "jose": {
+            "jwt": "jam.jose.create_jwt_instance",
+            "jws": "jam.jose.create_jws_instance",
+            "jwe": "jam.jose.create_jwe_instance",
+        },
         "session": "jam.sessions.create_instance",
         "oauth2": "jam.oauth2.create_instance",
         "paseto": "jam.paseto.create_instance",
         "otp": "jam.otp.__base__.OTPConfig",
     }
 
+    @deprecated(
+        "This method is deprecated; the JWT payload is generated automatically in accordance with the specification."
+    )
     def jwt_make_payload(
         self, exp: int | None, data: dict[str, Any]
     ) -> dict[str, Any]:
         """Make JWT-specific payload.
+
+        !!! Deprecated
+                This method is deprecated; the JWT payload is generated automatically in accordance with the specification.
 
         Args:
             exp (int | None): Token expire
@@ -36,16 +48,21 @@ class Jam(BaseJam):
         Returns:
             dict[str, Any]: Payload
         """
+        now = time.time()
         payload = {
-            "iat": datetime.datetime.now().timestamp(),
-            "exp": (datetime.datetime.now().timestamp() + exp) if exp else None,
+            "iat": now,
+            "exp": (now + exp) if exp else None,
             "jti": str(uuid.uuid4()),
         }
         payload = payload | data
         return payload
 
+    @deprecated("Use jam.jwt_encode")
     def jwt_create(self, payload: dict[str, Any]) -> str:
         """Create JWT token.
+
+        !!! Deprecated
+                Use Jam.jwt_encode
 
         Args:
             payload (dict[str, Any]): Data payload
@@ -68,8 +85,57 @@ class Jam(BaseJam):
 
         return token
 
+    def jwt_encode(
+        self,
+        iss: str | None = None,
+        sub: str | None = None,
+        aud: str | None = None,
+        exp: int | None = None,
+        nbf: int | None = None,
+        jti: str | None = None,
+        *,
+        payload: dict[str, Any] | None = None,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Encode the JWT with the given expire, header, and payload.
+
+        Args:
+            exp (int | None): The expiration time in seconds.
+            nbf (int | None): The not-before time in seconds.
+            iss (str | None): The issuer.
+            sub (str | None): The subject.
+            aud (str | None): The audience.
+            jti (str | None): The JWT ID. If none use the JTI fabric function.
+            header (dict[str, Any] | None): The header to include in the JWT.
+            payload (dict[str, Any] | None): The payload to include in the JWT.
+
+        Returns:
+            str: The encoded JWT.
+        """
+        assert self.jwt is not None
+        if not jti:
+            jti = self.jwt.jti
+        token = self.jwt.encode(
+            iss=iss,
+            sub=sub,
+            aud=aud,
+            exp=exp,
+            nbf=nbf,
+            jti=jti,
+            payload=payload,
+            header=header,
+        )
+        if self.jwt.list and self.jwt.list.__list_type__ == "white":
+            self.jwt.list.add(token)
+        return token
+
     def jwt_decode(
-        self, token: str, check_exp: bool = True, check_list: bool = True
+        self,
+        token: str,
+        check_exp: bool = True,
+        check_list: bool = True,
+        check_nbf: bool = False,
+        include_headers: bool = False,
     ) -> dict[str, Any]:
         """Verify and decode JWT token.
 
@@ -77,28 +143,37 @@ class Jam(BaseJam):
             token (str): JWT token
             check_exp (bool): Check expire
             check_list (bool): Check white/black list. Docs: https://jam.makridenko.ru/jwt/lists/what/
+            check_nbf (bool): Check not-before time
+            include_headers (bool): Include headers in the decoded payload
 
         Returns:
             dict[str, Any]: Decoded payload
 
         Raises:
             JamJWTExpired: If token is expired
+            JamJWTNotYetValid: If token is not yet valid (nbf claim)
             JamConfigurationError: If JWT list is not connected
             JamJWTNotInWhiteList: If token is not in white list
             JamJWTInBlackList: If token is in black list
         """
         self._logger.debug(
-            f"Verifying JWT token (length: {len(token)} chars), check_exp={check_exp}, check_list={check_list}"
+            f"Verifying JWT token (length: {len(token)} chars), check_exp={check_exp}, check_list={check_list}, check_nbf={check_nbf}"
         )
         assert self.jwt is not None
-        payload = self.jwt.decode(token)
+        data = self.jwt.decode(token)
+        payload = data["payload"]
+
+        if check_exp and "exp" in payload:
+            if payload["exp"] < time.time():
+                raise JamJWTExpired
+
+        if check_nbf and "nbf" in payload:
+            if payload["nbf"] > time.time():
+                raise JamJWTNotYetValid
+
         self._logger.debug(
             f"JWT token verified successfully, payload keys: {list(payload.keys())}"
         )
-
-        if check_exp:
-            if payload["exp"] < datetime.datetime.now().timestamp():
-                raise JamJWTExpired
 
         if check_list:
             if not self.jwt.list:
@@ -119,7 +194,83 @@ class Jam(BaseJam):
                             message="Invalid JWT list type",
                             error_code="configuration.jwt.unknown_list_type",
                         )
+
+        if include_headers:
+            return data
         return payload
+
+    def jws_sign(
+        self,
+        data: dict[str, Any] | str,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Sign data using JWS.
+
+        Args:
+            data: Data to sign. If dict, will be JSON encoded.
+            header: JWS header.
+
+        Returns:
+            str: JWS token.
+        """
+        assert self.jws is not None
+        self._logger.debug(f"Signing data with JWS, header: {header}")
+        token = self.jws.sign(header or {}, data)
+        self._logger.debug(f"JWS token created, length: {len(token)}")
+        return token
+
+    def jws_verify(self, token: str) -> dict[str, Any]:
+        """Verify JWS token.
+
+        Args:
+            token: JWS token.
+
+        Returns:
+            dict[str, Any]: Decoded payload.
+        """
+        assert self.jws is not None
+        self._logger.debug(f"Verifying JWS token, length: {len(token)}")
+        result = self.jws.verify(token)
+        self._logger.debug("JWS token verified successfully")
+        return result
+
+    def jwe_encrypt(
+        self,
+        data: dict[str, Any] | str,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Encrypt data using JWE.
+
+        Args:
+            data: Data to encrypt. If dict, will be JSON encoded.
+            header: JWE header.
+
+        Returns:
+            str: JWE token.
+        """
+        assert self.jwe is not None
+        self._logger.debug(f"Encrypting data with JWE, header: {header}")
+        token = self.jwe.encrypt(
+            self._serializer.dumps(data) if isinstance(data, dict) else data,
+            header,
+        )
+        self._logger.debug(f"JWE token created, length: {len(token)}")
+        return token
+
+    def jwe_decrypt(self, token: str) -> bytes:
+        """Decrypt JWE token.
+
+        Args:
+            token: JWE token.
+
+        Returns:
+            bytes: Decrypted data.
+        """
+        assert self.jwe is not None
+        self._logger.debug(f"Decrypting JWE token, length: {len(token)}")
+        result = self.jwe.decrypt(token)
+        self._logger.debug("JWE token decrypted successfully")
+        return result
 
     def session_create(self, session_key: str, data: dict[str, Any]) -> str:
         """Create new session.
@@ -391,9 +542,9 @@ class Jam(BaseJam):
         Returns:
             dict: Payload
         """
-        from jam.paseto.utils import payload_maker
+        from jam.paseto.utils import payload_maker as pm
 
-        return payload_maker(expire=exp, data=data)
+        return pm(expire=exp, data=data)
 
     def paseto_create(
         self,

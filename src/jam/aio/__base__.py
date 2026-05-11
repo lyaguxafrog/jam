@@ -6,15 +6,19 @@ from typing import Any
 from jam.__base__ import BaseJam
 from jam.aio.oauth2.__base__ import BaseAsyncOAuth2Client
 from jam.aio.sessions.__base__ import BaseAsyncSessionModule
+from jam.jose.__base__ import BaseJWE, BaseJWS
 
 
 class BaseAsyncJam(BaseJam):
     """Base async jam instance."""
 
-    MODULES: dict[str, str] = {}
+    MODULES: dict[str, str | dict[str, str]] = {}
 
     session: BaseAsyncSessionModule | None = None  # type: ignore[override]
     oauth2: dict[str, BaseAsyncOAuth2Client] | None = None  # type: ignore[override]
+    jose: dict[str, Any] | None = None  # type: ignore[override]
+    jws: BaseJWS | None = None  # type: ignore[override]
+    jwe: BaseJWE | None = None  # type: ignore[override]
 
     @abstractmethod
     async def jwt_make_payload(  # type: ignore[override]
@@ -46,8 +50,43 @@ class BaseAsyncJam(BaseJam):
         raise NotImplementedError
 
     @abstractmethod
+    async def jwt_encode(  # type: ignore[override]
+        self,
+        iss: str | None = None,
+        sub: str | None = None,
+        aud: str | None = None,
+        exp: int | None = None,
+        nbf: int | None = None,
+        jti: str | None = None,
+        *,
+        payload: dict[str, Any] | None = None,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Encode the JWT with the given expire, header, and payload.
+
+        Args:
+            exp (int | None): The expiration time in seconds.
+            nbf (int | None): The not-before time in seconds.
+            iss (str | None): The issuer.
+            sub (str | None): The subject.
+            aud (str | None): The audience.
+            jti (str | None): The JWT ID. If none use the JTI fabric function.
+            header (dict[str, Any] | None): The header to include in the JWT.
+            payload (dict[str, Any] | None): The payload to include in the JWT.
+
+        Returns:
+            str: The encoded JWT.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
     async def jwt_decode(  # type: ignore[override]
-        self, token: str, check_exp: bool = True, check_list: bool = True
+        self,
+        token: str,
+        check_exp: bool = True,
+        check_list: bool = True,
+        check_nbf: bool = False,
+        include_headers: bool = False,
     ) -> dict[str, Any]:
         """Verify and decode JWT token.
 
@@ -55,6 +94,8 @@ class BaseAsyncJam(BaseJam):
             token (str): JWT token
             check_exp (bool): Check expire
             check_list (bool): Check white/black list. Docs: https://jam.makridenko.ru/jwt/lists/what/
+            check_nbf (bool): Check not-before time
+            include_headers (bool): Include headers in the decoded payload
 
         Returns:
             dict[str, Any]: Decoded payload
@@ -302,6 +343,74 @@ class BaseAsyncJam(BaseJam):
 
         Returns:
             str: PASETO
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    async def jws_sign(  # type: ignore[override]
+        self,
+        data: dict[str, Any] | str,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Sign data using JWS.
+
+        Args:
+            data: Data to sign. If dict, will be JSON encoded.
+            header: JWS header.
+
+        Returns:
+            str: JWS token.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    async def jws_verify(  # type: ignore[override]
+        self, token: str
+    ) -> dict[str, Any]:
+        """Verify JWS token.
+
+        Args:
+            token: JWS token.
+
+        Returns:
+            dict[str, Any]: Decoded payload.
+
+        Raises:
+            JamJWSVerificationError: If verification fails.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    async def jwe_encrypt(  # type: ignore[override]
+        self,
+        data: dict[str, Any] | str,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Encrypt data using JWE.
+
+        Args:
+            data: Data to encrypt. If dict, will be JSON encoded.
+            header: JWE header.
+
+        Returns:
+            str: JWE token.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    async def jwe_decrypt(  # type: ignore[override]
+        self, token: str
+    ) -> bytes:
+        """Decrypt JWE token.
+
+        Args:
+            token: JWE token.
+
+        Returns:
+            bytes: Decrypted data.
+
+        Raises:
+            JamJWEDecryptionError: If decryption fails.
         """
         raise NotImplementedError
 

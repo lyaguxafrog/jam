@@ -7,10 +7,8 @@ Documentation: https://jam.makridenko.ru
 """
 
 from jam.__base__ import BaseJam
-from jam.__base_encoder__ import BaseEncoder
-from jam.encoders import JsonEncoder
 from jam.instance import Jam
 
 
-__version__ = "3.1.2"
-__all__ = ["Jam", "JsonEncoder", "BaseJam", "BaseEncoder"]
+__version__ = "3.2.0rc0"
+__all__ = ["Jam", "BaseJam"]

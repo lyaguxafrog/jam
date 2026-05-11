@@ -10,7 +10,7 @@ from typing import Any, Literal
 from jam.__base_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
 from jam.exceptions import JamConfigurationError
-from jam.jwt.__base__ import BaseJWT
+from jam.jose.__base__ import BaseJWE, BaseJWS, BaseJWT
 from jam.logger import BaseLogger, JamLogger
 from jam.oauth2.__base__ import BaseOAuth2Client
 from jam.otp.__base__ import BaseOTP, OTPConfig
@@ -23,7 +23,7 @@ from jam.utils.config_maker import __config_maker__, __module_loader__
 class BaseJam(ABC):
     """Base jam instance."""
 
-    MODULES: dict[str, str] = {}
+    MODULES: dict[str, str | dict[str, str]] = {}
 
     def __init__(
         self,
@@ -64,6 +64,9 @@ class BaseJam(ABC):
         self._plugins = []
 
         self.jwt: BaseJWT | None = None
+        self.jws: BaseJWS | None = None
+        self.jwe: BaseJWE | None = None
+        self.jose: dict[str, Any] | None = None
         self.session: BaseSessionModule | None = None
         self.oauth2: dict[str, BaseOAuth2Client] | None = None
         self.otp: OTPConfig | None = None
@@ -78,7 +81,7 @@ class BaseJam(ABC):
         )
         self._logger.debug(
             "BaseJam initialization complete. Modules loaded:\n"
-            f" jwt={self.jwt is not None}, session={self.session is not None}, oauth2={self.oauth2 is not None}"
+            f" jwt={self.jwt is not None}, jose={self.jose is not None}, session={self.session is not None}, oauth2={self.oauth2 is not None}"
         )
         if os.getenv("JAM_ENABLE_PLUGINS", "0") == "1":
             self._logger.warning("Experimental plugins are enabled!")
@@ -151,6 +154,7 @@ class BaseJam(ABC):
         """Build instance.
 
         Load modules from configuration and initialize them.
+        Supports both flat modules (name -> path) and nested modules (name -> {subname -> path}).
 
         Args:
             config (dict[str, Any]): Configuration
@@ -163,24 +167,68 @@ class BaseJam(ABC):
                 self._logger.debug(f"Missing configuration for module {name}")
                 continue
 
-            try:
-                module_cls = __module_loader__(path)
-                self._logger.debug(f"Loading module {name} from {path}")
-                params = config.get(name, {})
-                self._logger.debug(
-                    f"Module {name} config params: {list(params.keys())}"
-                )
-                # params["logger"] = self._logger
-                # params["serializer"] = self._serializer
-                module_instance = module_cls(**params)
-                self.__setattr__(name, module_instance)
-                self._logger.debug(f"Module {name} initialized successfully")
+            if isinstance(path, dict):
+                subconfig = config.get(name, {})
+                if not isinstance(subconfig, dict):
+                    subconfig = {}
 
-            except Exception as e:
-                self._logger.error(
-                    f"Failed to load module {name} from {path}: {e}",
-                    exc_info=True,
-                )
+                for subname, subpath in path.items():
+                    if subname not in subconfig:
+                        self._logger.debug(
+                            f"Missing configuration for module {name}.{subname}"
+                        )
+                        continue
+
+                    try:
+                        module_cls = __module_loader__(subpath)
+                        self._logger.debug(
+                            f"Loading module {name}.{subname} from {subpath}"
+                        )
+                        params = subconfig.get(subname, {})
+                        self._logger.debug(
+                            f"Module {name}.{subname} config params: {list(params.keys())}"
+                        )
+                        module_instance = module_cls(**params)
+
+                        if self.jose is None:
+                            self.jose = {}
+                        self.jose[subname] = module_instance
+
+                        if subname == "jwt":
+                            self.jwt = module_instance
+                        elif subname == "jws":
+                            self.jws = module_instance
+                        elif subname == "jwe":
+                            self.jwe = module_instance
+
+                        self._logger.debug(
+                            f"Module {name}.{subname} initialized successfully"
+                        )
+
+                    except Exception as e:
+                        self._logger.error(
+                            f"Failed to load module {name}.{subname} from {subpath}: {e}",
+                            exc_info=True,
+                        )
+            else:
+                try:
+                    module_cls = __module_loader__(path)
+                    self._logger.debug(f"Loading module {name} from {path}")
+                    params = config.get(name, {})
+                    self._logger.debug(
+                        f"Module {name} config params: {list(params.keys())}"
+                    )
+                    module_instance = module_cls(**params)
+                    self.__setattr__(name, module_instance)
+                    self._logger.debug(
+                        f"Module {name} initialized successfully"
+                    )
+
+                except Exception as e:
+                    self._logger.error(
+                        f"Failed to load module {name} from {path}: {e}",
+                        exc_info=True,
+                    )
 
     def __otp(
         self, type: Literal["totp", "hotp"] | None = None
@@ -235,36 +283,43 @@ class BaseJam(ABC):
         return kwargs
 
     @abstractmethod
-    def jwt_make_payload(
-        self, exp: int | None, data: dict[str, Any]
-    ) -> dict[str, Any]:
-        """Make JWT-specific payload.
+    def jwt_encode(
+        self,
+        iss: str | None = None,
+        sub: str | None = None,
+        aud: str | None = None,
+        exp: int | None = None,
+        nbf: int | None = None,
+        jti: str | None = None,
+        *,
+        payload: dict[str, Any] | None = None,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Encode the JWT with the given expire, header, and payload.
 
         Args:
-            exp (int | None): Token expire, if None -> use default
-            data (dict[str, Any]): Data to payload
+            exp (int | None): The expiration time in seconds.
+            nbf (int | None): The not-before time in seconds.
+            iss (str | None): The issuer.
+            sub (str | None): The subject.
+            aud (str | None): The audience.
+            jti (str | None): The JWT ID. If none use the JTI fabric function.
+            header (dict[str, Any] | None): The header to include in the JWT.
+            payload (dict[str, Any] | None): The payload to include in the JWT.
 
         Returns:
-            dict[str, Any]: Payload
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def jwt_create(self, payload: dict[str, Any]) -> str:
-        """Create JWT token.
-
-        Args:
-            payload (dict[str, Any]): Data payload
-
-        Returns:
-            str: New token
-
+            str: The encoded JWT.
         """
         raise NotImplementedError
 
     @abstractmethod
     def jwt_decode(
-        self, token: str, check_exp: bool = True, check_list: bool = True
+        self,
+        token: str,
+        check_exp: bool = True,
+        check_list: bool = True,
+        check_nbf: bool = False,
+        include_headers: bool = False,
     ) -> dict[str, Any]:
         """Verify and decode JWT token.
 
@@ -272,10 +327,76 @@ class BaseJam(ABC):
             token (str): JWT token
             check_exp (bool): Check expire
             check_list (bool): Check white/black list. Docs: https://jam.makridenko.ru/jwt/lists/what/
+            check_nbf (bool): Check not-before time
+            include_headers (bool): Include headers in the decoded payload
 
         Returns:
             dict[str, Any]: Decoded payload
 
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def jws_sign(
+        self,
+        data: dict[str, Any] | str,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Sign data using JWS.
+
+        Args:
+            data: Data to sign. If dict, will be JSON encoded.
+            header: JWS header.
+
+        Returns:
+            str: JWS token.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def jws_verify(self, token: str) -> dict[str, Any]:
+        """Verify JWS token.
+
+        Args:
+            token: JWS token.
+
+        Returns:
+            dict[str, Any]: Decoded payload.
+
+        Raises:
+            JamJWSVerificationError: If verification fails.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def jwe_encrypt(
+        self,
+        data: dict[str, Any] | str,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Encrypt data using JWE.
+
+        Args:
+            data: Data to encrypt. If dict, will be JSON encoded.
+            header: JWE header.
+
+        Returns:
+            str: JWE token.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def jwe_decrypt(self, token: str) -> bytes:
+        """Decrypt JWE token.
+
+        Args:
+            token: JWE token.
+
+        Returns:
+            bytes: Decrypted data.
+
+        Raises:
+            JamJWEDecryptionError: If decryption fails.
         """
         raise NotImplementedError
 

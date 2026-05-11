@@ -176,3 +176,7 @@ debug*
 :memory:
 .ruff_cache/
 sessions.json
+*.bak
+*.pem
+*.aes
+*.key

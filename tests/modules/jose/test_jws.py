@@ -1,0 +1,190 @@
+# -*- coding: utf-8 -*-
+
+import pytest
+from jam.jose import JWS
+from jam.jose.jwk import JWK
+from jam.exceptions import JamJWSVerificationError, JamJWTUnsupportedAlgorithm
+from jam.utils import generate_rsa_key_pair, generate_ecdsa_p384_keypair
+
+
+class TestJWSHMAC:
+    @pytest.fixture
+    def symmetric_key(self):
+        return "SOME_JWT_KEY"
+
+    def test_hs256_serialize_compact(self, symmetric_key):
+        jws = JWS(alg="HS256", key=symmetric_key)
+        token = jws.serialize_compact({"alg": "HS256"}, "test payload")
+        assert token.count(".") == 2
+        assert token.startswith("ey")
+
+    def test_hs256_deserialize_compact(self, symmetric_key):
+        jws = JWS(alg="HS256", key=symmetric_key)
+        token = jws.serialize_compact({"alg": "HS256"}, "test payload")
+        result = jws.deserialize_compact(token)
+        assert result["header"]["alg"] == "HS256"
+        assert result["payload"] == b"test payload"
+
+    def test_hs384_serialize_compact(self, symmetric_key):
+        jws = JWS(alg="HS384", key=symmetric_key)
+        token = jws.serialize_compact({"alg": "HS384"}, "test payload")
+        assert token.count(".") == 2
+
+    def test_hs384_deserialize_compact(self, symmetric_key):
+        jws = JWS(alg="HS384", key=symmetric_key)
+        token = jws.serialize_compact({"alg": "HS384"}, "test payload")
+        result = jws.deserialize_compact(token)
+        assert result["header"]["alg"] == "HS384"
+
+    def test_hs512_serialize_compact(self, symmetric_key):
+        jws = JWS(alg="HS512", key=symmetric_key)
+        token = jws.serialize_compact({"alg": "HS512"}, "test payload")
+        assert token.count(".") == 2
+
+    def test_hs512_deserialize_compact(self, symmetric_key):
+        jws = JWS(alg="HS512", key=symmetric_key)
+        token = jws.serialize_compact({"alg": "HS512"}, "test payload")
+        result = jws.deserialize_compact(token)
+        assert result["header"]["alg"] == "HS512"
+
+    def test_hs256_sign_and_verify(self, symmetric_key):
+        jws = JWS(alg="HS256", key=symmetric_key)
+        token = jws.sign({"typ": "JWT"}, "test data")
+        result = jws.verify(token)
+        assert result["payload"] == b"test data"
+
+    def test_hs256_with_dict_payload(self, symmetric_key):
+        jws = JWS(alg="HS256", key=symmetric_key)
+        token = jws.sign({"typ": "JWT"}, {"key": "value"})
+        result = jws.verify(token)
+        import json
+
+        assert json.loads(result["payload"]) == {"key": "value"}
+
+
+class TestJWSRSA:
+    @pytest.fixture
+    def rsa_key_pair(self):
+        return generate_rsa_key_pair()
+
+    def test_rs256_sign_and_verify(self, rsa_key_pair):
+        jws = JWS(alg="RS256", key=rsa_key_pair["private"])
+        token = jws.sign({"typ": "JWT"}, "test data")
+        result = jws.verify(token)
+        assert result["payload"] == b"test data"
+
+    def test_rs256_verify_with_public_key(self, rsa_key_pair):
+        jws_sign = JWS(alg="RS256", key=rsa_key_pair["private"])
+        jws_verify = JWS(alg="RS256", key=rsa_key_pair["public"])
+        token = jws_sign.sign({"typ": "JWT"}, "test data")
+        result = jws_verify.verify(token)
+        assert result["payload"] == b"test data"
+
+    def test_rs384_sign_and_verify(self, rsa_key_pair):
+        jws = JWS(alg="RS384", key=rsa_key_pair["private"])
+        token = jws.sign({"typ": "JWT"}, "test data")
+        result = jws.verify(token)
+        assert result["payload"] == b"test data"
+
+    def test_rs512_sign_and_verify(self, rsa_key_pair):
+        jws = JWS(alg="RS512", key=rsa_key_pair["private"])
+        token = jws.sign({"typ": "JWT"}, "test data")
+        result = jws.verify(token)
+        assert result["payload"] == b"test data"
+
+    def test_sign_with_jwk(self, rsa_key_pair):
+        jws = JWS(alg="RS256", key=rsa_key_pair["private"])
+        token = jws.sign({"typ": "JWT"}, "test data")
+        result = jws.verify(token)
+        assert result["payload"] == b"test data"
+
+
+class TestJWSECDSA:
+    @pytest.fixture
+    def ecdsa_key_pair(self):
+        return generate_ecdsa_p384_keypair()
+
+    def test_es256_sign_and_verify(self, ecdsa_key_pair):
+        jws = JWS(alg="ES256", key=ecdsa_key_pair["private"])
+        token = jws.sign({"typ": "JWT"}, "test data")
+        result = jws.verify(token)
+        assert result["payload"] == b"test data"
+
+    def test_es256_verify_with_public_key(self, ecdsa_key_pair):
+        jws_sign = JWS(alg="ES256", key=ecdsa_key_pair["private"])
+        jws_verify = JWS(alg="ES256", key=ecdsa_key_pair["public"])
+        token = jws_sign.sign({"typ": "JWT"}, "test data")
+        result = jws_verify.verify(token)
+        assert result["payload"] == b"test data"
+
+    def test_es384_sign_and_verify(self, ecdsa_key_pair):
+        jws = JWS(alg="ES384", key=ecdsa_key_pair["private"])
+        token = jws.sign({"typ": "JWT"}, "test data")
+        result = jws.verify(token)
+        assert result["payload"] == b"test data"
+
+    def test_es512_sign_and_verify(self, ecdsa_key_pair):
+        jws = JWS(alg="ES512", key=ecdsa_key_pair["private"])
+        token = jws.sign({"typ": "JWT"}, "test data")
+        result = jws.verify(token)
+        assert result["payload"] == b"test data"
+
+
+class TestJWSValidation:
+    @pytest.fixture
+    def symmetric_key(self):
+        return "SOME_JWT_KEY"
+
+    def test_invalid_algorithm(self, symmetric_key):
+        with pytest.raises(JamJWTUnsupportedAlgorithm):
+            JWS(alg="INVALID", key=symmetric_key)
+
+    def test_invalid_jws_format(self, symmetric_key):
+        jws = JWS(alg="HS256", key=symmetric_key)
+        with pytest.raises(JamJWSVerificationError):
+            jws.deserialize_compact("invalid.token")
+
+    def test_invalid_jws_format_no_dots(self, symmetric_key):
+        jws = JWS(alg="HS256", key=symmetric_key)
+        with pytest.raises(JamJWSVerificationError):
+            jws.deserialize_compact("invalid")
+
+    def test_algorithm_mismatch(self, symmetric_key):
+        jws_hs256 = JWS(alg="HS256", key=symmetric_key)
+        jws_hs384 = JWS(alg="HS384", key=symmetric_key)
+        token = jws_hs256.sign({"typ": "JWT"}, "test data")
+        with pytest.raises(JamJWSVerificationError):
+            jws_hs384.deserialize_compact(token)
+
+    def test_signature_verification_failed(self, symmetric_key):
+        jws = JWS(alg="HS256", key=symmetric_key)
+        jws_invalid = JWS(alg="HS256", key="different_key")
+        token = jws.sign({"typ": "JWT"}, "test data")
+        with pytest.raises(JamJWSVerificationError):
+            jws_invalid.deserialize_compact(token)
+
+    def test_deserialize_without_validation(self, symmetric_key):
+        jws = JWS(alg="HS256", key=symmetric_key)
+        token = jws.sign({"typ": "JWT"}, "test data")
+        jws_invalid = JWS(alg="HS256", key="different_key")
+        result = jws_invalid.deserialize_compact(token, validate=False)
+        assert result["payload"] == b"test data"
+
+
+class TestJWSCompactSerialization:
+    @pytest.fixture
+    def symmetric_key(self):
+        return "SOME_JWT_KEY"
+
+    def test_adds_alg_to_header(self, symmetric_key):
+        jws = JWS(alg="HS256", key=symmetric_key)
+        token = jws.serialize_compact({}, "test")
+        result = jws.deserialize_compact(token)
+        assert result["header"]["alg"] == "HS256"
+
+    def test_merges_provided_header_with_alg(self, symmetric_key):
+        jws = JWS(alg="HS256", key=symmetric_key)
+        token = jws.serialize_compact({"typ": "JWT"}, "test")
+        result = jws.deserialize_compact(token)
+        assert result["header"]["alg"] == "HS256"
+        assert result["header"]["typ"] == "JWT"

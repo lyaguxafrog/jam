@@ -13,7 +13,13 @@ nav:
       - Installation: installation.md
       - Configuration: configuration.md
   - Usage:
-      - JWT: usage/jwt.md
+      - JOSE:
+          - Overview: usage/jose/index.md
+          - JWT: usage/jose/jwt.md
+          - JWS: usage/jose/jws.md
+          - JWE: usage/jose/jwe.md
+          - JWK: usage/jose/jwk.md
+          - Algorithms: usage/jose/algorithms.md
       - PASETO: usage/paseto.md
       - Server side sessions: usage/sessions.md
       - OAuth2: usage/oauth2.md

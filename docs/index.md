@@ -83,7 +83,7 @@ Here is a comparison with other libraries:
 
 | Features / Library    | **Jam** | [Authx](https://authx.yezz.me/) | [PyJWT](https://pyjwt.readthedocs.io) | [AuthLib](https://docs.authlib.org) | [OTP Auth](https://otp.authlib.org/) |
 |-----------------------|--------|----------------------------------|---------------------------------------|-------------------------------------|--------------------------------------|
-| JWT                   | ✅     | ✅                               | ✅                                    | ✅                                  | ❌                                   |
+| JOSE                  | ✅     | ❌ only JWT                      | ❌ only JWT                           | ✅                                  | ❌                                   |
 | JWT black/white lists | ✅     | ❌                               | ❌                                    | ❌                                  | ❌                                   |
 | PASETO                | ✅     | ❌                               | ❌                                    | ❌                                  | ❌                                   |
 | Server side sessions  | ✅     | ✅                               | ❌                                    | ❌                                  | ❌                                   |

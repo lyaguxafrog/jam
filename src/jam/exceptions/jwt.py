@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from .base import JamError, JamValidationError, JamConfigurationError
+from .base import JamConfigurationError, JamError, JamValidationError
 
 
 class JamJWTExpired(JamError):
     default_message = "Token lifetime expired."
     default_code = "jwt.token_expired"
+
+
+class JamJWTNotYetValid(JamError):
+    default_message = "Token is not yet valid (nbf claim)."
+    default_code = "jwt.token_not_yet_valid"
 
 
 class JamJWTInBlackList(JamError):
@@ -24,7 +29,9 @@ class JamJWTEmptySecretKey(JamConfigurationError):
 
 
 class JamJWTEmptyPrivateKey(JamConfigurationError):
-    default_message = "For asymmetric encryption, you must specify `private_key`."
+    default_message = (
+        "For asymmetric encryption, you must specify `private_key`."
+    )
     default_code = "jwt.config.empty_private_key"
 
 
