@@ -141,9 +141,64 @@ class BaseJWS(ABC):
         """
         raise NotImplementedError
 
+    @abstractmethod
+    def sign(
+        self,
+        header: dict[str, Any],
+        data: bytes | str | dict[str, Any],
+    ) -> str:
+        """Sign data and return JWS compact serialization.
+
+        Args:
+            header: JWS header (must include 'alg').
+            data: Data to sign. If dict, will be JSON encoded.
+
+        Returns:
+            str: JWS compact serialization string.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def verify(
+        self,
+        token: str,
+        validate: bool = True,
+    ) -> dict[str, Any]:
+        """Verify JWS token and return header/payload.
+
+        Args:
+            token: JWS compact serialization token.
+            validate: Whether to validate signature. Defaults to True.
+
+        Returns:
+            dict[str, Any]: Parsed JWS with 'header' and 'payload' keys.
+
+        Raises:
+            JamJWSVerificationError: If validation fails.
+        """
+        raise NotImplementedError
+
 
 class BaseJWK(ABC):
     """JSON Web Key - RFC 7517."""
+
+    @property
+    @abstractmethod
+    def kty(self) -> str:
+        """Key type (kty) - RSA, EC, oct, etc."""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def alg(self) -> str | None:
+        """Algorithm (alg) - RS256, ES256, etc."""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def kid(self) -> str | None:
+        """Key ID (kid)."""
+        raise NotImplementedError
 
     @staticmethod
     @abstractmethod
@@ -212,6 +267,28 @@ class BaseJWK(ABC):
 
 class BaseJWKSet(ABC):
     """JWK Set - RFC 7517 Section 5."""
+
+    @classmethod
+    @abstractmethod
+    def from_dict(cls, data: dict[str, Any]) -> BaseJWKSet:
+        """Create JWKSet from dict.
+
+        Args:
+            data: JWKSet dict with 'keys' array.
+
+        Returns:
+            JWKSet instance.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def to_dict(self) -> dict[str, Any]:
+        """Convert JWKSet to dict.
+
+        Returns:
+            dict[str, Any]: JWKSet dict with 'keys' array.
+        """
+        raise NotImplementedError
 
     @abstractmethod
     def get_by_kid(self, kid: str) -> dict[str, Any] | None:
@@ -291,7 +368,7 @@ class BaseJWE(ABC):
     @abstractmethod
     def encrypt(
         self,
-        plaintext: bytes | str,
+        plaintext: bytes | str | dict[str, Any],
         header: dict[str, Any] | None = None,
     ) -> str:
         """Encrypt plaintext.
@@ -301,6 +378,7 @@ class BaseJWE(ABC):
 
         Args:
             plaintext: Data to encrypt. If str, will be encoded to UTF-8.
+                If dict, will be JSON encoded.
             header: JWE header (must include 'alg' and 'enc').
 
         Returns:
