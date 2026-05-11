@@ -8,7 +8,11 @@ from typing import TYPE_CHECKING, Any
 
 from jam.__base_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
-from jam.exceptions import JamJWEDecryptionError, JamJWEEncryptionError
+from jam.exceptions.jose import (
+    JamJWEDecryptionError,
+    JamJWEEncryptionError,
+    JamJWEInvalidFormatError,
+)
 from jam.jose.__algorithms__ import (
     SUPPORTED_ENC_ALGORITHMS,
     SUPPORTED_KEY_ALGORITHMS,
@@ -160,7 +164,9 @@ class JWE(BaseJWE):
         try:
             parts = token.split(".")
             if len(parts) != 5:
-                raise ValueError("Invalid JWE compact serialization format")
+                raise JamJWEInvalidFormatError(
+                    message="Invalid JWE compact serialization format"
+                )
 
             (
                 protected_b64,

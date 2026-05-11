@@ -50,15 +50,23 @@ class BaseJWT(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def decode(self, token: str, verify=True) -> dict[str, Any]:
+    def decode(
+        self,
+        token: str,
+        validate_claims: bool = True,
+    ) -> dict[str, Any]:
         """Decode the JWT and return the header and payload.
 
         Args:
             token (str): JWT
-            verify (bool): Verify the JWT signature.
+            validate_claims (bool): Whether to validate exp/nbf claims.
 
         Returns:
             dict with 'header' and 'payload' keys (both dicts).
+
+        Raises:
+            JamJWTExpired: If token is expired.
+            JamJWTNotYetValid: If token is not yet valid.
         """
         raise NotImplementedError
 

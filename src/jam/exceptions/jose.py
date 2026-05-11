@@ -66,3 +66,8 @@ class JamAlgorithmError(JamConfigurationError):
 class JamInvalidPaddingError(JamValidationError):
     default_message = "Invalid padding."
     default_code = "jose.invalid_padding"
+
+
+class JamRedisListConfigurationError(JamConfigurationError):
+    default_message = "Redis list configuration error."
+    default_code = "jose.redis_list_configuration_error"

@@ -3,7 +3,10 @@
 import json
 from typing import TYPE_CHECKING, Any
 
-from jam.exceptions import JamJWSVerificationError, JamJWTUnsupportedAlgorithm
+from jam.exceptions import JamJWTUnsupportedAlgorithm
+from jam.exceptions.jose import (
+    JamJWSVerificationError,
+)
 from jam.jose.__algorithms__ import (
     SUPPORTED_ALGORITHMS,
     KeyLike,
@@ -136,6 +139,18 @@ class JWS(BaseJWS):
             )
 
         header = json.loads(__base64url_decode__(protected_b64).decode())
+
+        if "crit" in header:
+            registered = {"alg", "typ", "kid", "x5u", "x5t", "cty", "crit"}
+            unknown = [k for k in header["crit"] if k not in registered]
+            if unknown:
+                raise JamJWSVerificationError(
+                    details={
+                        "reason": "unknown_critical_header",
+                        "unknown": unknown,
+                    }
+                )
+
         header_alg = header.get("alg")
         if header_alg != self._alg:
             raise JamJWSVerificationError(

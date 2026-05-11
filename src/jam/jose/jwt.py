@@ -9,7 +9,14 @@ import uuid
 from jam.__base_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
 from jam.exceptions import (
+    JamJWTExpired,
+    JamJWTNotYetValid,
     JamJWTUnsupportedAlgorithm,
+)
+from jam.exceptions.jose import (
+    JamConfigurationError,
+    JamInvalidKeyTypeError,
+    JamJWSVerificationError,
 )
 from jam.jose.__algorithms__ import (
     SUPPORTED_ALGORITHMS,
@@ -75,8 +82,8 @@ class JWT(BaseJWT):
 
         if jws is not None:
             if alg is not None:
-                raise ValueError(
-                    "Cannot specify both 'alg' and 'jws'. Use either 'jws' or 'alg'."
+                raise JamConfigurationError(
+                    message="Cannot specify both 'alg' and 'jws'. Use either 'jws' or 'alg'."
                 )
             self.jws = jws
             self._alg = jws._alg
@@ -100,8 +107,8 @@ class JWT(BaseJWT):
 
         if jwe is not None:
             if enc is not None:
-                raise ValueError(
-                    "Cannot specify both 'enc' and 'jwe'. Use either 'jwe' or 'enc'."
+                raise JamConfigurationError(
+                    message="Cannot specify both 'enc' and 'jwe'. Use either 'jwe' or 'enc'."
                 )
             self.jwe = jwe
             self._enc = jwe._enc
@@ -117,8 +124,8 @@ class JWT(BaseJWT):
             self._enc = None
 
         if not self.jws and not self.jwe:
-            raise ValueError(
-                "Either 'alg', 'enc', 'jws', or 'jwe' must be provided"
+            raise JamConfigurationError(
+                message="Either 'alg', 'enc', 'jws', or 'jwe' must be provided"
             )
 
         self.list = self._list_built(list) if list else None
@@ -151,7 +158,7 @@ class JWT(BaseJWT):
 
     def _build_jws(self) -> BaseJWS:
         if not self._alg or not self._key:
-            raise ValueError("JWS requires 'alg' and 'key'")
+            raise JamConfigurationError(message="JWS requires 'alg' and 'key'")
 
         return self.JWS(
             alg=self._alg,
@@ -162,7 +169,9 @@ class JWT(BaseJWT):
 
     def _build_jwe(self) -> JWE:
         if not self._enc:
-            raise ValueError("JWE requires 'enc' to be provided")
+            raise JamConfigurationError(
+                message="JWE requires 'enc' to be provided"
+            )
 
         key_type = self._detect_key_type(self._key)
 
@@ -181,7 +190,9 @@ class JWT(BaseJWT):
             jwe_alg = "A256KW" if key_len >= 32 else "A128KW"
             enc_key = self._derive_encryption_key(self._key)
         else:
-            raise ValueError(f"Unsupported key type for JWE: {key_type}")
+            raise JamInvalidKeyTypeError(
+                message=f"Unsupported key type for JWE: {key_type}"
+            )
 
         return self.JWE(
             alg=jwe_alg,
@@ -209,10 +220,10 @@ class JWT(BaseJWT):
                 load_ssh_public_key,
             )
 
-            if isinstance(key, (rsa.RSAPrivateKey, rsa.RSAPublicKey)):
+            if isinstance(key, rsa.RSAPrivateKey | rsa.RSAPublicKey):
                 return "rsa"
             if isinstance(
-                key, (ec.EllipticCurvePrivateKey, ec.EllipticCurvePublicKey)
+                key, ec.EllipticCurvePrivateKey | ec.EllipticCurvePublicKey
             ):
                 return "ec"
 
@@ -220,7 +231,7 @@ class JWT(BaseJWT):
                 try:
                     loaded = load_pem_private_key(key, password=None)
                     if isinstance(
-                        loaded, (rsa.RSAPrivateKey, ec.EllipticCurvePrivateKey)
+                        loaded, rsa.RSAPrivateKey | ec.EllipticCurvePrivateKey
                     ):
                         return (
                             "rsa"
@@ -233,7 +244,7 @@ class JWT(BaseJWT):
                 try:
                     loaded = load_der_private_key(key, password=None)
                     if isinstance(
-                        loaded, (rsa.RSAPrivateKey, ec.EllipticCurvePrivateKey)
+                        loaded, rsa.RSAPrivateKey | ec.EllipticCurvePrivateKey
                     ):
                         return (
                             "rsa"
@@ -246,7 +257,7 @@ class JWT(BaseJWT):
                 try:
                     loaded = load_ssh_public_key(key)
                     if isinstance(
-                        loaded, (rsa.RSAPublicKey, ec.EllipticCurvePublicKey)
+                        loaded, rsa.RSAPublicKey | ec.EllipticCurvePublicKey
                     ):
                         return (
                             "rsa"
@@ -308,8 +319,8 @@ class JWT(BaseJWT):
                     prefix=list_config.get("prefix", "jwt_list"),
                 )
             case _:
-                raise ValueError(
-                    f"Unknown list backend: {list_config['backend']}"
+                raise JamConfigurationError(
+                    message=f"Unknown list backend: {list_config['backend']}"
                 )
 
     def _validate_algorithm(self, alg: str) -> None:
@@ -343,7 +354,9 @@ class JWT(BaseJWT):
         """Get or create algorithm instance."""
         if self._algorithm is None:
             if not self._alg or not self._key:
-                raise ValueError("JWS requires 'alg' and 'key'")
+                raise JamConfigurationError(
+                    message="JWS requires 'alg' and 'key'"
+                )
             self._algorithm = create_algorithm(
                 self._alg, self._key, self._password, self._logger
             )
@@ -406,10 +419,12 @@ class JWT(BaseJWT):
             str: The encoded JWT (JWS compact serialization).
 
         Raises:
-            ValueError: If alg is not provided.
+            JamConfigurationError: If alg is not provided.
         """
         if not self.jws:
-            raise ValueError("JWS not configured. Provide 'alg' parameter.")
+            raise JamConfigurationError(
+                message="JWS not configured. Provide 'alg' parameter."
+            )
 
         if jti is None:
             jti = self.jti
@@ -420,26 +435,66 @@ class JWT(BaseJWT):
         _payload = self._make_payload(iss, sub, aud, exp, nbf, jti, payload)
         return self.jws.sign(header=_base_header, data=_payload)
 
-    def decode(self, token: str) -> dict[str, Any]:
+    def decode(
+        self,
+        token: str,
+        validate_claims: bool = True,
+    ) -> dict[str, Any]:
         """Decode the JWT and return the header and payload.
+
+        Args:
+            token: JWT token.
+            validate_claims: Whether to validate exp/nbf claims. Defaults to True.
 
         Returns:
             dict with 'header' and 'payload' keys (both dicts).
 
         Raises:
-            ValueError: If alg is not provided or token has invalid type.
+            JamConfigurationError: If alg is not provided.
+            JamJWSVerificationError: If token has invalid type.
+            JamJWTExpired: If token is expired.
+            JamJWTNotYetValid: If token is not yet valid.
         """
         if not self.jws:
-            raise ValueError("JWS not configured. Provide 'alg' parameter.")
+            raise JamConfigurationError(
+                message="JWS not configured. Provide 'alg' parameter."
+            )
 
         data = self.jws.verify(token, True)
         header = data["header"]
         if header.get("typ") != "JWT":
-            raise ValueError("Invalid token type")
+            raise JamJWSVerificationError(message="Invalid token type")
+        payload = json.loads(data["payload"])
+
+        if validate_claims:
+            self._validate_claims(payload)
+
         return {
             "header": header,
-            "payload": json.loads(data["payload"]),
+            "payload": payload,
         }
+
+    def _validate_claims(self, payload: dict[str, Any]) -> None:
+        """Validate JWT standard claims.
+
+        Args:
+            payload: JWT payload dict.
+
+        Raises:
+            JamJWTExpired: If token is expired.
+            JamJWTNotYetValid: If token is not yet valid.
+        """
+        now = int(time.time())
+
+        if "exp" in payload:
+            exp = payload["exp"]
+            if isinstance(exp, int | float) and exp < now:
+                raise JamJWTExpired(details={"exp": exp, "now": now})
+
+        if "nbf" in payload:
+            nbf = payload["nbf"]
+            if isinstance(nbf, int | float) and nbf > now:
+                raise JamJWTNotYetValid(details={"nbf": nbf, "now": now})
 
     def encrypt(
         self,
@@ -460,10 +515,12 @@ class JWT(BaseJWT):
             str: Encrypted JWT (JWE or JWS+JWE).
 
         Raises:
-            ValueError: If jwe is not configured.
+            JamConfigurationError: If jwe is not configured.
         """
         if not self.jwe:
-            raise ValueError("JWE not configured. Provide 'enc' parameter.")
+            raise JamConfigurationError(
+                message="JWE not configured. Provide 'enc' parameter."
+            )
 
         if isinstance(payload, dict):
             payload_bytes = self._serializer.dumps(payload)
@@ -495,10 +552,12 @@ class JWT(BaseJWT):
             dict[str, Any]: Decrypted payload.
 
         Raises:
-            ValueError: If enc is not provided or decryption fails.
+            JamConfigurationError: If enc is not provided.
         """
         if not self.jwe:
-            raise ValueError("JWE not configured. Provide 'enc' parameter.")
+            raise JamConfigurationError(
+                message="JWE not configured. Provide 'enc' parameter."
+            )
 
         plaintext = self.jwe.decrypt(token)
 

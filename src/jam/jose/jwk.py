@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Literal, TypedDict
 
 from jam.exceptions import JamJWKValidationError
+from jam.exceptions.jose import JamJWKInvalidKeyTypeError
 from jam.jose.__algorithms__ import KeyLike
 from jam.jose.__base__ import BaseJWK, BaseJWKSet
 from jam.jose.jws import JWS
@@ -308,7 +309,7 @@ class JWK(BaseJWK):
         if kty == "EC":
             return self._ec_to_pem()
 
-        raise ValueError(f"Unsupported key type: {kty}")
+        raise JamJWKInvalidKeyTypeError(message=f"Unsupported key type: {kty}")
 
     def _rsa_to_pem(self) -> str:
         """Convert RSA JWK to PEM format.
@@ -326,29 +327,28 @@ class JWK(BaseJWK):
         e = int.from_bytes(__base64url_decode__(self._data["e"]), "big")
 
         if "d" in self._data:
-            required_private = ["d", "p", "q"]
+            required_private = ["d", "p", "q", "dp", "dq", "qi"]
             missing = [p for p in required_private if p not in self._data]
             if missing:
-                raise ValueError(
-                    f"Missing RSA private key parameters: {missing}. "
-                    "For RSA private key conversion, 'd', 'p', and 'q' are required."
+                raise JamJWKValidationError(
+                    message=f"Missing RSA private key parameters: {missing}. "
+                    "RFC 7518 Section 6.3.2 requires all: d, p, q, dp, dq, qi"
                 )
 
             d = int.from_bytes(__base64url_decode__(self._data["d"]), "big")
             p = int.from_bytes(__base64url_decode__(self._data["p"]), "big")
             q = int.from_bytes(__base64url_decode__(self._data["q"]), "big")
-
-            dmp1 = d % (p - 1)
-            dmq1 = d % (q - 1)
-            iqmp = pow(q, -1, p)
+            dp = int.from_bytes(__base64url_decode__(self._data["dp"]), "big")
+            dq = int.from_bytes(__base64url_decode__(self._data["dq"]), "big")
+            qi = int.from_bytes(__base64url_decode__(self._data["qi"]), "big")
 
             private_numbers = rsa.RSAPrivateNumbers(
                 p=p,
                 q=q,
                 d=d,
-                dmp1=dmp1,
-                dmq1=dmq1,
-                iqmp=iqmp,
+                dmp1=dp,
+                dmq1=dq,
+                iqmp=qi,
                 public_numbers=rsa.RSAPublicNumbers(n=n, e=e),
             )
             key = private_numbers.private_key()
@@ -514,6 +514,14 @@ class JWKSet(BaseJWKSet):
 
         Returns:
             JWKSet instance.
+
+        Raises:
+            JamJWKValidationError: If data is invalid.
         """
-        keys = data.get("keys", [])
-        return cls(keys=keys)
+        if "keys" not in data:
+            raise JamJWKValidationError(message="Missing 'keys' in JWKSet")
+        keys = data["keys"]
+        if not isinstance(keys, list):
+            raise JamJWKValidationError(message="'keys' must be a list")
+        validated_keys = [JWK.validate(k) for k in keys]
+        return cls(keys=[k.to_dict() for k in validated_keys])

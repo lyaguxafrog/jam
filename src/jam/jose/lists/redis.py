@@ -15,6 +15,7 @@ except ImportError:
         """
     )
 
+from jam.exceptions.jose import JamRedisListConfigurationError
 from jam.jose.lists.__base__ import BaseJWTList
 
 
@@ -70,7 +71,9 @@ class RedisList(BaseJWTList):
         elif redis:
             self._redis = redis
         else:
-            raise ValueError("redis_uri or redis must be provided")
+            raise JamRedisListConfigurationError(
+                message="redis_uri or redis must be provided"
+            )
 
         self._logger = logger
         if self._logger:

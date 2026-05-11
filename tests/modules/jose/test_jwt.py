@@ -256,7 +256,8 @@ class TestJWTJWERSA:
 
 class TestJWTErrors:
     def test_missing_alg_and_enc(self):
-        with pytest.raises(ValueError):
+        from jam.exceptions import JamConfigurationError
+        with pytest.raises(JamConfigurationError):
             JWT(secret_key="some_key")
 
     def test_invalid_algorithm(self):
@@ -268,25 +269,29 @@ class TestJWTErrors:
             JWT(enc="INVALID", secret_key="some_key")
 
     def test_decode_without_jws_config(self):
+        from jam.exceptions import JamConfigurationError
         jwt = JWT(enc="A128CBC-HS256", secret_key="some_key_32_bytes_long")
-        with pytest.raises(ValueError):
+        with pytest.raises(JamConfigurationError):
             jwt.decode("some.token")
 
     def test_encrypt_without_jwe_config(self):
+        from jam.exceptions import JamConfigurationError
         jwt = JWT(alg="HS256", secret_key="some_key")
-        with pytest.raises(ValueError):
+        with pytest.raises(JamConfigurationError):
             jwt.encrypt({"data": "test"})
 
     def test_cannot_specify_both_alg_and_jws(self):
+        from jam.exceptions import JamConfigurationError
         jws = JWS(alg="HS256", key="SOME_KEY_THAT_IS_LONG")
-        with pytest.raises(ValueError, match="Cannot specify both"):
+        with pytest.raises(JamConfigurationError, match="Cannot specify both"):
             JWT(alg="HS256", jws=jws, secret_key="SOME_KEY")
 
     def test_cannot_specify_both_enc_and_jwe(self):
+        from jam.exceptions import JamConfigurationError
         jwe = JWE(
             alg="A128KW", enc="A128CBC-HS256", key="SOME_KEY_THAT_IS_LONG"
         )
-        with pytest.raises(ValueError, match="Cannot specify both"):
+        with pytest.raises(JamConfigurationError, match="Cannot specify both"):
             JWT(enc="A128CBC-HS256", jwe=jwe, secret_key="SOME_KEY")
 
     def test_invalid_token_type(self):
@@ -508,11 +513,11 @@ class TestJWTClaims:
             sub="subject",
             aud="audience",
             exp=3600,
-            nbf=10,
+            nbf=-10,
             payload={"custom": "claim"},
         )
 
-        decoded = decode_payload(jwt, token)
+        decoded = jwt.decode(token)["payload"]
 
         assert decoded["iss"] == "issuer"
         assert decoded["sub"] == "subject"

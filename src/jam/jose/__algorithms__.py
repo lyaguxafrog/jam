@@ -20,6 +20,15 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives.keywrap import aes_key_unwrap, aes_key_wrap
 
+from jam.exceptions.jose import (
+    JamAlgorithmError,
+    JamInvalidKeyTypeError,
+    JamInvalidPaddingError,
+    JamJWSInvalidFormatError,
+    JamJWSSigningError,
+    JamJWSValidationError,
+    JamJWSVerificationError,
+)
 from jam.jose.utils import __base64url_decode__, __base64url_encode__
 from jam.logger import BaseLogger
 
@@ -135,7 +144,9 @@ class BaseAlgorithm(ABC):
                 f"Failed to load private key: {e}",
                 exc_info=True,
             )
-            raise ValueError(f"Invalid private key format: {e}") from e
+            raise JamJWSInvalidFormatError(
+                message=f"Invalid private key format: {e}"
+            ) from e
 
     def _load_public_key_auto(self, key: KeyLike) -> Any:
         """Load public key automatically from various formats.
@@ -174,7 +185,9 @@ class BaseAlgorithm(ABC):
                     f"Failed to load public key: {e}",
                     exc_info=True,
                 )
-                raise ValueError(f"Invalid key format: {e}") from e
+                raise JamJWSInvalidFormatError(
+                    message=f"Invalid key format: {e}"
+                ) from e
 
 
 class HSAlgorithm(BaseAlgorithm):
@@ -196,8 +209,8 @@ class HSAlgorithm(BaseAlgorithm):
             else self._secret
         )
         if not isinstance(key, bytes):
-            raise ValueError(
-                f"Invalid key type for {self.alg}: expected str or bytes"
+            raise JamInvalidKeyTypeError(
+                message=f"Invalid key type for {self.alg}: expected str or bytes"
             )
 
         digest = getattr(hashlib, f"sha{self.alg[2:]}")
@@ -213,20 +226,20 @@ class HSAlgorithm(BaseAlgorithm):
             key (KeyLike): Key for verification
 
         Raises:
-            ValueError: If signature is invalid
+            JamJWSVerificationError: If signature is invalid
         """
         self._logger.debug(f"Verifying {self.alg} signature")
         k = key.encode() if isinstance(key, str) else key
         if not isinstance(k, bytes):
-            raise ValueError(
-                f"Invalid key type for {self.alg}: expected str or bytes"
+            raise JamInvalidKeyTypeError(
+                message=f"Invalid key type for {self.alg}: expected str or bytes"
             )
 
         digest = getattr(hashlib, f"sha{self.alg[2:]}")
         expected = hmac.new(k, data, digest).digest()
         if not hmac.compare_digest(sig, expected):
             self._logger.warning("HMAC signature verification failed")
-            raise ValueError("Invalid HMAC signature")
+            raise JamJWSVerificationError(message="Invalid HMAC signature")
 
 
 class RSAlgorithm(BaseAlgorithm):
@@ -268,7 +281,7 @@ class RSAlgorithm(BaseAlgorithm):
                 f"Failed to sign with {self.alg}: {e}",
                 exc_info=True,
             )
-            raise ValueError(f"Signing failed: {e}") from e
+            raise JamJWSSigningError(message=f"Signing failed: {e}") from e
 
     def verify(self, sig: bytes, data: bytes, key: KeyLike) -> None:
         """Verify RSA PKCS1v15 signature.
@@ -279,7 +292,7 @@ class RSAlgorithm(BaseAlgorithm):
             key (KeyLike): Key for verification
 
         Raises:
-            ValueError: If signature is invalid
+            JamJWSVerificationError: If signature is invalid
         """
         self._logger.debug(f"Verifying {self.alg} signature")
         try:
@@ -291,7 +304,9 @@ class RSAlgorithm(BaseAlgorithm):
                 f"RSA signature verification failed: {e}",
                 exc_info=True,
             )
-            raise ValueError(f"Invalid RSA signature: {e}") from e
+            raise JamJWSVerificationError(
+                message=f"Invalid RSA signature: {e}"
+            ) from e
 
 
 class ESAlgorithm(BaseAlgorithm):
@@ -342,7 +357,7 @@ class ESAlgorithm(BaseAlgorithm):
                 f"Failed to sign with {self.alg}: {e}",
                 exc_info=True,
             )
-            raise ValueError(f"Signing failed: {e}") from e
+            raise JamJWSSigningError(message=f"Signing failed: {e}") from e
 
     def verify(self, sig: bytes, data: bytes, key: KeyLike) -> None:
         """Verify ECDSA signature.
@@ -353,7 +368,7 @@ class ESAlgorithm(BaseAlgorithm):
             key (KeyLike): Key for verification
 
         Raises:
-            ValueError: If signature is invalid
+            JamJWSVerificationError: If signature is invalid
         """
         self._logger.debug(f"Verifying {self.alg} signature")
         try:
@@ -361,8 +376,8 @@ class ESAlgorithm(BaseAlgorithm):
             _, hash_alg = self._CURVE_MAP[self.alg]
             n = (pub_key.curve.key_size + 7) // 8
             if len(sig) != 2 * n:
-                raise ValueError(
-                    f"Invalid signature length: expected {2 * n}, got {len(sig)}"
+                raise JamJWSVerificationError(
+                    message=f"Invalid signature length: expected {2 * n}, got {len(sig)}"
                 )
             r, s = (
                 int.from_bytes(sig[:n], "big"),
@@ -370,12 +385,16 @@ class ESAlgorithm(BaseAlgorithm):
             )
             der = encode_dss_signature(r, s)
             pub_key.verify(der, data, ec.ECDSA(hash_alg))
+        except JamJWSVerificationError:
+            raise
         except Exception as e:
             self._logger.warning(
                 f"ECDSA signature verification failed: {e}",
                 exc_info=True,
             )
-            raise ValueError(f"Invalid ECDSA signature: {e}") from e
+            raise JamJWSVerificationError(
+                message=f"Invalid ECDSA signature: {e}"
+            ) from e
 
 
 class PSAlgorithm(BaseAlgorithm):
@@ -424,7 +443,7 @@ class PSAlgorithm(BaseAlgorithm):
                 f"Failed to sign with {self.alg}: {e}",
                 exc_info=True,
             )
-            raise ValueError(f"Signing failed: {e}") from e
+            raise JamJWSSigningError(message=f"Signing failed: {e}") from e
 
     def verify(self, sig: bytes, data: bytes, key: KeyLike) -> None:
         """Verify RSA PSS signature.
@@ -435,7 +454,7 @@ class PSAlgorithm(BaseAlgorithm):
             key (KeyLike): Key for verification
 
         Raises:
-            ValueError: If signature is invalid
+            JamJWSVerificationError: If signature is invalid
         """
         self._logger.debug(f"Verifying {self.alg} signature")
         try:
@@ -455,7 +474,9 @@ class PSAlgorithm(BaseAlgorithm):
                 f"RSA PSS signature verification failed: {e}",
                 exc_info=True,
             )
-            raise ValueError(f"Invalid RSA PSS signature: {e}") from e
+            raise JamJWSVerificationError(
+                message=f"Invalid RSA PSS signature: {e}"
+            ) from e
 
 
 def create_algorithm(
@@ -487,7 +508,7 @@ def create_algorithm(
     if alg.startswith("PS"):
         return PSAlgorithm(alg, secret, password, logger)
 
-    raise ValueError(f"Unsupported algorithm: {alg}")
+    raise JamAlgorithmError(message=f"Unsupported algorithm: {alg}")
 
 
 SUPPORTED_ALGORITHMS = (
@@ -628,7 +649,9 @@ class RSAKeyAlgorithm(BaseKeyAlgorithm):
         public_key = self._load_public_key()
         padding = self._PADDING_MAP.get(self.alg)
         if not padding:
-            raise ValueError(f"Unsupported RSA algorithm: {self.alg}")
+            raise JamAlgorithmError(
+                message=f"Unsupported RSA algorithm: {self.alg}"
+            )
 
         encrypted_key = public_key.encrypt(cek, padding)
         return encrypted_key, {}
@@ -639,7 +662,9 @@ class RSAKeyAlgorithm(BaseKeyAlgorithm):
         private_key = self._load_private_key()
         padding = self._PADDING_MAP.get(self.alg)
         if not padding:
-            raise ValueError(f"Unsupported RSA algorithm: {self.alg}")
+            raise JamAlgorithmError(
+                message=f"Unsupported RSA algorithm: {self.alg}"
+            )
 
         return private_key.decrypt(encrypted_key, padding)
 
@@ -647,7 +672,7 @@ class RSAKeyAlgorithm(BaseKeyAlgorithm):
 class AESKeyWrapAlgorithm(BaseKeyAlgorithm):
     """AES Key Wrap algorithms - RFC 7518 Section 4.4."""
 
-    _KEY_SIZES = {"A128KW": 16, "A256KW": 32}
+    _KEY_SIZES = {"A128KW": 16, "A192KW": 24, "A256KW": 32}
 
     def wrap_key(self, cek: bytes) -> tuple[bytes, dict[str, Any]]:
         """Wrap CEK using AES Key Wrap."""
@@ -659,7 +684,9 @@ class AESKeyWrapAlgorithm(BaseKeyAlgorithm):
         elif isinstance(self._key, bytes):
             key = self._key[:key_size]
         else:
-            raise ValueError(f"Invalid key type for {self.alg}")
+            raise JamInvalidKeyTypeError(
+                message=f"Invalid key type for {self.alg}"
+            )
 
         encrypted_key = aes_key_wrap(key, cek)
         return encrypted_key, {}
@@ -674,7 +701,9 @@ class AESKeyWrapAlgorithm(BaseKeyAlgorithm):
         elif isinstance(self._key, bytes):
             key = self._key[:key_size]
         else:
-            raise ValueError(f"Invalid key type for {self.alg}")
+            raise JamInvalidKeyTypeError(
+                message=f"Invalid key type for {self.alg}"
+            )
 
         return aes_key_unwrap(key, encrypted_key)
 
@@ -688,18 +717,25 @@ class ECDHKeyAlgorithm(BaseKeyAlgorithm):
         """Wrap CEK using ECDH."""
         self._logger.debug(f"Wrapping key with {self.alg}")
 
-        ephemeral_key = ec.generate_private_key(
-            ec.SECP256R1()
-            if self.alg in ("ECDH-ES", "ECDH-ES+A128KW")
-            else ec.SECP521R1()
-        )
+        if self.alg in ("ECDH-ES", "ECDH-ES+A128KW"):
+            curve = ec.SECP256R1()
+        elif self.alg == "ECDH-ES+A192KW":
+            curve = ec.SECP384R1()
+        else:
+            curve = ec.SECP521R1()
+
+        ephemeral_key = ec.generate_private_key(curve)
         ephemeral_public_key = ephemeral_key.public_key()
 
         public_key = self._load_public_key()
         shared_key = ephemeral_key.exchange(ec.ECDH(), public_key)
 
-        alg_map = {"ECDH-ES+A128KW": 16, "ECDH-ES+A256KW": 32}
-        key_length = alg_map.get(self.alg, (len(cek) + 7) // 8 * 8 // 8)
+        alg_map = {
+            "ECDH-ES+A128KW": 16,
+            "ECDH-ES+A192KW": 24,
+            "ECDH-ES+A256KW": 32,
+        }
+        key_length = alg_map.get(self.alg, (len(cek) + 7) // 8)
 
         derived_key = HKDF(
             algorithm=hashes.SHA256(),
@@ -719,14 +755,27 @@ class ECDHKeyAlgorithm(BaseKeyAlgorithm):
             )
             encrypted_key, _ = key_wrap.wrap_key(cek)
 
+        crv_map = {
+            "ECDH-ES": "P-256",
+            "ECDH-ES+A128KW": "P-256",
+            "ECDH-ES+A192KW": "P-384",
+            "ECDH-ES+A256KW": "P-521",
+        }
+        crv = crv_map.get(self.alg, "P-256")
+
+        curve_size = self._CURVE_SIZES.get(crv, 32)
         epk = {
             "kty": "EC",
-            "crv": "P-256",
+            "crv": crv,
             "x": __base64url_encode__(
-                ephemeral_public_key.public_numbers().x.to_bytes(32, "big")
+                ephemeral_public_key.public_numbers().x.to_bytes(
+                    curve_size, "big"
+                )
             ),
             "y": __base64url_encode__(
-                ephemeral_public_key.public_numbers().y.to_bytes(32, "big")
+                ephemeral_public_key.public_numbers().y.to_bytes(
+                    curve_size, "big"
+                )
             ),
         }
 
@@ -757,7 +806,11 @@ class ECDHKeyAlgorithm(BaseKeyAlgorithm):
         ).public_key()
         shared_key = private_key.exchange(ec.ECDH(), ephemeral_public_key)
 
-        alg_map = {"ECDH-ES+A128KW": 16, "ECDH-ES+A256KW": 32}
+        alg_map = {
+            "ECDH-ES+A128KW": 16,
+            "ECDH-ES+A192KW": 24,
+            "ECDH-ES+A256KW": 32,
+        }
         key_length = alg_map.get(self.alg, len(encrypted_key))
 
         derived_key = HKDF(
@@ -795,7 +848,9 @@ class AESGCMKeyAlgorithm(BaseKeyAlgorithm):
         elif isinstance(self._key, bytes):
             key = self._key[:key_size]
         else:
-            raise ValueError(f"Invalid key type for {self.alg}")
+            raise JamInvalidKeyTypeError(
+                message=f"Invalid key type for {self.alg}"
+            )
 
         aesgcm = AESGCM(key)
         encrypted_key = aesgcm.encrypt(iv, cek, None)
@@ -813,7 +868,9 @@ class AESGCMKeyAlgorithm(BaseKeyAlgorithm):
         elif isinstance(self._key, bytes):
             key = self._key[:key_size]
         else:
-            raise ValueError(f"Invalid key type for {self.alg}")
+            raise JamInvalidKeyTypeError(
+                message=f"Invalid key type for {self.alg}"
+            )
 
         aesgcm = AESGCM(key)
         tag = encrypted_key[-16:]
@@ -1054,7 +1111,7 @@ class AESCBCEncAlgorithm(BaseEncAlgorithm):
         ]
 
         if not hmac.compare_digest(tag, expected_tag):
-            raise ValueError("HMAC verification failed")
+            raise JamJWSValidationError(message="HMAC verification failed")
 
         cipher = Cipher(algorithms.AES(enc_key), modes.CBC(iv))
         decryptor = cipher.decryptor()
@@ -1069,8 +1126,28 @@ class AESCBCEncAlgorithm(BaseEncAlgorithm):
         return data + padding
 
     def _pkcs7_unpad(self, data: bytes) -> bytes:
-        """Remove PKCS#7 padding."""
+        """Remove PKCS#7 padding.
+
+        Args:
+            data: Padded data.
+
+        Returns:
+            Unpadded data.
+
+        Raises:
+            ValueError: If padding is invalid.
+        """
+        if not data:
+            raise JamInvalidPaddingError(message="Empty data for unpadding")
         padding_length = data[-1]
+        if not (1 <= padding_length <= 16):
+            raise JamInvalidPaddingError(message="Invalid padding length")
+        if padding_length > len(data):
+            raise JamInvalidPaddingError(
+                message="Invalid padding: exceeds data length"
+            )
+        if any(b != padding_length for b in data[-padding_length:]):
+            raise JamInvalidPaddingError(message="Invalid PKCS#7 padding")
         return data[:-padding_length]
 
 
@@ -1096,16 +1173,16 @@ def create_key_algorithm(
     """
     if alg in ("RSA1_5", "RSA-OAEP", "RSA-OAEP-256"):
         return RSAKeyAlgorithm(alg, key, password, logger)
-    if alg in ("A128KW", "A256KW"):
+    if alg in ("A128KW", "A192KW", "A256KW"):
         return AESKeyWrapAlgorithm(alg, key, password, logger)
-    if alg in ("ECDH-ES", "ECDH-ES+A128KW", "ECDH-ES+A256KW"):
+    if alg in ("ECDH-ES", "ECDH-ES+A128KW", "ECDH-ES+A192KW", "ECDH-ES+A256KW"):
         return ECDHKeyAlgorithm(alg, key, password, logger)
     if alg in ("A128GCMKW", "A256GCMKW"):
         return AESGCMKeyAlgorithm(alg, key, password, logger)
     if alg.startswith("PBES2"):
         return PBES2KeyAlgorithm(alg, key, password, logger)
 
-    raise ValueError(f"Unsupported key algorithm: {alg}")
+    raise JamAlgorithmError(message=f"Unsupported key algorithm: {alg}")
 
 
 def create_enc_algorithm(
@@ -1129,7 +1206,9 @@ def create_enc_algorithm(
     if enc in ("A128CBC-HS256", "A192CBC-HS384", "A256CBC-HS512"):
         return AESCBCEncAlgorithm(enc, logger)
 
-    raise ValueError(f"Unsupported content encryption algorithm: {enc}")
+    raise JamAlgorithmError(
+        message=f"Unsupported content encryption algorithm: {enc}"
+    )
 
 
 SUPPORTED_KEY_ALGORITHMS = frozenset(
@@ -1138,9 +1217,11 @@ SUPPORTED_KEY_ALGORITHMS = frozenset(
         "RSA-OAEP",
         "RSA-OAEP-256",
         "A128KW",
+        "A192KW",
         "A256KW",
         "ECDH-ES",
         "ECDH-ES+A128KW",
+        "ECDH-ES+A192KW",
         "ECDH-ES+A256KW",
         "A128GCMKW",
         "A256GCMKW",
