@@ -626,21 +626,20 @@ class BaseKeyAlgorithm(ABC):
         )
 
 
+_RSA_OAEP_SHA256 = padding.OAEP(
+    mgf=padding.MGF1(algorithm=hashes.SHA256()),
+    algorithm=hashes.SHA256(),
+    label=b"",
+)
+
+
 class RSAKeyAlgorithm(BaseKeyAlgorithm):
     """RSA Key Management algorithms - RFC 7518 Section 4.2."""
 
     _PADDING_MAP = {
         "RSA1_5": padding.PKCS1v15(),
-        "RSA-OAEP": padding.OAEP(
-            mgf=padding.MGF1(algorithm=hashes.SHA1()),
-            algorithm=hashes.SHA1(),
-            label=b"",
-        ),
-        "RSA-OAEP-256": padding.OAEP(
-            mgf=padding.MGF1(algorithm=hashes.SHA256()),
-            algorithm=hashes.SHA256(),
-            label=b"",
-        ),
+        "RSA-OAEP": _RSA_OAEP_SHA256,
+        "RSA-OAEP-256": _RSA_OAEP_SHA256,
     }
 
     def wrap_key(self, cek: bytes) -> tuple[bytes, dict[str, Any]]:
