@@ -76,6 +76,9 @@ class BasePlugin(InitPlugin):
             __config_maker__(config, pointer) if config else None
         )
 
+        # FIXME: Make config wrapper
+        if _config.get("jose", None):
+            _config = _config["jose"]
         params = _config.pop(self._CONFIG_KEY) if _config else kwargs
         self._setup_config(params)
         self._middleware = None
