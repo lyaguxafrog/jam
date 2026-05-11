@@ -13,10 +13,6 @@
         <link rel="canonical" href="https://jam.makridenko.ru/usage/jwt/">
       
       
-        <link rel="prev" href="../../configuration/">
-      
-      
-        <link rel="next" href="../paseto/">
       
       
         
@@ -406,20 +402,18 @@
       
   
   
-    
   
   
-  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
         
           
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
@@ -440,7 +434,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -455,24 +449,28 @@
                 
   
   
+  
+  
     
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
       
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        
           
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
     
   
-    JWT
+    JOSE
   
 
     
@@ -480,10 +478,56 @@
   
   
 
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    JOSE
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jose/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jose/jwt/" class="md-nav__link">
         
   
   
@@ -499,251 +543,125 @@
   
 
       </a>
-      
-        
+    </li>
+  
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+              
+            
+              
+                
   
   
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#use-in-instance" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use in instance
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Use in instance">
-      <ul class="md-nav__list">
+    <li class="md-nav__item">
+      <a href="../jose/jws/" class="md-nav__link">
         
-          <li class="md-nav__item">
-  <a href="#config" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Config
-      
-    </span>
-  </a>
   
-</li>
+  
+  <span class="md-ellipsis">
+    
+  
+    JWS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jose/jwe/" class="md-nav__link">
         
-          <li class="md-nav__item">
-  <a href="#usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Usage
-      
-    </span>
-  </a>
   
-    <nav class="md-nav" aria-label="Usage">
-      <ul class="md-nav__list">
+  
+  <span class="md-ellipsis">
+    
+  
+    JWE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jose/jwk/" class="md-nav__link">
         
-          <li class="md-nav__item">
-  <a href="#generate-payload" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Generate payload
-      
-    </span>
-  </a>
   
-</li>
+  
+  <span class="md-ellipsis">
+    
+  
+    JWK
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jose/algorithms/" class="md-nav__link">
         
-          <li class="md-nav__item">
-  <a href="#create-token" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Create token
-      
-    </span>
-  </a>
   
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#decode-token" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Decode token
-      
-    </span>
-  </a>
   
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#list" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        List
-      
-    </span>
-  </a>
+  <span class="md-ellipsis">
+    
   
-    <nav class="md-nav" aria-label="List">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#add-token-to-list" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Add token to list
-      
-    </span>
-  </a>
+    Algorithms
   
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#remove-token-from-list" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Remove token from list
-      
-    </span>
-  </a>
+
+    
+  </span>
   
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#check-token-in-list" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Check token in list
-      
-    </span>
-  </a>
   
-</li>
-        
-      </ul>
-    </nav>
+
+      </a>
+    </li>
   
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#use-out-of-instance" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use out of instance
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Use out of instance">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#built" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Built
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#encode-token" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Encode token
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#decode-token_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Decode token
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#list_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        List
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="List">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#add-token-to-list_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Add token to list
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#remove-token-from-list_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Remove token from list
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#check-token-in-list_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Check token in list
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -1806,6 +1724,10 @@
 
   <h1>JWT</h1>
 
+<div class="admonition deprecated">
+<p class="admonition-title">Deprecated</p>
+<p><code>jam.jwt</code> is deprecated, use <code>jam.jose</code>.</p>
+</div>
 <h2 id="use-in-instance">Use in instance<a class="headerlink" href="#use-in-instance" title="Permanent link">&para;</a></h2>
 <h3 id="config">Config<a class="headerlink" href="#config" title="Permanent link">&para;</a></h3>
 <ul>
@@ -2042,44 +1964,6 @@
       
         <footer class="md-footer">
   
-    
-      
-      <nav class="md-footer__inner md-grid" aria-label="Footer" >
-        
-          
-          <a href="../../configuration/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Configuration">
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l137.3-137.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg>
-            </div>
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              <div class="md-ellipsis">
-                Configuration
-              </div>
-            </div>
-          </a>
-        
-        
-          
-          <a href="../paseto/" class="md-footer__link md-footer__link--next" aria-label="Next: PASETO">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                PASETO
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M247.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L179.2 256 41.9 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg>
-            </div>
-          </a>
-        
-      </nav>
     
   
   <div class="md-footer-meta md-typeset">
