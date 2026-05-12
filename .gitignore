@@ -172,7 +172,6 @@ cython_debug/
 .pytest_cache/
 debug*
 .idea/
-.zed/
 :memory:
 .ruff_cache/
 sessions.json
