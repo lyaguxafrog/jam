@@ -81,6 +81,8 @@ class BaseBackend(AuthenticationBackend):
         try:
             if config:
                 config_ = __config_maker__(config, pointer)[self._CONFIG_KEY]
+                if config_.get("jose", None) and self.MODULE == create_jwt:
+                    config_ = config_["jose"]
                 self._auth = self.MODULE(**config_)
             else:
                 self._auth = self.MODULE(**kwargs)

@@ -89,6 +89,8 @@ class BaseAuthExtension(BaseExtension):
         _config: dict[str, Any] | None = (
             __config_maker__(config, pointer) if config else None
         )
+        if _config and _config.get("jose", None) and self.MODULE == create_jwt:
+            _config = _config["jose"]
 
         params = _config.pop(self._CONFIG_KEY) if _config else kwargs
         super().__init__(app=app, **params)

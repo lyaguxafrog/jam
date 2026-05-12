@@ -77,7 +77,7 @@ class BasePlugin(InitPlugin):
         )
 
         # FIXME: Make config wrapper
-        if _config.get("jose", None):
+        if _config and _config.get("jose", None) and self.MODULE == create_jwt:
             _config = _config["jose"]
         params = _config.pop(self._CONFIG_KEY) if _config else kwargs
         self._setup_config(params)
