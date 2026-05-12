@@ -20,7 +20,7 @@ def middleware_user():
 
 @pytest.fixture
 def jwt_config():
-    return {"jwt": {"secret": "test-secret", "alg": "HS256"}}
+    return {"jose": {"jwt": {"secret": "test-secret", "alg": "HS256"}}}
 
 
 @pytest.fixture

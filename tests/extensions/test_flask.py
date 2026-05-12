@@ -12,7 +12,7 @@ from jam.ext.flask import (
     SessionExtension,
     OAuth2Extension,
 )
-from jam.jwt import JWT
+from jam.jose.jwt import JWT
 from jam.paseto import create_instance as create_paseto
 from jam.sessions import create_instance as create_session
 from jam.exceptions import JamFlaskPluginConfigError
@@ -20,12 +20,12 @@ from jam.exceptions import JamFlaskPluginConfigError
 
 @pytest.fixture
 def jwt():
-    return JWT(alg="HS256", secret="test_secret")
+    return JWT(alg="HS256", secret_key="test_secret")
 
 
 @pytest.fixture
-def token(jwt) -> str:
-    return jwt.encode({"user_id": 123})
+def token(jwt: JWT) -> str:
+    return jwt.encode(payload={"user_id": 123})
 
 
 @pytest.fixture
