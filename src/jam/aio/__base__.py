@@ -4,6 +4,7 @@ from abc import abstractmethod
 from typing import Any
 
 from jam.__base__ import BaseJam
+from jam.__deprecated__ import deprecated
 from jam.aio.oauth2.__base__ import BaseAsyncOAuth2Client
 from jam.aio.sessions.__base__ import BaseAsyncSessionModule
 from jam.jose.__base__ import BaseJWE, BaseJWS
@@ -21,10 +22,16 @@ class BaseAsyncJam(BaseJam):
     jwe: BaseJWE | None = None  # type: ignore[override]
 
     @abstractmethod
+    @deprecated(
+        "This method is deprecated; the JWT payload is generated automatically in accordance with the specification."
+    )
     async def jwt_make_payload(  # type: ignore[override]
         self, exp: int | None, data: dict[str, Any]
     ) -> dict[str, Any]:
         """Make JWT-specific payload.
+
+        !!! Deprecated
+                This method is deprecated; the JWT payload is generated automatically in accordance with the specification.
 
         Args:
             exp (int | None): Token expire, if None -> use default
@@ -36,6 +43,7 @@ class BaseAsyncJam(BaseJam):
         raise NotImplementedError
 
     @abstractmethod
+    @deprecated("Use jam.jwt_encode")
     async def jwt_create(  # type: ignore[override]
         self, payload: dict[str, Any]
     ) -> str:
