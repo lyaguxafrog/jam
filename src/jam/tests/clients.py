@@ -5,6 +5,7 @@ import json
 from typing import Any, Union
 import uuid
 
+from jam.__deprecated__ import deprecated
 from jam.aio import Jam as AioJam
 from jam.instance import Jam
 from jam.jose.utils import __base64url_decode__ as base64url_decode
@@ -66,6 +67,9 @@ class TestJam(Jam):
         self._sessions: dict[str, dict[str, Any]] = {}
         self._session_keys: dict[str, str] = {}
 
+    @deprecated(
+        "This method is deprecated; the JWT payload is generated automatically in accordance with the specification."
+    )
     def jwt_make_payload(
         self, exp: int | None, data: dict[str, Any]
     ) -> dict[str, Any]:

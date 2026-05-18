@@ -9,12 +9,12 @@ import uuid
 from jam.__base_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
 from jam.exceptions import (
+    JamConfigurationError,
     JamJWTExpired,
     JamJWTNotYetValid,
     JamJWTUnsupportedAlgorithm,
 )
 from jam.exceptions.jose import (
-    JamConfigurationError,
     JamInvalidKeyTypeError,
     JamJWSVerificationError,
 )
@@ -30,6 +30,7 @@ from jam.jose.jwe import JWE
 from jam.jose.jws import JWS
 from jam.jose.lists import BaseJWTList
 from jam.logger import BaseLogger, logger
+from jam.utils.config_maker import __key_loader__
 
 
 if TYPE_CHECKING:
@@ -153,6 +154,7 @@ class JWT(BaseJWT):
         if isinstance(key, JWKClass):
             return key._to_keylike()
         if isinstance(key, str):
+            key = __key_loader__(key)
             return key.encode() if key else key
         return key
 
@@ -498,7 +500,7 @@ class JWT(BaseJWT):
 
     def encrypt(
         self,
-        payload: dict[str, Any] | str,
+        plaintext: bytes | str | dict[str, Any],
         header: dict[str, Any] | None = None,
     ) -> str:
         """Encrypt payload using JWE.
@@ -508,8 +510,8 @@ class JWT(BaseJWT):
         2. Use JWS result as plaintext for JWE (encrypt)
 
         Args:
-            payload: Data to encrypt. If dict, will be JSON encoded.
-            header: Additional JWE header.
+            plaintext (bytes | str | dict[str, Any]): Data to encrypt. If dict, will be JSON encoded.
+            header (dict[str, Any] | None): Additional JWE header.
 
         Returns:
             str: Encrypted JWT (JWE or JWS+JWE).
@@ -522,12 +524,12 @@ class JWT(BaseJWT):
                 message="JWE not configured. Provide 'enc' parameter."
             )
 
-        if isinstance(payload, dict):
-            payload_bytes = self._serializer.dumps(payload)
-        elif isinstance(payload, str):
-            payload_bytes = payload.encode("utf-8")
+        if isinstance(plaintext, dict):
+            payload_bytes = self._serializer.dumps(plaintext)
+        elif isinstance(plaintext, str):
+            payload_bytes = plaintext.encode("utf-8")
         else:
-            payload_bytes = payload
+            payload_bytes = plaintext
 
         if self.jws and self.jwe:
             _base_header = {"alg": self._alg, "typ": "JWT"}
@@ -538,7 +540,7 @@ class JWT(BaseJWT):
         else:
             return self.jwe.encrypt(payload_bytes, header)
 
-    def decrypt(self, token: str) -> dict[str, Any]:
+    def decrypt(self, token: str) -> dict[str, Any] | bytes:
         """Decrypt JWE or JWS+JWE token.
 
         If token is JWS+JWE (sign then encrypt):

@@ -19,6 +19,7 @@ from jam.exceptions import (
 )
 from jam.paseto.__base__ import PASETO, BasePASETO
 from jam.paseto.utils import __pae__, base64url_decode, base64url_encode
+from jam.utils.config_maker import __key_loader__
 from jam.utils.xchacha20poly1305 import (
     xchacha20poly1305_decrypt,
     xchacha20poly1305_encrypt,
@@ -42,6 +43,7 @@ class PASETOv2(BasePASETO):
 
         if purpose == "local":
             if isinstance(secret_key, str):
+                secret_key = __key_loader__(secret_key)
                 secret_key = base64.urlsafe_b64decode(secret_key + "==")
             if not isinstance(secret_key, bytes) or len(secret_key) != 32:
                 raise ValueError("v2.local key must be 32 bytes")
@@ -49,6 +51,8 @@ class PASETOv2(BasePASETO):
             return k
 
         elif purpose == "public":
+            if isinstance(secret_key, str):
+                secret_key = __key_loader__(secret_key)
             if isinstance(secret_key, Ed25519PrivateKey):
                 k._secret = secret_key
                 k._public_key = secret_key.public_key()

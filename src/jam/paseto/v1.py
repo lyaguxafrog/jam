@@ -29,6 +29,7 @@ from jam.paseto.utils import (
     base64url_decode,
     base64url_encode,
 )
+from jam.utils.config_maker import __key_loader__
 
 
 class PASETOv1(BasePASETO):
@@ -59,6 +60,7 @@ class PASETOv1(BasePASETO):
 
         if purpose == "local":
             if isinstance(secret_key, str):
+                secret_key = __key_loader__(secret_key)
                 raw = base64url_decode(secret_key.encode("utf-8"))
             else:
                 raw = secret_key
@@ -75,6 +77,8 @@ class PASETOv1(BasePASETO):
             return inst
 
         elif purpose == "public":
+            if isinstance(secret_key, str):
+                secret_key = __key_loader__(secret_key)
             if isinstance(secret_key, RSAPrivateKey):
                 inst._secret = secret_key
                 inst._public_key = secret_key.public_key()

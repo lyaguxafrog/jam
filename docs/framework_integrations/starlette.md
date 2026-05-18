@@ -55,9 +55,11 @@ The authorization backend accepts a standard Jam configuration as its configurat
 
 ```python
 config = {
-    "jwt": {
-        "alg": "HS256",
-        "secret": "SECRET"
+    "jose": {
+        "jwt": {
+            "alg": "HS256",
+            "secret": "SECRET"
+        }
     }
 }
 

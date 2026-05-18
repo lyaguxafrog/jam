@@ -35,7 +35,7 @@ payload = {
     "user": 1
 }
 
-jwt = jam.jwt_create(payload)
+jwt = jam.jwt_encode(payload=payload)
 session_id = jam.session_create("user@mail.com", payload)
 otp_code = jam.otp_code(secret="7K2HVNA3IQCYFFDX76IXKNCZHQ")
 ```
@@ -48,18 +48,18 @@ otp_code = jam.otp_code(secret="7K2HVNA3IQCYFFDX76IXKNCZHQ")
 ```python
 from jam.aio import Jam
 
-jam = Jam()
-payload = await jam.jwt_make_payload(
-    exp=3600, data={"user_id": 1}
+jam = Jam(config="config.toml")
+token = await jam.jwt_encode(
+    iss="Jam",
+    sub="username@example.com"
 )
-token = await jam.jwt_create(payload)
 ```
 
 
 ## Why Jam?
 Jam is a library that provides the most popular AUTH* mechanisms right out of the box.
 
-* [JWT](usage/jwt.md)
+* [JOSE](usage/jose/)
 * [PASETO](usage/paseto.md)
 * [Server side sessions](usage/sessions.md)
 * [OTP](usage/otp.md)

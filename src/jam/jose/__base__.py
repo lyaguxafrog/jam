@@ -73,34 +73,39 @@ class BaseJWT(ABC):
     @abstractmethod
     def encrypt(
         self,
-        payload: dict[str, Any] | str,
+        plaintext: bytes | str | dict[str, Any],
         header: dict[str, Any] | None = None,
     ) -> str:
-        """Encrypt payload using JWE.
+        """Encrypt plaintext.
 
-        Creates JWE or JWS+JWE token (sign then encrypt).
+        Produces JWE Compact Serialization:
+        BASE64URL(header).BASE64URL(encrypted_key).BASE64URL(iv).BASE64URL(ciphertext).BASE64URL(tag)
 
         Args:
-            payload: Data to encrypt. If dict, will be JSON encoded.
-            header: Additional JWE header.
+            plaintext: Data to encrypt. If str, will be encoded to UTF-8.
+                If dict, will be JSON encoded.
+            header: JWE header (must include 'alg' and 'enc').
 
         Returns:
-            str: Encrypted JWT (JWE or JWS+JWE).
+            JWE compact serialization string.
+
+        Raises:
+            JamJWEEncryptionError: If encryption fails.
         """
         raise NotImplementedError
 
     @abstractmethod
-    def decrypt(self, token: str) -> dict[str, Any]:
-        """Decrypt JWE or JWS+JWE token.
+    def decrypt(self, token: str) -> dict[str, Any] | bytes:
+        """Decrypt JWE token.
 
         Args:
-            token: Encrypted JWT token.
+            token: JWE compact serialization string.
 
         Returns:
-            dict[str, Any]: Decrypted payload.
+            bytes: Decrypted plaintext.
 
         Raises:
-            ValueError: If token is invalid or decryption fails.
+            JamJWEDecryptionError: If decryption fails.
         """
         raise NotImplementedError
 

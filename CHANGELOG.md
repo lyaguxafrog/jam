@@ -96,6 +96,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New utilities:
   - Utility for generating symmetric keys
   - Utility for generating ED key pairs
+- Added the ability to specify server keys as a path to a file. 
 
 ### Changed
 - License changed to Apache-2.0.

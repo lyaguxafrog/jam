@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import datetime
 import time
 from typing import Any
 import uuid
 
+from jam.__deprecated__ import deprecated
 from jam.aio.__base__ import BaseAsyncJam
 from jam.exceptions import (
     JamConfigurationError,
@@ -30,10 +30,16 @@ class Jam(BaseAsyncJam):
         "otp": "jam.otp.__base__.OTPConfig",
     }
 
+    @deprecated(
+        "This method is deprecated; the JWT payload is generated automatically in accordance with the specification."
+    )
     async def jwt_make_payload(
         self, exp: int | None, data: dict[str, Any]
     ) -> dict[str, Any]:
         """Make JWT-specific payload.
+
+        !!! Deprecated
+                This method is deprecated; the JWT payload is generated automatically in accordance with the specification.
 
         Args:
             exp (int | None): Token expire
@@ -42,16 +48,21 @@ class Jam(BaseAsyncJam):
         Returns:
             dict[str, Any]: Payload
         """
+        now = time.time()
         payload = {
-            "iat": datetime.datetime.now().timestamp(),
-            "exp": (datetime.datetime.now().timestamp() + exp) if exp else None,
+            "iat": now,
+            "exp": (now + exp) if exp else None,
             "jti": str(uuid.uuid4()),
         }
         payload = payload | data
         return payload
 
+    @deprecated("Use jam.jwt_encode")
     async def jwt_create(self, payload: dict[str, Any]) -> str:
         """Create JWT token.
+
+        !!! Deprecated
+                Use Jam.jwt_encode
 
         Args:
             payload (dict[str, Any]): Data payload
@@ -244,7 +255,10 @@ class Jam(BaseAsyncJam):
         """
         assert self.jwe is not None
         self._logger.debug(f"Encrypting data with JWE, header: {header}")
-        token = self.jwe.encrypt(data, header)
+        token = self.jwe.encrypt(
+            self._serializer.dumps(data) if isinstance(data, dict) else data,
+            header,
+        )
         self._logger.debug(f"JWE token created, length: {len(token)}")
         return token
 
@@ -369,8 +383,8 @@ class Jam(BaseAsyncJam):
     async def otp_uri(
         self,
         secret: str,
-        name: str | None = None,
-        issuer: str | None = None,
+        name: str,
+        issuer: str,
         counter: int | None = None,
     ) -> str:
         """Generates an otpauth:// URI for Google Authenticator.
@@ -388,9 +402,7 @@ class Jam(BaseAsyncJam):
         assert self._otp is not None
         return self._otp(
             secret=secret, digits=self.otp.digits, digest=self.otp.digest
-        ).provisioning_uri(
-            name=name or "", issuer=issuer or "", counter=counter
-        )
+        ).provisioning_uri(name=name, issuer=issuer, counter=counter)
 
     async def otp_verify_code(
         self,

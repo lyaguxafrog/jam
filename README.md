@@ -24,7 +24,7 @@ from jam import Jam
 
 jam = Jam(config="config.toml")
 
-jwt = jam.jwt_create({"user": 1})
+jwt = jam.jwt_encode(payload={"user": 1})
 session_id = jam.session_create(session_key="username", data={"user": 1})
 otp_code = jam.otp_code(secret="3DB7FOAOFBCI3WFDRE7EPF43CA")
 ```
@@ -32,7 +32,7 @@ otp_code = jam.otp_code(secret="3DB7FOAOFBCI3WFDRE7EPF43CA")
 ## Why Jam?
 Jam is a library that provides the most popular AUTH* mechanisms right out of the box.
 
-* [JOSE](https://jam.makridenko.ru/usage/jose/index/)
+* [JOSE](https://jam.makridenko.ru/usage/jose/)
 * [PASETO](https://jam.makridenko.ru/usage/paseto/)
 * [Server side sessions](https://jam.makridenko.ru/usage/sessions/)
 * [OTP](https://jam.makridenko.ru/usage/otp/)
