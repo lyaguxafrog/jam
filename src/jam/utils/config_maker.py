@@ -413,3 +413,18 @@ def __module_loader__(path: str) -> Callable:
     module_path, class_name = path.rsplit(".", 1)
     module = import_module(module_path)
     return getattr(module, class_name)
+
+
+def __key_loader__(key: str) -> str:
+    """Loads a key from file, if `key` is a path to a file.
+
+    Args:
+        key (str): Key to load. If it is a path to a file, the file will be loaded.
+
+    Returns:
+        str: Loaded key or original key if not a file path.
+    """
+    if os.path.isfile(key):
+        with open(key) as f:
+            return f.read().strip()
+    return key
