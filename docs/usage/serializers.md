@@ -26,9 +26,10 @@ class SomeEncoder(BaseEncoder)
 
 config = {
     "serializer": SomeEncoder,
-    "jwt": {
-        "alg": "HS256",
-        "secret_key": "SOMESECRET"
+    "paseto": {
+        "version": "v3",
+        "purpose": "local",
+        "secret_key": os.getenv("PASETO_SECRET_KEY")
     }
 }
 

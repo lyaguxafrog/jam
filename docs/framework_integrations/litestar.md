@@ -30,7 +30,7 @@ app = Litestar(
 # ---
 ## And now we can use JWT from DI
 from litestar import post, Response
-from jam.jwt import JWT
+from jam.jose import JWT
 
 @post("/login")
 async def login(login: str, password: str, jwt: JWT) -> Response:

@@ -6,7 +6,7 @@ You can easily override the implementation of any module using the `Base*` class
 
 ```python
 from jam import Jam
-from jam.jwt import BaseJWT
+from jam.jose import BaseJWT
 
 class MyJWT(BaseJWT):
     def __init__(
@@ -25,19 +25,21 @@ class MyJWT(BaseJWT):
 
 
 config = {
-    "jwt": {
-        "secret_key": "secret",
+    "jose": {
+        "jwt": {
+            "secret_key" = "your_secret"
+        }
     }
 }
 
 Jam.MODULES["jwt"] = "path.to.MyJWT"
 jam = Jam(config=config)
 
-token = jam.jwt_create(payload={"user_id": 123})
+token = jam.jwt_encode(payload={"user_id": 123})
 ```
 
 You can also replace modules within framework integrations.
-For example, suppose you want to replace the `JWT` implementation module in the [Starlette integration](http://127.0.0.1:8000/framework_integrations/starlette/):
+For example, suppose you want to replace the `JWT` implementation module in the [Starlette integration](/framework_integrations/starlette/):
 
 ```python
 from starlette.applications import Starlette
@@ -45,7 +47,7 @@ from starlette.middleware import Middleware
 from starlette.middleware.authentication import AuthenticationMiddleware
 
 from jam.ext.starlette import JWTBackend
-from jam.jwt import BaseJWT
+from jam.jose import BaseJWT
 
 class MyJWT(BaseJWT):
     def __init__(

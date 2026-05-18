@@ -23,17 +23,12 @@ class AuthService:
 
     # Generate token
     def generate_token(self, user: User) -> str:
-        payload = jam.jwt_make_payload(
-            exp=None, data=user.to_payload()
-        )
-        token = jam.jwt_create(payload)
+        token = jam.jwt_encode(sub=user.email)
 
     # Validate token and return user or None
     def validate_token(self, token) -> User | None:
         try:
-            payload = self.jam.jwt_decode(
-                token, check_exp=True, check_list=False
-            )
+            payload = self.jam.jwt_decode(token)
         except JamError:
             return None
 ```

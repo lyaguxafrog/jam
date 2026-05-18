@@ -35,9 +35,11 @@ import os
 from jam import Jam
 
 config = {
-    "jwt": {
-        "alg": "HS256",
-        "secret_key": os.getenv("JWT_SECRET_KEY")
+    "jose": {
+        "jwt": {
+            "alg": "HS256",
+            "secret_key": os.getenv("JWT_SECRET_KEY")
+        }
     },
     "paseto": {
         "version": "v4",
@@ -48,13 +50,13 @@ config = {
 }
 
 jam = Jam(config=config)
-jwt = jam.jwt_create(payload={"user": 1})
+jwt = jam.jwt_encode(payload={"user": 1})
 paseto = jam.paseto_create(payload={"user": 1}, footer=None)
 ```
 
 ##### TOML
 ```toml
-[jam.jwt]
+[jam.jose.jwt]
 alg = "HS256"
 secret_key = "$JWT_SECRET_KEY"
 
@@ -67,16 +69,17 @@ key = "$PASETO_SECRET_KEY"
 from jam import Jam
 
 jam = Jam(config="config.toml")
-jwt = jam.jwt_create(payload={"user": 1})
+jwt = jam.jwt_encode(payload={"user": 1})
 paseto = jam.paseto_create(payload={"user": 1}, footer=None)
 ```
 
 ##### YAML
 ```yaml
 jam:
-  jwt:
-    alg: HS256
-    secret_key: $JWT_SECRET_KEY
+  jose:
+    jwt:
+      alg: HS256
+      secret_key: $JWT_SECRET_KEY
   paseto:
     version: v4
     purpose: local
@@ -86,16 +89,18 @@ jam:
 from jam import Jam
 
 jam = Jam(config="config.yaml")
-jwt = jam.jwt_create(payload={"user": 1})
+jwt = jam.jwt_encode(payload={"user": 1})
 paseto = jam.paseto_create(payload={"user": 1}, footer=None)
 ```
 
 ##### Json
 ```json
 {
-  "jwt": {
-    "alg": "HS256",
-    "secret_key": "$JWT_SECRET_KEY"
+  "jose": {
+    "jwt": {
+      "alg": "HS256",
+      "secret_key": "$JWT_SECRET_KEY"
+    }
   },
   "paseto": {
     "version": "v4",
@@ -108,7 +113,7 @@ paseto = jam.paseto_create(payload={"user": 1}, footer=None)
 from jam import Jam
 
 jam = Jam(config="config.json")
-jwt = jam.jwt_create(payload={"user": 1})
+jwt = jam.jwt_encode(payload={"user": 1})
 paseto = jam.paseto_create(payload={"user": 1}, footer=None)
 ```
 
@@ -124,13 +129,13 @@ jam = Jam(
     config="config.toml",
     pointer="anotherpointer" # <- Another pointer
 )
-jwt = jam.jwt_create(payload={"user": 1})
+jwt = jam.jwt_encode(payload={"user": 1})
 paseto = jam.paseto_create(payload={"user": 1}, footer=None)
 ```
 
 Our config file will look like this:
 ```toml
-[anotherpointer.jwt]  # pointer
+[anotherpointer.jose.jwt]  # pointer
 alg = "HS256"
 secret_key = "$JWT_SECRET_KEY"
 
@@ -161,7 +166,7 @@ but then you need to pass the path to the class in Python style:
 [jam]
 logger = "yourapp.logger.YourCustomLogger"
 
-[jam.jwt]
+[jam.jose.jwt]
 alg = "HS256"
 secret_key = "$JWT_SECRET_KEY"
 ```
@@ -179,7 +184,7 @@ It can also be passed in the config file:
 [jam]
 log_level = "INFO"
 
-[jam.jwt]
+[jam.jose.jwt]
 alg = "HS256"
 secret_key = "$JWT_SECRET_KEY"
 ```
@@ -195,7 +200,7 @@ It can also be passed in the config file as a string:
 [jam]
 serializer = "jam.encoders.JsonEncoder"
 
-[jam.jwt]
+[jam.jose.jwt]
 alg = "HS256"
 secret_key = "$JWT_SECRET_KEY"
 ```
@@ -213,7 +218,7 @@ Example:
 [jwt]
 log_level = "INFO"
 
-[jam.jwt]
+[jam.jose.jwt]
 alg = "$JWT_ALG"
 secret_key = "$JWT_SECRET"
 ```
