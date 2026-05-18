@@ -9,12 +9,12 @@ import uuid
 from jam.__base_encoder__ import BaseEncoder
 from jam.encoders import JsonEncoder
 from jam.exceptions import (
+    JamConfigurationError,
     JamJWTExpired,
     JamJWTNotYetValid,
     JamJWTUnsupportedAlgorithm,
 )
 from jam.exceptions.jose import (
-    JamConfigurationError,
     JamInvalidKeyTypeError,
     JamJWSVerificationError,
 )
@@ -30,6 +30,7 @@ from jam.jose.jwe import JWE
 from jam.jose.jws import JWS
 from jam.jose.lists import BaseJWTList
 from jam.logger import BaseLogger, logger
+from jam.utils.config_maker import __key_loader__
 
 
 if TYPE_CHECKING:
@@ -153,6 +154,7 @@ class JWT(BaseJWT):
         if isinstance(key, JWKClass):
             return key._to_keylike()
         if isinstance(key, str):
+            key = __key_loader__(key)
             return key.encode() if key else key
         return key
 

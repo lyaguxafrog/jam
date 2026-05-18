@@ -15,6 +15,7 @@ from jam.jose.__algorithms__ import (
 from jam.jose.__base__ import BaseJWS
 from jam.jose.utils import __base64url_decode__, __base64url_encode__
 from jam.logger import BaseLogger, logger
+from jam.utils.config_maker import __key_loader__
 
 
 if TYPE_CHECKING:
@@ -45,6 +46,9 @@ class JWS(BaseJWS):
 
         self._alg = alg.upper()
         self._validate_algorithm(self._alg)
+
+        if isinstance(key, str):
+            key = __key_loader__(key)
 
         if isinstance(key, JWKClass):
             key = key._to_keylike()
