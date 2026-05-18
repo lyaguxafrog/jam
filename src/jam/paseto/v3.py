@@ -30,6 +30,7 @@ from jam.paseto.utils import (
     base64url_decode,
     base64url_encode,
 )
+from jam.utils.config_maker import __key_loader__
 
 
 class PASETOv3(BasePASETO):
@@ -56,6 +57,7 @@ class PASETOv3(BasePASETO):
 
         if purpose == "local":
             if isinstance(secret_key, str):
+                secret_key = __key_loader__(secret_key)
                 try:
                     raw = base64url_decode(secret_key.encode("utf-8"))
                 except Exception:
@@ -72,6 +74,8 @@ class PASETOv3(BasePASETO):
             return inst
 
         elif purpose == "public":
+            if isinstance(secret_key, str):
+                secret_key = __key_loader__(secret_key)
             if hasattr(secret_key, "sign") and isinstance(
                 secret_key, ec.EllipticCurvePrivateKey
             ):

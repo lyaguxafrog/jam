@@ -21,6 +21,7 @@ from jam.exceptions import (
 )
 from jam.paseto.__base__ import PASETO, BasePASETO
 from jam.paseto.utils import __pae__, base64url_decode, base64url_encode
+from jam.utils.config_maker import __key_loader__
 from jam.utils.xchacha20poly1305 import (
     xchacha20poly1305_decrypt,
     xchacha20poly1305_encrypt,
@@ -53,6 +54,7 @@ class PASETOv4(BasePASETO):
 
         if purpose == "local":
             if isinstance(secret_key, str):
+                secret_key = __key_loader__(secret_key)
                 raw = base64url_decode(secret_key.encode("utf-8"))
             else:
                 raw = secret_key
@@ -65,6 +67,8 @@ class PASETOv4(BasePASETO):
 
         elif purpose == "public":
             # Ed25519 objects
+            if isinstance(secret_key, str):
+                secret_key = __key_loader__(secret_key)
             if isinstance(secret_key, Ed25519PrivateKey):
                 inst._secret = secret_key
                 inst._public_key = secret_key.public_key()
