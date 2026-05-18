@@ -7,9 +7,11 @@ from uuid import uuid4
 
 from cryptography.fernet import Fernet
 
-from jam.encoders import BaseEncoder, JsonEncoder
+from jam.__base_encoder__ import BaseEncoder
+from jam.encoders import JsonEncoder
 from jam.exceptions import JamSessionEmptyAESKey
 from jam.logger import BaseLogger
+from jam.utils.config_maker import __key_loader__
 
 
 class BaseSessionModule(ABC):
@@ -76,6 +78,8 @@ class BaseSessionModule(ABC):
             raise JamSessionEmptyAESKey
         if is_session_crypt:
             assert session_aes_secret is not None
+            if isinstance(session_aes_secret, str):
+                session_aes_secret = __key_loader__(session_aes_secret)
             self._code_session_key = Fernet(session_aes_secret)
 
     def __encode_session_id__(self, data: str) -> str:
