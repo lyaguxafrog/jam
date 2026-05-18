@@ -95,7 +95,7 @@ class BaseJWT(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def decrypt(self, token: str) -> bytes:
+    def decrypt(self, token: str) -> dict[str, Any] | bytes:
         """Decrypt JWE token.
 
         Args:
