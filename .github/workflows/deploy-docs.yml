@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   deploy:
-    if: ${{ !matches(github.ref_name, '.*(rc|alpha|beta).*') }}
+    if: ${{ !matches(github.ref_name, '.*(rc|a|b).*') }}
 
     runs-on: ubuntu-latest
 
