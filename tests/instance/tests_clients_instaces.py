@@ -18,16 +18,18 @@ async def async_client_instance() -> TestAsyncJam:
 
 
 def test_client_instance(client_instance):
-    payload = client_instance.jwt_make_payload(exp=None, data={"user": 1})
-    valid_token = client_instance.jwt_create_token(payload)
+    payload = {"user": 1}
+    valid_token = client_instance.jwt_encode(payload=payload)
 
-    verify = client_instance.jwt_verify_token(valid_token)
-    assert verify == payload
+    verify = client_instance.jwt_decode(
+        valid_token, check_exp=False, check_list=False
+    )
+    assert verify["user"] == 1
 
     invalid_token_ = invalid_token()
 
     with pytest.raises(ValueError):
-        client_instance.jwt_verify_token(invalid_token_)
+        client_instance.jwt_decode(invalid_token_, check_exp=False, check_list=False)
 
     session_id = client_instance.session_create(
         session_key="TEST", data={"user": 1}
@@ -56,17 +58,21 @@ def test_client_instance(client_instance):
 
 
 @pytest.mark.asyncio
-async def test_client_instance(async_client_instance):
-    payload = await async_client_instance.jwt_make_payload(exp=None, data={"user": 1})
-    valid_token = await async_client_instance.jwt_create_token(payload)
+async def test_async_client_instance(async_client_instance):
+    payload = {"user": 1}
+    valid_token = await async_client_instance.jwt_encode(payload=payload)
 
-    verify = await async_client_instance.jwt_verify_token(valid_token)
-    assert verify == payload
+    verify = await async_client_instance.jwt_decode(
+        valid_token, check_exp=False, check_list=False
+    )
+    assert verify["user"] == 1
 
     invalid_token_ = invalid_token()
 
     with pytest.raises(ValueError):
-        await async_client_instance.jwt_verify_token(invalid_token_)
+        await async_client_instance.jwt_decode(
+            invalid_token_, check_exp=False, check_list=False
+        )
 
     session_id = await async_client_instance.session_create(
         session_key="TEST", data={"user": 1}

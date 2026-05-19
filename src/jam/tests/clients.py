@@ -10,7 +10,10 @@ from jam.aio import Jam as AioJam
 from jam.instance import Jam
 from jam.jose.utils import __base64url_decode__ as base64url_decode
 from jam.tests.fakers import (
+    fake_jwe_token,
+    fake_jws_token,
     fake_jwt_token,
+    fake_jwt_token_v2,
     fake_oauth2_token,
     fake_paseto_token,
     generate_session_id,
@@ -35,17 +38,17 @@ class TestJam(Jam):
 
         def test_jwt_token(client) -> None:
             payload = {"user_id": 1, "role": "admin"}
-            token = client.jwt_create_token(payload)
+            token = client.jwt_encode(payload=payload)
             assert isinstance(token, str)
             assert token.count(".") == 2
 
-            verified_payload = client.jwt_verify_token(token, check_exp=False, check_list=False)
+            verified_payload = client.jwt_decode(token, check_exp=False, check_list=False)
             assert verified_payload == payload
 
         def test_invalid_jwt_token(client) -> None:
             token = invalid_token()
             with pytest.raises(ValueError):
-                client.jwt_verify_token(token, check_exp=False, check_list=False)
+                client.jwt_decode(token, check_exp=False, check_list=False)
         ```
     """
 
@@ -90,6 +93,18 @@ class TestJam(Jam):
         payload = payload | data
         return payload
 
+    @deprecated("Use jam.jwt_encode")
+    def jwt_create(self, payload: dict[str, Any]) -> str:
+        """Create JWT token.
+
+        Args:
+            payload (dict[str, Any]): Data payload
+
+        Returns:
+            str: New token
+        """
+        return fake_jwt_token(payload)
+
     def jwt_encode(
         self,
         iss: str | None = None,
@@ -97,6 +112,7 @@ class TestJam(Jam):
         aud: str | None = None,
         exp: int | None = None,
         nbf: int | None = None,
+        jti: str | None = None,
         *,
         payload: dict[str, Any] | None = None,
         header: dict[str, Any] | None = None,
@@ -109,28 +125,31 @@ class TestJam(Jam):
             iss (str | None): The issuer.
             sub (str | None): The subject.
             aud (str | None): The audience.
+            jti (str | None): The JWT ID. If none use the JTI fabric function.
             header (dict[str, Any] | None): The header to include in the JWT.
             payload (dict[str, Any] | None): The payload to include in the JWT.
 
         Returns:
             str: The encoded JWT.
         """
-        jwt_payload = self.jwt_make_payload(exp, payload or {})
-        return self.jwt_create_token(jwt_payload)
+        return fake_jwt_token_v2(
+            iss=iss,
+            sub=sub,
+            aud=aud,
+            exp=exp,
+            nbf=nbf,
+            jti=jti,
+            payload=payload,
+            header=header,
+        )
 
-    def jwt_create_token(self, payload: dict[str, Any]) -> str:
-        """Create JWT token.
-
-        Args:
-            payload (dict[str, Any]): Data payload
-
-        Returns:
-            str: New token
-        """
-        return fake_jwt_token(payload)
-
-    def jwt_verify_token(
-        self, token: str, check_exp: bool = True, check_list: bool = True
+    def jwt_decode(
+        self,
+        token: str,
+        check_exp: bool = True,
+        check_list: bool = True,
+        check_nbf: bool = False,
+        include_headers: bool = False,
     ) -> dict[str, Any]:
         """Verify and decode JWT token.
 
@@ -138,6 +157,8 @@ class TestJam(Jam):
             token (str): JWT token
             check_exp (bool): Check expire
             check_list (bool): Check white/black list
+            check_nbf (bool): Check not-before time
+            include_headers (bool): Include headers in the decoded payload
 
         Returns:
             dict[str, Any]: Decoded payload
@@ -146,16 +167,102 @@ class TestJam(Jam):
             ValueError: If the token format is invalid.
         """
         try:
-            headers, payload, _ = token.split(".")
-            headers = json.loads(base64url_decode(headers).decode("utf-8"))
-            payload = base64url_decode(payload).decode("utf-8")
+            headers_b64, payload_b64, _ = token.split(".")
+            headers = json.loads(base64url_decode(headers_b64).decode("utf-8"))
+            payload = json.loads(base64url_decode(payload_b64).decode("utf-8"))
 
             if headers.get("typ") == "fake-JWT":
-                return json.loads(payload)
+                if check_exp and "exp" in payload:
+                    if payload["exp"] < datetime.datetime.now().timestamp():
+                        from jam.exceptions import JamJWTExpired
+
+                        raise JamJWTExpired
+
+                if check_nbf and "nbf" in payload:
+                    if payload["nbf"] > datetime.datetime.now().timestamp():
+                        from jam.exceptions import JamJWTNotYetValid
+
+                        raise JamJWTNotYetValid
+
+                if include_headers:
+                    return {"header": headers, "payload": payload}
+                return payload
             else:
                 raise ValueError("Invalid token format.")
         except (ValueError, IndexError, json.JSONDecodeError) as e:
             raise ValueError("Invalid token format.") from e
+
+    def jws_sign(
+        self,
+        data: dict[str, Any] | str,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Sign data using JWS.
+
+        Args:
+            data: Data to sign. If dict, will be JSON encoded.
+            header: JWS header.
+
+        Returns:
+            str: JWS token.
+        """
+        return fake_jws_token(data, header)
+
+    def jws_verify(self, token: str) -> dict[str, Any]:
+        """Verify JWS token.
+
+        Args:
+            token: JWS token.
+
+        Returns:
+            dict[str, Any]: Decoded payload.
+        """
+        try:
+            parts = token.split(".")
+            if len(parts) != 3:
+                raise ValueError("Invalid JWS token format")
+            payload_b64 = parts[1]
+            payload_str = base64url_decode(payload_b64).decode("utf-8")
+            try:
+                return json.loads(payload_str)
+            except json.JSONDecodeError:
+                return {"data": payload_str}
+        except (ValueError, IndexError) as e:
+            raise ValueError("Invalid JWS token format.") from e
+
+    def jwe_encrypt(
+        self,
+        data: dict[str, Any] | str,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Encrypt data using JWE.
+
+        Args:
+            data: Data to encrypt. If dict, will be JSON encoded.
+            header: JWE header.
+
+        Returns:
+            str: JWE token.
+        """
+        return fake_jwe_token(data, header)
+
+    def jwe_decrypt(self, token: str) -> bytes:
+        """Decrypt JWE token.
+
+        Args:
+            token: JWE token.
+
+        Returns:
+            bytes: Decrypted data.
+        """
+        try:
+            parts = token.split(".")
+            if len(parts) != 4:
+                raise ValueError("Invalid JWE token format")
+            payload_b64 = parts[1]
+            return base64url_decode(payload_b64)
+        except (ValueError, IndexError) as e:
+            raise ValueError("Invalid JWE token format.") from e
 
     def session_create(self, session_key: str, data: dict[str, Any]) -> str:
         """Create new session.
@@ -255,8 +362,8 @@ class TestJam(Jam):
     def otp_uri(
         self,
         secret: str,
-        name: str | None = None,
-        issuer: str | None = None,
+        name: str,
+        issuer: str,
         counter: int | None = None,
     ) -> str:
         """Generates an otpauth:// URI for Google Authenticator.
@@ -270,7 +377,7 @@ class TestJam(Jam):
         Returns:
             str: A string of the form "otpauth://..."
         """
-        uri = f"otpauth://totp/{name or 'user'}?secret={secret}"
+        uri = f"otpauth://totp/{name}?secret={secret}"
         if issuer:
             uri += f"&issuer={issuer}"
         if counter is not None:
@@ -438,7 +545,7 @@ class TestJam(Jam):
             if len(parts) < 3:
                 raise ValueError("Invalid PASETO token format")
 
-            if parts[0] not in ("v1", "v2", "v3", "v4"):
+            if parts[0] not in ("v1", "v2", "v3", "v4", "v_fake"):
                 raise ValueError("Invalid PASETO version")
 
             payload_part = parts[2]
@@ -485,11 +592,11 @@ class TestAsyncJam(AioJam):
         @pytest.mark.asyncio
         async def test_jwt_token(client) -> None:
             payload = {"user_id": 1, "role": "admin"}
-            token = await client.jwt_create_token(payload)
+            token = await client.jwt_encode(payload=payload)
             assert isinstance(token, str)
             assert token.count(".") == 2
 
-            verified_payload = await client.jwt_verify_token(token, check_exp=False, check_list=False)
+            verified_payload = await client.jwt_decode(token, check_exp=False, check_list=False)
             assert verified_payload == payload
         ```
     """
@@ -512,6 +619,9 @@ class TestAsyncJam(AioJam):
         self._sessions: dict[str, dict[str, Any]] = {}
         self._session_keys: dict[str, str] = {}
 
+    @deprecated(
+        "This method is deprecated; the JWT payload is generated automatically in accordance with the specification."
+    )
     async def jwt_make_payload(
         self, exp: int | None, data: dict[str, Any]
     ) -> dict[str, Any]:
@@ -532,6 +642,18 @@ class TestAsyncJam(AioJam):
         payload = payload | data
         return payload
 
+    @deprecated("Use jam.jwt_encode")
+    async def jwt_create(self, payload: dict[str, Any]) -> str:
+        """Create JWT token.
+
+        Args:
+            payload (dict[str, Any]): Data payload
+
+        Returns:
+            str: New token
+        """
+        return fake_jwt_token(payload)
+
     async def jwt_encode(
         self,
         iss: str | None = None,
@@ -539,6 +661,7 @@ class TestAsyncJam(AioJam):
         aud: str | None = None,
         exp: int | None = None,
         nbf: int | None = None,
+        jti: str | None = None,
         *,
         payload: dict[str, Any] | None = None,
         header: dict[str, Any] | None = None,
@@ -551,28 +674,31 @@ class TestAsyncJam(AioJam):
             iss (str | None): The issuer.
             sub (str | None): The subject.
             aud (str | None): The audience.
+            jti (str | None): The JWT ID. If none use the JTI fabric function.
             header (dict[str, Any] | None): The header to include in the JWT.
             payload (dict[str, Any] | None): The payload to include in the JWT.
 
         Returns:
             str: The encoded JWT.
         """
-        jwt_payload = await self.jwt_make_payload(exp, payload or {})
-        return await self.jwt_create_token(jwt_payload)
+        return fake_jwt_token_v2(
+            iss=iss,
+            sub=sub,
+            aud=aud,
+            exp=exp,
+            nbf=nbf,
+            jti=jti,
+            payload=payload,
+            header=header,
+        )
 
-    async def jwt_create_token(self, payload: dict[str, Any]) -> str:
-        """Create JWT token.
-
-        Args:
-            payload (dict[str, Any]): Data payload
-
-        Returns:
-            str: New token
-        """
-        return fake_jwt_token(payload)
-
-    async def jwt_verify_token(
-        self, token: str, check_exp: bool = True, check_list: bool = True
+    async def jwt_decode(
+        self,
+        token: str,
+        check_exp: bool = True,
+        check_list: bool = True,
+        check_nbf: bool = False,
+        include_headers: bool = False,
     ) -> dict[str, Any]:
         """Verify and decode JWT token.
 
@@ -580,6 +706,8 @@ class TestAsyncJam(AioJam):
             token (str): JWT token
             check_exp (bool): Check expire
             check_list (bool): Check white/black list
+            check_nbf (bool): Check not-before time
+            include_headers (bool): Include headers in the decoded payload
 
         Returns:
             dict[str, Any]: Decoded payload
@@ -588,16 +716,102 @@ class TestAsyncJam(AioJam):
             ValueError: If the token format is invalid.
         """
         try:
-            headers, payload, _ = token.split(".")
-            headers = json.loads(base64url_decode(headers).decode("utf-8"))
-            payload = base64url_decode(payload).decode("utf-8")
+            headers_b64, payload_b64, _ = token.split(".")
+            headers = json.loads(base64url_decode(headers_b64).decode("utf-8"))
+            payload = json.loads(base64url_decode(payload_b64).decode("utf-8"))
 
             if headers.get("typ") == "fake-JWT":
-                return json.loads(payload)
+                if check_exp and "exp" in payload:
+                    if payload["exp"] < datetime.datetime.now().timestamp():
+                        from jam.exceptions import JamJWTExpired
+
+                        raise JamJWTExpired
+
+                if check_nbf and "nbf" in payload:
+                    if payload["nbf"] > datetime.datetime.now().timestamp():
+                        from jam.exceptions import JamJWTNotYetValid
+
+                        raise JamJWTNotYetValid
+
+                if include_headers:
+                    return {"header": headers, "payload": payload}
+                return payload
             else:
                 raise ValueError("Invalid token format.")
         except (ValueError, IndexError, json.JSONDecodeError) as e:
             raise ValueError("Invalid token format.") from e
+
+    async def jws_sign(
+        self,
+        data: dict[str, Any] | str,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Sign data using JWS.
+
+        Args:
+            data: Data to sign. If dict, will be JSON encoded.
+            header: JWS header.
+
+        Returns:
+            str: JWS token.
+        """
+        return fake_jws_token(data, header)
+
+    async def jws_verify(self, token: str) -> dict[str, Any]:
+        """Verify JWS token.
+
+        Args:
+            token: JWS token.
+
+        Returns:
+            dict[str, Any]: Decoded payload.
+        """
+        try:
+            parts = token.split(".")
+            if len(parts) != 3:
+                raise ValueError("Invalid JWS token format")
+            payload_b64 = parts[1]
+            payload_str = base64url_decode(payload_b64).decode("utf-8")
+            try:
+                return json.loads(payload_str)
+            except json.JSONDecodeError:
+                return {"data": payload_str}
+        except (ValueError, IndexError) as e:
+            raise ValueError("Invalid JWS token format.") from e
+
+    async def jwe_encrypt(
+        self,
+        data: dict[str, Any] | str,
+        header: dict[str, Any] | None = None,
+    ) -> str:
+        """Encrypt data using JWE.
+
+        Args:
+            data: Data to encrypt. If dict, will be JSON encoded.
+            header: JWE header.
+
+        Returns:
+            str: JWE token.
+        """
+        return fake_jwe_token(data, header)
+
+    async def jwe_decrypt(self, token: str) -> bytes:
+        """Decrypt JWE token.
+
+        Args:
+            token: JWE token.
+
+        Returns:
+            bytes: Decrypted data.
+        """
+        try:
+            parts = token.split(".")
+            if len(parts) != 4:
+                raise ValueError("Invalid JWE token format")
+            payload_b64 = parts[1]
+            return base64url_decode(payload_b64)
+        except (ValueError, IndexError) as e:
+            raise ValueError("Invalid JWE token format.") from e
 
     async def session_create(
         self, session_key: str, data: dict[str, Any]
@@ -703,8 +917,8 @@ class TestAsyncJam(AioJam):
     async def otp_uri(
         self,
         secret: str,
-        name: str | None = None,
-        issuer: str | None = None,
+        name: str,
+        issuer: str,
         counter: int | None = None,
     ) -> str:
         """Generates an otpauth:// URI for Google Authenticator.
@@ -718,7 +932,7 @@ class TestAsyncJam(AioJam):
         Returns:
             str: A string of the form "otpauth://..."
         """
-        uri = f"otpauth://totp/{name or 'user'}?secret={secret}"
+        uri = f"otpauth://totp/{name}?secret={secret}"
         if issuer:
             uri += f"&issuer={issuer}"
         if counter is not None:
@@ -886,7 +1100,7 @@ class TestAsyncJam(AioJam):
             if len(parts) < 3:
                 raise ValueError("Invalid PASETO token format")
 
-            if parts[0] not in ("v1", "v2", "v3", "v4"):
+            if parts[0] not in ("v1", "v2", "v3", "v4", "v_fake"):
                 raise ValueError("Invalid PASETO version")
 
             payload_part = parts[2]
