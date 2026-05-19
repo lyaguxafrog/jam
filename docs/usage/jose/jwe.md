@@ -12,7 +12,11 @@ Creates JWE Compact Serialization - encrypted data.
 
 Args:
 
-* `alg`: `str` - Key management algorithm. Available: `RSA-OAEP`, `RSA1_5`, `A128KW`, `A192KW`, `A256KW`, `ECDH-ES`, `ECDH-ES+A128KW`, `ECDH-ES+A192KW`, `ECDH-ES+A256KW`, `PBES2-HS256+A128KW`, `PBES2-HS384+A192KW`, `PBES2-HS512+A256KW`.
+* `alg`: `str` - Key management algorithm. Available: `RSA-OAEP`,
+  `RSA-OAEP-256`, `RSA1_5`, `A128KW`, `A192KW`, `A256KW`, `ECDH-ES`,
+  `ECDH-ES+A128KW`, `ECDH-ES+A192KW`, `ECDH-ES+A256KW`, `A128GCMKW`,
+  `A256GCMKW`, `PBES2-HS256+A128KW`, `PBES2-HS384+A192KW`,
+  `PBES2-HS512+A256KW`.
 * `enc`: `str` - Content encryption algorithm. Available: `A128CBC-HS256`, `A192CBC-HS384`, `A256CBC-HS512`, `A128GCM`, `A256GCM`.
 * `payload`: `dict[str, Any] | str | bytes` - Data to encrypt.
 * `header`: `dict[str, Any] | None = None` - Additional header fields.
@@ -84,6 +88,18 @@ jwe = JWE(
     alg="RSA-OAEP",
     enc="A128CBC-HS256",
     key=rsa_public_key
+)
+```
+
+### Factory function
+
+```python
+from jam.jose import create_jwe_instance
+
+jwe = create_jwe_instance(
+    alg="A256KW",
+    enc="A256GCM",
+    key="your-256-bit-key-here!!",
 )
 ```
 
@@ -234,29 +250,4 @@ jwe_dec = JWE(
     password=b"user_password"
 )
 data = jwe_dec.decrypt(token)
-```
-
-## Error handling
-
-```python
-from jam.jose import JWE
-from jam.exceptions.jose import (
-    JamJWEDecryptionError,
-    JamJWEEncryptionError,
-    JamJWEInvalidFormatError,
-)
-
-jwe = JWE(
-    alg="RSA-OAEP",
-    enc="A128CBC-HS256",
-    key=rsa_key
-)
-
-try:
-    data = jwe.decrypt(token)
-except JamJWEDecryptionError as e:
-    print(f"Decryption failed: {e.message}")
-    print(f"Error code: {e.error_code}")
-except JamJWEInvalidFormatError as e:
-    print(f"Invalid token format: {e.message}")
 ```
