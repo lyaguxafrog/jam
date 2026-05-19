@@ -2,7 +2,21 @@
 title: JWS
 ---
 
-## Instance (jam.Jam)
+## Use in instance
+
+### Config
+
+
+* `alg`: `str` - Signing algorithm. Available: `HS256`, `HS384`, `HS512`, `RS256`, `RS384`, `RS512`, `ES256`, `ES384`, `ES512`, `PS256`, `PS384`, `PS512`.
+* `key`: `str` - Secret key for signing/verify.
+* `password`: `str | None` - Password for key derivation.
+
+```toml
+[jam.jose.jws]
+alg = ""
+key = "$JWS_SECRET_KEY"
+password = "$JWS_PASSWORD"
+```
 
 ### Sign data
 
@@ -87,6 +101,17 @@ from jam.jose import JWS
 jws = JWS(
     alg="ES256",
     key="-----BEGIN EC PRIVATE KEY-----..."
+)
+```
+
+### Factory function
+
+```python
+from jam.jose import create_jws_instance
+
+jws = create_jws_instance(
+    alg="HS256",
+    key="your-secret-key",
 )
 ```
 
@@ -182,19 +207,34 @@ Raises:
 data = jws.deserialize_compact(jws_token, validate=True)
 ```
 
-## Error handling
+### Critical header validation
+
+JWS validates the `crit` (critical) header per RFC 7515. If a header name is
+listed in `crit`, it must be a registered JOSE header name (`alg`, `typ`,
+`kid`, `x5u`, `x5t`, `cty`, `crit`). Unknown critical headers cause
+verification to fail.
 
 ```python
-from jam.jose import JWS
-from jam.exceptions.jose import JamJWSVerificationError
+# This will fail - "unknown" is not a registered header
+jws.deserialize_compact(
+    "eyJhbGciOiJIUzI1NiIsImNyaXQiOlsidW5rbm93biJ9...",
+    validate=True,
+)
+# Raises JamJWSVerificationError: unknown_critical_header
+```
 
-jws = JWS(alg="HS256", key="secret_key")
+### Key auto-loading
 
-try:
-    result = jws.verify(token, validate=True)
-except JamJWSVerificationError as e:
-    print(f"Verification failed: {e.error_code}")
-    print(f"Details: {e.details}")
+When a string is passed as `key`, JWS attempts to load it as a file path first.
+If the file exists, its contents are used as the key. Otherwise, the string is
+used directly as the key material.
+
+```python
+# Loads key from file if path exists
+jws = JWS(alg="RS256", key="/path/to/private-key.pem")
+
+# Uses string directly if not a valid file path
+jws = JWS(alg="HS256", key="my-secret-string-key")
 ```
 
 ## Examples

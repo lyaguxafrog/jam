@@ -3,9 +3,61 @@ title: JWT
 ---
 
 !!! tip
-    The `jam.jwt` module is [deprecated](/breaking_changes/deprecated), but the documentation is still available at [/usage/jwt](/usage/jwt)
+    The `jam.jwt` module is [deprecated](/breaking_changes/deprecated), but the
+    documentation is still available at [/usage/jwt](/usage/jwt)
 
-## Instance (jam.Jam)
+## Token modes
+
+JWT supports three operating modes:
+
+### JWS-only (signed tokens)
+
+Standard signed JWT. Payload is readable by anyone but cannot be tampered with.
+
+```python
+jwt = JWT(alg="RS256", secret_key=private_key)
+token = jwt.encode(sub="user", exp=3600)
+data = jwt.decode(token)
+```
+
+### JWE-only (encrypted tokens)
+
+Encrypted-only token. Payload is confidential but not integrity-protected by
+signature.
+
+```python
+jwt = JWT(enc="A256GCM", secret_key=encryption_key)
+token = jwt.encrypt({"secret": "data"})
+data = jwt.decrypt(token)
+```
+
+### JWS+JWE (sign-then-encrypt, RFC 7519)
+
+Hybrid mode: first signs the payload, then encrypts the signed token. Follows
+RFC 7519 nested JWT pattern.
+
+```python
+jwt = JWT(alg="RS256", enc="A256GCM", secret_key=key)
+token = jwt.encrypt({"data": "sensitive"})  # Signs then encrypts
+data = jwt.decrypt(token)  # Decrypts then verifies signature
+```
+
+## Automatic JWE algorithm selection
+
+When using JWS+JWE mode with a symmetric key, JWT automatically selects the JWE
+key management algorithm based on key type:
+
+| Key type | Auto-selected JWE `alg` |
+|----------|------------------------|
+| RSA | `RSA-OAEP` |
+| EC | `ECDH-ES` |
+| Symmetric (>=32 bytes) | `A256KW` |
+| Symmetric (<32 bytes) | `A128KW` |
+
+For symmetric keys, an encryption key is derived from the signing key using
+HKDF-SHA256 with salt `jwe-encryption` and info `encryption-key`.
+
+## Use in instance
 
 ### Config
 
@@ -150,9 +202,9 @@ print(data)
 >>> {'user_id': 123, 'role': 'admin'}
 ```
 
-## Standalone (module)
+## Use out of instance
 
-### Create instance
+### Built
 
 Module: `jam.jose.JWT`
 
@@ -175,6 +227,45 @@ from jam.jose import JWT
 jwt = JWT(
     alg="RS256",
     secret_key=os.getenv("RSA_PRIVATE_KEY")
+)
+```
+
+### Pre-built JWS/JWE instances
+
+For full control over the underlying JWS and JWE instances, you can pass
+pre-built instances to the JWT constructor:
+
+```python
+from jam.jose import JWS, JWE, JWT
+
+# Custom JWS with specific settings
+jws = JWS(alg="PS256", key=private_key)
+
+# Custom JWE with specific settings
+jwe = JWE(alg="ECDH-ES+A256KW", enc="A256GCM", key=ec_public_key)
+
+# JWT with pre-built instances
+jwt = JWT(jws=jws, jwe=jwe)
+```
+
+When using pre-built instances:
+
+- If `jws` is provided, `alg` must be `None` (otherwise raises
+  `JamConfigurationError`)
+- If `jwe` is provided, `enc` must be `None` (otherwise raises
+  `JamConfigurationError`)
+- At least one of `alg`, `enc`, `jws`, or `jwe` must be provided
+
+### Factory functions
+
+```python
+from jam.jose import create_jwt_instance, create_instance
+
+# create_instance is an alias for create_jwt_instance
+jwt = create_jwt_instance(
+    alg="RS256",
+    secret=private_key,  # or secret_key=private_key
+    password=None,
 )
 ```
 
@@ -280,26 +371,4 @@ Returns:
 jti = jwt.jti
 print(jti)
 >>> "0c2c38d2-5dcb-4294-bb2d-0820f6ff787d"
-```
-
-## Error handling
-
-```python
-from jam import Jam
-from jam.exceptions import (
-    JamJWTExpired,
-    JamJWTNotYetValid,
-    JamJWSVerificationError,
-)
-
-jam = Jam(config="config.toml")
-
-try:
-    data = jam.jwt_decode(token=token, validate_claims=True)
-except JamJWTExpired:
-    print("Token has expired")
-except JamJWTNotYetValid:
-    print("Token is not yet valid")
-except JamJWSVerificationError:
-    print("Invalid signature")
 ```

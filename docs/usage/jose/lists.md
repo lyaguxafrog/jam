@@ -2,11 +2,16 @@
 title: Lists
 ---
 
-## Instance (jam.Jam)
+## Use in instance
 
 ### Config
 
 ```toml
+
+[jam.jose.jwt]
+alg = "$JWT_ALG"
+secret_key = "$JWT_SECRET_KEY"
+
 [jam.jose.jwt.list]
 type = "black"
 backend = "redis"
@@ -127,7 +132,7 @@ Args:
 jam.jwt_list.delete_many(tokens=[token1, token2])
 ```
 
-## Standalone (module)
+## Use out of instance
 
 ### RedisList
 
@@ -157,6 +162,11 @@ list.add(token)
 list.check(token)
 list.delete(token)
 ```
+
+!!! note "TTL behavior"
+    When `ttl` is set, tokens automatically expire from the list after the
+    specified number of seconds. This is useful for token blacklists where
+    tokens should only be tracked until their natural expiration.
 
 ### MemoryList
 
