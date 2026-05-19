@@ -45,6 +45,17 @@ from .sessions import (
     JamSessionEmptyAESKey,
     JamSessionNotFound,
 )
+from .saml import (
+    JamSAMLError,
+    JamSAMLExpired,
+    JamSAMLNotYetValid,
+    JamSAMLInvalidAudience,
+    JamSAMLInvalidIssuer,
+    JamSAMLEmptyPrivateKey,
+    JamSAMLEmptyPublicKey,
+    JamSAMLUnsupportedAlgorithm,
+    JamSAMLValidationError,
+)
 
 
 __all__ = [
@@ -81,4 +92,13 @@ __all__ = [
     "JamStarlettePluginError",
     "JamSessionNotFound",
     "JamSessionEmptyAESKey",
+    "JamSAMLError",
+    "JamSAMLExpired",
+    "JamSAMLNotYetValid",
+    "JamSAMLInvalidAudience",
+    "JamSAMLInvalidIssuer",
+    "JamSAMLEmptyPrivateKey",
+    "JamSAMLEmptyPublicKey",
+    "JamSAMLUnsupportedAlgorithm",
+    "JamSAMLValidationError",
 ]
