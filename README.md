@@ -9,6 +9,8 @@
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/lyaguxafrog/jam)
 [![GitHub License](https://img.shields.io/github/license/lyaguxafrog/jam)](https://github.com/lyaguxafrog/jam/blob/master/LICENSE.md)
 
+**Jam (Jam Auth Module)** - A universal auth* combine that provides popular auth mechanisms strictly according to the specification.
+
 * Documentation: [jam.makridenko.ru](https://jam.makridenko.ru)
 * Changelog: [CHANGELOG.md](https://github.com/lyaguxafrog/jam/blob/master/CHANGELOG.md)
 

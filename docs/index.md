@@ -15,7 +15,7 @@ image: assets/logo_n_title.png
 [![GitHub License](https://img.shields.io/github/license/lyaguxafrog/jam)](https://github.com/lyaguxafrog/jam/blob/master/LICENSE.md)
 
 ## About
-Jam(Jeneric auth module) - a simple library that makes implementing authentication in your application effortless.
+**Jam (Jam Auth Module)** - A universal auth* combine that provides popular auth mechanisms strictly according to the specification.
 
 ## Installation
 <!-- termynal -->
