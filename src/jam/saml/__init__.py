@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-"""SAML."""
+"""Security Assertion Markup Language."""
