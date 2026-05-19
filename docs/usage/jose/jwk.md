@@ -2,6 +2,91 @@
 title: JWK
 ---
 
+## TypedDicts
+
+### JWKCommon
+
+Common JWK parameters shared across all key types.
+
+```python
+from jam.jose import JWKCommon
+
+key: JWKCommon = {
+    "kty": "RSA",           # Required. Key type: RSA, EC, oct
+    "use": "sig",           # Public key use: "sig" or "enc"
+    "key_ops": ["sign"],    # Intended key operations
+    "alg": "RS256",         # Intended algorithm
+    "kid": "key-id",        # Unique key identifier
+    "x5u": "https://...",   # X.509 URL
+    "x5c": "MIID...",       # X.509 certificate chain (base64)
+    "x5t": "abc...",        # X.509 SHA-1 thumbprint
+    "x5t_S256": "xyz...",   # X.509 SHA-256 thumbprint
+}
+```
+
+### JWKRSA
+
+RSA key parameters (extends `JWKCommon`).
+
+```python
+from jam.jose import JWKRSA
+
+# Public key
+rsa_pub: JWKRSA = {
+    "kty": "RSA",
+    "n": "0vx7agoebGcQSuu...",   # Modulus (base64url)
+    "e": "AQAB",                    # Exponent (base64url)
+}
+
+# Private key (requires all CRT parameters per RFC 7518)
+rsa_priv: JWKRSA = {
+    "kty": "RSA",
+    "n": "...", "e": "AQAB",
+    "d": "...",    # Private exponent
+    "p": "...",    # First prime factor
+    "q": "...",    # Second prime factor
+    "dp": "...",   # d mod (p-1)
+    "dq": "...",   # d mod (q-1)
+    "qi": "...",   # q^(-1) mod p
+}
+```
+
+!!! warning "RSA private key validation"
+    When `d` is present, all CRT parameters (`p`, `q`, `dp`, `dq`, `qi`) are
+    required. Missing any of them raises `JamJWKValidationError` per RFC 7518
+    Section 6.3.2.
+
+### JWKEC
+
+Elliptic curve key parameters (extends `JWKCommon`).
+
+```python
+from jam.jose import JWKEC
+
+ec_key: JWKEC = {
+    "kty": "EC",
+    "crv": "P-256",    # Supported: P-256, P-384, P-521
+    "x": "f83OJ3D...",  # X coordinate (base64url)
+    "y": "x_FEzRu...",  # Y coordinate (base64url)
+    "d": "...",         # Private key (optional, base64url)
+}
+```
+
+### JWKOct
+
+Symmetric (octet sequence) key parameters (extends `JWKCommon`).
+
+```python
+from jam.jose import JWKOct
+
+oct_key: JWKOct = {
+    "kty": "oct",
+    "k": "c2VjcmV0LWtleS0zMi1ieXRlcy1sb25n",  # Key value (base64url)
+}
+```
+
+---
+
 ## Standalone (module)
 
 ### JWK - JSON Web Key
@@ -86,6 +171,20 @@ print(jwk.kty)  # "oct"
 print(jwk.alg)  # None
 print(jwk.kid)  # "key1"
 ```
+
+All JWK parameters are accessible via `to_dict()`:
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `kty` | `str` | Key Type (RSA, EC, oct) |
+| `use` | `str` | Public key use (`sig`, `enc`) |
+| `key_ops` | `list[str]` | Intended key operations |
+| `alg` | `str` | Intended algorithm |
+| `kid` | `str` | Key ID |
+| `x5u` | `str` | X.509 URL |
+| `x5c` | `str` | X.509 certificate chain |
+| `x5t` | `str` | X.509 SHA-1 thumbprint |
+| `x5t#S256` | `str` | X.509 SHA-256 thumbprint |
 
 ### Sign data
 
@@ -327,30 +426,20 @@ token = ec_jwk.sign(b"data", alg="ES256")
 result = ec_jwk.verify(token)
 ```
 
-## Error handling
+## Key type-specific classes
+
+Typed key classes are exported for static type checking:
 
 ```python
-from jam.jose import JWK, JWKSet
-from jam.exceptions.jose import (
-    JamJWKValidationError,
-    JamJWSVerificationError,
-)
+from jam.jose import JWKRSA, JWKEC, JWKOct
 
-# JWK validation
-try:
-    jwk = JWK.from_dict({"kty": "INVALID"})
-except JamJWKValidationError as e:
-    print(f"Invalid JWK: {e.message}")
+# These are TypedDicts for type annotations
+def process_rsa_key(key: JWKRSA) -> None:
+    ...
 
-# JWKSet validation
-try:
-    jwks = JWKSet.from_dict({"keys": "not a list"})
-except JamJWKValidationError as e:
-    print(f"Invalid JWKSet: {e.message}")
+def process_ec_key(key: JWKEC) -> None:
+    ...
 
-# Signature verification
-try:
-    result = jwk.verify(token)
-except JamJWSVerificationError as e:
-    print(f"Verification failed: {e.error_code}")
+def process_symmetric_key(key: JWKOct) -> None:
+    ...
 ```
