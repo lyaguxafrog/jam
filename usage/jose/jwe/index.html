@@ -709,6 +709,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#factory-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Factory function
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#encrypt-data_1" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -821,17 +832,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Error handling
-      
-    </span>
-  </a>
   
 </li>
       
@@ -1777,6 +1777,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#factory-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Factory function
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#encrypt-data_1" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1892,17 +1903,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Error handling
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1931,7 +1931,11 @@
 <p>Creates JWE Compact Serialization - encrypted data.</p>
 <p>Args:</p>
 <ul>
-<li><code>alg</code>: <code>str</code> - Key management algorithm. Available: <code>RSA-OAEP</code>, <code>RSA1_5</code>, <code>A128KW</code>, <code>A192KW</code>, <code>A256KW</code>, <code>ECDH-ES</code>, <code>ECDH-ES+A128KW</code>, <code>ECDH-ES+A192KW</code>, <code>ECDH-ES+A256KW</code>, <code>PBES2-HS256+A128KW</code>, <code>PBES2-HS384+A192KW</code>, <code>PBES2-HS512+A256KW</code>.</li>
+<li><code>alg</code>: <code>str</code> - Key management algorithm. Available: <code>RSA-OAEP</code>,
+  <code>RSA-OAEP-256</code>, <code>RSA1_5</code>, <code>A128KW</code>, <code>A192KW</code>, <code>A256KW</code>, <code>ECDH-ES</code>,
+  <code>ECDH-ES+A128KW</code>, <code>ECDH-ES+A192KW</code>, <code>ECDH-ES+A256KW</code>, <code>A128GCMKW</code>,
+  <code>A256GCMKW</code>, <code>PBES2-HS256+A128KW</code>, <code>PBES2-HS384+A192KW</code>,
+  <code>PBES2-HS512+A256KW</code>.</li>
 <li><code>enc</code>: <code>str</code> - Content encryption algorithm. Available: <code>A128CBC-HS256</code>, <code>A192CBC-HS384</code>, <code>A256CBC-HS512</code>, <code>A128GCM</code>, <code>A256GCM</code>.</li>
 <li><code>payload</code>: <code>dict[str, Any] | str | bytes</code> - Data to encrypt.</li>
 <li><code>header</code>: <code>dict[str, Any] | None = None</code> - Additional header fields.</li>
@@ -1988,6 +1992,15 @@
     <span class="n">alg</span><span class="o">=</span><span class="s2">&quot;RSA-OAEP&quot;</span><span class="p">,</span>
     <span class="n">enc</span><span class="o">=</span><span class="s2">&quot;A128CBC-HS256&quot;</span><span class="p">,</span>
     <span class="n">key</span><span class="o">=</span><span class="n">rsa_public_key</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="factory-function">Factory function<a class="headerlink" href="#factory-function" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam.jose</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_jwe_instance</span>
+
+<span class="n">jwe</span> <span class="o">=</span> <span class="n">create_jwe_instance</span><span class="p">(</span>
+    <span class="n">alg</span><span class="o">=</span><span class="s2">&quot;A256KW&quot;</span><span class="p">,</span>
+    <span class="n">enc</span><span class="o">=</span><span class="s2">&quot;A256GCM&quot;</span><span class="p">,</span>
+    <span class="n">key</span><span class="o">=</span><span class="s2">&quot;your-256-bit-key-here!!&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 <h3 id="encrypt-data_1">Encrypt data<a class="headerlink" href="#encrypt-data_1" title="Permanent link">&para;</a></h3>
@@ -2105,28 +2118,6 @@
     <span class="n">password</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;user_password&quot;</span>
 <span class="p">)</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">jwe_dec</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
-</code></pre></div>
-<h2 id="error-handling">Error handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam.jose</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWE</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">jam.exceptions.jose</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">JamJWEDecryptionError</span><span class="p">,</span>
-    <span class="n">JamJWEEncryptionError</span><span class="p">,</span>
-    <span class="n">JamJWEInvalidFormatError</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">jwe</span> <span class="o">=</span> <span class="n">JWE</span><span class="p">(</span>
-    <span class="n">alg</span><span class="o">=</span><span class="s2">&quot;RSA-OAEP&quot;</span><span class="p">,</span>
-    <span class="n">enc</span><span class="o">=</span><span class="s2">&quot;A128CBC-HS256&quot;</span><span class="p">,</span>
-    <span class="n">key</span><span class="o">=</span><span class="n">rsa_key</span>
-<span class="p">)</span>
-
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">jwe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
-<span class="k">except</span> <span class="n">JamJWEDecryptionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Decryption failed: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error code: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">error_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="k">except</span> <span class="n">JamJWEInvalidFormatError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid token format: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 
 

@@ -1516,17 +1516,12 @@
 
     <span class="c1"># Generate token</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">generate_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">User</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="n">payload</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_make_payload</span><span class="p">(</span>
-            <span class="n">exp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">to_payload</span><span class="p">()</span>
-        <span class="p">)</span>
-        <span class="n">token</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_create</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_encode</span><span class="p">(</span><span class="n">sub</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">)</span>
 
     <span class="c1"># Validate token and return user or None</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">validate_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">User</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">payload</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jam</span><span class="o">.</span><span class="n">jwt_decode</span><span class="p">(</span>
-                <span class="n">token</span><span class="p">,</span> <span class="n">check_exp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_list</span><span class="o">=</span><span class="kc">False</span>
-            <span class="p">)</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jam</span><span class="o">.</span><span class="n">jwt_decode</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">JamError</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 </code></pre></div>

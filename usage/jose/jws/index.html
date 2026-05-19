@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#instance-jamjam" class="md-skip">
+        <a href="#use-in-instance" class="md-skip">
           Skip to content
         </a>
       
@@ -619,16 +619,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#instance-jamjam" class="md-nav__link">
+  <a href="#use-in-instance" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Instance (jam.Jam)
+        Use in instance
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Instance (jam.Jam)">
+    <nav class="md-nav" aria-label="Use in instance">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Config
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#sign-data" class="md-nav__link">
@@ -681,6 +692,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#factory-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Factory function
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#sign-data_1" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -724,19 +746,30 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#critical-header-validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Error handling
+        Critical header validation
       
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-auto-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key auto-loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1709,16 +1742,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#instance-jamjam" class="md-nav__link">
+  <a href="#use-in-instance" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Instance (jam.Jam)
+        Use in instance
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Instance (jam.Jam)">
+    <nav class="md-nav" aria-label="Use in instance">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Config
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#sign-data" class="md-nav__link">
@@ -1771,6 +1815,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#factory-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Factory function
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#sign-data_1" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1814,19 +1869,30 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#critical-header-validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Error handling
+        Critical header validation
       
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-auto-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key auto-loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1913,7 +1979,18 @@
 
   <h1>JWS</h1>
 
-<h2 id="instance-jamjam">Instance (jam.Jam)<a class="headerlink" href="#instance-jamjam" title="Permanent link">&para;</a></h2>
+<h2 id="use-in-instance">Use in instance<a class="headerlink" href="#use-in-instance" title="Permanent link">&para;</a></h2>
+<h3 id="config">Config<a class="headerlink" href="#config" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>alg</code>: <code>str</code> - Signing algorithm. Available: <code>HS256</code>, <code>HS384</code>, <code>HS512</code>, <code>RS256</code>, <code>RS384</code>, <code>RS512</code>, <code>ES256</code>, <code>ES384</code>, <code>ES512</code>, <code>PS256</code>, <code>PS384</code>, <code>PS512</code>.</li>
+<li><code>key</code>: <code>str</code> - Secret key for signing/verify.</li>
+<li><code>password</code>: <code>str | None</code> - Password for key derivation.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">[jam.jose.jws]</span>
+<span class="n">alg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;$JWS_SECRET_KEY&quot;</span>
+<span class="n">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;$JWS_PASSWORD&quot;</span>
+</code></pre></div>
 <h3 id="sign-data">Sign data<a class="headerlink" href="#sign-data" title="Permanent link">&para;</a></h3>
 <p>Method: <code>jam.jws_sign</code></p>
 <p>Creates JWS Compact Serialization - digital signature of data.</p>
@@ -1979,6 +2056,14 @@
 <span class="n">jws</span> <span class="o">=</span> <span class="n">JWS</span><span class="p">(</span>
     <span class="n">alg</span><span class="o">=</span><span class="s2">&quot;ES256&quot;</span><span class="p">,</span>
     <span class="n">key</span><span class="o">=</span><span class="s2">&quot;-----BEGIN EC PRIVATE KEY-----...&quot;</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="factory-function">Factory function<a class="headerlink" href="#factory-function" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam.jose</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_jws_instance</span>
+
+<span class="n">jws</span> <span class="o">=</span> <span class="n">create_jws_instance</span><span class="p">(</span>
+    <span class="n">alg</span><span class="o">=</span><span class="s2">&quot;HS256&quot;</span><span class="p">,</span>
+    <span class="n">key</span><span class="o">=</span><span class="s2">&quot;your-secret-key&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 <h3 id="sign-data_1">Sign data<a class="headerlink" href="#sign-data_1" title="Permanent link">&para;</a></h3>
@@ -2047,17 +2132,27 @@
 </ul>
 <div class="highlight"><pre><span></span><code><span class="n">data</span> <span class="o">=</span> <span class="n">jws</span><span class="o">.</span><span class="n">deserialize_compact</span><span class="p">(</span><span class="n">jws_token</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="error-handling">Error handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam.jose</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWS</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">jam.exceptions.jose</span><span class="w"> </span><span class="kn">import</span> <span class="n">JamJWSVerificationError</span>
+<h3 id="critical-header-validation">Critical header validation<a class="headerlink" href="#critical-header-validation" title="Permanent link">&para;</a></h3>
+<p>JWS validates the <code>crit</code> (critical) header per RFC 7515. If a header name is
+listed in <code>crit</code>, it must be a registered JOSE header name (<code>alg</code>, <code>typ</code>,
+<code>kid</code>, <code>x5u</code>, <code>x5t</code>, <code>cty</code>, <code>crit</code>). Unknown critical headers cause
+verification to fail.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># This will fail - &quot;unknown&quot; is not a registered header</span>
+<span class="n">jws</span><span class="o">.</span><span class="n">deserialize_compact</span><span class="p">(</span>
+    <span class="s2">&quot;eyJhbGciOiJIUzI1NiIsImNyaXQiOlsidW5rbm93biJ9...&quot;</span><span class="p">,</span>
+    <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># Raises JamJWSVerificationError: unknown_critical_header</span>
+</code></pre></div>
+<h3 id="key-auto-loading">Key auto-loading<a class="headerlink" href="#key-auto-loading" title="Permanent link">&para;</a></h3>
+<p>When a string is passed as <code>key</code>, JWS attempts to load it as a file path first.
+If the file exists, its contents are used as the key. Otherwise, the string is
+used directly as the key material.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Loads key from file if path exists</span>
+<span class="n">jws</span> <span class="o">=</span> <span class="n">JWS</span><span class="p">(</span><span class="n">alg</span><span class="o">=</span><span class="s2">&quot;RS256&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;/path/to/private-key.pem&quot;</span><span class="p">)</span>
 
-<span class="n">jws</span> <span class="o">=</span> <span class="n">JWS</span><span class="p">(</span><span class="n">alg</span><span class="o">=</span><span class="s2">&quot;HS256&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;secret_key&quot;</span><span class="p">)</span>
-
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">jws</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">except</span> <span class="n">JamJWSVerificationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Verification failed: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">error_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Details: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Uses string directly if not a valid file path</span>
+<span class="n">jws</span> <span class="o">=</span> <span class="n">JWS</span><span class="p">(</span><span class="n">alg</span><span class="o">=</span><span class="s2">&quot;HS256&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;my-secret-string-key&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
 <h3 id="hmac-hs256384512">HMAC (HS256/384/512)<a class="headerlink" href="#hmac-hs256384512" title="Permanent link">&para;</a></h3>

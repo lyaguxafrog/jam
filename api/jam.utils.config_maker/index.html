@@ -1522,6 +1522,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#jam.utils.config_maker.__key_loader__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;__key_loader__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#jam.utils.config_maker.__module_loader__" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1624,6 +1635,14 @@
               <td>
                 <div class="doc-md-description">
                   <p>Base config masker.</p>
+                </div>
+              </td>
+            </tr>
+            <tr class="doc-section-item">
+              <td><code><a class="autorefs autorefs-internal" title="            __key_loader__ (jam.utils.config_maker.__key_loader__)" href="#jam.utils.config_maker.__key_loader__">__key_loader__</a></code></td>
+              <td>
+                <div class="doc-md-description">
+                  <p>Loads a key from file, if <code>key</code> is a path to a file.</p>
                 </div>
               </td>
             </tr>
@@ -1929,6 +1948,80 @@
             <td>
               <div class="doc-md-description">
                 <p>dict[str, Any]: Parsed config with environment variable substitution</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="jam.utils.config_maker.__key_loader__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">__key_loader__</span>
+
+
+<a href="#jam.utils.config_maker.__key_loader__" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">__key_loader__</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="str">str</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Loads a key from file, if <code>key</code> is a path to a file.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>key</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Key to load. If it is a path to a file, the file will be loaded.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>str</code></td>            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Loaded key or original key if not a file path.</p>
               </div>
             </td>
           </tr>

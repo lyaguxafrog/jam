@@ -4429,7 +4429,7 @@ If dict, will be JSON encoded.</p>
    (jam.jose.__base__.BaseJWT.decrypt)" href="#jam.jose.__base__.BaseJWT.decrypt">decrypt</a></code></td>
               <td>
                 <div class="doc-md-description">
-                  <p>Decrypt JWE or JWS+JWE token.</p>
+                  <p>Decrypt JWE token.</p>
                 </div>
               </td>
             </tr>
@@ -4455,7 +4455,7 @@ If dict, will be JSON encoded.</p>
    (jam.jose.__base__.BaseJWT.encrypt)" href="#jam.jose.__base__.BaseJWT.encrypt">encrypt</a></code></td>
               <td>
                 <div class="doc-md-description">
-                  <p>Encrypt payload using JWE.</p>
+                  <p>Encrypt plaintext.</p>
                 </div>
               </td>
             </tr>
@@ -4675,12 +4675,12 @@ If dict, will be JSON encoded.</p>
   </span>
 
 <a href="#jam.jose.__base__.BaseJWT.decrypt" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">decrypt</span><span class="p">(</span><span class="n">token</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">decrypt</span><span class="p">(</span><span class="n">token</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span> <span class="o">|</span> <span class="n"><span title="bytes">bytes</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Decrypt JWE or JWS+JWE token.</p>
+        <p>Decrypt JWE token.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4703,7 +4703,7 @@ If dict, will be JSON encoded.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Encrypted JWT token.</p>
+                <p>JWE compact serialization string.</p>
               </div>
             </td>
             <td>
@@ -4718,18 +4718,18 @@ If dict, will be JSON encoded.</p>
     <table>
       <thead>
         <tr>
-          <th>Type</th>
+<th>Name</th>          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
+<td><code>bytes</code></td>            <td>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>] | <span title="bytes">bytes</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>dict[str, Any]: Decrypted payload.</p>
+                <p>Decrypted plaintext.</p>
               </div>
             </td>
           </tr>
@@ -4748,11 +4748,11 @@ If dict, will be JSON encoded.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="ValueError">ValueError</span></code>
+                  <code><span title="JamJWEDecryptionError">JamJWEDecryptionError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If token is invalid or decryption fails.</p>
+                <p>If decryption fails.</p>
               </div>
             </td>
           </tr>
@@ -4976,15 +4976,16 @@ If dict, will be JSON encoded.</p>
 
 <a href="#jam.jose.__base__.BaseJWT.encrypt" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">encrypt</span><span class="p">(</span>
-    <span class="n">payload</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span> <span class="o">|</span> <span class="n"><span title="str">str</span></span><span class="p">,</span>
+    <span class="n">plaintext</span><span class="p">:</span> <span class="n"><span title="bytes">bytes</span></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">],</span>
     <span class="n">header</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="str">str</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Encrypt payload using JWE.</p>
-<p>Creates JWE or JWS+JWE token (sign then encrypt).</p>
+        <p>Encrypt plaintext.</p>
+<p>Produces JWE Compact Serialization:
+BASE64URL(header).BASE64URL(encrypted_key).BASE64URL(iv).BASE64URL(ciphertext).BASE64URL(tag)</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5000,14 +5001,15 @@ If dict, will be JSON encoded.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>payload</code>
+                <code>plaintext</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>] | <span title="str">str</span></code>
+                  <code><span title="bytes">bytes</span> | <span title="str">str</span> | <span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Data to encrypt. If dict, will be JSON encoded.</p>
+                <p>Data to encrypt. If str, will be encoded to UTF-8.
+If dict, will be JSON encoded.</p>
               </div>
             </td>
             <td>
@@ -5023,7 +5025,7 @@ If dict, will be JSON encoded.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Additional JWE header.</p>
+                <p>JWE header (must include 'alg' and 'enc').</p>
               </div>
             </td>
             <td>
@@ -5038,18 +5040,41 @@ If dict, will be JSON encoded.</p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>str</code></td>            <td>
+            <td>
                   <code><span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Encrypted JWT (JWE or JWS+JWE).</p>
+                <p>JWE compact serialization string.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="JamJWEEncryptionError">JamJWEEncryptionError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If encryption fails.</p>
               </div>
             </td>
           </tr>

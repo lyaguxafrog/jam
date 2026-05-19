@@ -1518,9 +1518,10 @@
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;serializer&quot;</span><span class="p">:</span> <span class="n">SomeEncoder</span><span class="p">,</span>
-    <span class="s2">&quot;jwt&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;alg&quot;</span><span class="p">:</span> <span class="s2">&quot;HS256&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;secret_key&quot;</span><span class="p">:</span> <span class="s2">&quot;SOMESECRET&quot;</span>
+    <span class="s2">&quot;paseto&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;v3&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;purpose&quot;</span><span class="p">:</span> <span class="s2">&quot;local&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;secret_key&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PASETO_SECRET_KEY&quot;</span><span class="p">)</span>
     <span class="p">}</span>
 <span class="p">}</span>
 

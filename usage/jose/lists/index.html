@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#instance-jamjam" class="md-skip">
+        <a href="#use-in-instance" class="md-skip">
           Skip to content
         </a>
       
@@ -1475,15 +1475,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#instance-jamjam" class="md-nav__link">
+  <a href="#use-in-instance" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Instance (jam.Jam)
+        Use in instance
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Instance (jam.Jam)">
+    <nav class="md-nav" aria-label="Use in instance">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1580,15 +1580,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#standalone-module" class="md-nav__link">
+  <a href="#use-out-of-instance" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Standalone (module)
+        Use out of instance
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Standalone (module)">
+    <nav class="md-nav" aria-label="Use out of instance">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1701,9 +1701,13 @@
 
   <h1>Lists</h1>
 
-<h2 id="instance-jamjam">Instance (jam.Jam)<a class="headerlink" href="#instance-jamjam" title="Permanent link">&para;</a></h2>
+<h2 id="use-in-instance">Use in instance<a class="headerlink" href="#use-in-instance" title="Permanent link">&para;</a></h2>
 <h3 id="config">Config<a class="headerlink" href="#config" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="k">[jam.jose.jwt.list]</span>
+<div class="highlight"><pre><span></span><code><span class="k">[jam.jose.jwt]</span>
+<span class="n">alg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;$JWT_ALG&quot;</span>
+<span class="n">secret_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;$JWT_SECRET_KEY&quot;</span>
+
+<span class="k">[jam.jose.jwt.list]</span>
 <span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;black&quot;</span>
 <span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;redis&quot;</span>
 <span class="n">redis_uri</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;redis://localhost:6379&quot;</span>
@@ -1785,7 +1789,7 @@
 </ul>
 <div class="highlight"><pre><span></span><code><span class="n">jam</span><span class="o">.</span><span class="n">jwt_list</span><span class="o">.</span><span class="n">delete_many</span><span class="p">(</span><span class="n">tokens</span><span class="o">=</span><span class="p">[</span><span class="n">token1</span><span class="p">,</span> <span class="n">token2</span><span class="p">])</span>
 </code></pre></div>
-<h2 id="standalone-module">Standalone (module)<a class="headerlink" href="#standalone-module" title="Permanent link">&para;</a></h2>
+<h2 id="use-out-of-instance">Use out of instance<a class="headerlink" href="#use-out-of-instance" title="Permanent link">&para;</a></h2>
 <h3 id="redislist">RedisList<a class="headerlink" href="#redislist" title="Permanent link">&para;</a></h3>
 <p>Redis-based token list. Most optimal for production with TTL support.</p>
 <p>Module: <code>jam.jose.lists.redis.RedisList</code></p>
@@ -1810,6 +1814,12 @@
 <span class="nb">list</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
 <span class="nb">list</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
 </code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">TTL behavior</p>
+<p>When <code>ttl</code> is set, tokens automatically expire from the list after the
+specified number of seconds. This is useful for token blacklists where
+tokens should only be tracked until their natural expiration.</p>
+</div>
 <h3 id="memorylist">MemoryList<a class="headerlink" href="#memorylist" title="Permanent link">&para;</a></h3>
 <p>In-memory token list. Simple but not persistent.</p>
 <p>Module: <code>jam.jose.lists.memory.MemoryList</code></p>

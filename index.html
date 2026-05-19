@@ -1731,7 +1731,7 @@
     <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="mi">1</span>
 <span class="p">}</span>
 
-<span class="n">jwt</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_create</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">jwt</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_encode</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
 <span class="n">session_id</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">session_create</span><span class="p">(</span><span class="s2">&quot;user@mail.com&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
 <span class="n">otp_code</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">otp_code</span><span class="p">(</span><span class="n">secret</span><span class="o">=</span><span class="s2">&quot;7K2HVNA3IQCYFFDX76IXKNCZHQ&quot;</span><span class="p">)</span>
 </code></pre></div>
@@ -1742,16 +1742,16 @@
 </div>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam.aio</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jam</span>
 
-<span class="n">jam</span> <span class="o">=</span> <span class="n">Jam</span><span class="p">()</span>
-<span class="n">payload</span> <span class="o">=</span> <span class="k">await</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_make_payload</span><span class="p">(</span>
-    <span class="n">exp</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+<span class="n">jam</span> <span class="o">=</span> <span class="n">Jam</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="s2">&quot;config.toml&quot;</span><span class="p">)</span>
+<span class="n">token</span> <span class="o">=</span> <span class="k">await</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_encode</span><span class="p">(</span>
+    <span class="n">iss</span><span class="o">=</span><span class="s2">&quot;Jam&quot;</span><span class="p">,</span>
+    <span class="n">sub</span><span class="o">=</span><span class="s2">&quot;username@example.com&quot;</span>
 <span class="p">)</span>
-<span class="n">token</span> <span class="o">=</span> <span class="k">await</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_create</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="why-jam">Why Jam?<a class="headerlink" href="#why-jam" title="Permanent link">&para;</a></h2>
 <p>Jam is a library that provides the most popular AUTH* mechanisms right out of the box.</p>
 <ul>
-<li><a href="usage/jwt/">JWT</a></li>
+<li><a href="usage/jose/">JOSE</a></li>
 <li><a href="usage/paseto/">PASETO</a></li>
 <li><a href="usage/sessions/">Server side sessions</a></li>
 <li><a href="usage/otp/">OTP</a></li>

@@ -6029,7 +6029,7 @@ If dict, will be serialized using self._serializer.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            JamConfigurationError (jam.exceptions.jose.JamConfigurationError)" href="../jam.exceptions/#jam.exceptions.JamConfigurationError">JamConfigurationError</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            JamConfigurationError (jam.exceptions.JamConfigurationError)" href="../jam.exceptions/#jam.exceptions.JamConfigurationError">JamConfigurationError</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6083,7 +6083,7 @@ If dict, will be serialized using self._serializer.</p>
 
 
 <a href="#jam.jose.JWT.decrypt" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">decrypt</span><span class="p">(</span><span class="n">token</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">decrypt</span><span class="p">(</span><span class="n">token</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span> <span class="o">|</span> <span class="n"><span title="bytes">bytes</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -6136,7 +6136,7 @@ If dict, will be serialized using self._serializer.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>] | <span title="bytes">bytes</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6159,7 +6159,7 @@ If dict, will be serialized using self._serializer.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            JamConfigurationError (jam.exceptions.jose.JamConfigurationError)" href="../jam.exceptions/#jam.exceptions.JamConfigurationError">JamConfigurationError</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            JamConfigurationError (jam.exceptions.JamConfigurationError)" href="../jam.exceptions/#jam.exceptions.JamConfigurationError">JamConfigurationError</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6377,7 +6377,7 @@ If dict, will be serialized using self._serializer.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            JamConfigurationError (jam.exceptions.jose.JamConfigurationError)" href="../jam.exceptions/#jam.exceptions.JamConfigurationError">JamConfigurationError</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            JamConfigurationError (jam.exceptions.JamConfigurationError)" href="../jam.exceptions/#jam.exceptions.JamConfigurationError">JamConfigurationError</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6402,7 +6402,7 @@ If dict, will be serialized using self._serializer.</p>
 
 <a href="#jam.jose.JWT.encrypt" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">encrypt</span><span class="p">(</span>
-    <span class="n">payload</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span> <span class="o">|</span> <span class="n"><span title="str">str</span></span><span class="p">,</span>
+    <span class="n">plaintext</span><span class="p">:</span> <span class="n"><span title="bytes">bytes</span></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">],</span>
     <span class="n">header</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="str">str</span></span>
 </code></pre></div>
@@ -6428,10 +6428,10 @@ If dict, will be serialized using self._serializer.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>payload</code>
+                <code>plaintext</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>] | <span title="str">str</span></code>
+                  <code><span title="bytes">bytes</span> | <span title="str">str</span> | <span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6496,7 +6496,7 @@ If dict, will be serialized using self._serializer.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            JamConfigurationError (jam.exceptions.jose.JamConfigurationError)" href="../jam.exceptions/#jam.exceptions.JamConfigurationError">JamConfigurationError</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            JamConfigurationError (jam.exceptions.JamConfigurationError)" href="../jam.exceptions/#jam.exceptions.JamConfigurationError">JamConfigurationError</a></code>
             </td>
             <td>
               <div class="doc-md-description">

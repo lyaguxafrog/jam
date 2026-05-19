@@ -1499,7 +1499,7 @@
 
 <p>You can easily override the implementation of any module using the <code>Base*</code> class. For example, if we want to override the implementation of the JWT module, we use <code>jam.jwt.BaseJWT</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jam</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">jam.jwt</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseJWT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jam.jose</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseJWT</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">MyJWT</span><span class="p">(</span><span class="n">BaseJWT</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1518,24 +1518,26 @@
 
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;jwt&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;secret_key&quot;</span><span class="p">:</span> <span class="s2">&quot;secret&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;jose&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;jwt&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;secret_key&quot;</span> <span class="o">=</span> <span class="s2">&quot;your_secret&quot;</span>
+        <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
 
 <span class="n">Jam</span><span class="o">.</span><span class="n">MODULES</span><span class="p">[</span><span class="s2">&quot;jwt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;path.to.MyJWT&quot;</span>
 <span class="n">jam</span> <span class="o">=</span> <span class="n">Jam</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
 
-<span class="n">token</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_create</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="mi">123</span><span class="p">})</span>
+<span class="n">token</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_encode</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="mi">123</span><span class="p">})</span>
 </code></pre></div>
 <p>You can also replace modules within framework integrations.
-For example, suppose you want to replace the <code>JWT</code> implementation module in the <a href="http://127.0.0.1:8000/framework_integrations/starlette/">Starlette integration</a>:</p>
+For example, suppose you want to replace the <code>JWT</code> implementation module in the <a href="/framework_integrations/starlette/">Starlette integration</a>:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">starlette.applications</span><span class="w"> </span><span class="kn">import</span> <span class="n">Starlette</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">starlette.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">Middleware</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">starlette.middleware.authentication</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthenticationMiddleware</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">jam.ext.starlette</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWTBackend</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">jam.jwt</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseJWT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jam.jose</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseJWT</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">MyJWT</span><span class="p">(</span><span class="n">BaseJWT</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>

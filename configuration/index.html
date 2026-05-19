@@ -1873,9 +1873,11 @@ Standalone modules such as <code>jam.jwt.JWT</code>, <code>jam.paseto.PASETOv4</
 <span class="kn">from</span><span class="w"> </span><span class="nn">jam</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jam</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;jwt&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;alg&quot;</span><span class="p">:</span> <span class="s2">&quot;HS256&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;secret_key&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;JWT_SECRET_KEY&quot;</span><span class="p">)</span>
+    <span class="s2">&quot;jose&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;jwt&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;alg&quot;</span><span class="p">:</span> <span class="s2">&quot;HS256&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;secret_key&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;JWT_SECRET_KEY&quot;</span><span class="p">)</span>
+        <span class="p">}</span>
     <span class="p">},</span>
     <span class="s2">&quot;paseto&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;v4&quot;</span><span class="p">,</span>
@@ -1886,11 +1888,11 @@ Standalone modules such as <code>jam.jwt.JWT</code>, <code>jam.paseto.PASETOv4</
 <span class="p">}</span>
 
 <span class="n">jam</span> <span class="o">=</span> <span class="n">Jam</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
-<span class="n">jwt</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_create</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="n">jwt</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_encode</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 <span class="n">paseto</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">paseto_create</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="n">footer</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 <h5 id="toml">TOML<a class="headerlink" href="#toml" title="Permanent link">&para;</a></h5>
-<p><div class="highlight"><pre><span></span><code><span class="k">[jam.jwt]</span>
+<p><div class="highlight"><pre><span></span><code><span class="k">[jam.jose.jwt]</span>
 <span class="n">alg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;HS256&quot;</span>
 <span class="n">secret_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;$JWT_SECRET_KEY&quot;</span>
 
@@ -1902,14 +1904,15 @@ Standalone modules such as <code>jam.jwt.JWT</code>, <code>jam.paseto.PASETOv4</
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jam</span>
 
 <span class="n">jam</span> <span class="o">=</span> <span class="n">Jam</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="s2">&quot;config.toml&quot;</span><span class="p">)</span>
-<span class="n">jwt</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_create</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="n">jwt</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_encode</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 <span class="n">paseto</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">paseto_create</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="n">footer</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div></p>
 <h5 id="yaml">YAML<a class="headerlink" href="#yaml" title="Permanent link">&para;</a></h5>
 <p><div class="highlight"><pre><span></span><code><span class="nt">jam</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">jwt</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">alg</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HS256</span>
-<span class="w">    </span><span class="nt">secret_key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$JWT_SECRET_KEY</span>
+<span class="w">  </span><span class="nt">jose</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">jwt</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">alg</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HS256</span>
+<span class="w">      </span><span class="nt">secret_key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$JWT_SECRET_KEY</span>
 <span class="w">  </span><span class="nt">paseto</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v4</span>
 <span class="w">    </span><span class="nt">purpose</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span>
@@ -1918,14 +1921,16 @@ Standalone modules such as <code>jam.jwt.JWT</code>, <code>jam.paseto.PASETOv4</
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jam</span>
 
 <span class="n">jam</span> <span class="o">=</span> <span class="n">Jam</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="s2">&quot;config.yaml&quot;</span><span class="p">)</span>
-<span class="n">jwt</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_create</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="n">jwt</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_encode</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 <span class="n">paseto</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">paseto_create</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="n">footer</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div></p>
 <h5 id="json">Json<a class="headerlink" href="#json" title="Permanent link">&para;</a></h5>
 <p><div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;jwt&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;alg&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HS256&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;secret_key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$JWT_SECRET_KEY&quot;</span>
+<span class="w">  </span><span class="nt">&quot;jose&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;jwt&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;alg&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HS256&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;secret_key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$JWT_SECRET_KEY&quot;</span>
+<span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;paseto&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v4&quot;</span><span class="p">,</span>
@@ -1937,7 +1942,7 @@ Standalone modules such as <code>jam.jwt.JWT</code>, <code>jam.paseto.PASETOv4</
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jam</span>
 
 <span class="n">jam</span> <span class="o">=</span> <span class="n">Jam</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="s2">&quot;config.json&quot;</span><span class="p">)</span>
-<span class="n">jwt</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_create</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="n">jwt</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_encode</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 <span class="n">paseto</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">paseto_create</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="n">footer</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div></p>
 <hr />
@@ -1950,11 +1955,11 @@ Standalone modules such as <code>jam.jwt.JWT</code>, <code>jam.paseto.PASETOv4</
     <span class="n">config</span><span class="o">=</span><span class="s2">&quot;config.toml&quot;</span><span class="p">,</span>
     <span class="n">pointer</span><span class="o">=</span><span class="s2">&quot;anotherpointer&quot;</span> <span class="c1"># &lt;- Another pointer</span>
 <span class="p">)</span>
-<span class="n">jwt</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_create</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="n">jwt</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">jwt_encode</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 <span class="n">paseto</span> <span class="o">=</span> <span class="n">jam</span><span class="o">.</span><span class="n">paseto_create</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="n">footer</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div></p>
 <p>Our config file will look like this:
-<div class="highlight"><pre><span></span><code><span class="k">[anotherpointer.jwt]</span><span class="w">  </span><span class="c1"># pointer</span>
+<div class="highlight"><pre><span></span><code><span class="k">[anotherpointer.jose.jwt]</span><span class="w">  </span><span class="c1"># pointer</span>
 <span class="n">alg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;HS256&quot;</span>
 <span class="n">secret_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;$JWT_SECRET_KEY&quot;</span>
 
@@ -1981,7 +1986,7 @@ but then you need to pass the path to the class in Python style:
 <div class="highlight"><pre><span></span><code><span class="k">[jam]</span>
 <span class="n">logger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;yourapp.logger.YourCustomLogger&quot;</span>
 
-<span class="k">[jam.jwt]</span>
+<span class="k">[jam.jose.jwt]</span>
 <span class="n">alg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;HS256&quot;</span>
 <span class="n">secret_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;$JWT_SECRET_KEY&quot;</span>
 </code></pre></div></p>
@@ -1994,7 +1999,7 @@ The takes one of the following values: <code>DEBUG</code>, <code>INFO</code>, <c
 <div class="highlight"><pre><span></span><code><span class="k">[jam]</span>
 <span class="n">log_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;INFO&quot;</span>
 
-<span class="k">[jam.jwt]</span>
+<span class="k">[jam.jose.jwt]</span>
 <span class="n">alg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;HS256&quot;</span>
 <span class="n">secret_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;$JWT_SECRET_KEY&quot;</span>
 </code></pre></div></p>
@@ -2005,7 +2010,7 @@ The takes one of the following values: <code>DEBUG</code>, <code>INFO</code>, <c
 <div class="highlight"><pre><span></span><code><span class="k">[jam]</span>
 <span class="n">serializer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;jam.encoders.JsonEncoder&quot;</span>
 
-<span class="k">[jam.jwt]</span>
+<span class="k">[jam.jose.jwt]</span>
 <span class="n">alg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;HS256&quot;</span>
 <span class="n">secret_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;$JWT_SECRET_KEY&quot;</span>
 </code></pre></div></p>
@@ -2017,7 +2022,7 @@ if a value begins with <code>$</code> in config files. For python dict, use <cod
 <div class="highlight"><pre><span></span><code><span class="k">[jwt]</span>
 <span class="n">log_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;INFO&quot;</span>
 
-<span class="k">[jam.jwt]</span>
+<span class="k">[jam.jose.jwt]</span>
 <span class="n">alg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;$JWT_ALG&quot;</span>
 <span class="n">secret_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;$JWT_SECRET&quot;</span>
 </code></pre></div>

@@ -574,6 +574,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#exports" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exports
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#navigation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1559,6 +1570,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#exports" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exports
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#navigation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1597,15 +1619,33 @@
 <li><strong>JWS</strong> (RFC 7515) - JSON Web Signature - digital signature</li>
 <li><strong>JWE</strong> (RFC 7516) - JSON Web Encryption - data encryption</li>
 <li><strong>JWK</strong> (RFC 7517) - JSON Web Key - cryptographic key representation</li>
+<li><strong>RFC 7518</strong> - JSON Web Algorithms - cryptographic algorithms</li>
 <li><strong>JWT</strong> (RFC 7519) - JSON Web Token - compact token format</li>
 </ul>
 <p>Jam provides a complete implementation of all JOSE standards with support for:</p>
 <ul>
-<li>Symmetric (HMAC) and asymmetric (RSA, ECDSA) signing algorithms</li>
-<li>Multiple key management algorithms (RSA, AES Key Wrap, ECDH-ES, PBES2)</li>
+<li>Symmetric (HMAC) and asymmetric (RSA, ECDSA, RSA-PSS) signing algorithms</li>
+<li>Multiple key management algorithms (RSA, AES Key Wrap, ECDH-ES, PBES2,
+  AES-GCM Key Wrap)</li>
 <li>Various content encryption modes (AES-CBC-HS, AES-GCM)</li>
+<li>Three token modes: JWS-only (signed), JWE-only (encrypted), JWS+JWE
+  (sign-then-encrypt)</li>
+<li>Automatic JWE key management algorithm selection based on key type</li>
+<li>HKDF key derivation for symmetric sign-then-encrypt scenarios</li>
 <li>JWT standard claims validation (exp, nbf)</li>
-<li>Token black/white lists</li>
+<li>Critical header (<code>crit</code>) validation per RFC 7515</li>
+<li>Token black/white lists with pluggable backends</li>
+</ul>
+<h2 id="exports">Exports<a class="headerlink" href="#exports" title="Permanent link">&para;</a></h2>
+<p>The <code>jam.jose</code> package exports the following:</p>
+<p><strong>Classes:</strong></p>
+<ul>
+<li><code>JWK</code> - JSON Web Key</li>
+<li><code>JWKSet</code> - Set of JWK keys</li>
+<li><code>JWKRSA</code>, <code>JWKEC</code>, <code>JWKOct</code> - TypedDicts for typed key definitions</li>
+<li><code>JWS</code> - JSON Web Signature</li>
+<li><code>JWE</code> - JSON Web Encryption</li>
+<li><code>JWT</code> - JSON Web Token (supports all three token modes)</li>
 </ul>
 <h2 id="navigation">Navigation<a class="headerlink" href="#navigation" title="Permanent link">&para;</a></h2>
 <ul>

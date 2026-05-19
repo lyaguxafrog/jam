@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#standalone-module" class="md-skip">
+        <a href="#typeddicts" class="md-skip">
           Skip to content
         </a>
       
@@ -675,6 +675,67 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#typeddicts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TypedDicts
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TypedDicts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jwkcommon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JWKCommon
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jwkrsa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JWKRSA
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jwkec" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JWKEC
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jwkoct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JWKOct
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#standalone-module" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -897,10 +958,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
+  <a href="#key-type-specific-classes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Error handling
+        Key type-specific classes
       
     </span>
   </a>
@@ -1759,6 +1820,67 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#typeddicts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TypedDicts
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TypedDicts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jwkcommon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JWKCommon
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jwkrsa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JWKRSA
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jwkec" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JWKEC
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jwkoct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JWKOct
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#standalone-module" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1981,10 +2103,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
+  <a href="#key-type-specific-classes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Error handling
+        Key type-specific classes
       
     </span>
   </a>
@@ -2013,6 +2135,74 @@
 
   <h1>JWK</h1>
 
+<h2 id="typeddicts">TypedDicts<a class="headerlink" href="#typeddicts" title="Permanent link">&para;</a></h2>
+<h3 id="jwkcommon">JWKCommon<a class="headerlink" href="#jwkcommon" title="Permanent link">&para;</a></h3>
+<p>Common JWK parameters shared across all key types.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam.jose</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWKCommon</span>
+
+<span class="n">key</span><span class="p">:</span> <span class="n">JWKCommon</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;kty&quot;</span><span class="p">:</span> <span class="s2">&quot;RSA&quot;</span><span class="p">,</span>           <span class="c1"># Required. Key type: RSA, EC, oct</span>
+    <span class="s2">&quot;use&quot;</span><span class="p">:</span> <span class="s2">&quot;sig&quot;</span><span class="p">,</span>           <span class="c1"># Public key use: &quot;sig&quot; or &quot;enc&quot;</span>
+    <span class="s2">&quot;key_ops&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;sign&quot;</span><span class="p">],</span>    <span class="c1"># Intended key operations</span>
+    <span class="s2">&quot;alg&quot;</span><span class="p">:</span> <span class="s2">&quot;RS256&quot;</span><span class="p">,</span>         <span class="c1"># Intended algorithm</span>
+    <span class="s2">&quot;kid&quot;</span><span class="p">:</span> <span class="s2">&quot;key-id&quot;</span><span class="p">,</span>        <span class="c1"># Unique key identifier</span>
+    <span class="s2">&quot;x5u&quot;</span><span class="p">:</span> <span class="s2">&quot;https://...&quot;</span><span class="p">,</span>   <span class="c1"># X.509 URL</span>
+    <span class="s2">&quot;x5c&quot;</span><span class="p">:</span> <span class="s2">&quot;MIID...&quot;</span><span class="p">,</span>       <span class="c1"># X.509 certificate chain (base64)</span>
+    <span class="s2">&quot;x5t&quot;</span><span class="p">:</span> <span class="s2">&quot;abc...&quot;</span><span class="p">,</span>        <span class="c1"># X.509 SHA-1 thumbprint</span>
+    <span class="s2">&quot;x5t_S256&quot;</span><span class="p">:</span> <span class="s2">&quot;xyz...&quot;</span><span class="p">,</span>   <span class="c1"># X.509 SHA-256 thumbprint</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="jwkrsa">JWKRSA<a class="headerlink" href="#jwkrsa" title="Permanent link">&para;</a></h3>
+<p>RSA key parameters (extends <code>JWKCommon</code>).</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam.jose</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWKRSA</span>
+
+<span class="c1"># Public key</span>
+<span class="n">rsa_pub</span><span class="p">:</span> <span class="n">JWKRSA</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;kty&quot;</span><span class="p">:</span> <span class="s2">&quot;RSA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;n&quot;</span><span class="p">:</span> <span class="s2">&quot;0vx7agoebGcQSuu...&quot;</span><span class="p">,</span>   <span class="c1"># Modulus (base64url)</span>
+    <span class="s2">&quot;e&quot;</span><span class="p">:</span> <span class="s2">&quot;AQAB&quot;</span><span class="p">,</span>                    <span class="c1"># Exponent (base64url)</span>
+<span class="p">}</span>
+
+<span class="c1"># Private key (requires all CRT parameters per RFC 7518)</span>
+<span class="n">rsa_priv</span><span class="p">:</span> <span class="n">JWKRSA</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;kty&quot;</span><span class="p">:</span> <span class="s2">&quot;RSA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;n&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;e&quot;</span><span class="p">:</span> <span class="s2">&quot;AQAB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;d&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>    <span class="c1"># Private exponent</span>
+    <span class="s2">&quot;p&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>    <span class="c1"># First prime factor</span>
+    <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>    <span class="c1"># Second prime factor</span>
+    <span class="s2">&quot;dp&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>   <span class="c1"># d mod (p-1)</span>
+    <span class="s2">&quot;dq&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>   <span class="c1"># d mod (q-1)</span>
+    <span class="s2">&quot;qi&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>   <span class="c1"># q^(-1) mod p</span>
+<span class="p">}</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">RSA private key validation</p>
+<p>When <code>d</code> is present, all CRT parameters (<code>p</code>, <code>q</code>, <code>dp</code>, <code>dq</code>, <code>qi</code>) are
+required. Missing any of them raises <code>JamJWKValidationError</code> per RFC 7518
+Section 6.3.2.</p>
+</div>
+<h3 id="jwkec">JWKEC<a class="headerlink" href="#jwkec" title="Permanent link">&para;</a></h3>
+<p>Elliptic curve key parameters (extends <code>JWKCommon</code>).</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam.jose</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWKEC</span>
+
+<span class="n">ec_key</span><span class="p">:</span> <span class="n">JWKEC</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;kty&quot;</span><span class="p">:</span> <span class="s2">&quot;EC&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;crv&quot;</span><span class="p">:</span> <span class="s2">&quot;P-256&quot;</span><span class="p">,</span>    <span class="c1"># Supported: P-256, P-384, P-521</span>
+    <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="s2">&quot;f83OJ3D...&quot;</span><span class="p">,</span>  <span class="c1"># X coordinate (base64url)</span>
+    <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="s2">&quot;x_FEzRu...&quot;</span><span class="p">,</span>  <span class="c1"># Y coordinate (base64url)</span>
+    <span class="s2">&quot;d&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>         <span class="c1"># Private key (optional, base64url)</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="jwkoct">JWKOct<a class="headerlink" href="#jwkoct" title="Permanent link">&para;</a></h3>
+<p>Symmetric (octet sequence) key parameters (extends <code>JWKCommon</code>).</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam.jose</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWKOct</span>
+
+<span class="n">oct_key</span><span class="p">:</span> <span class="n">JWKOct</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;kty&quot;</span><span class="p">:</span> <span class="s2">&quot;oct&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;k&quot;</span><span class="p">:</span> <span class="s2">&quot;c2VjcmV0LWtleS0zMi1ieXRlcy1sb25n&quot;</span><span class="p">,</span>  <span class="c1"># Key value (base64url)</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr />
 <h2 id="standalone-module">Standalone (module)<a class="headerlink" href="#standalone-module" title="Permanent link">&para;</a></h2>
 <h3 id="jwk-json-web-key">JWK - JSON Web Key<a class="headerlink" href="#jwk-json-web-key" title="Permanent link">&para;</a></h3>
 <p>JWK represents a cryptographic key in JSON format.</p>
@@ -2078,6 +2268,63 @@
 <span class="nb">print</span><span class="p">(</span><span class="n">jwk</span><span class="o">.</span><span class="n">alg</span><span class="p">)</span>  <span class="c1"># None</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">jwk</span><span class="o">.</span><span class="n">kid</span><span class="p">)</span>  <span class="c1"># &quot;key1&quot;</span>
 </code></pre></div>
+<p>All JWK parameters are accessible via <code>to_dict()</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kty</code></td>
+<td><code>str</code></td>
+<td>Key Type (RSA, EC, oct)</td>
+</tr>
+<tr>
+<td><code>use</code></td>
+<td><code>str</code></td>
+<td>Public key use (<code>sig</code>, <code>enc</code>)</td>
+</tr>
+<tr>
+<td><code>key_ops</code></td>
+<td><code>list[str]</code></td>
+<td>Intended key operations</td>
+</tr>
+<tr>
+<td><code>alg</code></td>
+<td><code>str</code></td>
+<td>Intended algorithm</td>
+</tr>
+<tr>
+<td><code>kid</code></td>
+<td><code>str</code></td>
+<td>Key ID</td>
+</tr>
+<tr>
+<td><code>x5u</code></td>
+<td><code>str</code></td>
+<td>X.509 URL</td>
+</tr>
+<tr>
+<td><code>x5c</code></td>
+<td><code>str</code></td>
+<td>X.509 certificate chain</td>
+</tr>
+<tr>
+<td><code>x5t</code></td>
+<td><code>str</code></td>
+<td>X.509 SHA-1 thumbprint</td>
+</tr>
+<tr>
+<td><code>x5t#S256</code></td>
+<td><code>str</code></td>
+<td>X.509 SHA-256 thumbprint</td>
+</tr>
+</tbody>
+</table>
 <h3 id="sign-data">Sign data<a class="headerlink" href="#sign-data" title="Permanent link">&para;</a></h3>
 <p>Method: <code>jwk.sign</code></p>
 <p>Signs data using JWK.</p>
@@ -2246,30 +2493,19 @@
 <span class="n">token</span> <span class="o">=</span> <span class="n">ec_jwk</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">alg</span><span class="o">=</span><span class="s2">&quot;ES256&quot;</span><span class="p">)</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">ec_jwk</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="error-handling">Error handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam.jose</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWK</span><span class="p">,</span> <span class="n">JWKSet</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">jam.exceptions.jose</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">JamJWKValidationError</span><span class="p">,</span>
-    <span class="n">JamJWSVerificationError</span><span class="p">,</span>
-<span class="p">)</span>
+<h2 id="key-type-specific-classes">Key type-specific classes<a class="headerlink" href="#key-type-specific-classes" title="Permanent link">&para;</a></h2>
+<p>Typed key classes are exported for static type checking:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam.jose</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWKRSA</span><span class="p">,</span> <span class="n">JWKEC</span><span class="p">,</span> <span class="n">JWKOct</span>
 
-<span class="c1"># JWK validation</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">jwk</span> <span class="o">=</span> <span class="n">JWK</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="s2">&quot;kty&quot;</span><span class="p">:</span> <span class="s2">&quot;INVALID&quot;</span><span class="p">})</span>
-<span class="k">except</span> <span class="n">JamJWKValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid JWK: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># These are TypedDicts for type annotations</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_rsa_key</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="n">JWKRSA</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="o">...</span>
 
-<span class="c1"># JWKSet validation</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">jwks</span> <span class="o">=</span> <span class="n">JWKSet</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="s2">&quot;keys&quot;</span><span class="p">:</span> <span class="s2">&quot;not a list&quot;</span><span class="p">})</span>
-<span class="k">except</span> <span class="n">JamJWKValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid JWKSet: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_ec_key</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="n">JWKEC</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="o">...</span>
 
-<span class="c1"># Signature verification</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">jwk</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
-<span class="k">except</span> <span class="n">JamJWSVerificationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Verification failed: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">error_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_symmetric_key</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="n">JWKOct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="o">...</span>
 </code></pre></div>
 
 
