@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Auto-detection of JWE key management algorithm based on key type (RSA→RSA-OAEP, EC→ECDH-ES, symmetric→A*-KW)
 - `exp` and `nbf` claims validation moved from JOSE module to `Jam` instances
 - `include_headers` parameter added to both sync and async `jwt_decode()`
+- Update TestClients.
 
 ### Deprecated
 - `jam.Jam.jwt_make_payload`: The JWT specification has been introduced, so signing is now done via JWS
