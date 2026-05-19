@@ -21,40 +21,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 -->
 
-## 3.2.0 - [unreleased]
+## [3.2.0] - [unreleased]
 
 ### Added
-- New JOSE module:
-  - JWT
-  - JWE
-  - JWK(s)
-  - JWS
+- Complete JOSE module (`jam.jose`):
+  - `JWS` - JSON Web Signature (RFC 7515)
+  - `JWE` - JSON Web Encryption (RFC 7516)
+  - `JWK` / `JWKSet` - JSON Web Key (RFC 7517)
+  - `JWT` - JSON Web Token (RFC 7519)
+- JWT token lists (black/white) with pluggable backends: Redis, JSON, in-memory
+- Factory functions: `create_jwt_instance`, `create_jws_instance`,
+  `create_jwe_instance`
 - `JamJWTNotYetValid` exception for nbf claim validation
 - `check_nbf` parameter in `Jam.jwt_decode()` and `Jam.aio.jwt_decode()`
 - `include_headers` parameter in `Jam.jwt_decode()` and `Jam.aio.jwt_decode()`
 - `jti` parameter in `Jam.jwt_encode()` and `Jam.aio.jwt_encode()`
-- Support for pre-built JWS/JWE instances in JWT constructor
-- `JWT.decode()` always returns `{"header": dict, "payload": dict}`
+- Pre-built JWS/JWE instances support in JWT constructor
+- Critical header (`crit`) validation per RFC 7515
+- HKDF key derivation for symmetric sign-then-encrypt
 
 ### Changed
-- JWT sign-then-encrypt now follows RFC 7519 specification
-- Auto-detection of JWE key management algorithm based on key type (RSA→RSA-OAEP, EC→ECDH-ES, symmetric→A*-KW)
+- JWT sign-then-encrypt now follows RFC 7519 nested JWT specification
+- JWE key management algorithm auto-detected based on key type:
+  RSA → `RSA-OAEP`, EC → `ECDH-ES`, symmetric → `A256KW` / `A128KW`
 - `exp` and `nbf` claims validation moved from JOSE module to `Jam` instances
-- `include_headers` parameter added to both sync and async `jwt_decode()`
-- Update TestClients.
+- `JWT.decode()` consistently returns `{"header": dict, "payload": dict}`
+- Updated TestClients
 
 ### Deprecated
-- `jam.Jam.jwt_make_payload`: The JWT specification has been introduced, so signing is now done via JWS
+- `jam.Jam.jwt_make_payload`: Use JWS for signing
 - `jam.Jam.jwt_create`: Use `jam.Jam.jwt_encode`
 - `jam.jwt.JWT`: Use `jam.jose.JWT`
 
 ### Removed
-- Remove `JsonEncoder` and `BaseEncoder` from `__all__` imports.
+- `JsonEncoder` and `BaseEncoder` from `__all__` exports
 
 ### Fixed
-- Fixed typo in CLI documentation (`bahs` → `bash`)
+- Typo in CLI documentation (`bahs` → `bash`)
 
 ### Security
+- Algorithm `none` explicitly disabled
 
 ---
 
