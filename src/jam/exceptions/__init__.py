@@ -3,6 +3,7 @@
 """All Jam exceptions"""
 
 from .base import JamConfigurationError, JamError, JamValidationError
+from .jam_plugins import JamPluginConfigurationError
 from .jose import (
     JamJWEEncryptionError,
     JamJWEDecryptionError,
@@ -51,6 +52,7 @@ __all__ = [
     "JamError",
     "JamConfigurationError",
     "JamValidationError",
+    "JamPluginConfigurationError",
     "JamOAuth2Error",
     "JamOAuth2EmptyRaw",
     "JamOAuth2ProviderNotConfigured",

@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- 
-## VERSION - [unreleased]
+## [unreleased]
 
 ### Added
 
@@ -20,6 +20,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 -->
+
+## [unreleased]
+
+### Added
+- Added base Jam plugins exceptions
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+---
 
 ## [3.2.0] - 19.05.2026
 
