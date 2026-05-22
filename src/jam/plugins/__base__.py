@@ -2,6 +2,8 @@
 
 from abc import ABC
 
+from jam.logger import BaseLogger
+
 
 class BasePlugin(ABC):
     """Base plugin for Jam.
@@ -56,3 +58,31 @@ class BasePlugin(ABC):
             **kwargs: Event data
         """
         self._jam.emit(event, **kwargs)
+
+
+class EmitTool:
+    """Tool for implementation emit in modules."""
+
+    _logger: BaseLogger
+    _plugins: list[BasePlugin] = []
+
+    def _emit(self, event: str, **kwargs):
+        """Emit event.
+
+        Args:
+            event (str): Event name
+            **kwargs: Event keyword arguments
+        """
+        for plugin in self._plugins:
+            handler = getattr(plugin, f"on_{event}", None)
+
+            if handler:
+                try:
+                    result = handler(**kwargs)
+                    if isinstance(result, dict):
+                        kwargs.update(result)
+
+                except Exception as e:
+                    self._logger.error(f"Plugin:{plugin.name} | error: {e}")
+
+        return kwargs
