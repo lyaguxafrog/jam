@@ -1,70 +1,38 @@
-## Code style
-Line length: 80 characters
-Docstrings: Google-style with type specifications, example:
-```python
-# -*- coding: utf-8 -*-
+## Project
 
-import os  # stdlib
+**jamlib** — universal Python auth library (JWT/JWS/JWE, PASETO, sessions, OTP, OAuth2).
+Single-package, source in `src/jam/`, tests in `tests/`.
 
-import cryptography  # libs
+## Commands
 
-from jam.some.__base__ import BaseSomeClass  # our modules
-
-
-def some_func(
-    self,
-    some_param: int,
-    another_param: srt | None = None
-) -> bool:
-    """Function description
-    
-    Args:
-        some_param (int): Parameter description
-        another_param (str | None): Parameter description
-    
-    Raises:
-        ValueError: Error cause description
-    
-    Returns:
-        bool: Response description
-    """
-    ...
-
-class SomeClass(BaseSomeClass):
-    """A long and detailed description of the class."""
-
-    def some_class_func(
-        self,
-        arg_one: int,
-        arg_two: bool = False
-    ) -> None:
-        """Class method description.
-
-        Args:
-            arg_one (int): Some arg
-            arg_two (bool): Another arg
-
-        Returns:
-            None
-        """
-        ...
+```bash
+uv sync --group tests --all-extras   # install
+uv run pytest -x                     # run all tests
+uv run pytest tests/modules/jwt/     # run one module's tests
+uv run ruff check src/               # lint
+uv run ruff format src/              # format
+uv run pyrefly                       # typecheck (pyrefly, not mypy/pyright)
 ```
 
-## Recommended flow
-```
-Writing an interface
-    |
-    |
-    V
-Writing tests for it
-    |
-    |
-    V
-Implementation
-    |
-    |
-    V
-Documentation
-```
+CI runs: `uv run pytest -x` (no lint/typecheck in CI — run them locally).
 
-The interfaces of each class are named `Base + Interface Name` and are described in `__base__.py`.
+## Architecture
+
+- Entry point: `src/jam/__init__.py` exports `Jam` and `BaseJam`.
+- `BaseJam` (`src/jam/__base__.py`) defines the abstract interface. `Jam` (`src/jam/instance.py`) is the concrete implementation.
+- Each submodule (jwt, sessions, otp, etc.) follows the same pattern: a `__base__.py` with `Base*` interface classes, then implementations.
+- Modules are loaded dynamically from config via `__module_loader__`.
+- Optional extras: `redis`, `json`, `yaml`, `toml`, `litestar`, `starlette`, `fastapi`, `flask`.
+
+## Style
+
+- Line length: 80.
+- Import order: stdlib, libs, `jam.*` — each group separated by 2 blank lines.
+- Ruff ignores: `UP009`, `D100`, `UP007` (see `pyproject.toml`).
+- Docstrings: Google-style with type specs. Example in current AGENTS.md is authoritative.
+
+## Testing
+
+- Uses `pytest-asyncio`. Async test patterns exist in `tests/`.
+- `conftest.py` monkey-patches `TestAsyncJam._async_mock` — be aware if adding async mocks.
+- `fakeredis` is a dev dependency for session/redis tests.
