@@ -11,6 +11,7 @@ from jam.exceptions.saml import (
     JamSAMLInvalidRecipient,
     JamSAMLNotYetValid,
     JamSAMLReplayDetected,
+    JamSAMLSOAPError,
     JamSAMLValidationError,
 )
 
@@ -1033,6 +1034,128 @@ class TestArtifactBinding:
                 issuer="https://sp.test",
                 destination="https://idp.test/artifact",
             )
+
+    def test_resolve_artifact_soap_roundtrip(self, private_key_pem, public_key_pem):
+        import urllib.request
+        from unittest.mock import patch
+
+        from jam.saml import SAML
+
+        sp = SAML(
+            role="sp",
+            private_key=private_key_pem,
+            entity_id="https://sp.test",
+            idp_public_key=public_key_pem,
+        )
+        idp = SAML(
+            role="idp",
+            private_key=private_key_pem,
+            entity_id="https://idp.test",
+            sp_public_key=public_key_pem,
+        )
+        artifact = idp.build_artifact(
+            source_message_id="_resp_1", issuer="https://idp.test"
+        )
+        original_msg = (
+            '<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"'
+            ' ID="_orig" Version="2.0" IssueInstant="2024-01-15T12:00:00Z">'
+            "<saml:Issuer xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\">"
+            "https://idp.test</saml:Issuer></samlp:Response>"
+        )
+
+        class FakeResponse:
+            def __init__(self, data):
+                self._data = data
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
+            def read(self):
+                return self._data
+
+        def fake_urlopen(request, timeout=None):
+            resolve = idp.parse_artifact_resolve(
+                request.data.decode("utf-8"), binding="soap"
+            )
+            assert resolve.artifact == artifact
+            response_xml = idp.build_artifact_response(
+                in_response_to=resolve.id,
+                original_message_xml=original_msg,
+                issuer="https://idp.test",
+                destination="https://sp.test/acs",
+                binding="soap",
+            )
+            envelope = (
+                '<?xml version="1.0" encoding="UTF-8"?>'
+                '<SOAP-ENV:Envelope xmlns:SOAP-ENV='
+                '"http://schemas.xmlsoap.org/soap/envelope/">'
+                f"<SOAP-ENV:Body>{response_xml}</SOAP-ENV:Body>"
+                "</SOAP-ENV:Envelope>"
+            )
+            return FakeResponse(envelope.encode("utf-8"))
+
+        with patch("urllib.request.urlopen", side_effect=fake_urlopen):
+            result = sp.resolve_artifact(
+                artifact=artifact,
+                issuer="https://sp.test",
+                resolve_url="https://idp.test/artifact",
+            )
+        assert "_orig" in result
+
+    def test_resolve_artifact_malformed_response_raises(
+        self, private_key_pem
+    ):
+        import urllib.request
+        from unittest.mock import patch
+
+        sp = SAML(
+            role="sp",
+            private_key=private_key_pem,
+            entity_id="https://sp.test",
+        )
+
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
+            def read(self):
+                return b""
+
+        with patch("urllib.request.urlopen", return_value=FakeResponse()):
+            with pytest.raises(JamSAMLSOAPError):
+                sp.resolve_artifact(
+                    artifact="AAQA...",
+                    issuer="https://sp.test",
+                    resolve_url="https://idp.test/artifact",
+                )
+
+    def test_resolve_artifact_http_error_raises(self, private_key_pem):
+        import urllib.error
+        import urllib.request
+        from unittest.mock import patch
+
+        sp = SAML(
+            role="sp",
+            private_key=private_key_pem,
+            entity_id="https://sp.test",
+        )
+
+        def fake_urlopen(request, timeout=None):
+            raise urllib.error.URLError("connection refused")
+
+        with patch("urllib.request.urlopen", side_effect=fake_urlopen):
+            with pytest.raises(JamSAMLSOAPError):
+                sp.resolve_artifact(
+                    artifact="AAQA...",
+                    issuer="https://sp.test",
+                    resolve_url="https://idp.test/artifact",
+                )
 
 
 class TestManageNameID:
