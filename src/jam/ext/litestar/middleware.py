@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from collections.abc import Callable
+from typing import Any
 
 from litestar.connection import ASGIConnection
 from litestar.middleware import (
@@ -18,7 +18,7 @@ from jam.paseto import BasePASETO
 class BaseMiddleware(AbstractAuthenticationMiddleware):
     """Base Jam middleware for litestar."""
 
-    AUTH_MODULE: Callable
+    AUTH_MODULE: Any
     HEADER_NAME: str | None
     COOKIE_NAME: str | None
     BEARER: bool = False
@@ -95,7 +95,7 @@ class SessionMiddleware(BaseMiddleware):
             if not data:
                 return AuthenticationResult(None, auth=token_model)
             user = self.USER.from_payload(data)
-            return AuthenticationResult(user, token)
+            return AuthenticationResult(user=user, auth=token_model)
         except Exception as e:
             raise JamLitestarPluginError(message=str(e))
 
@@ -113,10 +113,10 @@ class PASETOMiddleware(BaseMiddleware):
         if not token:
             return AuthenticationResult(None, auth=token_model)
         try:
-            data = self.AUTH_MODULE.decode(token)
-            if not data:
+            result = self.AUTH_MODULE.decode(token)
+            if not result:
                 return AuthenticationResult(None, auth=token_model)
-            user = self.USER.from_payload(data)
-            return AuthenticationResult(user, token)
+            user = self.USER.from_payload(result[0])
+            return AuthenticationResult(user=user, auth=token_model)
         except Exception as e:
             raise JamLitestarPluginError(message=str(e))

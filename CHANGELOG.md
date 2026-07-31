@@ -21,6 +21,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 -->
 
+## [3.3.0] - 01.08.2026
+
+### Added
+- Complete SAML 2.0 module (`jam.saml`):
+  - Both roles: Service Provider (SP) and Identity Provider (IdP)
+  - Bindings: HTTP-POST, HTTP-Redirect, HTTP-Artifact + SOAP back-channel
+  - XML-DSig signatures (RSA-SHA256) with embedded certificates
+  - Assertion encryption (AES-256-GCM + RSA-OAEP) via `EncryptedAssertion`
+    with automatic decryption on the SP side
+  - Single Logout (SLO)
+  - Attribute Query
+  - NameID Management
+  - Metadata generation and parsing
+  - Replay protection and clock skew tolerance
+  - XXE-safe XML parsing
+  - `create_instance` factory
+  - 12 dedicated `JamSAML*` exceptions
+
+### Fixed
+- SAML: `resolve_artifact()` now raises `JamSAMLSOAPError` on malformed SOAP
+  responses instead of `JamSAMLValidationError`
+- SAML: `encrypt_aes_key()` no longer returns a dead second tuple element
+- SAML: `parse_metadata()` return type annotation is now `SAMLMetadata`
+- SAML: None-safe text extraction in request/response parsers
+- JWE: RSA/EC private key objects (not just PEM) now work for decryption
+- JOSE: key algorithms no longer crash when loading private key objects
+- Redis list: `check_many()` now returns correct per-token results instead of
+  iterating the integer `EXISTS` return value
+- Litestar: PASETO middleware decodes `(payload, footer)` correctly and passes
+  the token model as `auth` to `AuthenticationResult`
+
+---
+
 ## [3.2.0] - 19.05.2026
 
 ### Added

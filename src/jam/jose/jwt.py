@@ -25,7 +25,7 @@ from jam.jose.__algorithms__ import (
     KeyLike,
     create_algorithm,
 )
-from jam.jose.__base__ import BaseJWS, BaseJWT
+from jam.jose.__base__ import BaseJWT
 from jam.jose.jwe import JWE
 from jam.jose.jws import JWS
 from jam.jose.lists import BaseJWTList
@@ -80,6 +80,11 @@ class JWT(BaseJWT):
         """
         self._logger = logger
         self._serializer = serializer
+
+        self.jws: JWS | None = None
+        self.jwe: JWE | None = None
+        self._alg: str | None = None
+        self._enc: str | None = None
 
         if jws is not None:
             if alg is not None:
@@ -158,47 +163,60 @@ class JWT(BaseJWT):
             return key.encode() if key else key
         return key
 
-    def _build_jws(self) -> BaseJWS:
-        if not self._alg or not self._key:
+    def _build_jws(self) -> JWS:
+        alg = self._alg
+        key = self._key
+        if not alg or not key:
             raise JamConfigurationError(message="JWS requires 'alg' and 'key'")
 
-        return self.JWS(
-            alg=self._alg,
-            key=self._key,
+        return JWS(
+            alg=alg,
+            key=key,
             password=self._password,
             logger=self._logger,
         )
 
     def _build_jwe(self) -> JWE:
-        if not self._enc:
+        enc = self._enc
+        if not enc:
             raise JamConfigurationError(
                 message="JWE requires 'enc' to be provided"
             )
 
-        key_type = self._detect_key_type(self._key)
+        key = self._key
+        key_type = self._detect_key_type(key)
 
         if key_type == "rsa":
             jwe_alg = "RSA-OAEP"
-            enc_key = self._key
+            enc_key = key
         elif key_type == "ec":
             jwe_alg = "ECDH-ES"
-            enc_key = self._key
+            enc_key = key
         elif key_type == "symmetric":
-            key_len = (
-                len(self._key)
-                if isinstance(self._key, bytes)
-                else len(self._key.encode())
-            )
+            if isinstance(key, bytes):
+                key_bytes = key
+            elif isinstance(key, str):
+                key_bytes = key.encode("utf-8")
+            else:
+                raise JamInvalidKeyTypeError(
+                    message="Symmetric JWE requires a bytes or str key"
+                )
+            key_len = len(key_bytes)
             jwe_alg = "A256KW" if key_len >= 32 else "A128KW"
-            enc_key = self._derive_encryption_key(self._key)
+            enc_key = self._derive_encryption_key(key_bytes)
         else:
+            raise JamInvalidKeyTypeError(
+                message=f"Unsupported key type for JWE: {key_type}"
+            )
+
+        if enc_key is None:
             raise JamInvalidKeyTypeError(
                 message=f"Unsupported key type for JWE: {key_type}"
             )
 
         return self.JWE(
             alg=jwe_alg,
-            enc=self._enc,
+            enc=enc,
             key=enc_key,
             password=self._password,
             serializer=self._serializer,
@@ -354,13 +372,15 @@ class JWT(BaseJWT):
     @property
     def _algo(self) -> BaseAlgorithm:
         """Get or create algorithm instance."""
+        alg = self._alg
+        key = self._key
         if self._algorithm is None:
-            if not self._alg or not self._key:
+            if not alg or not key:
                 raise JamConfigurationError(
                     message="JWS requires 'alg' and 'key'"
                 )
             self._algorithm = create_algorithm(
-                self._alg, self._key, self._password, self._logger
+                alg, key, self._password, self._logger
             )
         return self._algorithm
 
@@ -569,10 +589,15 @@ class JWT(BaseJWT):
 
             decoded = self.jws.verify(plaintext, True)
             payload = decoded.get("payload")
-            if isinstance(payload, bytes):
-                payload_str = payload.decode("utf-8")
-            else:
-                payload_str = payload
+            payload_str = (
+                payload.decode("utf-8")
+                if isinstance(payload, bytes)
+                else payload
+            )
+            if not isinstance(payload_str, str):
+                raise JamJWSVerificationError(
+                    message="Invalid JWS payload in nested token.",
+                )
 
             if "." in payload_str:
                 inner_parts = payload_str.split(".")
@@ -594,9 +619,11 @@ class JWT(BaseJWT):
                     inner_decoded = self.jws.verify(payload_str, True)
 
                 inner_payload = inner_decoded.get("payload")
-                if isinstance(inner_payload, bytes):
+                if isinstance(inner_payload, bytes | str):
                     return self._serializer.loads(inner_payload)
-                return self._serializer.loads(inner_payload)
+                raise JamJWSVerificationError(
+                    message="Invalid inner JWS payload.",
+                )
 
             return self._serializer.loads(payload_str)
 

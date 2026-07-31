@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, TypeVar
+from typing import Any
 
 from starlette.authentication import BaseUser as StarletteBaseUser
-
-
-User = TypeVar("User", bound="BaseUser")
 
 
 class BaseUser(ABC, StarletteBaseUser):
@@ -15,7 +14,7 @@ class BaseUser(ABC, StarletteBaseUser):
 
     @classmethod
     @abstractmethod
-    def from_payload(cls, payload: dict[str, Any]) -> User:
+    def from_payload(cls, payload: dict[str, Any]) -> BaseUser:
         """Create instance by payload.
 
         Args:
@@ -49,7 +48,7 @@ class SimpleUser(BaseUser):
     payload: dict[str, Any]
 
     @classmethod
-    def from_payload(cls, payload: dict[str, Any]):  # noqa
+    def from_payload(cls, payload: dict[str, Any]) -> SimpleUser:  # noqa
         return cls(payload=payload)
 
     def is_authenticated(self) -> bool:  # type: ignore # noqa

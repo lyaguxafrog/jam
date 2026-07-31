@@ -84,7 +84,7 @@ class JWS(BaseJWS):
     def serialize_compact(
         self,
         protected: dict[str, Any],
-        payload: bytes | str,
+        payload: bytes | str | dict[str, Any],
     ) -> str:
         """Create JWS Compact Serialization.
 

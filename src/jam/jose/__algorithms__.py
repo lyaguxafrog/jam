@@ -112,6 +112,8 @@ class BaseAlgorithm(ABC):
             except OSError:
                 is_file = False
             return path.read_bytes() if is_file else data.encode()
+        if isinstance(data, rsa.RSAPrivateKey | ec.EllipticCurvePrivateKey):
+            data = data.public_key()
         return data.public_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PublicFormat.SubjectPublicKeyInfo,
@@ -602,6 +604,11 @@ class BaseKeyAlgorithm(ABC):
         if hasattr(self._key, "private_key"):
             return self._key.private_key()
 
+        if isinstance(
+            self._key, rsa.RSAPrivateKey | ec.EllipticCurvePrivateKey
+        ):
+            return self._key
+
         key_bytes = self._load_key_data(self._key)
         return serialization.load_pem_private_key(
             key_bytes, password=self._password
@@ -620,6 +627,8 @@ class BaseKeyAlgorithm(ABC):
             except OSError:
                 is_file = False
             return path.read_bytes() if is_file else data.encode()
+        if isinstance(data, rsa.RSAPrivateKey | ec.EllipticCurvePrivateKey):
+            data = data.public_key()
         return data.public_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PublicFormat.SubjectPublicKeyInfo,

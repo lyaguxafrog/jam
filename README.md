@@ -39,6 +39,7 @@ Jam is a library that provides the most popular AUTH* mechanisms right out of th
 * [Server side sessions](https://jam.makridenko.ru/usage/sessions/)
 * [OTP](https://jam.makridenko.ru/usage/otp/)
 * [OAuth2](https://jam.makridenko.ru/usage/oauth2/)
+* [SAML](https://jam.makridenko.ru/usage/saml/)
 
 ### Framework integrations
 
@@ -64,5 +65,6 @@ Here is a comparison with other libraries:
 | Server side sessions  | ✅     | ✅                               | ❌                                    | ❌                                  | ❌                                   |
 | OTP                   | ✅     | ❌                               | ❌                                    | ❌                                  | ✅                                   |
 | OAuth2                | ✅     | ✅                               | ❌                                    | ✅                                  | ❌                                   |
+| SAML 2.0              | ✅     | ❌                               | ❌                                    | ❌                                  | ❌                                   |
 | Flexible config       | ✅     | ❌                               | ❌                                    | ❌                                  | ❌                                   |
 | Modularity            | ✅     | ❌                               | ❌                                    | ❌                                  | ❌                                   |

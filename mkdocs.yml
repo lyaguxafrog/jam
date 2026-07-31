@@ -24,6 +24,7 @@ nav:
       - Server side sessions: usage/sessions.md
       - OAuth2: usage/oauth2.md
       - OTP: usage/otp.md
+      - SAML: usage/saml.md
       - Logging: usage/logging.md
       - JSON serialization: usage/serializers.md
       - Testing: usage/test_client.md
