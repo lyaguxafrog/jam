@@ -4,10 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, TypeVar
-
-
-User = TypeVar("User", bound="BaseUser")
+from typing import Any
 
 
 @dataclass(slots=True)
@@ -23,7 +20,7 @@ class BaseUser(ABC):
 
     @classmethod
     @abstractmethod
-    def from_payload(cls, payload: dict[str, Any]) -> User:
+    def from_payload(cls, payload: dict[str, Any]) -> BaseUser:
         """Build model from payload.
 
         Args:
