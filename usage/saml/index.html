@@ -1,0 +1,3362 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Simple and universal library for authorization.">
+      
+      
+      
+        <link rel="canonical" href="https://jam.makridenko.ru/usage/saml/">
+      
+      
+        <link rel="prev" href="../otp/">
+      
+      
+        <link rel="next" href="../logging/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/logo.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
+    
+    
+      
+        <title>SAML - Jam</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../termynal.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#setup" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Jam" class="md-header__button md-logo" aria-label="Jam" data-md-component="logo">
+      
+  <img src="../../assets/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jam
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              SAML
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="pink" data-md-color-accent="pink"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="pink" data-md-color-accent="pink"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l137.3-137.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/lyaguxafrog/jam" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    lyaguxafrog/jam
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Jam" class="md-nav__button md-logo" aria-label="Jam" data-md-component="logo">
+      
+  <img src="../../assets/logo.svg" alt="logo">
+
+    </a>
+    Jam
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/lyaguxafrog/jam" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    lyaguxafrog/jam
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geting start
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Geting start
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Usage
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JOSE
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    JOSE
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jose/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jose/jwt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JWT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jose/jws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JWS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jose/jwe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JWE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jose/jwk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JWK
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jose/algorithms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../paseto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PASETO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sessions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Server side sessions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../oauth2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OAuth2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../otp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OTP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SAML
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SAML
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#service-provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service Provider
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Service Provider">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#init" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Init
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prepare-authnrequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prepare AuthnRequest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse response
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#identity-provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identity Provider
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Identity Provider">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#init_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Init
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-authnrequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse AuthnRequest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build response
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#single-logout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single Logout
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Single Logout">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-logoutrequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build LogoutRequest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-logoutrequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse LogoutRequest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-logoutresponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build LogoutResponse
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-logoutresponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse LogoutResponse
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attribute-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attribute Query
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Attribute Query">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-attributequery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build AttributeQuery
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-attributequery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse AttributeQuery
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-attributequeryresponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build AttributeQueryResponse
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-attributequeryresponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse AttributeQueryResponse
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#artifact-binding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Artifact Binding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Artifact Binding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-an-artifact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create an artifact
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-artifactresolve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build ArtifactResolve
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-artifactresolve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse ArtifactResolve
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-artifactresponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build ArtifactResponse
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-artifactresponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse ArtifactResponse
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resolve-artifact-over-http" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resolve artifact over HTTP
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nameid-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NameID Management
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="NameID Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-managenameidrequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build ManageNameIDRequest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-managenameidrequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse ManageNameIDRequest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-managenameidresponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build ManageNameIDResponse
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-managenameidresponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse ManageNameIDResponse
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metadata
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Metadata">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#generate-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generate metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#signature-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Signature verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clock-skew" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Clock skew
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#replay-protection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Replay protection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xxe-protection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        XXE protection
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exceptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exceptions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serializers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JSON serialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../test_client/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Customization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_12" id="__nav_3_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utils
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Utils
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/key_generators/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Keys generators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/auth_utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Auth utils
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Framework integration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Framework integration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../framework_integrations/litestar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Litestar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../framework_integrations/starlette/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Starlette
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../framework_integrations/fastapi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FastAPI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../framework_integrations/flask/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flask
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/SUMMARY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Breaking changes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Breaking changes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../breaking_changes/deprecated/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deprecated
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../breaking_changes/jam256_to_300/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.5.6 -> 3.0.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../breaking_changes/jam114_to_200/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.1.4 -> 2.0.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/lyaguxafrog/jam/blob/master/CHANGELOG.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../philosophy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Philosophy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#service-provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service Provider
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Service Provider">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#init" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Init
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prepare-authnrequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prepare AuthnRequest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse response
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#identity-provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identity Provider
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Identity Provider">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#init_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Init
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-authnrequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse AuthnRequest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build response
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#single-logout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single Logout
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Single Logout">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-logoutrequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build LogoutRequest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-logoutrequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse LogoutRequest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-logoutresponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build LogoutResponse
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-logoutresponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse LogoutResponse
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attribute-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attribute Query
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Attribute Query">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-attributequery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build AttributeQuery
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-attributequery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse AttributeQuery
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-attributequeryresponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build AttributeQueryResponse
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-attributequeryresponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse AttributeQueryResponse
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#artifact-binding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Artifact Binding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Artifact Binding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-an-artifact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create an artifact
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-artifactresolve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build ArtifactResolve
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-artifactresolve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse ArtifactResolve
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-artifactresponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build ArtifactResponse
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-artifactresponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse ArtifactResponse
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resolve-artifact-over-http" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resolve artifact over HTTP
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nameid-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NameID Management
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="NameID Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-managenameidrequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build ManageNameIDRequest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-managenameidrequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse ManageNameIDRequest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-managenameidresponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build ManageNameIDResponse
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-managenameidresponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse ManageNameIDResponse
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metadata
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Metadata">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#generate-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generate metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parse metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#signature-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Signature verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clock-skew" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Clock skew
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#replay-protection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Replay protection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xxe-protection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        XXE protection
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exceptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exceptions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>SAML</h1>
+
+<p>SAML 2.0 (Security Assertion Markup Language) support.</p>
+<p>The module implements both roles:</p>
+<ul>
+<li><strong>Service Provider (SP)</strong> - accepts logins from external IdPs.</li>
+<li><strong>Identity Provider (IdP)</strong> - issues SAML assertions.</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The SAML module is not implemented in <code>jam.Jam</code> / <code>jam.aio.Jam</code>. The reason is listed here: <a href="https://makridenko.ru/posts/2026/05/25/some-think-about-jam">makridenko.ru</a></p>
+</div>
+<p>Supported features:</p>
+<ul>
+<li>HTTP-POST, HTTP-Redirect and HTTP-Artifact bindings.</li>
+<li>XML-DSig signatures (RSA-SHA256) with embedded certificates.</li>
+<li>Assertion encryption (AES-256-GCM + RSA-OAEP) via <code>EncryptedAssertion</code>.</li>
+<li>Single Logout (SLO).</li>
+<li>Attribute Query.</li>
+<li>NameID Management.</li>
+<li>Metadata generation and parsing.</li>
+<li>Replay protection and clock skew tolerance.</li>
+</ul>
+<p>Works with zero extra dependencies (<code>xml.etree</code> + <code>cryptography</code>).</p>
+<h2 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h2>
+<p>Module: <code>jam.saml.SAML</code></p>
+<p>There is no <code>Jam</code> instance integration yet, so the module is used directly
+or through the <code>jam.saml.create_instance</code> factory.</p>
+<p>Args:</p>
+<ul>
+<li><code>role</code>: <code>str = "sp"</code> - <code>"sp"</code> (Service Provider) or <code>"idp"</code> (Identity Provider).</li>
+<li><code>private_key</code>: <code>str | None</code> - PEM string or path to the private key file (used for signing and decryption).</li>
+<li><code>public_key</code>: <code>str | None</code> - PEM string or path to the public key / certificate (used for verification).</li>
+<li><code>certificate</code>: <code>str | None</code> - PEM certificate string (included in metadata and signatures).</li>
+<li><code>entity_id</code>: <code>str | None</code> - Entity ID of this party.</li>
+<li><code>acs_url</code>: <code>str | None</code> - Assertion Consumer Service URL (SP role).</li>
+<li><code>sso_url</code>: <code>str | None</code> - Single Sign-On URL (IdP role).</li>
+<li><code>idp_public_key</code>: <code>str | None</code> - IdP public key for signature verification (SP role).</li>
+<li><code>sp_public_key</code>: <code>str | None</code> - SP public key for signature verification (IdP role).</li>
+<li><code>encryption_key</code>: <code>str | None</code> - SP public key for assertion encryption (IdP role).</li>
+<li><code>default_exp</code>: <code>int = 300</code> - Default assertion lifetime in seconds.</li>
+<li><code>allowed_clock_skew</code>: <code>int = 120</code> - Clock skew tolerance in seconds.</li>
+<li><code>want_assertions_signed</code>: <code>bool = True</code> - Require signed assertions (SP role).</li>
+<li><code>id_store</code>: <code>dict | None</code> - Dict for replay protection. Auto-created if <code>None</code>.</li>
+<li><code>replay_ttl</code>: <code>int = 300</code> - Seconds before a consumed ID is eligible for cleanup.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam.saml</span><span class="w"> </span><span class="kn">import</span> <span class="n">SAML</span>
+
+<span class="n">idp</span> <span class="o">=</span> <span class="n">SAML</span><span class="p">(</span>
+    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;idp&quot;</span><span class="p">,</span>
+    <span class="n">private_key</span><span class="o">=</span><span class="s2">&quot;path/to/idp_private_key.pem&quot;</span><span class="p">,</span>
+    <span class="n">certificate</span><span class="o">=</span><span class="s2">&quot;path/to/idp_cert.pem&quot;</span><span class="p">,</span>
+    <span class="n">entity_id</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">sso_url</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com/sso&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">sp</span> <span class="o">=</span> <span class="n">SAML</span><span class="p">(</span>
+    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;sp&quot;</span><span class="p">,</span>
+    <span class="n">private_key</span><span class="o">=</span><span class="s2">&quot;path/to/sp_private_key.pem&quot;</span><span class="p">,</span>
+    <span class="n">entity_id</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">acs_url</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com/acs&quot;</span><span class="p">,</span>
+    <span class="n">idp_public_key</span><span class="o">=</span><span class="s2">&quot;path/to/idp_cert.pem&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h2 id="service-provider">Service Provider<a class="headerlink" href="#service-provider" title="Permanent link">&para;</a></h2>
+<h3 id="init">Init<a class="headerlink" href="#init" title="Permanent link">&para;</a></h3>
+<p>Module: <code>jam.saml.SAML</code> with <code>role="sp"</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam.saml</span><span class="w"> </span><span class="kn">import</span> <span class="n">SAML</span>
+
+<span class="n">sp</span> <span class="o">=</span> <span class="n">SAML</span><span class="p">(</span>
+    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;sp&quot;</span><span class="p">,</span>
+    <span class="n">entity_id</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">acs_url</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com/acs&quot;</span><span class="p">,</span>
+    <span class="n">idp_public_key</span><span class="o">=</span><span class="s2">&quot;path/to/idp_cert.pem&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="prepare-authnrequest">Prepare AuthnRequest<a class="headerlink" href="#prepare-authnrequest" title="Permanent link">&para;</a></h3>
+<p>Method: <code>sp.prepare_authn_request</code></p>
+<p>Args:</p>
+<ul>
+<li><code>idp_sso_url</code>: <code>str</code> - IdP single sign-on endpoint URL.</li>
+<li><code>acs_url</code>: <code>str | None</code> - SP assertion consumer service URL (defaults to the instance <code>acs_url</code>).</li>
+<li><code>binding</code>: <code>str = "redirect"</code> - <code>"redirect"</code> or <code>"post"</code>.</li>
+<li><code>**kwargs</code> - <code>relay_state</code>, <code>issuer</code>, <code>force_authn</code>, etc.</li>
+</ul>
+<p>Returns:</p>
+<p><code>str</code> - Redirect: IdP URL with a signed AuthnRequest. POST: Base64-encoded SAMLRequest for an HTML form.</p>
+<p>Redirect binding:</p>
+<div class="highlight"><pre><span></span><code><span class="n">url</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">prepare_authn_request</span><span class="p">(</span>
+    <span class="n">idp_sso_url</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com/sso&quot;</span><span class="p">,</span>
+    <span class="n">acs_url</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com/acs&quot;</span><span class="p">,</span>
+    <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;redirect&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">idp</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">sso</span><span class="err">?</span><span class="n">SAMLRequest</span><span class="o">=...&amp;</span><span class="n">SigAlg</span><span class="o">=</span><span class="n">http</span><span class="o">%</span><span class="mi">3</span><span class="n">A</span><span class="o">%</span><span class="mi">2</span><span class="n">F</span><span class="o">%</span><span class="mi">2</span><span class="n">Fwww</span><span class="o">.</span><span class="n">w3</span><span class="o">.</span><span class="n">org</span><span class="o">%</span><span class="mi">2</span><span class="n">F2001</span><span class="o">%</span><span class="mi">2</span><span class="n">F04</span><span class="o">%</span><span class="mi">2</span><span class="n">Fxmldsig</span><span class="o">-</span><span class="n">more</span><span class="o">%</span><span class="mi">23</span><span class="n">rsa</span><span class="o">-</span><span class="n">sha256</span><span class="o">&amp;</span><span class="n">Signature</span><span class="o">=...</span>
+</code></pre></div>
+<p>POST binding (embed the result in an HTML form field named <code>SAMLRequest</code>):</p>
+<div class="highlight"><pre><span></span><code><span class="n">saml_request</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">prepare_authn_request</span><span class="p">(</span>
+    <span class="n">idp_sso_url</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com/sso&quot;</span><span class="p">,</span>
+    <span class="n">acs_url</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com/acs&quot;</span><span class="p">,</span>
+    <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="parse-response">Parse response<a class="headerlink" href="#parse-response" title="Permanent link">&para;</a></h3>
+<p>Method: <code>sp.parse_response</code></p>
+<p>Args:</p>
+<ul>
+<li><code>saml_response</code>: <code>str</code> - Raw SAMLResponse data (Base64 for POST, query-string for Redirect).</li>
+<li><code>binding</code>: <code>str = "post"</code> - <code>"post"</code> or <code>"redirect"</code>.</li>
+<li><code>**kwargs</code>:</li>
+<li><code>audience</code>: <code>str</code> - Expected audience (SP entity ID).</li>
+<li><code>issuer</code>: <code>str</code> - Expected issuer (IdP entity ID).</li>
+<li><code>acs_url</code>: <code>str</code> - Expected Recipient (ACS URL).</li>
+<li><code>verify_signature</code>: <code>bool</code> - Override <code>want_assertions_signed</code>.</li>
+</ul>
+<p>Returns:</p>
+<p><code>SAMLResponse</code> - Parsed response with the assertion data.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam.saml.binding</span><span class="w"> </span><span class="kn">import</span> <span class="n">encode_post</span>
+
+<span class="n">saml_response</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">parse_response</span><span class="p">(</span>
+    <span class="n">encoded_response</span><span class="p">,</span>
+    <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span>
+    <span class="n">audience</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">saml_response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">urn</span><span class="p">:</span><span class="n">oasis</span><span class="p">:</span><span class="n">names</span><span class="p">:</span><span class="n">tc</span><span class="p">:</span><span class="n">SAML</span><span class="p">:</span><span class="mf">2.0</span><span class="p">:</span><span class="n">status</span><span class="p">:</span><span class="n">Success</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">saml_response</span><span class="o">.</span><span class="n">assertion</span><span class="o">.</span><span class="n">subject</span><span class="o">.</span><span class="n">name_id</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">user</span><span class="nd">@example</span><span class="o">.</span><span class="n">com</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">saml_response</span><span class="o">.</span><span class="n">assertion</span><span class="o">.</span><span class="n">attributes</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">{</span><span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;user@example.com&quot;</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;admin&quot;</span><span class="p">}</span>
+</code></pre></div>
+<p>Encrypted assertions are decrypted automatically when the SP has a <code>private_key</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">sp</span> <span class="o">=</span> <span class="n">SAML</span><span class="p">(</span>
+    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;sp&quot;</span><span class="p">,</span>
+    <span class="n">private_key</span><span class="o">=</span><span class="s2">&quot;path/to/sp_private_key.pem&quot;</span><span class="p">,</span>
+    <span class="n">idp_public_key</span><span class="o">=</span><span class="s2">&quot;path/to/idp_cert.pem&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">parse_response</span><span class="p">(</span><span class="n">encoded_response</span><span class="p">,</span> <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="identity-provider">Identity Provider<a class="headerlink" href="#identity-provider" title="Permanent link">&para;</a></h2>
+<h3 id="init_1">Init<a class="headerlink" href="#init_1" title="Permanent link">&para;</a></h3>
+<p>Module: <code>jam.saml.SAML</code> with <code>role="idp"</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">jam.saml</span><span class="w"> </span><span class="kn">import</span> <span class="n">SAML</span>
+
+<span class="n">idp</span> <span class="o">=</span> <span class="n">SAML</span><span class="p">(</span>
+    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;idp&quot;</span><span class="p">,</span>
+    <span class="n">private_key</span><span class="o">=</span><span class="s2">&quot;path/to/idp_private_key.pem&quot;</span><span class="p">,</span>
+    <span class="n">certificate</span><span class="o">=</span><span class="s2">&quot;path/to/idp_cert.pem&quot;</span><span class="p">,</span>
+    <span class="n">entity_id</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">sso_url</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com/sso&quot;</span><span class="p">,</span>
+    <span class="n">sp_public_key</span><span class="o">=</span><span class="s2">&quot;path/to/sp_cert.pem&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="parse-authnrequest">Parse AuthnRequest<a class="headerlink" href="#parse-authnrequest" title="Permanent link">&para;</a></h3>
+<p>Method: <code>idp.parse_authn_request</code></p>
+<p>Args:</p>
+<ul>
+<li><code>saml_request</code>: <code>str</code> - Raw SAMLRequest data.</li>
+<li><code>binding</code>: <code>str = "redirect"</code> - <code>"redirect"</code> or <code>"post"</code>.</li>
+<li><code>**kwargs</code> - <code>issuer</code> (expected issuer for validation).</li>
+</ul>
+<p>Returns:</p>
+<p><code>SAMLRequest</code> - Parsed request.</p>
+<div class="highlight"><pre><span></span><code><span class="n">request</span> <span class="o">=</span> <span class="n">idp</span><span class="o">.</span><span class="n">parse_authn_request</span><span class="p">(</span>
+    <span class="n">query_string</span><span class="p">,</span>
+    <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;redirect&quot;</span><span class="p">,</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">_abc123</span><span class="o">...</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">acs_url</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">sp</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">acs</span>
+</code></pre></div>
+<h3 id="build-response">Build response<a class="headerlink" href="#build-response" title="Permanent link">&para;</a></h3>
+<p>Method: <code>idp.build_response</code></p>
+<p>Args:</p>
+<ul>
+<li><code>subject</code>: <code>str</code> - The authenticated user identifier.</li>
+<li><code>attributes</code>: <code>dict[str, Any]</code> - User attributes (email, roles, etc.).</li>
+<li><code>issuer</code>: <code>str</code> - IdP entity ID.</li>
+<li><code>audience</code>: <code>str</code> - SP entity ID (the intended audience).</li>
+<li><code>**kwargs</code>:</li>
+<li><code>in_response_to</code>: <code>str</code> - AuthnRequest ID.</li>
+<li><code>name_id_format</code>: <code>str</code> - NameID format.</li>
+<li><code>session_index</code>: <code>str</code> - Session index.</li>
+<li><code>destination</code>: <code>str</code> - ACS URL (defaults to the instance <code>acs_url</code>).</li>
+<li><code>encrypt</code>: <code>bool = False</code> - Encrypt the assertion with <code>encryption_key</code>.</li>
+</ul>
+<p>Returns:</p>
+<p><code>str</code> - Signed (and optionally encrypted) SAML Response XML.</p>
+<div class="highlight"><pre><span></span><code><span class="n">xml_str</span> <span class="o">=</span> <span class="n">idp</span><span class="o">.</span><span class="n">build_response</span><span class="p">(</span>
+    <span class="n">subject</span><span class="o">=</span><span class="s2">&quot;user@example.com&quot;</span><span class="p">,</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;user@example.com&quot;</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;admin&quot;</span><span class="p">},</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">audience</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">in_response_to</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Encrypt the assertion (the SP must have the matching <code>private_key</code>):</p>
+<div class="highlight"><pre><span></span><code><span class="n">idp</span> <span class="o">=</span> <span class="n">SAML</span><span class="p">(</span>
+    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;idp&quot;</span><span class="p">,</span>
+    <span class="n">private_key</span><span class="o">=</span><span class="s2">&quot;path/to/idp_private_key.pem&quot;</span><span class="p">,</span>
+    <span class="n">encryption_key</span><span class="o">=</span><span class="s2">&quot;path/to/sp_cert.pem&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">xml_str</span> <span class="o">=</span> <span class="n">idp</span><span class="o">.</span><span class="n">build_response</span><span class="p">(</span>
+    <span class="n">subject</span><span class="o">=</span><span class="s2">&quot;user@example.com&quot;</span><span class="p">,</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;user@example.com&quot;</span><span class="p">},</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">audience</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">encrypt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h2 id="single-logout">Single Logout<a class="headerlink" href="#single-logout" title="Permanent link">&para;</a></h2>
+<p>SLO is supported in both directions. Both <code>build_*</code> and <code>parse_*</code> methods
+accept <code>binding="post"</code> or <code>binding="redirect"</code>.</p>
+<h3 id="build-logoutrequest">Build LogoutRequest<a class="headerlink" href="#build-logoutrequest" title="Permanent link">&para;</a></h3>
+<p>Method: <code>saml.build_logout_request</code></p>
+<p>Args:</p>
+<ul>
+<li><code>name_id</code>: <code>str</code> - User identifier to log out.</li>
+<li><code>issuer</code>: <code>str</code> - Entity ID of the sender.</li>
+<li><code>destination</code>: <code>str</code> - SLO endpoint of the recipient.</li>
+<li><code>session_index</code>: <code>str | None</code> - Session index (optional).</li>
+<li><code>**kwargs</code> - <code>binding</code>, <code>relay_state</code>, <code>name_id_format</code>.</li>
+</ul>
+<p>Returns:</p>
+<p><code>str</code> - POST: Base64-encoded signed XML. Redirect: signed redirect URL.</p>
+<div class="highlight"><pre><span></span><code><span class="n">result</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">build_logout_request</span><span class="p">(</span>
+    <span class="n">name_id</span><span class="o">=</span><span class="s2">&quot;user@example.com&quot;</span><span class="p">,</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">destination</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com/slo&quot;</span><span class="p">,</span>
+    <span class="n">session_index</span><span class="o">=</span><span class="s2">&quot;_session_abc&quot;</span><span class="p">,</span>
+    <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="parse-logoutrequest">Parse LogoutRequest<a class="headerlink" href="#parse-logoutrequest" title="Permanent link">&para;</a></h3>
+<p>Method: <code>saml.parse_logout_request</code></p>
+<p>Args:</p>
+<ul>
+<li><code>saml_request</code>: <code>str</code> - Raw LogoutRequest data.</li>
+<li><code>binding</code>: <code>str = "redirect"</code> - <code>"redirect"</code> or <code>"post"</code>.</li>
+<li><code>**kwargs</code> - <code>issuer</code> (expected issuer).</li>
+</ul>
+<p>Returns:</p>
+<p><code>SAMLLogoutRequest</code> - Parsed request.</p>
+<div class="highlight"><pre><span></span><code><span class="n">logout_request</span> <span class="o">=</span> <span class="n">idp</span><span class="o">.</span><span class="n">parse_logout_request</span><span class="p">(</span>
+    <span class="n">encoded</span><span class="p">,</span>
+    <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">logout_request</span><span class="o">.</span><span class="n">name_id</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">user</span><span class="nd">@example</span><span class="o">.</span><span class="n">com</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">logout_request</span><span class="o">.</span><span class="n">session_index</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">_session_abc</span>
+</code></pre></div>
+<h3 id="build-logoutresponse">Build LogoutResponse<a class="headerlink" href="#build-logoutresponse" title="Permanent link">&para;</a></h3>
+<p>Method: <code>saml.build_logout_response</code></p>
+<p>Args:</p>
+<ul>
+<li><code>in_response_to</code>: <code>str</code> - LogoutRequest ID to respond to.</li>
+<li><code>issuer</code>: <code>str</code> - Entity ID of the sender.</li>
+<li><code>destination</code>: <code>str</code> - SLO endpoint of the recipient.</li>
+<li><code>status_code</code>: <code>str = "urn:oasis:names:tc:SAML:2.0:status:Success"</code> - SAML status code.</li>
+<li><code>**kwargs</code> - <code>binding</code>, <code>relay_state</code>.</li>
+</ul>
+<p>Returns:</p>
+<p><code>str</code> - POST: Base64-encoded signed XML. Redirect: signed redirect URL.</p>
+<div class="highlight"><pre><span></span><code><span class="n">result</span> <span class="o">=</span> <span class="n">idp</span><span class="o">.</span><span class="n">build_logout_response</span><span class="p">(</span>
+    <span class="n">in_response_to</span><span class="o">=</span><span class="n">logout_request</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">destination</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com/slo&quot;</span><span class="p">,</span>
+    <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="parse-logoutresponse">Parse LogoutResponse<a class="headerlink" href="#parse-logoutresponse" title="Permanent link">&para;</a></h3>
+<p>Method: <code>saml.parse_logout_response</code></p>
+<p>Args:</p>
+<ul>
+<li><code>saml_response</code>: <code>str</code> - Raw LogoutResponse data.</li>
+<li><code>binding</code>: <code>str = "redirect"</code> - <code>"redirect"</code> or <code>"post"</code>.</li>
+<li><code>**kwargs</code> - <code>issuer</code> (expected issuer).</li>
+</ul>
+<p>Returns:</p>
+<p><code>SAMLLogoutResponse</code> - Parsed response.</p>
+<div class="highlight"><pre><span></span><code><span class="n">logout_response</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">parse_logout_response</span><span class="p">(</span>
+    <span class="n">encoded</span><span class="p">,</span>
+    <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">logout_response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">urn</span><span class="p">:</span><span class="n">oasis</span><span class="p">:</span><span class="n">names</span><span class="p">:</span><span class="n">tc</span><span class="p">:</span><span class="n">SAML</span><span class="p">:</span><span class="mf">2.0</span><span class="p">:</span><span class="n">status</span><span class="p">:</span><span class="n">Success</span>
+</code></pre></div>
+<h2 id="attribute-query">Attribute Query<a class="headerlink" href="#attribute-query" title="Permanent link">&para;</a></h2>
+<p>Lets an SP request specific user attributes from the IdP.</p>
+<h3 id="build-attributequery">Build AttributeQuery<a class="headerlink" href="#build-attributequery" title="Permanent link">&para;</a></h3>
+<p>Method: <code>sp.build_attribute_query</code></p>
+<p>Args:</p>
+<ul>
+<li><code>subject</code>: <code>str</code> - Subject to query attributes for.</li>
+<li><code>issuer</code>: <code>str</code> - SP entity ID.</li>
+<li><code>destination</code>: <code>str</code> - IdP attribute query endpoint URL.</li>
+<li><code>attribute_names</code>: <code>list[str] | None</code> - Specific attributes to request (<code>None</code> = all).</li>
+<li><code>binding</code>: <code>str = "post"</code> - <code>"post"</code> or <code>"redirect"</code>.</li>
+</ul>
+<p>Returns:</p>
+<p><code>str</code> - POST: Base64-encoded signed XML. Redirect: signed redirect URL.</p>
+<div class="highlight"><pre><span></span><code><span class="n">encoded</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">build_attribute_query</span><span class="p">(</span>
+    <span class="n">subject</span><span class="o">=</span><span class="s2">&quot;user@example.com&quot;</span><span class="p">,</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">destination</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com/attr&quot;</span><span class="p">,</span>
+    <span class="n">attribute_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">],</span>
+    <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="parse-attributequery">Parse AttributeQuery<a class="headerlink" href="#parse-attributequery" title="Permanent link">&para;</a></h3>
+<p>Method: <code>idp.parse_attribute_query</code></p>
+<p>Args:</p>
+<ul>
+<li><code>saml_request</code>: <code>str</code> - Raw AttributeQuery data.</li>
+<li><code>binding</code>: <code>str = "redirect"</code> - <code>"redirect"</code> or <code>"post"</code>.</li>
+<li><code>**kwargs</code> - <code>issuer</code> (expected issuer).</li>
+</ul>
+<p>Returns:</p>
+<p><code>SAMLAttributeQuery</code> - Parsed query.</p>
+<div class="highlight"><pre><span></span><code><span class="n">query</span> <span class="o">=</span> <span class="n">idp</span><span class="o">.</span><span class="n">parse_attribute_query</span><span class="p">(</span><span class="n">encoded</span><span class="p">,</span> <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">subject</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">user</span><span class="nd">@example</span><span class="o">.</span><span class="n">com</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">attribute_names</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">]</span>
+</code></pre></div>
+<h3 id="build-attributequeryresponse">Build AttributeQueryResponse<a class="headerlink" href="#build-attributequeryresponse" title="Permanent link">&para;</a></h3>
+<p>Method: <code>idp.build_attribute_query_response</code></p>
+<p>Args:</p>
+<ul>
+<li><code>in_response_to</code>: <code>str</code> - AttributeQuery ID.</li>
+<li><code>subject</code>: <code>str</code> - The subject.</li>
+<li><code>attributes</code>: <code>dict[str, Any]</code> - User attributes.</li>
+<li><code>issuer</code>: <code>str</code> - IdP entity ID.</li>
+<li><code>audience</code>: <code>str</code> - SP entity ID.</li>
+</ul>
+<p>Returns:</p>
+<p><code>str</code> - Signed SAML Response XML.</p>
+<div class="highlight"><pre><span></span><code><span class="n">xml_str</span> <span class="o">=</span> <span class="n">idp</span><span class="o">.</span><span class="n">build_attribute_query_response</span><span class="p">(</span>
+    <span class="n">in_response_to</span><span class="o">=</span><span class="n">query</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+    <span class="n">subject</span><span class="o">=</span><span class="s2">&quot;user@example.com&quot;</span><span class="p">,</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;user@example.com&quot;</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;admin&quot;</span><span class="p">},</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">audience</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="parse-attributequeryresponse">Parse AttributeQueryResponse<a class="headerlink" href="#parse-attributequeryresponse" title="Permanent link">&para;</a></h3>
+<p>Method: <code>sp.parse_attribute_query_response</code></p>
+<p>Same signature and return type as <code>sp.parse_response</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="n">result</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">parse_attribute_query_response</span><span class="p">(</span>
+    <span class="n">encoded</span><span class="p">,</span>
+    <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span>
+    <span class="n">audience</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">assertion</span><span class="o">.</span><span class="n">attributes</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">{</span><span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;user@example.com&quot;</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;admin&quot;</span><span class="p">}</span>
+</code></pre></div>
+<h2 id="artifact-binding">Artifact Binding<a class="headerlink" href="#artifact-binding" title="Permanent link">&para;</a></h2>
+<p>The SP receives an artifact instead of the actual message, then resolves it
+through a direct SOAP back-channel request to the IdP.</p>
+<h3 id="create-an-artifact">Create an artifact<a class="headerlink" href="#create-an-artifact" title="Permanent link">&para;</a></h3>
+<p>Method: <code>saml.build_artifact</code></p>
+<p>Args:</p>
+<ul>
+<li><code>source_message_id</code>: <code>str</code> - ID of the referenced message.</li>
+<li><code>issuer</code>: <code>str</code> - Entity ID of the issuer.</li>
+</ul>
+<p>Returns:</p>
+<p><code>str</code> - Base64-encoded artifact.</p>
+<div class="highlight"><pre><span></span><code><span class="n">artifact</span> <span class="o">=</span> <span class="n">idp</span><span class="o">.</span><span class="n">build_artifact</span><span class="p">(</span>
+    <span class="n">source_message_id</span><span class="o">=</span><span class="n">response_id</span><span class="p">,</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">artifact</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">AQAAEAAA</span><span class="o">...</span>
+</code></pre></div>
+<h3 id="build-artifactresolve">Build ArtifactResolve<a class="headerlink" href="#build-artifactresolve" title="Permanent link">&para;</a></h3>
+<p>Method: <code>sp.build_artifact_resolve</code></p>
+<p>Args:</p>
+<ul>
+<li><code>artifact</code>: <code>str</code> - The artifact to resolve.</li>
+<li><code>issuer</code>: <code>str</code> - SP entity ID.</li>
+<li><code>destination</code>: <code>str</code> - IdP artifact resolution service URL.</li>
+<li><code>**kwargs</code> - <code>binding</code> (<code>"post"</code>, <code>"redirect"</code>, or <code>"soap"</code>).</li>
+</ul>
+<p>Returns:</p>
+<p><code>str</code> - POST: Base64. Redirect: signed URL. SOAP: raw XML.</p>
+<div class="highlight"><pre><span></span><code><span class="n">resolve_xml</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">build_artifact_resolve</span><span class="p">(</span>
+    <span class="n">artifact</span><span class="o">=</span><span class="n">artifact</span><span class="p">,</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">destination</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com/artifact&quot;</span><span class="p">,</span>
+    <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;soap&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="parse-artifactresolve">Parse ArtifactResolve<a class="headerlink" href="#parse-artifactresolve" title="Permanent link">&para;</a></h3>
+<p>Method: <code>idp.parse_artifact_resolve</code></p>
+<p>Args:</p>
+<ul>
+<li><code>saml_request</code>: <code>str</code> - Raw ArtifactResolve data.</li>
+<li><code>binding</code>: <code>str = "post"</code> - <code>"post"</code>, <code>"redirect"</code>, or <code>"soap"</code>.</li>
+<li><code>**kwargs</code> - <code>issuer</code> (expected issuer).</li>
+</ul>
+<p>Returns:</p>
+<p><code>SAMLArtifactResolve</code> - Parsed resolve request.</p>
+<div class="highlight"><pre><span></span><code><span class="n">resolve</span> <span class="o">=</span> <span class="n">idp</span><span class="o">.</span><span class="n">parse_artifact_resolve</span><span class="p">(</span><span class="n">soap_envelope</span><span class="p">,</span> <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;soap&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">resolve</span><span class="o">.</span><span class="n">artifact</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">AQAAEAAA</span><span class="o">...</span>
+</code></pre></div>
+<h3 id="build-artifactresponse">Build ArtifactResponse<a class="headerlink" href="#build-artifactresponse" title="Permanent link">&para;</a></h3>
+<p>Method: <code>idp.build_artifact_response</code></p>
+<p>Args:</p>
+<ul>
+<li><code>in_response_to</code>: <code>str</code> - ArtifactResolve ID.</li>
+<li><code>original_message_xml</code>: <code>str</code> - The original SAML message XML to embed.</li>
+<li><code>issuer</code>: <code>str</code> - IdP entity ID.</li>
+<li><code>destination</code>: <code>str</code> - SP endpoint URL.</li>
+<li><code>**kwargs</code> - <code>binding</code>, <code>status_code</code>.</li>
+</ul>
+<p>Returns:</p>
+<p><code>str</code> - POST: Base64. Redirect: signed URL. SOAP: raw XML.</p>
+<div class="highlight"><pre><span></span><code><span class="n">response_xml</span> <span class="o">=</span> <span class="n">idp</span><span class="o">.</span><span class="n">build_artifact_response</span><span class="p">(</span>
+    <span class="n">in_response_to</span><span class="o">=</span><span class="n">resolve</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+    <span class="n">original_message_xml</span><span class="o">=</span><span class="n">original_response_xml</span><span class="p">,</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">destination</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com/acs&quot;</span><span class="p">,</span>
+    <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;soap&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="parse-artifactresponse">Parse ArtifactResponse<a class="headerlink" href="#parse-artifactresponse" title="Permanent link">&para;</a></h3>
+<p>Method: <code>sp.parse_artifact_response</code></p>
+<p>Args:</p>
+<ul>
+<li><code>saml_response</code>: <code>str</code> - Raw ArtifactResponse data.</li>
+<li><code>binding</code>: <code>str = "post"</code> - <code>"post"</code>, <code>"redirect"</code>, or <code>"soap"</code>.</li>
+<li><code>**kwargs</code> - <code>issuer</code> (expected issuer).</li>
+</ul>
+<p>Returns:</p>
+<p><code>SAMLArtifactResponse</code> - Parsed response with the embedded <code>original_message</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="n">artifact_response</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">parse_artifact_response</span><span class="p">(</span>
+    <span class="n">soap_response</span><span class="p">,</span>
+    <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;soap&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">artifact_response</span><span class="o">.</span><span class="n">original_message</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="o">&lt;</span><span class="n">samlp</span><span class="p">:</span><span class="n">Response</span> <span class="o">...&gt;</span>
+</code></pre></div>
+<h3 id="resolve-artifact-over-http">Resolve artifact over HTTP<a class="headerlink" href="#resolve-artifact-over-http" title="Permanent link">&para;</a></h3>
+<p>Method: <code>sp.resolve_artifact</code></p>
+<p>Sends the ArtifactResolve as a SOAP request to the IdP's artifact resolution
+service and returns the original message.</p>
+<p>Args:</p>
+<ul>
+<li><code>artifact</code>: <code>str</code> - The artifact to resolve.</li>
+<li><code>issuer</code>: <code>str</code> - SP entity ID.</li>
+<li><code>resolve_url</code>: <code>str</code> - IdP artifact resolution service URL.</li>
+<li><code>**kwargs</code> - <code>timeout</code> (int, default 10), <code>expected_issuer</code> (IdP entity ID for validation).</li>
+</ul>
+<p>Returns:</p>
+<p><code>str</code> - The original SAML message XML from the ArtifactResponse.</p>
+<div class="highlight"><pre><span></span><code><span class="n">original_message</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">resolve_artifact</span><span class="p">(</span>
+    <span class="n">artifact</span><span class="o">=</span><span class="n">artifact</span><span class="p">,</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">resolve_url</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com/artifact&quot;</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h2 id="nameid-management">NameID Management<a class="headerlink" href="#nameid-management" title="Permanent link">&para;</a></h2>
+<p>Change or terminate a NameID with the other party.</p>
+<h3 id="build-managenameidrequest">Build ManageNameIDRequest<a class="headerlink" href="#build-managenameidrequest" title="Permanent link">&para;</a></h3>
+<p>Method: <code>saml.build_manage_name_id_request</code></p>
+<p>Args:</p>
+<ul>
+<li><code>name_id</code>: <code>str</code> - Current NameID.</li>
+<li><code>issuer</code>: <code>str</code> - Entity ID of the requester.</li>
+<li><code>destination</code>: <code>str</code> - Recipient endpoint URL.</li>
+<li><code>new_id</code>: <code>str | None</code> - New identifier (<code>None</code> = terminate).</li>
+<li><code>binding</code>: <code>str = "post"</code> - <code>"post"</code> or <code>"redirect"</code>.</li>
+</ul>
+<p>Returns:</p>
+<p><code>str</code> - POST: Base64-encoded signed XML. Redirect: signed redirect URL.</p>
+<p>Change the identifier:</p>
+<div class="highlight"><pre><span></span><code><span class="n">encoded</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">build_manage_name_id_request</span><span class="p">(</span>
+    <span class="n">name_id</span><span class="o">=</span><span class="s2">&quot;user@example.com&quot;</span><span class="p">,</span>
+    <span class="n">new_id</span><span class="o">=</span><span class="s2">&quot;newuser@example.com&quot;</span><span class="p">,</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">destination</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com/nameid&quot;</span><span class="p">,</span>
+    <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Terminate the identifier (no <code>new_id</code>):</p>
+<div class="highlight"><pre><span></span><code><span class="n">encoded</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">build_manage_name_id_request</span><span class="p">(</span>
+    <span class="n">name_id</span><span class="o">=</span><span class="s2">&quot;user@example.com&quot;</span><span class="p">,</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">destination</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com/nameid&quot;</span><span class="p">,</span>
+    <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="parse-managenameidrequest">Parse ManageNameIDRequest<a class="headerlink" href="#parse-managenameidrequest" title="Permanent link">&para;</a></h3>
+<p>Method: <code>idp.parse_manage_name_id_request</code></p>
+<p>Args:</p>
+<ul>
+<li><code>saml_request</code>: <code>str</code> - Raw ManageNameIDRequest data.</li>
+<li><code>binding</code>: <code>str = "redirect"</code> - <code>"redirect"</code> or <code>"post"</code>.</li>
+<li><code>**kwargs</code> - <code>issuer</code> (expected issuer).</li>
+</ul>
+<p>Returns:</p>
+<p><code>SAMLManageNameIDRequest</code> - Parsed request.</p>
+<div class="highlight"><pre><span></span><code><span class="n">request</span> <span class="o">=</span> <span class="n">idp</span><span class="o">.</span><span class="n">parse_manage_name_id_request</span><span class="p">(</span><span class="n">encoded</span><span class="p">,</span> <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">name_id</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">user</span><span class="nd">@example</span><span class="o">.</span><span class="n">com</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">new_id</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">newuser</span><span class="nd">@example</span><span class="o">.</span><span class="n">com</span>
+</code></pre></div>
+<h3 id="build-managenameidresponse">Build ManageNameIDResponse<a class="headerlink" href="#build-managenameidresponse" title="Permanent link">&para;</a></h3>
+<p>Method: <code>saml.build_manage_name_id_response</code></p>
+<p>Args:</p>
+<ul>
+<li><code>in_response_to</code>: <code>str</code> - ManageNameIDRequest ID.</li>
+<li><code>issuer</code>: <code>str</code> - Entity ID of the responder.</li>
+<li><code>destination</code>: <code>str</code> - Endpoint URL of the requester.</li>
+<li><code>status_code</code>: <code>str</code> - SAML status code (default Success).</li>
+<li><code>**kwargs</code> - <code>binding</code>, <code>relay_state</code>.</li>
+</ul>
+<p>Returns:</p>
+<p><code>str</code> - POST: Base64-encoded signed XML. Redirect: signed redirect URL.</p>
+<div class="highlight"><pre><span></span><code><span class="n">encoded</span> <span class="o">=</span> <span class="n">idp</span><span class="o">.</span><span class="n">build_manage_name_id_response</span><span class="p">(</span>
+    <span class="n">in_response_to</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">destination</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com/nameid&quot;</span><span class="p">,</span>
+    <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="parse-managenameidresponse">Parse ManageNameIDResponse<a class="headerlink" href="#parse-managenameidresponse" title="Permanent link">&para;</a></h3>
+<p>Method: <code>sp.parse_manage_name_id_response</code></p>
+<p>Args:</p>
+<ul>
+<li><code>saml_response</code>: <code>str</code> - Raw ManageNameIDResponse data.</li>
+<li><code>binding</code>: <code>str = "redirect"</code> - <code>"redirect"</code> or <code>"post"</code>.</li>
+<li><code>**kwargs</code> - <code>issuer</code> (expected issuer).</li>
+</ul>
+<p>Returns:</p>
+<p><code>SAMLManageNameIDResponse</code> - Parsed response.</p>
+<div class="highlight"><pre><span></span><code><span class="n">response</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">parse_manage_name_id_response</span><span class="p">(</span><span class="n">encoded</span><span class="p">,</span> <span class="n">binding</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">urn</span><span class="p">:</span><span class="n">oasis</span><span class="p">:</span><span class="n">names</span><span class="p">:</span><span class="n">tc</span><span class="p">:</span><span class="n">SAML</span><span class="p">:</span><span class="mf">2.0</span><span class="p">:</span><span class="n">status</span><span class="p">:</span><span class="n">Success</span>
+</code></pre></div>
+<h2 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h2>
+<h3 id="generate-metadata">Generate metadata<a class="headerlink" href="#generate-metadata" title="Permanent link">&para;</a></h3>
+<p>Method: <code>saml.generate_metadata</code></p>
+<p>Args:</p>
+<ul>
+<li><code>entity_id</code>: <code>str | None</code> - Entity ID (defaults to the instance <code>entity_id</code>).</li>
+<li><code>sso_url</code>: <code>str | None</code> - SSO URL (IdP metadata).</li>
+<li><code>acs_url</code>: <code>str | None</code> - ACS URL (SP metadata).</li>
+<li><code>role</code>: <code>str | None</code> - <code>"idp"</code> or <code>"sp"</code> (defaults to the instance role).</li>
+</ul>
+<p>Returns:</p>
+<p><code>str</code> - SAML metadata XML.</p>
+<div class="highlight"><pre><span></span><code><span class="n">idp_metadata</span> <span class="o">=</span> <span class="n">idp</span><span class="o">.</span><span class="n">generate_metadata</span><span class="p">(</span>
+    <span class="n">entity_id</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">sso_url</span><span class="o">=</span><span class="s2">&quot;https://idp.example.com/sso&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">sp_metadata</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">generate_metadata</span><span class="p">(</span>
+    <span class="n">entity_id</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com&quot;</span><span class="p">,</span>
+    <span class="n">acs_url</span><span class="o">=</span><span class="s2">&quot;https://sp.example.com/acs&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="parse-metadata">Parse metadata<a class="headerlink" href="#parse-metadata" title="Permanent link">&para;</a></h3>
+<p>Method: <code>saml.parse_metadata</code></p>
+<p>Args:</p>
+<ul>
+<li><code>metadata_xml</code>: <code>str</code> - Raw metadata XML string.</li>
+</ul>
+<p>Returns:</p>
+<p><code>SAMLMetadata</code> - Parsed metadata.</p>
+<div class="highlight"><pre><span></span><code><span class="n">metadata</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">parse_metadata</span><span class="p">(</span><span class="n">idp_metadata</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">entity_id</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">idp</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">com</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">sso_url</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">idp</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">sso</span>
+</code></pre></div>
+<h2 id="security">Security<a class="headerlink" href="#security" title="Permanent link">&para;</a></h2>
+<h3 id="signature-verification">Signature verification<a class="headerlink" href="#signature-verification" title="Permanent link">&para;</a></h3>
+<p>Assertions and protocol messages are signed with RSA-SHA256 and an embedded
+certificate. The SP verifies assertions using the <code>idp_public_key</code>; the IdP
+verifies requests using <code>sp_public_key</code>. When no key is configured, the
+certificate embedded in the signature <code>KeyInfo</code> is used.</p>
+<p>Set <code>want_assertions_signed=False</code> on the SP to skip assertion signature
+verification:</p>
+<div class="highlight"><pre><span></span><code><span class="n">sp</span> <span class="o">=</span> <span class="n">SAML</span><span class="p">(</span>
+    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;sp&quot;</span><span class="p">,</span>
+    <span class="n">want_assertions_signed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="clock-skew">Clock skew<a class="headerlink" href="#clock-skew" title="Permanent link">&para;</a></h3>
+<p>Expired or not-yet-valid assertions are rejected. The <code>allowed_clock_skew</code>
+(default 120 seconds) tolerates small clock differences between the parties.</p>
+<h3 id="replay-protection">Replay protection<a class="headerlink" href="#replay-protection" title="Permanent link">&para;</a></h3>
+<p>Every incoming message ID is checked against the <code>id_store</code> before being
+consumed, which raises <code>JamSAMLReplayDetected</code> on duplicate IDs. Pass your own
+dict to share state between instances or processes:</p>
+<div class="highlight"><pre><span></span><code><span class="n">sp</span> <span class="o">=</span> <span class="n">SAML</span><span class="p">(</span>
+    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;sp&quot;</span><span class="p">,</span>
+    <span class="n">id_store</span><span class="o">=</span><span class="n">shared_store</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="xxe-protection">XXE protection<a class="headerlink" href="#xxe-protection" title="Permanent link">&para;</a></h3>
+<p>Incoming XML is parsed with <code>safe_fromstring</code>, which rejects DTD/entity
+declarations, preventing XXE and entity-expansion attacks.</p>
+<h2 id="exceptions">Exceptions<a class="headerlink" href="#exceptions" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Exception</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>JamSAMLError</code></td>
+<td>Base SAML error.</td>
+</tr>
+<tr>
+<td><code>JamSAMLExpired</code></td>
+<td>The assertion has expired.</td>
+</tr>
+<tr>
+<td><code>JamSAMLNotYetValid</code></td>
+<td>The assertion is not yet valid.</td>
+</tr>
+<tr>
+<td><code>JamSAMLInvalidAudience</code></td>
+<td>Audience validation failed.</td>
+</tr>
+<tr>
+<td><code>JamSAMLInvalidIssuer</code></td>
+<td>Issuer validation failed.</td>
+</tr>
+<tr>
+<td><code>JamSAMLInvalidRecipient</code></td>
+<td>SubjectConfirmationData Recipient does not match the expected ACS URL.</td>
+</tr>
+<tr>
+<td><code>JamSAMLReplayDetected</code></td>
+<td>The message ID has already been consumed (replay attack).</td>
+</tr>
+<tr>
+<td><code>JamSAMLSOAPError</code></td>
+<td>SOAP / artifact resolution failed.</td>
+</tr>
+<tr>
+<td><code>JamSAMLValidationError</code></td>
+<td>Generic signature or XML validation failure.</td>
+</tr>
+<tr>
+<td><code>JamSAMLEmptyPrivateKey</code></td>
+<td>Signing requires a <code>private_key</code>.</td>
+</tr>
+<tr>
+<td><code>JamSAMLEmptyPublicKey</code></td>
+<td>Verification requires a <code>public_key</code>.</td>
+</tr>
+<tr>
+<td><code>JamSAMLUnsupportedAlgorithm</code></td>
+<td>Unsupported SAML algorithm.</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../otp/" class="md-footer__link md-footer__link--prev" aria-label="Previous: OTP">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l137.3-137.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                OTP
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../logging/" class="md-footer__link md-footer__link--next" aria-label="Next: Logging">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Logging
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M247.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L179.2 256 41.9 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Adrian Makridenko | <a href="https://github.com/lyaguxafrog/">@lyaguxafrog</a>
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/lyaguxafrog/jam" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://pypi.org/project/jamlib/" target="_blank" rel="noopener" title="pypi.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6M286.2 444.7a20.4 20.4 0 1 1 0-40.7 20.4 20.4 0 1 1 0 40.7M167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4m-6.6-183.4a20.4 20.4 0 1 1 0 40.8 20.4 20.4 0 1 1 0-40.8"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.instant.progress", "header.autohide", "tabs", "navigation.footer"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../termynal.js"></script>
+      
+    
+  </body>
+</html>
