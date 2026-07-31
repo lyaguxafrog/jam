@@ -194,7 +194,11 @@ def verify_assertion_signature(
 
     signed_info = sig.find(f"{{{NS_DS}}}SignedInfo")
     sig_value_elem = sig.find(f"{{{NS_DS}}}SignatureValue")
-    if signed_info is None or sig_value_elem is None:
+    if (
+        signed_info is None
+        or sig_value_elem is None
+        or sig_value_elem.text is None
+    ):
         raise JamSAMLValidationError(
             message="Invalid signature structure.",
         )

@@ -56,7 +56,7 @@ def load_encryption_key(pem: str) -> rsa.RSAPublicKey:
 def encrypt_aes_key(
     aes_key: bytes,
     public_key: rsa.RSAPublicKey,
-) -> tuple[str, bytes]:
+) -> str:
     """Encrypt an AES key with RSA-OAEP.
 
     Args:
@@ -64,7 +64,7 @@ def encrypt_aes_key(
         public_key: RSA public key for encryption.
 
     Returns:
-        Tuple of (base64-encoded ciphertext, OAEP padding used).
+        Base64-encoded encrypted AES key.
     """
     ct = public_key.encrypt(
         aes_key,
@@ -74,11 +74,7 @@ def encrypt_aes_key(
             label=None,
         ),
     )
-    return base64.b64encode(ct).decode("ascii"), padding.OAEP(
-        mgf=padding.MGF1(algorithm=hashes.SHA256()),
-        algorithm=hashes.SHA256(),
-        label=None,
-    )
+    return base64.b64encode(ct).decode("ascii")
 
 
 def decrypt_aes_key(
@@ -129,7 +125,7 @@ def encrypt_assertion(
 
     payload_b64 = base64.b64encode(nonce + ciphertext).decode("ascii")
 
-    encrypted_key_b64, _ = encrypt_aes_key(aes_key, public_key)
+    encrypted_key_b64 = encrypt_aes_key(aes_key, public_key)
 
     enc_assertion = make_element("EncryptedAssertion", NS_SAML)
 

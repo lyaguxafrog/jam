@@ -56,6 +56,7 @@ from jam.saml.types import (
     SAMLLogoutResponse,
     SAMLManageNameIDRequest,
     SAMLManageNameIDResponse,
+    SAMLMetadata,
     SAMLRequest,
     SAMLResponse,
     SAMLSubject,
@@ -143,6 +144,8 @@ class SAML(BaseSAML):
         self._public_key: Any = None
         self._certificate: str | None = certificate
         self._encryption_key: Any = None
+        self._idp_public_key: Any = None
+        self._sp_public_key: Any = None
 
         if private_key:
             pem = __key_loader__(private_key)
@@ -767,17 +770,18 @@ class SAML(BaseSAML):
         subject_elem = root.find(f"{{{NS_SAML}}}Subject")
         if subject_elem is not None:
             name_id = subject_elem.find(f"{{{NS_SAML}}}NameID")
-            subject_text = name_id.text if name_id is not None else ""
+            subject_text = (name_id.text if name_id is not None else None) or ""
         else:
             subject_text = ""
 
-        attribute_names: list[str] | None = []
+        attribute_names: list[str] | None = None
+        names: list[str] = []
         for attr in root.findall(f"{{{NS_SAML}}}Attribute"):
             name = attr.get("Name")
             if name:
-                attribute_names.append(name)
-        if not attribute_names:
-            attribute_names = None
+                names.append(name)
+        if names:
+            attribute_names = names
 
         expected_issuer = kwargs.get("issuer")
         if expected_issuer and issuer != expected_issuer:
@@ -997,7 +1001,9 @@ class SAML(BaseSAML):
 
         issuer = _find_text(root, "Issuer", NS_SAML)
         name_id_elem = root.find(f"{{{NS_SAML}}}NameID")
-        name_id = name_id_elem.text if name_id_elem is not None else ""
+        name_id = (
+            name_id_elem.text if name_id_elem is not None else None
+        ) or ""
         session_index_elem = root.find(f"{{{NS_SAMLP}}}SessionIndex")
         session_index = (
             session_index_elem.text if session_index_elem is not None else None
@@ -1244,7 +1250,9 @@ class SAML(BaseSAML):
         self._check_replay(resolve_id)
 
         artifact_elem = root.find(f"{{{NS_SAMLP}}}Artifact")
-        artifact = artifact_elem.text if artifact_elem is not None else ""
+        artifact = (
+            artifact_elem.text if artifact_elem is not None else None
+        ) or ""
 
         expected_issuer = kwargs.get("issuer")
         if expected_issuer and issuer != expected_issuer:
@@ -1437,7 +1445,12 @@ class SAML(BaseSAML):
                 message=f"SOAP request failed: {exc}",
             ) from exc
 
-        soap_root = safe_fromstring(soap_response)
+        try:
+            soap_root = safe_fromstring(soap_response)
+        except JamSAMLValidationError as exc:
+            raise JamSAMLSOAPError(
+                message=f"Malformed SOAP response: {exc}",
+            ) from exc
         body = soap_root.find(f"{{{NS_SOAP}}}Body")
         if body is None:
             raise JamSAMLSOAPError(
@@ -1624,7 +1637,9 @@ class SAML(BaseSAML):
         self._check_replay(request_id)
 
         name_id_elem = root.find(f"{{{NS_SAML}}}NameID")
-        name_id = name_id_elem.text if name_id_elem is not None else ""
+        name_id = (
+            name_id_elem.text if name_id_elem is not None else None
+        ) or ""
 
         new_id_elem = root.find(f"{{{NS_SAML}}}NewID")
         new_id = new_id_elem.text if new_id_elem is not None else None
@@ -1807,7 +1822,7 @@ class SAML(BaseSAML):
             certificate=self._certificate,
         )
 
-    def parse_metadata(self, metadata_xml: str) -> Any:
+    def parse_metadata(self, metadata_xml: str) -> SAMLMetadata:
         """Parse SAML metadata XML into a SAMLMetadata object.
 
         Args:
@@ -1842,7 +1857,7 @@ def _parse_subject(assertion_elem: ET.Element) -> SAMLSubject | None:
     if subj is None:
         return None
     name_id = subj.find(f"{{{NS_SAML}}}NameID")
-    name_id_text = name_id.text if name_id is not None else ""
+    name_id_text = (name_id.text if name_id is not None else None) or ""
     name_id_format = (
         name_id.get("Format", NAMEID_UNSPECIFIED)
         if name_id is not None

@@ -8,6 +8,7 @@ Zero external dependencies — built on stdlib xml + cryptography.
 
 from typing import Any
 
+from jam.__deprecated__ import deprecated
 from jam.saml.__base__ import BaseSAML
 from jam.saml.saml import SAML
 from jam.saml.types import (
@@ -28,6 +29,7 @@ from jam.saml.types import (
 )
 
 
+@deprecated()
 def create_instance(
     role: str = "sp",
     private_key: str | None = None,

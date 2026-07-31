@@ -70,19 +70,6 @@ sp = SAML(
 )
 ```
 
-You can also use the factory:
-
-```python
-from jam.saml import create_instance
-
-sp = create_instance(
-    role="sp",
-    entity_id="https://sp.example.com",
-    acs_url="https://sp.example.com/acs",
-    idp_public_key="path/to/idp_cert.pem",
-)
-```
-
 ## Service Provider
 
 ### Init
@@ -107,7 +94,7 @@ Method: `sp.prepare_authn_request`
 Args:
 
 * `idp_sso_url`: `str` - IdP single sign-on endpoint URL.
-* `acs_url`: `str` - SP assertion consumer service URL.
+* `acs_url`: `str | None` - SP assertion consumer service URL (defaults to the instance `acs_url`).
 * `binding`: `str = "redirect"` - `"redirect"` or `"post"`.
 * `**kwargs` - `relay_state`, `issuer`, `force_authn`, etc.
 
