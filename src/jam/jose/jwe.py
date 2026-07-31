@@ -66,6 +66,8 @@ class JWE(BaseJWE):
 
         self._alg = alg.upper()
         self._enc = enc.upper()
+        if isinstance(key, JWKClass):
+            key = key._to_keylike()
         self._key = key
         self._password = password
         self._serializer = serializer

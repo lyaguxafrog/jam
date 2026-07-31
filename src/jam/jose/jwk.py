@@ -56,9 +56,6 @@ class JWKRSA(JWKCommon, total=False):
         ... }
     """
 
-    kty: Literal["RSA"]
-    """Key Type. Fixed to "RSA"."""
-
     n: str
     """RSA modulus n. The modulus value for the RSA public key."""
 
@@ -98,9 +95,6 @@ class JWKEC(JWKCommon, total=False):
         ... }
     """
 
-    kty: Literal["EC"]
-    """Key Type. Fixed to "EC"."""
-
     crv: Literal["P-256", "P-384", "P-521"]
     """Elliptic curve name. The curve on which the key is based."""
 
@@ -125,9 +119,6 @@ class JWKOct(JWKCommon, total=False):
         ...     "k": "AyM32w-xOvmxxkBq...",
         ... }
     """
-
-    kty: Literal["oct"]
-    """Key Type. Fixed to "oct"."""
 
     k: str
     """Key value. The base64url-encoded symmetric key value."""

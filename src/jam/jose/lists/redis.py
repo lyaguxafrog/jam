@@ -134,9 +134,11 @@ class RedisList(BaseJWTList):
         """
         if not tokens:
             return {}
-        keys = [self._make_key(t) for t in tokens]
-        exists = self._redis.exists(*keys)
-        return {token: bool(result) for token, result in zip(tokens, exists)}
+        pipe = self._redis.pipeline()
+        for token in tokens:
+            pipe.exists(self._make_key(token))
+        results = pipe.execute()
+        return {token: bool(result) for token, result in zip(tokens, results)}
 
     def delete(self, token: str) -> None:
         """Remove a token from the list.
