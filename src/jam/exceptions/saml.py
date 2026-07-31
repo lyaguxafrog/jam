@@ -46,3 +46,21 @@ class JamSAMLUnsupportedAlgorithm(JamConfigurationError):
 class JamSAMLValidationError(JamValidationError):
     default_message = "SAML assertion validation failed."
     default_code = "saml.validation.assertion_error"
+
+
+class JamSAMLInvalidRecipient(JamError):
+    default_message = (
+        "SAML assertion SubjectConfirmationData Recipient "
+        "does not match the expected ACS URL."
+    )
+    default_code = "saml.invalid_recipient"
+
+
+class JamSAMLReplayDetected(JamError):
+    default_message = "SAML message ID has already been consumed (replay attack)."
+    default_code = "saml.replay_detected"
+
+
+class JamSAMLSOAPError(JamError):
+    default_message = "SAML SOAP/artifact resolution failed."
+    default_code = "saml.soap_error"
